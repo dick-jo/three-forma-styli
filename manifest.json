@@ -1,0 +1,16 @@
+{
+  "name": "Three Forma Styli",
+  "collections": {
+    "Global": {
+      "modes": {
+        "Global": ["global.json"]
+      }
+    },
+    "Theme": {
+      "modes": {
+        "Default": ["default.json"],
+        "Nonon": ["nonon.json"]
+      }
+    }
+  }
+}

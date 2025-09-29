@@ -1,0 +1,24 @@
+{
+  "Color": {
+    "Primary": {
+      "$type": "color",
+      "$value": "#fe9cab"
+    },
+    "Primary-Tr-Invisible": {
+      "$type": "color",
+      "$value": "rgba(254, 156, 171, 0)"
+    },
+    "Primary-Tr-Light": {
+      "$type": "color",
+      "$value": "rgba(254, 156, 171, 0.25)"
+    },
+    "Secondary": {
+      "$type": "color",
+      "$value": "#dfc37b"
+    },
+    "Neutral": {
+      "$type": "color",
+      "$value": "#ecdfe3"
+    }
+  }
+}
