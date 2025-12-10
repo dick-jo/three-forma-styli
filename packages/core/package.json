@@ -1,0 +1,28 @@
+{
+  "name": "@three-forma-styli/core",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Core design token generation library - framework-agnostic, browser and Node.js compatible",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": ["design-tokens", "css-variables", "theming", "oklch", "color"],
+  "author": "three",
+  "license": "ISC",
+  "dependencies": {
+    "culori": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/culori": "^2.1.1",
+    "typescript": "^5.8.2",
+    "vitest": "^2.1.0"
+  }
+}
