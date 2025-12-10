@@ -6,14 +6,7 @@
 
 import type { DesignSystem, GapMode, SpacingMode } from '../types.js';
 import type { TokenValue, GeneratorResult, GeneratorConfig } from './types.js';
-
-/**
- * Get the default mode from an array of modes
- */
-function getDefaultMode<T extends { isDefault?: boolean; name: string }>(modes: T[]): T {
-	const defaultMode = modes.find((m) => m.isDefault);
-	return defaultMode || modes[0];
-}
+import { getDefaultMode } from './utils.js';
 
 /**
  * Properties that are metadata, not actual gap values

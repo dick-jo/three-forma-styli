@@ -8,7 +8,7 @@
 import type { DesignSystem, PartialDesignSystem } from '../types.js';
 import type { IR, TokenValue, GeneratorConfig, GeneratorResult, ModeInfo } from './types.js';
 import { defaultGeneratorConfig } from './types.js';
-import { validateDesignSystem, validatePartialDesignSystem, ValidationError } from './validate.js';
+import { validatePartialDesignSystem, ValidationError } from './validate.js';
 import { generateColorTokens } from './colors.js';
 import { generateSpacingTokens } from './spacing.js';
 import { generateGapTokens } from './gap.js';
@@ -65,55 +65,6 @@ function tokensToRecord(tokens: TokenValue[]): Record<string, TokenValue> {
 		record[token.name] = token;
 	}
 	return record;
-}
-
-/**
- * Determine which mode category a mode belongs to based on which families have it
- */
-function determineModeCategory(
-	modeName: string,
-	results: {
-		colors: GeneratorResult;
-		spacing: GeneratorResult;
-		gap: GeneratorResult;
-		typography: GeneratorResult;
-		borderRadius: GeneratorResult;
-		borderWidth: GeneratorResult;
-		time: GeneratorResult;
-	}
-): 'color' | 'size' | 'time' | null {
-	// Check if it's a color mode
-	if (
-		results.colors.modeInfo.default === modeName ||
-		results.colors.modeInfo.overrides.includes(modeName)
-	) {
-		return 'color';
-	}
-
-	// Check if it's a time mode
-	if (
-		results.time.modeInfo.default === modeName ||
-		results.time.modeInfo.overrides.includes(modeName)
-	) {
-		return 'time';
-	}
-
-	// Check if it's a size mode (spacing, gap, typography, borderRadius, borderWidth)
-	const sizeResults = [
-		results.spacing,
-		results.gap,
-		results.typography,
-		results.borderRadius,
-		results.borderWidth,
-	];
-
-	for (const result of sizeResults) {
-		if (result.modeInfo.default === modeName || result.modeInfo.overrides.includes(modeName)) {
-			return 'size';
-		}
-	}
-
-	return null;
 }
 
 /**

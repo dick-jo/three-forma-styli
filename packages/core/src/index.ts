@@ -67,9 +67,6 @@ export * from './types.js';
 // Color utilities
 export { oklch, oklchToCss, applyTransparency, formatColor, formatColorWithAlpha } from './utils.js';
 
-// Legacy config export
-export { transformerConfig } from './config.js';
-
 // ===========================================
 // CONSTRAINT VALIDATION
 // ===========================================

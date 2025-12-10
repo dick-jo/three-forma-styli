@@ -4,14 +4,7 @@
 
 import type { DesignSystem, BorderRadiusMode, BorderWidthMode, SpacingMode } from '../types.js';
 import type { TokenValue, GeneratorResult, GeneratorConfig, ModeInfo } from './types.js';
-
-/**
- * Get the default mode from an array of modes
- */
-function getDefaultMode<T extends { isDefault?: boolean; name: string }>(modes: T[]): T {
-	const defaultMode = modes.find((m) => m.isDefault);
-	return defaultMode || modes[0];
-}
+import { getDefaultMode } from './utils.js';
 
 // ============================================
 // BORDER RADIUS
