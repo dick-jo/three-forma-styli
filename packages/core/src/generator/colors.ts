@@ -4,7 +4,6 @@
  * Generates color tokens with transparency variants based on schedule
  */
 
-import type { Oklch } from 'culori';
 import type { DesignSystem, ColorMode, TransparencySchedule } from '../types.js';
 import type { TokenValue, GeneratorResult, GeneratorConfig } from './types.js';
 import { formatColor, formatColorWithAlpha } from '../utils.js';
@@ -63,65 +62,37 @@ function generateTokensForMode(
 }
 
 /**
- * Normalize color modes - fill in missing tokens from default mode
+ * Get the transparency schedule for a mode, falling back to system default
  */
-function normalizeColorModes(
-	modes: Array<ColorMode & { name: string }>,
+function getTransparencySchedule(
+	mode: ColorMode & { name: string },
 	systemTransparencySchedule: TransparencySchedule
-): Array<ColorMode & { name: string }> {
-	// Deep clone to avoid mutating original (JSON clone since culori objects aren't structuredClone-able)
-	const normalized = JSON.parse(JSON.stringify(modes)) as Array<ColorMode & { name: string }>;
-
-	const defaultMode = getDefaultMode(normalized);
-	const defaultTokens = defaultMode.tokens;
-	const defaultTransparencySchedule = defaultMode.transparencySchedule || systemTransparencySchedule;
-
-	// Fill in missing tokens and transparency schedules for override modes
-	normalized.forEach((mode) => {
-		if (mode === defaultMode) return;
-
-		// Fill missing tokens from default
-		Object.entries(defaultTokens).forEach(([tokenName, tokenValue]) => {
-			if (tokenValue && (!(tokenName in mode.tokens) || mode.tokens[tokenName] === undefined)) {
-				(mode.tokens as Record<string, Oklch>)[tokenName] = tokenValue;
-			}
-		});
-
-		// Fill missing transparency schedule from default
-		if (!mode.transparencySchedule) {
-			mode.transparencySchedule = defaultTransparencySchedule;
-		}
-	});
-
-	return normalized;
+): TransparencySchedule {
+	return mode.transparencySchedule || systemTransparencySchedule;
 }
 
 /**
  * Generate all color tokens from a DesignSystem
+ *
+ * Default mode generates all tokens (placed in :root).
+ * Override modes only generate tokens for explicitly defined colors
+ * (CSS cascade handles inheritance from :root).
  */
 export function generateColorTokens(
 	colors: DesignSystem['colors'],
 	config: GeneratorConfig
 ): GeneratorResult {
-	const normalizedModes = normalizeColorModes(colors.modes, colors.transparencySchedule);
-	const defaultMode = getDefaultMode(normalizedModes);
-	const overrideModes = normalizedModes.filter((m) => m !== defaultMode);
+	const defaultMode = getDefaultMode(colors.modes);
+	const overrideModes = colors.modes.filter((m) => m !== defaultMode);
 
-	const defaultTransparencySchedule = defaultMode.transparencySchedule || colors.transparencySchedule;
+	const defaultTransparencySchedule = getTransparencySchedule(defaultMode, colors.transparencySchedule);
 	const defaultTokens = generateTokensForMode(defaultMode, defaultTransparencySchedule, config);
 
 	const overrideTokens: Record<string, TokenValue[]> = {};
 	for (const mode of overrideModes) {
-		const modeTransparencySchedule = mode.transparencySchedule || defaultTransparencySchedule;
-		// For overrides, we only generate tokens for colors that were explicitly defined
-		// (not inherited), so we use the original mode from colors.modes
-		const originalMode = colors.modes.find((m) => m.name === mode.name);
-		if (originalMode && Object.keys(originalMode.tokens).length > 0) {
-			overrideTokens[mode.name] = generateTokensForMode(
-				originalMode as ColorMode & { name: string },
-				modeTransparencySchedule,
-				config
-			);
+		if (Object.keys(mode.tokens).length > 0) {
+			const modeTransparencySchedule = getTransparencySchedule(mode, defaultTransparencySchedule);
+			overrideTokens[mode.name] = generateTokensForMode(mode, modeTransparencySchedule, config);
 		}
 	}
 
