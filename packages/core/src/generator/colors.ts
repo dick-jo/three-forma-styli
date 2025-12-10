@@ -69,8 +69,8 @@ function normalizeColorModes(
 	modes: Array<ColorMode & { name: string }>,
 	systemTransparencySchedule: TransparencySchedule
 ): Array<ColorMode & { name: string }> {
-	// Deep clone to avoid mutating original
-	const normalized = structuredClone(modes);
+	// Deep clone to avoid mutating original (JSON clone since culori objects aren't structuredClone-able)
+	const normalized = JSON.parse(JSON.stringify(modes)) as Array<ColorMode & { name: string }>;
 
 	const defaultMode = getDefaultMode(normalized);
 	const defaultTokens = defaultMode.tokens;
