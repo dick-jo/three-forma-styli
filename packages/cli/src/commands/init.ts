@@ -158,9 +158,7 @@ async function getAvailableThemes(themesBasePath: string): Promise<Array<{ name:
     if (entry.isDirectory()) {
       // Could read a theme.json for description in future
       const descriptions: Record<string, string> = {
-        'default': 'Clean, minimal starting point',
-        'scatter-2': 'Extended palette with network colors',
-        'scatter-3': 'Alternative style variant',
+        'default': 'Clean, minimal dark theme',
       };
       themes.push({
         name: entry.name,
@@ -200,7 +198,9 @@ export const config: GeneratorConfig = {
 
   // selectors: {
   //   root: ":root",
-  //   themeMode: '[data-theme-mode="{mode}"]',
+  //   colorMode: '[data-color-mode="{mode}"]',
+  //   sizeMode: '[data-size-mode="{mode}"]',
+  //   timeMode: '[data-time-mode="{mode}"]',
   // },
 };
 `;

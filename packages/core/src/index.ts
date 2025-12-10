@@ -16,7 +16,7 @@ export type { CssTransformerConfig } from './transformers/index.js';
 // CONVENIENCE FUNCTION
 // ===========================================
 
-import type { DesignSystem, GeneratorConfig as LegacyGeneratorConfig } from './types.js';
+import type { DesignSystem } from './types.js';
 import type { GeneratorConfig } from './generator/index.js';
 import type { CssTransformerConfig } from './transformers/index.js';
 import { generate } from './generator/index.js';
