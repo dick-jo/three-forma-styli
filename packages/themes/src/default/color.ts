@@ -1,8 +1,9 @@
 // Color system configuration
-import { ColorMode, DesignSystem, TransparencySchedule, oklch } from "@three-forma-styli/core";
+import { ColorMode, DesignSystem, AlphaSchedule, oklch } from "@three-forma-styli/core";
 
-// Define transparency schedule
-export const TRANSPARENCY_SCHEDULE: TransparencySchedule = {
+// Define alpha schedule (least opaque to most opaque)
+export const ALPHA_SCHEDULE: AlphaSchedule = {
+  non: 0,
   min: 0.07,
   "lo-x": 0.125,
   lo: 0.25,
@@ -18,13 +19,13 @@ export const COLOR_MODES: Record<string, ColorMode> = {
     tokens: {
       bg: oklch(0.2603, 0.0000, 129.63),      // Very dark background
       ev: oklch(0.2935, 0.0018, 286.29),      // Elevated surface
-      primary: oklch(0.7969, 0.1178, 296.37), // Purple/pink brand color
-      neutral: oklch(0.9302, 0.0371, 299.19), // Light desaturated purple
+      pri: oklch(0.7969, 0.1178, 296.37),     // Purple/pink brand color
+      neu: oklch(0.9302, 0.0371, 299.19),     // Light desaturated purple
       ink: oklch(0.9333, 0.0371, 299.20),     // Text/icons
-      positive: oklch(0.7625, 0.2030, 150.49), // Green
-      negative: oklch(0.6875, 0.2113, 7.38),   // Red
+      pos: oklch(0.7625, 0.2030, 150.49),     // Green
+      neg: oklch(0.6875, 0.2113, 7.38),       // Red
     },
-    transparencySchedule: TRANSPARENCY_SCHEDULE,
+    alphaSchedule: ALPHA_SCHEDULE,
   },
 };
 
@@ -34,5 +35,5 @@ export const color: DesignSystem["colors"] = {
     name,
     ...mode,
   })),
-  transparencySchedule: TRANSPARENCY_SCHEDULE,
+  alphaSchedule: ALPHA_SCHEDULE,
 };

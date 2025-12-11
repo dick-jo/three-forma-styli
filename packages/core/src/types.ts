@@ -11,39 +11,26 @@ import type { Oklch } from "culori";
  * - C (chroma): 0-0.5 typical range (saturation)
  * - H (hue): 0-360 degrees
  *
- * Required core colors (7):
+ * Recommended core colors (7):
  * - bg: Page background
  * - ev: Elevated surfaces (cards, panels)
- * - primary: Main brand/action color
- * - neutral: Achromatic scale (grays)
+ * - pri: Main brand/action color
+ * - neu: Achromatic scale (grays)
  * - ink: Text and icons
- * - positive: Success/positive sentiment
- * - negative: Error/negative sentiment
+ * - pos: Success/positive sentiment
+ * - neg: Error/negative sentiment
  *
- * Extended colors (optional):
- * Any additional colors (accent, warning, twitter, etc.)
+ * But you can use any color names you want.
  */
-export interface ColorTokens {
-  // Required core colors
-  bg: Oklch;
-  ev: Oklch;
-  primary: Oklch;
-  neutral: Oklch;
-  ink: Oklch;
-  positive: Oklch;
-  negative: Oklch;
-
-  // Extended colors (any additional colors)
-  [tokenName: string]: Oklch;
-}
+export type ColorTokens = Record<string, Oklch>;
 
 /**
- * Default color mode - requires all core color tokens
+ * Default color mode - defines the base color tokens
  */
 export interface DefaultColorMode {
   isDefault: true;
   tokens: ColorTokens;
-  transparencySchedule?: TransparencySchedule;
+  alphaSchedule?: AlphaSchedule;
 }
 
 /**
@@ -51,8 +38,8 @@ export interface DefaultColorMode {
  */
 export interface OverrideColorMode {
   isDefault?: false;
-  tokens: Partial<ColorTokens>;  // Only override what changes
-  transparencySchedule?: TransparencySchedule;
+  tokens: ColorTokens;  // Partial by nature - only override what changes
+  alphaSchedule?: AlphaSchedule;
 }
 
 /**
@@ -61,20 +48,17 @@ export interface OverrideColorMode {
 export type ColorMode = DefaultColorMode | OverrideColorMode;
 
 /**
- * Transparency schedule defines opacity levels for alpha variants.
- * Each key becomes a suffix (e.g., "lo" -> --clr-primary-a-lo)
+ * Alpha schedule defines opacity levels for alpha variants.
+ * Each key becomes a suffix (e.g., "lo" -> --clr-pri-a-lo)
  * Each value is between 0 (fully transparent) and 1 (fully opaque).
  *
- * Recommended schedule:
- *   { min: 0.07, "lo-x": 0.125, lo: 0.25, hi: 0.68, "hi-x": 0.85, max: 0.93 }
+ * Recommended schedule (least opaque to most opaque):
+ *   { non: 0, min: 0.07, "lo-x": 0.125, lo: 0.25, hi: 0.68, "hi-x": 0.85, max: 0.93 }
  *
  * Simple alternative:
- *   { low: 0.25, high: 0.75 }
- *
- * Percentage-based:
- *   { "10": 0.1, "25": 0.25, "50": 0.5, "75": 0.75, "90": 0.9 }
+ *   { non: 0, low: 0.25, high: 0.75 }
  */
-export interface TransparencySchedule {
+export interface AlphaSchedule {
   [level: string]: number;
 }
 
@@ -192,7 +176,7 @@ export interface TimeMode {
 export interface DesignSystem {
   colors: {
     modes: Array<ColorMode & { name: string }>;
-    transparencySchedule: TransparencySchedule;
+    alphaSchedule: AlphaSchedule;
   };
   spacing: {
     modes: Array<SpacingMode & { name: string }>;
@@ -223,7 +207,7 @@ export interface DesignSystem {
  * const ir = generate({
  *   colors: {
  *     modes: [{ name: 'default', isDefault: true, tokens: { bg, primary, ink } }],
- *     transparencySchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 },
+ *     alphaSchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 },
  *   },
  * });
  * ```
@@ -231,7 +215,7 @@ export interface DesignSystem {
 export interface PartialDesignSystem {
   colors?: {
     modes: Array<ColorMode & { name: string }>;
-    transparencySchedule: TransparencySchedule;
+    alphaSchedule: AlphaSchedule;
   };
   spacing?: {
     modes: Array<SpacingMode & { name: string }>;

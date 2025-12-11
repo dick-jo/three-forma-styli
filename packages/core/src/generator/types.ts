@@ -32,11 +32,11 @@ export interface TokenValue {
 }
 
 export interface TokenMetadata {
-	/** For color tokens: is this a transparency variant? */
-	isTransparencyVariant?: boolean;
+	/** For color tokens: is this an alpha variant? */
+	isAlphaVariant?: boolean;
 
-	/** For color tokens: which transparency level (min, lo, hi, etc.) */
-	transparencyLevel?: string;
+	/** For color tokens: which alpha level (min, lo, hi, etc.) */
+	alphaLevel?: string;
 
 	/** For color tokens: the base color this variant derives from */
 	baseColor?: string;

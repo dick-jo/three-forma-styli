@@ -4,7 +4,7 @@
  * Validates inputs at the generator entry point and throws helpful errors.
  */
 
-import type { DesignSystem, PartialDesignSystem, TransparencySchedule } from '../types.js';
+import type { DesignSystem, PartialDesignSystem, AlphaSchedule } from '../types.js';
 
 export class ValidationError extends Error {
 	constructor(message: string) {
@@ -99,13 +99,13 @@ function validateColorsPartial(colors: NonNullable<PartialDesignSystem['colors']
 		}
 	});
 
-	if (colors.transparencySchedule) {
-		validateTransparencySchedule(colors.transparencySchedule, 'colors.transparencySchedule');
+	if (colors.alphaSchedule) {
+		validateAlphaSchedule(colors.alphaSchedule, 'colors.alphaSchedule');
 	}
 
 	colors.modes.forEach((mode) => {
-		if (mode.transparencySchedule) {
-			validateTransparencySchedule(mode.transparencySchedule, `colors.modes["${mode.name}"].transparencySchedule`);
+		if (mode.alphaSchedule) {
+			validateAlphaSchedule(mode.alphaSchedule, `colors.modes["${mode.name}"].alphaSchedule`);
 		}
 	});
 }
@@ -279,11 +279,11 @@ function validateTimePartial(time: NonNullable<PartialDesignSystem['time']>): vo
 	});
 }
 
-function validateTransparencySchedule(schedule: TransparencySchedule, path: string): void {
+function validateAlphaSchedule(schedule: AlphaSchedule, path: string): void {
 	const entries = Object.entries(schedule);
 
 	if (entries.length === 0) {
-		throw new ValidationError(`${path} must have at least one transparency level`);
+		throw new ValidationError(`${path} must have at least one alpha level`);
 	}
 
 	for (const [level, value] of entries) {

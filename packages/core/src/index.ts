@@ -65,7 +65,7 @@ export * from './types.js';
 // ===========================================
 
 // Color utilities
-export { oklch, oklchToCss, applyTransparency, formatColor, formatColorWithAlpha } from './utils.js';
+export { oklch, oklchToCss, applyAlpha, formatColor, formatColorWithAlpha } from './utils.js';
 
 // Re-export Oklch type from culori for TypeScript consumers
 export type { Oklch } from 'culori';

@@ -9,7 +9,7 @@ TFS is an opinionated design token generator. It takes user-defined theme inputs
 ### Philosophy
 
 1. **Luminosity-First Design** - Lightness relationships determine readability. When luminosity is correct, hue choices become flexible.
-2. **Transparency-Based Variations** - Instead of generating solid color variants (blue-100, blue-200...), use transparency variants of base colors.
+2. **Alpha-Based Variations** - Instead of generating solid color variants (blue-100, blue-200...), use alpha/transparency variants of base colors.
 3. **Ergonomic Abstraction** - Limit choices to enforce consistency. Spacing scales, gap shortcuts, and semantic naming reduce decision fatigue.
 4. **Runtime Theming** - CSS custom properties enable theme switching without reloading.
 
@@ -71,12 +71,12 @@ Modes are grouped into categories that share output selectors:
 
 ### Colors
 
-**Philosophy:** Transparency-driven variations. User provides root colors, generator creates transparency variants.
+**Philosophy:** Alpha-driven variations. User provides root colors, generator creates alpha variants.
 
 **Input:**
 ```typescript
 interface ColorSystem {
-  transparencySchedule: TransparencySchedule;  // Default for all modes
+  alphaSchedule: AlphaSchedule;  // Default for all modes
   modes: ColorMode[];
 }
 
@@ -84,10 +84,10 @@ interface ColorMode {
   name: string;
   isDefault?: boolean;
   tokens: Record<string, Oklch>;  // Arbitrary color names (not enforced)
-  transparencySchedule?: TransparencySchedule;  // Override per mode
+  alphaSchedule?: AlphaSchedule;  // Override per mode
 }
 
-interface TransparencySchedule {
+interface AlphaSchedule {
   min: number;    // e.g., 0.07
   'lo-x': number; // e.g., 0.125
   lo: number;     // e.g., 0.25
@@ -100,7 +100,7 @@ interface TransparencySchedule {
 **Generation Rules:**
 - For each color in `tokens`, generate:
   - Base color: `{prefix}-{name}` (e.g., `--clr-bg`)
-  - Transparency variants: `{prefix}-{name}-a-{level}` for each level in schedule
+  - Alpha variants: `{prefix}-{name}-a-{level}` for each level in schedule
 
 **Conventions (documented, not enforced):**
 - Background colors: `bg`, `ev` (elevation)
@@ -110,7 +110,7 @@ interface TransparencySchedule {
 **Mode Inheritance:**
 - Override modes only define colors they want to change
 - Missing colors inherit from default mode
-- Missing transparencySchedule inherits from default mode or system default
+- Missing alphaSchedule inherits from default mode or system default
 
 ---
 
@@ -373,8 +373,8 @@ interface TokenValue {
   unit?: string;            // 'px', 'rem', 'ms', etc.
   reference?: string;       // For gaps: 'sp-1' (what user defined)
   metadata?: {
-    isTransparencyVariant?: boolean;
-    transparencyLevel?: string;
+    isAlphaVariant?: boolean;
+    alphaLevel?: string;
     baseColor?: string;
   };
 }
@@ -386,7 +386,7 @@ Performed at generator entry point:
 
 - DesignSystem must have at least one mode per token family
 - Each token family must have exactly one default mode (or first mode is used)
-- Transparency values must be between 0 and 1
+- Alpha values must be between 0 and 1
 - Numeric values must be positive
 - Required fields must be present
 

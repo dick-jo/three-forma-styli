@@ -57,10 +57,10 @@ export function oklchToRgb(oklchColor: Oklch): string {
 }
 
 /**
- * Apply transparency to OKLCH color
+ * Apply alpha to OKLCH color
  * Returns oklch() string with alpha channel
  */
-export function applyTransparency(oklchColor: Oklch, opacity: number): string {
+export function applyAlpha(oklchColor: Oklch, opacity: number): string {
   // Map to sRGB gamut
   const gamutMappedRgb = toGamutMappedRgb(oklchColor);
   // Convert back to OKLCH for CSS output
@@ -76,9 +76,9 @@ export function applyTransparency(oklchColor: Oklch, opacity: number): string {
 }
 
 /**
- * Apply transparency to OKLCH color and return as rgba() string
+ * Apply alpha to OKLCH color and return as rgba() string
  */
-export function applyTransparencyRgba(oklchColor: Oklch, opacity: number): string {
+export function applyAlphaRgba(oklchColor: Oklch, opacity: number): string {
   const gamutMappedRgb = toGamutMappedRgb(oklchColor);
   const r = Math.round(gamutMappedRgb.r * 255);
   const g = Math.round(gamutMappedRgb.g * 255);
@@ -90,9 +90,9 @@ export function applyTransparencyRgba(oklchColor: Oklch, opacity: number): strin
 }
 
 /**
- * Apply transparency to OKLCH color and return as 8-digit hex with alpha
+ * Apply alpha to OKLCH color and return as 8-digit hex with alpha
  */
-export function applyTransparencyHexa(oklchColor: Oklch, opacity: number): string {
+export function applyAlphaHexa(oklchColor: Oklch, opacity: number): string {
   const gamutMappedRgb = toGamutMappedRgb(oklchColor);
   const hex = formatHex(gamutMappedRgb);
   const alpha = Math.round(opacity * 255).toString(16).padStart(2, '0');
@@ -128,11 +128,11 @@ export function formatColorWithAlpha(
 ): string {
   switch (format) {
     case 'rgba':
-      return applyTransparencyRgba(oklchColor, opacity);
+      return applyAlphaRgba(oklchColor, opacity);
     case 'hexa':
-      return applyTransparencyHexa(oklchColor, opacity);
+      return applyAlphaHexa(oklchColor, opacity);
     case 'oklch':
     default:
-      return applyTransparency(oklchColor, opacity);
+      return applyAlpha(oklchColor, opacity);
   }
 }

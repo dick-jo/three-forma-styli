@@ -1,10 +1,10 @@
 /**
  * Color token generator
  *
- * Generates color tokens with transparency variants based on schedule
+ * Generates color tokens with alpha variants based on schedule
  */
 
-import type { DesignSystem, ColorMode, TransparencySchedule } from '../types.js';
+import type { DesignSystem, ColorMode, AlphaSchedule } from '../types.js';
 import type { TokenValue, GeneratorResult, GeneratorConfig } from './types.js';
 import { formatColor, formatColorWithAlpha } from '../utils.js';
 import { getDefaultMode } from './utils.js';
@@ -14,7 +14,7 @@ import { getDefaultMode } from './utils.js';
  */
 function generateTokensForMode(
 	mode: ColorMode & { name: string },
-	transparencySchedule: TransparencySchedule | undefined,
+	alphaSchedule: AlphaSchedule | undefined,
 	config: GeneratorConfig
 ): TokenValue[] {
 	const prefix = config.prefixes.color;
@@ -35,17 +35,17 @@ function generateTokensForMode(
 			},
 		});
 
-		// Transparency variants (skip if no schedule provided)
-		if (!transparencySchedule) return;
-		Object.entries(transparencySchedule).forEach(([level, alpha]) => {
+		// Alpha variants (skip if no schedule provided)
+		if (!alphaSchedule) return;
+		Object.entries(alphaSchedule).forEach(([level, alpha]) => {
 			tokens.push({
 				family: 'color',
 				name: `${prefix}-${colorName}-${alphaModifier}-${level}`,
 				value: formatColorWithAlpha(color, alpha, config.colorFormat.alpha),
 				rawValue: alpha,
 				metadata: {
-					isTransparencyVariant: true,
-					transparencyLevel: level,
+					isAlphaVariant: true,
+					alphaLevel: level,
 					baseColor: colorName,
 				},
 			});
@@ -56,13 +56,13 @@ function generateTokensForMode(
 }
 
 /**
- * Get the transparency schedule for a mode, falling back to system default
+ * Get the alpha schedule for a mode, falling back to system default
  */
-function getTransparencySchedule(
+function getAlphaSchedule(
 	mode: ColorMode & { name: string },
-	systemTransparencySchedule: TransparencySchedule | undefined
-): TransparencySchedule | undefined {
-	return mode.transparencySchedule || systemTransparencySchedule;
+	systemAlphaSchedule: AlphaSchedule | undefined
+): AlphaSchedule | undefined {
+	return mode.alphaSchedule || systemAlphaSchedule;
 }
 
 /**
@@ -79,14 +79,14 @@ export function generateColorTokens(
 	const defaultMode = getDefaultMode(colors.modes);
 	const overrideModes = colors.modes.filter((m) => m !== defaultMode);
 
-	const defaultTransparencySchedule = getTransparencySchedule(defaultMode, colors.transparencySchedule);
-	const defaultTokens = generateTokensForMode(defaultMode, defaultTransparencySchedule, config);
+	const defaultAlphaSchedule = getAlphaSchedule(defaultMode, colors.alphaSchedule);
+	const defaultTokens = generateTokensForMode(defaultMode, defaultAlphaSchedule, config);
 
 	const overrideTokens: Record<string, TokenValue[]> = {};
 	for (const mode of overrideModes) {
 		if (Object.keys(mode.tokens).length > 0) {
-			const modeTransparencySchedule = getTransparencySchedule(mode, defaultTransparencySchedule);
-			overrideTokens[mode.name] = generateTokensForMode(mode, modeTransparencySchedule, config);
+			const modeAlphaSchedule = getAlphaSchedule(mode, defaultAlphaSchedule);
+			overrideTokens[mode.name] = generateTokensForMode(mode, modeAlphaSchedule, config);
 		}
 	}
 

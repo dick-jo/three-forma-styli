@@ -7,7 +7,7 @@ Generate CSS custom properties from TypeScript-defined design systems. Built for
 ## Philosophy
 
 1. **Luminance-First Design** - Lightness relationships determine readability. When luminance is correct, hue choices become flexible.
-2. **Transparency-Based Variations** - Instead of generating solid color variants (blue-100, blue-200...), use transparency variants of base colors.
+2. **Alpha-Based Variations** - Instead of generating solid color variants (blue-100, blue-200...), use alpha/transparency variants of base colors.
 3. **Ergonomic Abstraction** - Limit choices to enforce consistency. Spacing scales, gap shortcuts, and semantic naming reduce decision fatigue.
 4. **Runtime Theming** - CSS custom properties enable theme switching without page reload.
 
@@ -59,7 +59,7 @@ tfs build . --output tokens.css
 
 ### Colors
 
-Define root colors, get transparency variants automatically:
+Define root colors, get alpha variants automatically:
 
 ```typescript
 colors: {
@@ -76,7 +76,7 @@ colors: {
       negative: oklch(0.65, 0.20, 15)
     }
   }],
-  transparencySchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 }
+  alphaSchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 }
 }
 ```
 
@@ -237,7 +237,7 @@ pnpm --filter @three-forma-styli/core test
 
 **Why "ev" instead of "surface"?** Shorter for hand-coding. Emphasizes z-index relationship (elevation above background).
 
-**Why transparency variants instead of solid color scales?** Fewer tokens, consistent relationships, works with any base color.
+**Why alpha variants instead of solid color scales?** Fewer tokens, consistent relationships, works with any base color.
 
 **Why multiplicative spacing but additive typography?** Spacing needs harmonic ratios (8, 16, 24...). Typography needs consistent visual steps (14px, 16px, 18px...).
 

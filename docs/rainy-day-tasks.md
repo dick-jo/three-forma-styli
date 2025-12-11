@@ -15,7 +15,8 @@ Low-priority cleanup and consistency tasks to tackle when time permits.
 
 - [ ] Add tests for validatePartialDesignSystem
 - [ ] Add tests for generate() with partial inputs
-- [ ] Add tests for flexible TransparencySchedule keys
+- [x] Rename TransparencySchedule → AlphaSchedule (terminology consistency)
+- [ ] Add tests for flexible AlphaSchedule keys
 
 ## Documentation
 

@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { generateColorTokens } from './colors.js';
 import { defaultGeneratorConfig } from './types.js';
-import type { DesignSystem, TransparencySchedule } from '../types.js';
+import type { DesignSystem, AlphaSchedule } from '../types.js';
 
-const defaultTransparencySchedule: TransparencySchedule = {
+const defaultAlphaSchedule: AlphaSchedule = {
 	min: 0.07,
 	'lo-x': 0.125,
 	lo: 0.25,
@@ -14,7 +14,7 @@ const defaultTransparencySchedule: TransparencySchedule = {
 
 describe('generateColorTokens', () => {
 	const basicColors: DesignSystem['colors'] = {
-		transparencySchedule: defaultTransparencySchedule,
+		alphaSchedule: defaultAlphaSchedule,
 		modes: [
 			{
 				name: 'default',
@@ -43,10 +43,10 @@ describe('generateColorTokens', () => {
 		expect(primaryToken).toBeDefined();
 	});
 
-	it('generates transparency variants for each color', () => {
+	it('generates alpha variants for each color', () => {
 		const result = generateColorTokens(basicColors, defaultGeneratorConfig);
 
-		// Check that bg has all transparency variants
+		// Check that bg has all alpha variants
 		const bgAlphaMin = result.defaultTokens.find((t) => t.name === 'clr-bg-a-min');
 		const bgAlphaLo = result.defaultTokens.find((t) => t.name === 'clr-bg-a-lo');
 		const bgAlphaHi = result.defaultTokens.find((t) => t.name === 'clr-bg-a-hi');
@@ -58,13 +58,13 @@ describe('generateColorTokens', () => {
 		expect(bgAlphaMax).toBeDefined();
 	});
 
-	it('includes transparency metadata on alpha variants', () => {
+	it('includes alpha metadata on alpha variants', () => {
 		const result = generateColorTokens(basicColors, defaultGeneratorConfig);
 
 		const bgAlphaLo = result.defaultTokens.find((t) => t.name === 'clr-bg-a-lo');
 
-		expect(bgAlphaLo?.metadata?.isTransparencyVariant).toBe(true);
-		expect(bgAlphaLo?.metadata?.transparencyLevel).toBe('lo');
+		expect(bgAlphaLo?.metadata?.isAlphaVariant).toBe(true);
+		expect(bgAlphaLo?.metadata?.alphaLevel).toBe('lo');
 		expect(bgAlphaLo?.metadata?.baseColor).toBe('bg');
 	});
 
@@ -117,7 +117,7 @@ describe('generateColorTokens', () => {
 
 	describe('mode handling', () => {
 		const multiModeColors: DesignSystem['colors'] = {
-			transparencySchedule: defaultTransparencySchedule,
+			alphaSchedule: defaultAlphaSchedule,
 			modes: [
 				{
 					name: 'light',
@@ -179,10 +179,10 @@ describe('generateColorTokens', () => {
 		});
 	});
 
-	describe('transparency schedule override', () => {
-		it('allows mode-specific transparency schedule', () => {
+	describe('alpha schedule override', () => {
+		it('allows mode-specific alpha schedule', () => {
 			const colorsWithModeSchedule: DesignSystem['colors'] = {
-				transparencySchedule: defaultTransparencySchedule,
+				alphaSchedule: defaultAlphaSchedule,
 				modes: [
 					{
 						name: 'default',
@@ -196,7 +196,7 @@ describe('generateColorTokens', () => {
 							positive: { mode: 'oklch', l: 0.76, c: 0.2, h: 150 },
 							negative: { mode: 'oklch', l: 0.69, c: 0.21, h: 7 },
 						},
-						transparencySchedule: {
+						alphaSchedule: {
 							min: 0.1, // Different from system default
 							'lo-x': 0.2,
 							lo: 0.3,

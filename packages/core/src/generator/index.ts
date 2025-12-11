@@ -80,7 +80,7 @@ function tokensToRecord(tokens: TokenValue[]): Record<string, TokenValue> {
  * const ir = generate({
  *   colors: {
  *     modes: [{ name: 'default', isDefault: true, tokens: { bg, primary, ink } }],
- *     transparencySchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 },
+ *     alphaSchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 },
  *   },
  * });
  * ```
