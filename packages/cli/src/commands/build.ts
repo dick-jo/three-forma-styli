@@ -4,6 +4,7 @@ import os from 'os';
 import chalk from 'chalk';
 import * as esbuild from 'esbuild';
 import { generateCss, type DesignSystem, type GenerateCssConfig } from '@three-forma-styli/core';
+import { CLI_VERSION } from '../version.js';
 
 export interface BuildOptions {
   output?: string;
@@ -91,9 +92,36 @@ export async function buildCommand(filePath: string, options: BuildOptions): Pro
       process.exit(1);
     }
 
-    // Generate CSS
+    // Generate CSS with file header
     console.log(chalk.cyan('Generating CSS variables...'));
-    const css = generateCss(designSystem, userConfig || undefined);
+
+    // Build final config with file header
+    // User can disable header by setting fileHeader: false in their config
+    const finalConfig: GenerateCssConfig = {
+      ...userConfig,
+    };
+
+    if (userConfig?.fileHeader === false) {
+      // User explicitly disabled header
+      finalConfig.fileHeader = false;
+    } else if (userConfig?.fileHeader && typeof userConfig.fileHeader === 'object') {
+      // User provided custom header config - merge with defaults
+      // User values override our defaults
+      finalConfig.fileHeader = {
+        toolName: userConfig.fileHeader.toolName || 'three-forma-styli',
+        toolVersion: userConfig.fileHeader.toolVersion || CLI_VERSION,
+        includeTimestamp: userConfig.fileHeader.includeTimestamp,
+        customLines: userConfig.fileHeader.customLines,
+      };
+    } else {
+      // No user config for header - use defaults
+      finalConfig.fileHeader = {
+        toolName: 'three-forma-styli',
+        toolVersion: CLI_VERSION,
+      };
+    }
+
+    const css = generateCss(designSystem, finalConfig);
 
     // Output
     if (options.output) {

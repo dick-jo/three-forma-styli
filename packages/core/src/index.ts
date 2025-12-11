@@ -10,7 +10,11 @@ export type { IR, TokenValue, GeneratorConfig, GeneratorResult, ModeInfo } from 
 
 // Transformers - convert IR to output formats
 export { toCss, defaultCssConfig } from './transformers/index.js';
-export type { CssTransformerConfig } from './transformers/index.js';
+export type { CssTransformerConfig, FileHeaderConfig } from './transformers/index.js';
+
+// Header utilities (for building custom transformers)
+export { getHeaderLines, formatHeaderComment } from './transformers/index.js';
+export type { FileHeaderInfo, CommentStyle } from './transformers/index.js';
 
 // ===========================================
 // CONVENIENCE FUNCTION

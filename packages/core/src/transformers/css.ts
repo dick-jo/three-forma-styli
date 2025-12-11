@@ -5,6 +5,25 @@
  */
 
 import type { IR, TokenValue } from '../generator/types.js';
+import type { FileHeaderInfo } from '../header.js';
+import { getHeaderLines, formatHeaderComment } from '../header.js';
+
+/**
+ * File header configuration for generated output
+ */
+export interface FileHeaderConfig {
+	/** Tool name (e.g., "three-forma-styli") */
+	toolName: string;
+
+	/** Tool version (e.g., "0.1.2") */
+	toolVersion: string;
+
+	/** Include generation timestamp (default: false) */
+	includeTimestamp?: boolean;
+
+	/** Additional custom lines to include */
+	customLines?: string[];
+}
 
 /**
  * CSS Transformer configuration
@@ -17,6 +36,13 @@ export interface CssTransformerConfig {
 		sizeMode?: string;
 		timeMode?: string;
 	};
+
+	/**
+	 * File header configuration.
+	 * Set to false to disable header entirely.
+	 * If not provided, no header is added (caller must provide config to enable).
+	 */
+	fileHeader?: FileHeaderConfig | false;
 }
 
 /**
@@ -32,8 +58,9 @@ const defaultSelectors: ResolvedCssConfig['selectors'] = {
 /**
  * Default CSS transformer configuration (exported for reference)
  */
-export const defaultCssConfig: Required<CssTransformerConfig> = {
+export const defaultCssConfig: CssTransformerConfig = {
 	selectors: defaultSelectors,
+	// fileHeader is undefined by default (no header unless caller provides config)
 };
 
 /**
@@ -117,11 +144,36 @@ function formatTokensAsCss(tokens: Record<string, TokenValue>): string[] {
 }
 
 /**
+ * Generate file header if configured
+ */
+function generateHeader(fileHeaderConfig: FileHeaderConfig | false | undefined): string {
+	if (fileHeaderConfig === false || fileHeaderConfig === undefined) {
+		return '';
+	}
+
+	const headerInfo: FileHeaderInfo = {
+		toolName: fileHeaderConfig.toolName,
+		toolVersion: fileHeaderConfig.toolVersion,
+		timestamp: fileHeaderConfig.includeTimestamp ? new Date() : undefined,
+		customLines: fileHeaderConfig.customLines,
+	};
+
+	const lines = getHeaderLines(headerInfo);
+	return formatHeaderComment(lines, 'block');
+}
+
+/**
  * Transform IR to CSS string
  */
 export function toCss(ir: IR, userConfig?: Partial<CssTransformerConfig>): string {
 	const config = mergeConfig(userConfig);
 	const blocks: string[] = [];
+
+	// Add file header if configured
+	const header = generateHeader(userConfig?.fileHeader);
+	if (header) {
+		blocks.push(header.trimEnd()); // Remove trailing newlines, we'll add separator
+	}
 
 	// Generate :root block with all default tokens
 	const rootVars = formatTokensAsCss(ir.tokens);

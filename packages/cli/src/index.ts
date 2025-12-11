@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { initCommand } from './commands/init.js';
 import { buildCommand } from './commands/build.js';
+import { CLI_VERSION } from './version.js';
 
 const program = new Command();
 
@@ -14,7 +15,7 @@ console.log(chalk.magenta('Design token generator\n'));
 program
   .name('tfs')
   .description('TypeScript-first design token generator with luminosity-based color control')
-  .version('1.0.0');
+  .version(CLI_VERSION);
 
 // Init command
 program
