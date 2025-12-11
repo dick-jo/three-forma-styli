@@ -14,7 +14,7 @@ import { getDefaultMode } from './utils.js';
  */
 function generateTokensForMode(
 	mode: ColorMode & { name: string },
-	transparencySchedule: TransparencySchedule,
+	transparencySchedule: TransparencySchedule | undefined,
 	config: GeneratorConfig
 ): TokenValue[] {
 	const prefix = config.prefixes.color;
@@ -35,7 +35,8 @@ function generateTokensForMode(
 			},
 		});
 
-		// Transparency variants
+		// Transparency variants (skip if no schedule provided)
+		if (!transparencySchedule) return;
 		Object.entries(transparencySchedule).forEach(([level, alpha]) => {
 			tokens.push({
 				family: 'color',
@@ -59,8 +60,8 @@ function generateTokensForMode(
  */
 function getTransparencySchedule(
 	mode: ColorMode & { name: string },
-	systemTransparencySchedule: TransparencySchedule
-): TransparencySchedule {
+	systemTransparencySchedule: TransparencySchedule | undefined
+): TransparencySchedule | undefined {
 	return mode.transparencySchedule || systemTransparencySchedule;
 }
 

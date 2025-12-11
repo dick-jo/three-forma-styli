@@ -5,9 +5,11 @@ import { input, select } from '@inquirer/prompts';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { execSync } from 'child_process';
+import { createRequire } from 'module';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const require = createRequire(import.meta.url);
 
 export interface InitOptions {
   theme?: string;
@@ -39,7 +41,9 @@ export async function initCommand(projectName?: string, options: InitOptions = {
     }
 
     // Step 3: Get available themes
-    const themesBasePath = path.join(__dirname, '../../node_modules/@three-forma-styli/themes/src');
+    // Use require.resolve to find themes package regardless of install location
+    const themesPackagePath = path.dirname(require.resolve('@three-forma-styli/themes/package.json'));
+    const themesBasePath = path.join(themesPackagePath, 'src');
     const availableThemes = await getAvailableThemes(themesBasePath);
 
     if (availableThemes.length === 0) {
@@ -247,7 +251,7 @@ function generatePackageJson(projectName: string): string {
     private: true,
     type: "module",
     dependencies: {
-      "@three-forma-styli/core": "^1.0.0"
+      "@three-forma-styli/core": "latest"
     }
   }, null, 2) + '\n';
 }

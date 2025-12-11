@@ -1,10 +1,10 @@
 import { DesignSystem } from "@three-forma-styli/core";
-import { color } from "./color";
-import { spacing } from "./spacing";
-import { gap } from "./gap";
-import { typography } from "./typography";
-import { border } from "./border";
-import { time } from "./time";
+import { color } from "./color.js";
+import { spacing } from "./spacing.js";
+import { gap } from "./gap.js";
+import { typography } from "./typography.js";
+import { border } from "./border.js";
+import { time } from "./time.js";
 
 // Default starter theme - a complete, ready-to-use design system
 export const designSystem: DesignSystem = {

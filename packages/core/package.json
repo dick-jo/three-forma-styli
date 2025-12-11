@@ -1,10 +1,16 @@
 {
   "name": "@three-forma-styli/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Core design token generation library - framework-agnostic, browser and Node.js compatible",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
