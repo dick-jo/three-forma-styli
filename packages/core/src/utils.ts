@@ -1,6 +1,6 @@
 // src/utils.ts
-import { toGamut, oklch as toOklch, formatHex, formatRgb, converter } from "culori";
-import type { Oklch, Rgb } from "culori";
+import { toGamut, formatHex, formatRgb } from "culori";
+import type { Oklch, P3, Rgb } from "culori";
 
 /**
  * Create an OKLCH color object
@@ -21,19 +21,18 @@ function toGamutMappedRgb(oklchColor: Oklch): Rgb {
 }
 
 /**
- * Convert OKLCH color to CSS oklch() string
- * Applies gamut mapping to ensure color is displayable in sRGB
+ * Convert OKLCH color to CSS oklch() string.
+ *
+ * Preserves author intent — no gamut mapping is applied. The CSS oklch() function
+ * carries wide-gamut values natively; the browser handles gamut mapping per display
+ * at render time, which is both higher-quality and per-display-correct compared to
+ * a build-time sRGB clip. For formats that *require* sRGB (hex, rgb), use the
+ * dedicated converters which clip as needed.
  */
 export function oklchToCss(oklchColor: Oklch): string {
-  // Map to sRGB gamut while preserving perceptual intent
-  const gamutMappedRgb = toGamutMappedRgb(oklchColor);
-  // Convert back to OKLCH for CSS output
-  const gamutMapped = toOklch(gamutMappedRgb);
-
-  // Format as oklch() string
-  const l = gamutMapped.l.toFixed(4);
-  const c = gamutMapped.c.toFixed(4);
-  const h = (gamutMapped.h || 0).toFixed(2);
+  const l = oklchColor.l.toFixed(4);
+  const c = (oklchColor.c ?? 0).toFixed(4);
+  const h = (oklchColor.h || 0).toFixed(2);
 
   return `oklch(${l} ${c} ${h})`;
 }
@@ -57,19 +56,13 @@ export function oklchToRgb(oklchColor: Oklch): string {
 }
 
 /**
- * Apply alpha to OKLCH color
- * Returns oklch() string with alpha channel
+ * Apply alpha to OKLCH color.
+ * Returns oklch() string with alpha channel — no gamut mapping (see oklchToCss).
  */
 export function applyAlpha(oklchColor: Oklch, opacity: number): string {
-  // Map to sRGB gamut
-  const gamutMappedRgb = toGamutMappedRgb(oklchColor);
-  // Convert back to OKLCH for CSS output
-  const gamutMapped = toOklch(gamutMappedRgb);
-
-  // Format as oklch() with alpha
-  const l = gamutMapped.l.toFixed(4);
-  const c = gamutMapped.c.toFixed(4);
-  const h = (gamutMapped.h || 0).toFixed(2);
+  const l = oklchColor.l.toFixed(4);
+  const c = (oklchColor.c ?? 0).toFixed(4);
+  const h = (oklchColor.h || 0).toFixed(2);
   const a = opacity.toFixed(4);
 
   return `oklch(${l} ${c} ${h} / ${a})`;
@@ -100,16 +93,33 @@ export function applyAlphaHexa(oklchColor: Oklch, opacity: number): string {
   return `${hex}${alpha}`;
 }
 
+/** Convert OKLCH to Display-P3 component bytes for profile-aware consumers. */
+export function oklchToHexP3(oklchColor: Oklch): string {
+  const p3 = toGamut('p3', 'oklch')(oklchColor) as P3;
+  const toByte = (value: number) => Math.round(Math.max(0, Math.min(1, value)) * 255)
+    .toString(16)
+    .padStart(2, '0');
+  return `#${toByte(p3.r)}${toByte(p3.g)}${toByte(p3.b)}`;
+}
+
+/** Add an alpha byte to Display-P3 component bytes. */
+export function applyAlphaHexaP3(oklchColor: Oklch, opacity: number): string {
+  const alpha = Math.round(opacity * 255).toString(16).padStart(2, '0');
+  return `${oklchToHexP3(oklchColor)}${alpha}`;
+}
+
 /**
  * Format color based on specified format type
  */
 export function formatColor(
   oklchColor: Oklch,
-  format: 'hex' | 'oklch' | 'rgb'
+  format: 'hex' | 'hex-p3' | 'oklch' | 'rgb'
 ): string {
   switch (format) {
     case 'hex':
       return oklchToHex(oklchColor);
+    case 'hex-p3':
+      return oklchToHexP3(oklchColor);
     case 'rgb':
       return oklchToRgb(oklchColor);
     case 'oklch':
@@ -124,13 +134,15 @@ export function formatColor(
 export function formatColorWithAlpha(
   oklchColor: Oklch,
   opacity: number,
-  format: 'rgba' | 'oklch' | 'hexa'
+  format: 'rgba' | 'oklch' | 'hexa' | 'hexa-p3'
 ): string {
   switch (format) {
     case 'rgba':
       return applyAlphaRgba(oklchColor, opacity);
     case 'hexa':
       return applyAlphaHexa(oklchColor, opacity);
+    case 'hexa-p3':
+      return applyAlphaHexaP3(oklchColor, opacity);
     case 'oklch':
     default:
       return applyAlpha(oklchColor, opacity);

@@ -179,7 +179,7 @@ async function getAvailableThemes(themesBasePath: string): Promise<Array<{ name:
  * Generate config.ts content
  */
 function generateConfigFile(): string {
-  return `import type { GeneratorConfig } from "@three-forma-styli/core";
+  return `import type { GenerateCssConfig } from "@three-forma-styli/core";
 
 /**
  * CSS Generation Configuration
@@ -187,7 +187,7 @@ function generateConfigFile(): string {
  * Customize how your design tokens are converted to CSS variables.
  * All fields are optional — defaults are used for anything not specified.
  */
-export const config: GeneratorConfig = {
+export const config: GenerateCssConfig = {
   // Uncomment and modify to customize:
 
   // prefixes: {

@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { initCommand } from './commands/init.js';
 import { buildCommand } from './commands/build.js';
+import { figmaSyncCommand } from './commands/figma-sync.js';
 import { CLI_VERSION } from './version.js';
 
 const program = new Command();
@@ -14,7 +15,7 @@ console.log(chalk.magenta('Design token generator\n'));
 
 program
   .name('tfs')
-  .description('TypeScript-first design token generator with luminosity-based color control')
+  .description('TypeScript-first design token generator with luminance-based color control')
   .version(CLI_VERSION);
 
 // Init command
@@ -30,10 +31,32 @@ program
 // Build command
 program
   .command('build <path>')
-  .description('Generate CSS from theme files (directory or index.ts file)')
-  .option('-o, --output <path>', 'output CSS file path (default: stdout)')
+  .description('Generate design tokens from theme files')
+  .option('-o, --output <path>', 'output file path (default: stdout)')
+  .option('-f, --format <format>', 'output format: css, dtcg, figma-variables', 'css')
+  .option('--collection <name>', 'Figma collection name', 'Color')
+  .option('--color-space <space>', 'JSON color space: srgb or display-p3', 'srgb')
   .action(async (filePath, options) => {
     await buildCommand(filePath, options);
+  });
+
+// Figma sync command
+program
+  .command('figma-sync <path>')
+  .description('Sync design tokens to Figma via Variables API')
+  .requiredOption('--file-key <key>', 'Figma file key (from URL)')
+  .option('--figma-token <token>', 'Figma personal access token (prefer FIGMA_TOKEN env)')
+  .option('--collection <name>', 'Figma collection name', 'Color')
+  .option('--color-space <space>', 'target Figma file color space: srgb or display-p3', 'srgb')
+  .option('--dry-run', 'show payload without sending to Figma')
+  .action(async (filePath, options) => {
+    await figmaSyncCommand(filePath, {
+      fileKey: options.fileKey,
+      token: options.figmaToken,
+      collectionName: options.collection,
+      colorSpace: options.colorSpace,
+      dryRun: options.dryRun,
+    });
   });
 
 // Parse arguments

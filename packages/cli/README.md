@@ -1,6 +1,6 @@
 # @three-forma-styli/cli
 
-CLI tool for generating CSS design tokens from TypeScript definitions.
+CLI tool for generating CSS, DTCG JSON, and Figma Variables from TypeScript definitions.
 
 ## Installation
 
@@ -26,7 +26,7 @@ Options:
 
 ### `tfs build`
 
-Generate CSS from theme files:
+Generate output from theme files:
 
 ```bash
 tfs build . --output tokens.css
@@ -34,6 +34,22 @@ tfs build . --output tokens.css
 
 Options:
 - `--output, -o <path>` - Output file path (prints to stdout if omitted)
+- `--format, -f <format>` - `css`, `dtcg`, or `figma-variables`
+- `--collection <name>` - Figma collection name
+- `--color-space <space>` - `srgb` or `display-p3`; must match the Figma file profile
+
+### `tfs figma-sync`
+
+Create or update color variables through Figma's Variables REST API:
+
+```bash
+FIGMA_TOKEN=... tfs figma-sync . --file-key ... --color-space display-p3
+tfs figma-sync . --file-key dry-run --dry-run
+```
+
+Live sync requires Figma Enterprise access and both `file_variables:read` and
+`file_variables:write` token scopes. The command does not delete variables or
+modes that are absent from the source.
 
 ## Example Workflow
 
@@ -51,4 +67,4 @@ tfs init
 tfs build . --output tokens.css
 ```
 
-See the [main repo](https://github.com/three/three-forma-styli) for full documentation.
+See the [main repo](https://github.com/dick-jo/three-forma-styli) for full documentation.

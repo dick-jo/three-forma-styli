@@ -107,10 +107,18 @@ export interface GeneratorConfig {
 
 	/** Color output format */
 	colorFormat: {
-		base: 'hex' | 'oklch' | 'rgb';
-		alpha: 'rgba' | 'oklch' | 'hexa';
+		base: 'hex' | 'hex-p3' | 'oklch' | 'rgb';
+		alpha: 'rgba' | 'oklch' | 'hexa' | 'hexa-p3';
 		alphaModifier: string;
 	};
+}
+
+/** User-facing generator options. Every nested field is optional. */
+export interface GeneratorOptions {
+	prefixes?: Partial<GeneratorConfig['prefixes']>;
+	separators?: Partial<GeneratorConfig['separators']>;
+	modeCategories?: Partial<GeneratorConfig['modeCategories']>;
+	colorFormat?: Partial<GeneratorConfig['colorFormat']>;
 }
 
 /**

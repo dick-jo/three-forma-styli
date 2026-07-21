@@ -13,10 +13,10 @@ Low-priority cleanup and consistency tasks to tackle when time permits.
 
 ## Testing
 
-- [ ] Add tests for validatePartialDesignSystem
-- [ ] Add tests for generate() with partial inputs
+- [ ] Expand tests for validatePartialDesignSystem
+- [x] Add tests for generate() with partial inputs
 - [x] Rename TransparencySchedule → AlphaSchedule (terminology consistency)
-- [ ] Add tests for flexible AlphaSchedule keys
+- [x] Add tests for flexible AlphaSchedule keys
 
 ## Documentation
 
@@ -25,5 +25,5 @@ Low-priority cleanup and consistency tasks to tackle when time permits.
 
 ## Preview Package
 
-- [ ] Update preview to use new API (generateCss instead of generateCssVariables)
-- [ ] Fix preview build errors
+- [x] Update preview to use new API (generateCss instead of generateCssVariables)
+- [x] Fix preview type/build errors

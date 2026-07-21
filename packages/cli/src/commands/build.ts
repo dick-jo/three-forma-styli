@@ -3,11 +3,50 @@ import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 import * as esbuild from 'esbuild';
-import { generateCss, type DesignSystem, type GenerateCssConfig } from '@three-forma-styli/core';
+import {
+  generateCss,
+  generateFigmaJson,
+  type DesignSystem,
+  type GenerateCssConfig,
+  type FigmaJsonFormat,
+} from '@three-forma-styli/core';
 import { CLI_VERSION } from '../version.js';
+
+export type OutputFormat = 'css' | 'dtcg' | 'figma-variables';
+
+const outputFormats: OutputFormat[] = ['css', 'dtcg', 'figma-variables'];
+
+export function parseOutputFormat(value: string | undefined): OutputFormat {
+  const format = value ?? 'css';
+  if (!outputFormats.includes(format as OutputFormat)) {
+    throw new Error(`Unsupported output format "${format}". Expected one of: ${outputFormats.join(', ')}`);
+  }
+  return format as OutputFormat;
+}
+
+function resolveFileHeader(userConfig: GenerateCssConfig | null) {
+  if (userConfig?.fileHeader === false) {
+    return false as const;
+  }
+  if (userConfig?.fileHeader && typeof userConfig.fileHeader === 'object') {
+    return {
+      toolName: userConfig.fileHeader.toolName || 'three-forma-styli',
+      toolVersion: userConfig.fileHeader.toolVersion || CLI_VERSION,
+      includeTimestamp: userConfig.fileHeader.includeTimestamp,
+      customLines: userConfig.fileHeader.customLines,
+    };
+  }
+  return {
+    toolName: 'three-forma-styli',
+    toolVersion: CLI_VERSION,
+  };
+}
 
 export interface BuildOptions {
   output?: string;
+  format?: OutputFormat;
+  collection?: string;
+  colorSpace?: 'srgb' | 'display-p3';
 }
 
 export async function buildCommand(filePath: string, options: BuildOptions): Promise<void> {
@@ -92,47 +131,39 @@ export async function buildCommand(filePath: string, options: BuildOptions): Pro
       process.exit(1);
     }
 
-    // Generate CSS with file header
-    console.log(chalk.cyan('Generating CSS variables...'));
+    // Resolve file header config
+    const fileHeader = resolveFileHeader(userConfig);
 
-    // Build final config with file header
-    // User can disable header by setting fileHeader: false in their config
-    const finalConfig: GenerateCssConfig = {
-      ...userConfig,
-    };
+    // Determine output format
+    const format = parseOutputFormat(options.format);
+    let output: string;
 
-    if (userConfig?.fileHeader === false) {
-      // User explicitly disabled header
-      finalConfig.fileHeader = false;
-    } else if (userConfig?.fileHeader && typeof userConfig.fileHeader === 'object') {
-      // User provided custom header config - merge with defaults
-      // User values override our defaults
-      finalConfig.fileHeader = {
-        toolName: userConfig.fileHeader.toolName || 'three-forma-styli',
-        toolVersion: userConfig.fileHeader.toolVersion || CLI_VERSION,
-        includeTimestamp: userConfig.fileHeader.includeTimestamp,
-        customLines: userConfig.fileHeader.customLines,
-      };
+    if (format === 'css') {
+      console.log(chalk.cyan('Generating CSS variables...'));
+      const finalConfig: GenerateCssConfig = { ...userConfig, fileHeader };
+      output = generateCss(designSystem, finalConfig);
     } else {
-      // No user config for header - use defaults
-      finalConfig.fileHeader = {
-        toolName: 'three-forma-styli',
-        toolVersion: CLI_VERSION,
-      };
+      const figmaFormat: FigmaJsonFormat = format;
+      console.log(chalk.cyan(`Generating design-token JSON (${figmaFormat})...`));
+      output = generateFigmaJson(designSystem, {
+        transformer: {
+          fileHeader: fileHeader === false ? false : fileHeader,
+          collectionName: options.collection,
+          colorSpace: options.colorSpace,
+        },
+      }, figmaFormat);
     }
-
-    const css = generateCss(designSystem, finalConfig);
 
     // Output
     if (options.output) {
       const outputPath = path.resolve(process.cwd(), options.output);
       await fs.ensureDir(path.dirname(outputPath));
-      await fs.writeFile(outputPath, css);
+      await fs.writeFile(outputPath, output);
       console.log(chalk.green(`✓ Generated ${path.relative(process.cwd(), outputPath)}`));
     } else {
       // Print to stdout
       console.log('\n' + chalk.gray('─'.repeat(50)));
-      console.log(css);
+      console.log(output);
       console.log(chalk.gray('─'.repeat(50)));
     }
 

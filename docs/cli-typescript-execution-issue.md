@@ -1,4 +1,8 @@
-# CLI TypeScript Execution Issue
+# CLI TypeScript Execution Issue (historical)
+
+> Archived note: this describes the removed pre-generator API. Current commands
+> bundle theme entry points with esbuild and call `generateCss()` or
+> `generateFigmaJson()`; examples below are retained only as debugging history.
 
 > **Status:** Open issue requiring fix
 > **Date:** 2025-12-08

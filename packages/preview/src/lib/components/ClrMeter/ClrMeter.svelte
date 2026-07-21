@@ -420,6 +420,10 @@
 		}
 
 		/* HEADER/FOOTER ---------------------------------------- */
+		footer > .flag {
+			flex-direction: column-reverse;
+		}
+
 		header,
 		footer {
 			--loc-size--flag: var(--sp-2);
@@ -485,10 +489,6 @@
 					&:active {
 						cursor: grabbing;
 					}
-				}
-
-				footer & {
-					flex-direction: column-reverse;
 				}
 
 				& > .body {

@@ -2,9 +2,12 @@
   "name": "three-forma-styli",
   "version": "1.0.0",
   "private": true,
-  "description": "TypeScript-first design token generator with luminosity-based color control",
+  "description": "TypeScript-first design token generator with luminance-based color control",
   "scripts": {
     "build": "pnpm -r --filter '!@three-forma-styli/preview' build",
+    "build:all": "pnpm -r build",
+    "test": "pnpm --filter @three-forma-styli/core test && pnpm --filter @three-forma-styli/cli test",
+    "check": "pnpm test && pnpm --filter @three-forma-styli/preview check && pnpm build:all",
     "dev": "pnpm --filter @three-forma-styli/cli dev",
     "preview": "cat dist/tokens.css"
   },

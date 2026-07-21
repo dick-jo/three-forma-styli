@@ -3,21 +3,42 @@
   "version": "0.1.4",
   "type": "module",
   "description": "Starter and reference design system themes",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./default": {
+      "types": "./dist/default/index.d.ts",
+      "import": "./dist/default/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
+    "build": "node ../../scripts/clean.mjs && tsc",
+    "dev": "tsc --watch",
+    "prepack": "pnpm build"
   },
   "keywords": ["design-tokens", "themes", "starter-themes"],
   "author": "three",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dick-jo/three-forma-styli.git",
+    "directory": "packages/themes"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "@three-forma-styli/core": "^0.1.0"
+    "@three-forma-styli/core": "workspace:^"
   },
   "devDependencies": {
     "typescript": "^5.8.2"

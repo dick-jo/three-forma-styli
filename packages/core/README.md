@@ -40,12 +40,19 @@ const colorsCss = toCss(generate(partial));
 - `toCss(ir, config?)` - Transform IR to CSS string
 - `oklch(l, c, h)` - Create OKLCH color object
 - `generateCss(designSystem, config?)` - Convenience function combining generate + toCss
+- `generateFigmaJson(designSystem, config?, format?)` - Generate DTCG or Figma Variables JSON
+- `toFigmaJson(ir, config?, format?)` - Transform a hex/profile-aware IR to JSON
 
 ## Types
 
 - `DesignSystem` - Full design system with all token families
 - `PartialDesignSystem` - Partial design system (all families optional)
 - `GeneratorConfig` - Configuration for token generation
+- `GeneratorOptions` - Deeply optional user-facing generator configuration
 - `CssTransformerConfig` - Configuration for CSS output
 
-See the [main repo](https://github.com/three/three-forma-styli) for full documentation.
+Display-P3 output uses profile-relative RGB components and must only be sent to
+a Display-P3 Figma file. CSS output should stay in native OKLCH; TFS rejects P3
+component bytes passed to `generateCss()` as CSS hex.
+
+See the [main repo](https://github.com/dick-jo/three-forma-styli) for full documentation.

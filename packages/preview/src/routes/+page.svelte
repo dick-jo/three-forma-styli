@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import {
-		generateCssVariables,
 		validateLuminance,
 		type DesignSystem,
 	} from '@three-forma-styli/core';
@@ -16,6 +15,13 @@
 	// Get default mode color tokens
 	let defaultMode = $derived(designSystem.colors.modes[0]);
 	let colorTokens = $derived(defaultMode.tokens);
+	let backgroundMax = $derived(Math.max(colorTokens.bg?.l ?? 0, colorTokens.ev?.l ?? 0));
+	let foregroundMin = $derived(Math.min(
+		colorTokens.primary?.l ?? 1,
+		colorTokens.neutral?.l ?? 1,
+		colorTokens.ink?.l ?? 1,
+	));
+	let backgroundOrderValid = $derived((colorTokens.ev?.l ?? 0) > (colorTokens.bg?.l ?? 0));
 
 	// Validate luminance constraints (full groups except positive/negative)
 	let validation = $derived(
@@ -28,8 +34,10 @@
 				ink: colorTokens.ink,
 			},
 			{
-				type: 'dark',
+				polarity: 'negative',
 				minDelta: 0.4, // OKLCH uses 0-1 scale (0.4 = 40% contrast)
+				backgroundColors: ['bg', 'ev'],
+				foregroundColors: ['primary', 'neutral', 'ink'],
 			}
 		)
 	);
@@ -63,7 +71,7 @@
 							step="0.01"
 							value={color.l}
 							oninput={(e) =>
-								updateColor(colorName, Number(e.currentTarget.value), color.c, color.h)}
+								updateColor(colorName, Number(e.currentTarget.value), color.c, color.h ?? 0)}
 						/>
 						<input
 							type="range"
@@ -72,7 +80,7 @@
 							step="0.01"
 							value={color.l}
 							oninput={(e) =>
-								updateColor(colorName, Number(e.currentTarget.value), color.c, color.h)}
+								updateColor(colorName, Number(e.currentTarget.value), color.c, color.h ?? 0)}
 						/>
 					</label>
 				</div>
@@ -86,7 +94,7 @@
 							step="0.01"
 							value={color.c}
 							oninput={(e) =>
-								updateColor(colorName, color.l, Number(e.currentTarget.value), color.h)}
+								updateColor(colorName, color.l, Number(e.currentTarget.value), color.h ?? 0)}
 						/>
 						<input
 							type="range"
@@ -95,7 +103,7 @@
 							step="0.01"
 							value={color.c}
 							oninput={(e) =>
-								updateColor(colorName, color.l, Number(e.currentTarget.value), color.h)}
+								updateColor(colorName, color.l, Number(e.currentTarget.value), color.h ?? 0)}
 						/>
 					</label>
 				</div>
@@ -148,7 +156,7 @@
 		<div class="section">
 			<h4>Delta Calculation:</h4>
 			<pre>  Actual delta:   min(foreground) - max(background)
-                  {validation.foregroundMin.toFixed(4)} - {validation.backgroundMax.toFixed(4)} = {validation.actualDelta.toFixed(4)}
+                  {foregroundMin.toFixed(4)} - {backgroundMax.toFixed(4)} = {validation.actualDelta.toFixed(4)}
   Required delta: {validation.requiredDelta.toFixed(4)}
   Status: {#if validation.deltaValid}<span class="valid">✓ VALID</span
 					> ({validation.actualDelta.toFixed(4)} >= {validation.requiredDelta.toFixed(
@@ -160,17 +168,17 @@
 
 		<div class="section">
 			<h4>Boundaries (for dark mode):</h4>
-			<pre>  Background colors must be ≤ {validation.backgroundMax.toFixed(4)}
-  Foreground colors must be ≥ {validation.foregroundMin.toFixed(4)}
+			<pre>  Background colors must be ≤ {validation.backgroundConstraint.toFixed(4)}
+  Foreground colors must be ≥ {validation.foregroundConstraint.toFixed(4)}
   Gap between them: {validation.actualDelta.toFixed(4)}</pre>
 		</div>
 
 		<div class="section">
 			<h4>Background Order Check:</h4>
-			<pre>  {#if validation.backgroundOrderValid}<span class="valid">✓ VALID</span
+			<pre>  {#if backgroundOrderValid}<span class="valid">✓ VALID</span
 					> ev ({colorTokens.ev?.l.toFixed(4)}) > bg ({colorTokens.bg?.l.toFixed(4)}){:else}<span
 						class="invalid">✗ INVALID</span
-					> {validation.backgroundOrderViolation}{/if}</pre>
+					> ev should be lighter than bg{/if}</pre>
 		</div>
 	</div>
 </section>

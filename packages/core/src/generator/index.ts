@@ -6,7 +6,7 @@
  */
 
 import type { DesignSystem, PartialDesignSystem } from '../types.js';
-import type { IR, TokenValue, GeneratorConfig, GeneratorResult, ModeInfo } from './types.js';
+import type { IR, TokenValue, GeneratorConfig, GeneratorOptions, GeneratorResult, ModeInfo } from './types.js';
 import { defaultGeneratorConfig } from './types.js';
 import { validatePartialDesignSystem, ValidationError } from './validate.js';
 import { generateColorTokens } from './colors.js';
@@ -17,7 +17,7 @@ import { generateBorderRadiusTokens, generateBorderWidthTokens } from './border.
 import { generateTimeTokens } from './time.js';
 
 export { ValidationError };
-export type { IR, TokenValue, GeneratorConfig, GeneratorResult, ModeInfo };
+export type { IR, TokenValue, GeneratorConfig, GeneratorOptions, GeneratorResult, ModeInfo };
 
 /**
  * Empty generator result for when a family is not provided
@@ -31,7 +31,7 @@ const emptyResult: GeneratorResult = {
 /**
  * Merge user config with defaults
  */
-function mergeConfig(userConfig?: Partial<GeneratorConfig>): GeneratorConfig {
+function mergeConfig(userConfig?: GeneratorOptions): GeneratorConfig {
 	if (!userConfig) {
 		return defaultGeneratorConfig;
 	}
@@ -87,7 +87,7 @@ function tokensToRecord(tokens: TokenValue[]): Record<string, TokenValue> {
  */
 export function generate(
 	designSystem: DesignSystem | PartialDesignSystem,
-	userConfig?: Partial<GeneratorConfig>
+	userConfig?: GeneratorOptions
 ): IR {
 	// Validate inputs
 	validatePartialDesignSystem(designSystem);

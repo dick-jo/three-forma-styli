@@ -23,7 +23,23 @@ tfs init
 # Edit your theme files (with full TypeScript IntelliSense)
 # Then generate CSS
 tfs build . --output tokens.css
+
+# Or emit standards-based DTCG JSON
+tfs build . --format dtcg --output tokens.json
 ```
+
+Display-P3 Figma files are supported explicitly. The selected color space must
+match the target file profile:
+
+```bash
+tfs build . --format figma-variables --color-space display-p3 --output figma.json
+tfs figma-sync . --file-key "$FIGMA_FILE_KEY" --color-space display-p3
+```
+
+The sync command uses Figma's Variables REST API, which currently requires an
+Enterprise organization, an eligible full seat, edit access, and a token with
+both `file_variables:read` and `file_variables:write` scopes. Run with
+`--dry-run` to inspect the atomic payload without a token or network write.
 
 ## Packages
 
@@ -232,6 +248,9 @@ pnpm build
 # Run tests
 pnpm --filter @three-forma-styli/core test
 ```
+
+See [docs/releasing.md](docs/releasing.md) for the npm release and production
+consumer update procedure.
 
 ## Design Decisions
 

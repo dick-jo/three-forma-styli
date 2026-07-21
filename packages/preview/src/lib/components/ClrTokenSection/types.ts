@@ -1,6 +1,6 @@
-import type { Lch } from 'culori';
+import type { Oklch } from 'culori';
 
 export interface ClrTokenSectionProps {
 	colorName: string;
-	colorValue: Lch;
+	colorValue: Oklch;
 }

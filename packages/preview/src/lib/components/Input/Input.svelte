@@ -46,6 +46,12 @@
 		&:has(input:focus) {
 			--loc-clr-bg: var(--clr-neutral-a-lo-x);
 			--loc-clr-border: var(--clr-neutral-a-hi);
+
+			.header label {
+				--loc-clr-bg: var(--clr-neutral);
+				--loc-clr-ink: var(--clr-bg);
+				padding: 0 calc(var(--loc-gap) * 4);
+			}
 		}
 		max-height: fit-content;
 		width: 100%;
@@ -64,10 +70,6 @@
 			label {
 				--loc-clr-bg: var(--clr-neutral-a-lo-x);
 				--loc-clr-ink: var(--clr-ink);
-				.host:has(input:focus) & {
-					--loc-clr-bg: var(--clr-neutral);
-					--loc-clr-ink: var(--clr-bg);
-				}
 				padding: 0 calc(var(--loc-gap) * 2);
 				display: flex;
 				justify-content: center;
@@ -81,9 +83,6 @@
 				font-size: var(--fs-1);
 				text-transform: capitalize;
 				transition: var(--loc-transition);
-				.host:has(input:focus) & {
-					padding: 0 calc(var(--loc-gap) * 4);
-				}
 			}
 
 			/* AUX -------------------------------------------------- */
