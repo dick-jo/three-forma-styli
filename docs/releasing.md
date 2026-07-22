@@ -9,6 +9,18 @@ favours a predictable pre-1.0 toolchain over independently versioned packages.
 The production Scatter app currently consumes `@three-forma-styli/core`; it does
 not consume the CLI or themes package at runtime.
 
+## TODO: circle back before the next npm release
+
+- [ ] Review this procedure with fresh eyes and confirm npm scope/account access.
+- [ ] Add the appropriate Changeset for the post-`0.2.0` hardening, scoped
+  typography-mode fix, and any other unreleased public changes.
+- [ ] Publish an exact `next` canary, install it in Splinter, and run the full
+  application and visual-regression checks before promoting `latest`.
+- [ ] Replace temporary vendored TFS tarballs in downstream design-system
+  projects with the reviewed published version.
+
+No npm publication was performed during the current toolkit/design-system work.
+
 ## Safe release sequence
 
 1. Add `pnpm changeset` with every user-visible package change. Choose the
