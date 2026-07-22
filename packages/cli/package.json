@@ -1,12 +1,16 @@
 {
 	"name": "@three-forma-styli/cli",
-	"version": "0.1.4",
+	"version": "0.2.0",
 	"type": "module",
 	"description": "CLI tool for generating design tokens from TypeScript definitions",
 	"bin": {
 		"tfs": "dist/index.js"
 	},
 	"exports": {
+		".": {
+			"types": "./dist/api.d.ts",
+			"import": "./dist/api.js"
+		},
 		"./project": {
 			"types": "./dist/project.d.ts",
 			"import": "./dist/project.js"

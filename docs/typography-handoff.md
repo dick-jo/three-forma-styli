@@ -63,8 +63,9 @@ holistic project and does not replace `examples/project/generated`.
 
 ## Verification snapshot — 22 July 2026
 
-- `pnpm check`: 156 core tests, 47 CLI tests, both type suites, zero Svelte
-  diagnostics, and every workspace build passed.
+- `pnpm check:release`: 160 core tests, 60 CLI tests, both type suites, zero
+  Svelte diagnostics, every workspace build, and the isolated packed-consumer
+  test passed.
 - `pnpm audit --prod --audit-level=moderate`: no known vulnerabilities.
 - Core, themes and CLI tarball dry-runs contained their intended declarations,
   executable and exports.
@@ -72,10 +73,10 @@ holistic project and does not replace `examples/project/generated`.
   semver, installed together in a clean disposable consumer, and built the
   complete 10-file default project successfully.
 
-No package was published. The local package versions still equal versions that
-already exist on npm (`core` 0.1.3, `themes`/`cli` 0.1.4), so a release must bump
-them first and follow [`releasing.md`](./releasing.md). Scatter should consume a
-canary before any `latest` promotion.
+No package was published. The three public package manifests are prepared as one
+coordinated `0.2.0` release, and the release check proves their packed form works
+together without workspace-only resolution. Follow [`releasing.md`](./releasing.md)
+and let Scatter consume a canary before any `latest` promotion.
 
 ## Key invariants to challenge
 
@@ -125,9 +126,9 @@ modify the dirty Splinter worktree.
 
 ## Decisions still requiring visual review
 
-- Supreme for headings only versus both headings and prose.
 - The exact Supreme line-height/tracking anchors at multiline display sizes.
-- JetBrains Mono's intentionally exposed label weights and default.
+- The first-pass Supreme prose/heading and JetBrains Mono label weight choices in
+  the Scatter source project.
 - Observed geometry and swap behavior for the generated adjusted fallbacks in
   representative browsers and platforms. Measurement and emission are implemented
   and inspectable; TFS does not own a human approval state.

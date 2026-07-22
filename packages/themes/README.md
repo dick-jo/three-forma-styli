@@ -1,6 +1,8 @@
 # @three-forma-styli/themes
 
-Starter and reference design system themes for three-forma-styli.
+Typed starter and reference design-system source presets for three-forma-styli.
+These are authored inputs, not runtime CSS themes. The package also includes the
+source templates used by `tfs init`.
 
 ## Installation
 
@@ -22,4 +24,4 @@ const css = toCss(generate(designSystem));
 - `default` - The modern reference theme with fully visible prose/heading/label typography
 - `legacy` - The frozen pre-semantic default/small/large typography modes
 
-See the [main repo](https://github.com/three/three-forma-styli) for full documentation.
+See the [main repo](https://github.com/dick-jo/three-forma-styli) for full documentation.

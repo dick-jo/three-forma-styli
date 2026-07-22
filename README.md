@@ -14,7 +14,7 @@ Generate CSS custom properties from TypeScript-defined design systems. Built for
 ## Quick Start
 
 ```bash
-# Install the CLI globally
+# Use a global CLI only for the initial scaffold
 npm install -g @three-forma-styli/cli
 
 # Initialize a new theme project
@@ -48,6 +48,14 @@ both `file_variables:read` and `file_variables:write` scopes. Run with
 | `@three-forma-styli/core`   | Core library for generating design tokens |
 | `@three-forma-styli/cli`    | CLI tool (`tfs` command)                  |
 | `@three-forma-styli/themes` | Starter/reference themes                  |
+
+The private Svelte review application lives under `apps/preview`; it is repository
+tooling, not a published package or consumer dependency. Installing the CLI/core
+does not install or bundle Svelte.
+
+The public packages share a coordinated release version and are verified as
+packed artifacts before publishing. See [the package architecture](docs/package-architecture.md)
+and [release procedure](docs/releasing.md).
 
 ## Architecture
 

@@ -1,8 +1,8 @@
 {
 	"name": "@three-forma-styli/themes",
-	"version": "0.1.4",
+	"version": "0.2.0",
 	"type": "module",
-	"description": "Starter and reference design system themes",
+	"description": "Typed starter and reference design-system source presets",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",

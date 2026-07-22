@@ -1,4 +1,4 @@
-import type { Oklch } from 'culori';
+import type { Oklch } from '@three-forma-styli/core';
 
 export interface ClrTokenSectionProps {
 	colorName: string;

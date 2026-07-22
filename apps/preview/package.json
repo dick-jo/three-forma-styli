@@ -1,6 +1,5 @@
 {
 	"name": "@three-forma-styli/preview",
-	"version": "1.0.0",
 	"private": true,
 	"description": "Preview webapp for testing and visualizing generated themes",
 	"type": "module",

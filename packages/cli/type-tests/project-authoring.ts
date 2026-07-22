@@ -1,4 +1,4 @@
-import { defineTfsProject } from '../src/project.js';
+import { defineTfsProject } from '../src/api.js';
 
 const fonts = {
 	supreme: {

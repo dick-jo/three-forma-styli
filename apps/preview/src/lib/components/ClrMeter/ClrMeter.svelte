@@ -1,6 +1,5 @@
 <script lang="ts">
-	import type { Oklch } from 'culori';
-	import { oklchToCss } from '@three-forma-styli/core';
+	import { oklchToCss, type Oklch } from '@three-forma-styli/core';
 
 	export interface ClrMeterFlag {
 		id: string;

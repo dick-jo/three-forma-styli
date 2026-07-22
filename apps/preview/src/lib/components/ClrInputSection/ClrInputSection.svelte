@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ClrMeter, type ClrMeterFlag } from '$lib/components/ClrMeter';
 	import Input from '$lib/components/Input/Input.svelte';
-	import type { Oklch } from 'culori';
+	import type { Oklch } from '@three-forma-styli/core';
 
 	interface Props {
 		name: string;

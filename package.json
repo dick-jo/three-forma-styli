@@ -1,13 +1,14 @@
 {
 	"name": "three-forma-styli",
-	"version": "1.0.0",
 	"private": true,
 	"description": "TypeScript-first design token generator with luminance-based color control",
 	"scripts": {
 		"build": "pnpm -r --filter '!@three-forma-styli/preview' build",
 		"build:all": "pnpm -r build",
 		"test": "pnpm --filter @three-forma-styli/core test && pnpm --filter @three-forma-styli/cli test",
-		"check": "pnpm test && pnpm --filter @three-forma-styli/preview check && pnpm build:all",
+		"check:versions": "node scripts/verify-package-versions.mjs",
+		"check": "pnpm check:versions && pnpm test && pnpm --filter @three-forma-styli/preview check && pnpm build:all",
+		"check:release": "pnpm check && node scripts/verify-packed-release.mjs",
 		"typography:review": "pnpm build && node scripts/typography-review.mjs",
 		"dev": "pnpm --filter @three-forma-styli/cli dev",
 		"preview": "cat dist/tokens.css"
@@ -21,7 +22,8 @@
 	"author": "three",
 	"license": "ISC",
 	"workspaces": [
-		"packages/*"
+		"packages/*",
+		"apps/*"
 	],
 	"devDependencies": {
 		"@three-forma-styli/cli": "workspace:*",
@@ -31,16 +33,5 @@
 		"prettier-plugin-svelte": "^3.4.0",
 		"typescript": "^5.8.2"
 	},
-	"packageManager": "pnpm@9.4.0+sha512.f549b8a52c9d2b8536762f99c0722205efc5af913e77835dbccc3b0b0b2ca9e7dc8022b78062c17291c48e88749c70ce88eb5a74f1fa8c4bf5e18bb46c8bd83a",
-	"pnpm": {
-		"overrides": {
-			"cookie@0.6.0": "0.7.2",
-			"diff@4.0.2": "4.0.4",
-			"picomatch@2.3.1": "2.3.2",
-			"postcss": "^8.5.10",
-			"rollup": "^4.59.0",
-			"svelte": "^5.56.7",
-			"vite": "^6.4.3"
-		}
-	}
+	"packageManager": "pnpm@11.9.0"
 }

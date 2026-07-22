@@ -231,7 +231,7 @@ function generateProjectFile(moduleNames: string[]): string {
 	const properties = moduleNames
 		.map((name) => (name === 'color' ? '    colors: color,' : `    ${name},`))
 		.join('\n');
-	return `import { defineTfsProject } from "@three-forma-styli/cli/project";
+	return `import { defineTfsProject } from "@three-forma-styli/cli";
 ${imports}
 
 export default defineTfsProject({

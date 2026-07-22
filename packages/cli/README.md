@@ -5,9 +5,16 @@ color-only DTCG/Figma Variables JSON, and typography specimens from TypeScript d
 
 ## Installation
 
+Install it in the design-system project so `tfs.config.ts`, the executable and
+the lockfile always use the same release:
+
 ```bash
-npm install -g @three-forma-styli/cli
+npm install --save-dev @three-forma-styli/cli
+npx tfs --help
 ```
+
+A global install is convenient for the initial `tfs init`, but generated
+projects install their own local CLI and should run that local executable.
 
 ## Commands
 

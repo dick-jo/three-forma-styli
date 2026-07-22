@@ -1,19 +1,25 @@
 # Releasing to npm
 
 The three public packages are currently published manually under the npm scope
-`@three-forma-styli`. The production Scatter app consumes
-`@three-forma-styli/core`; it does not consume the CLI or themes package at runtime.
+`@three-forma-styli`. They use one coordinated version because the CLI composes
+the exact core and themes APIs from the same source release. This deliberately
+favours a predictable pre-1.0 toolchain over independently versioned packages.
+
+The production Scatter app currently consumes `@three-forma-styli/core`; it does
+not consume the CLI or themes package at runtime.
 
 ## Safe release sequence
 
 1. Start from a clean `master` and confirm the intended commit is on GitHub.
 2. Run `npm whoami` and confirm the account can publish the scope.
-3. Run `pnpm install --frozen-lockfile`, `pnpm check`, and
+3. Bump `core`, `themes` and `cli` to the same version. Keep their internal
+   dependency declarations as `workspace:^` and regenerate the lockfile.
+4. Run `pnpm install --frozen-lockfile`, `pnpm check:release`, and
    `pnpm audit --prod --audit-level=moderate`.
-4. Review each tarball with `npm pack --dry-run --json` from `packages/core`,
+   `check:release` installs all three packed artifacts into a clean temporary
+   consumer and checks both the import API and the executable.
+5. Review each tarball with `npm pack --dry-run --json` from `packages/core`,
    `packages/themes`, and `packages/cli`.
-5. Bump package versions deliberately. If core changes, update dependent package
-   ranges through their `workspace:^` declarations and regenerate the lockfile.
 6. Publish in dependency order with pnpm so workspace ranges are rewritten to
    normal semver ranges in the tarballs:
 
