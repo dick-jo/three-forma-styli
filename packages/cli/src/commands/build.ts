@@ -11,7 +11,7 @@ import {
 	type FigmaJsonFormat,
 } from '@three-forma-styli/core';
 import { CLI_VERSION } from '../version.js';
-import { loadConfigModule } from '../config/load-module.js';
+import { loadConfigModule, resolveDesignSystemExport } from '../config/load-module.js';
 import { buildProject } from '../project-build.js';
 import type { TfsProject } from '../project.js';
 
@@ -70,33 +70,9 @@ function isProject(value: unknown): value is TfsProject {
 	);
 }
 
-async function projectConfigPath(filePath: string): Promise<string | undefined> {
-	const input = path.resolve(process.cwd(), filePath);
-	if (!(await fs.pathExists(input))) return undefined;
-	const stats = await fs.stat(input);
-	if (!stats.isDirectory()) {
-		return ['tfs.config.ts', 'tfs.config.js'].includes(path.basename(input)) ? input : undefined;
-	}
-	const candidates = ['tfs.config.ts', 'tfs.config.js'];
-	const existing = [];
-	for (const candidate of candidates) {
-		const resolved = path.join(input, candidate);
-		if (await fs.pathExists(resolved)) existing.push(resolved);
-	}
-	if (existing.length > 1) {
-		throw new Error(`Multiple TFS project configs found: ${existing.join(', ')}`);
-	}
-	return existing[0];
-}
-
 export async function buildCommand(filePath: string, options: BuildOptions): Promise<void> {
-	const possibleProjectPath = await projectConfigPath(filePath);
-	let inputPath = possibleProjectPath ?? path.resolve(process.cwd(), filePath);
-	if ((await fs.pathExists(inputPath)) && (await fs.stat(inputPath)).isDirectory()) {
-		inputPath = path.join(inputPath, 'index.ts');
-	}
-	const loaded = await loadConfigModule(inputPath);
-	const module = loaded.module as Record<string, any>;
+	const loaded = await loadConfigModule(filePath);
+	const module = loaded.module;
 	if (isProject(module.default)) {
 		if (options.format || options.output || options.fontCss) {
 			throw new Error(
@@ -111,19 +87,15 @@ export async function buildCommand(filePath: string, options: BuildOptions): Pro
 		);
 		return;
 	}
-	const exported = module.default || module.theme || module.designSystem;
-	const designSystem: PartialDesignSystem =
-		exported && !exported.colors && (exported.default || exported.designSystem)
-			? exported.default || exported.designSystem
-			: exported;
-	const tokenFamilies = ['colors', 'spacing', 'gap', 'typography', 'border', 'time'] as const;
-	if (!designSystem || !tokenFamilies.some((family) => designSystem[family])) {
-		throw new Error(
-			`No valid design system found. Export at least one token family: ${tokenFamilies.join(', ')}.`
-		);
-	}
+	const designSystem: PartialDesignSystem = resolveDesignSystemExport(module);
+	const defaultExport =
+		module.default && typeof module.default === 'object'
+			? (module.default as Record<string, unknown>)
+			: undefined;
 	const userConfig: GenerateCssConfig | null =
-		module.config || (module.default && module.default.config) || null;
+		(module.config as GenerateCssConfig | undefined) ??
+		(defaultExport?.config as GenerateCssConfig | undefined) ??
+		null;
 	const fileHeader = resolveFileHeader(userConfig);
 	const format = parseOutputFormat(options.format);
 	if (options.fontCss && format !== 'specimen') {

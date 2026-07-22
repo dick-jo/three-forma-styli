@@ -26,11 +26,16 @@ type ProjectTypographyInput<Fonts extends Record<string, ProjectFont>> = Omit<
 	roles: Record<string, ProjectTypographyRole<Fonts>>;
 };
 
-type SelfContainedTypographySystem = Omit<TypographySystem, 'fonts' | 'roles'> &
-	(
-		| { fonts: NonNullable<TypographySystem['fonts']>; roles?: TypographySystem['roles'] }
-		| { fonts?: undefined; roles?: undefined }
-	);
+type SelfContainedTypographySystem = TypographySystem;
+
+type ProjectSystem<Fonts extends Record<string, ProjectFont>> = Omit<
+	PartialDesignSystem,
+	'typography'
+> & {
+	typography?:
+		| SelfContainedTypographySystem
+		| (keyof Fonts extends never ? never : ProjectTypographyInput<Fonts>);
+};
 
 export interface ProjectOutputFormat {
 	file?: string;
@@ -51,9 +56,7 @@ export interface ProjectTypographyCssOutput extends ProjectOutputFormat {
 }
 
 export type ProjectFontAssetUrlPolicy =
-	| { mode: 'relative' }
-	| { mode: 'public'; prefix: string }
-	| { mode: 'absolute'; prefix: string };
+	{ mode: 'relative' } | { mode: 'public'; prefix: string } | { mode: 'absolute'; prefix: string };
 
 export interface ProjectFontAssetsOutput {
 	/** Prepared font subtree inside output.directory. Defaults to `fonts`. */
@@ -84,14 +87,13 @@ export interface TfsProjectOutput {
 
 export interface TfsProjectInput<Fonts extends Record<string, ProjectFont>> {
 	fonts?: Fonts;
-	system: Omit<PartialDesignSystem, 'typography'> & {
-		typography?: ProjectTypographyInput<Fonts> | SelfContainedTypographySystem;
-	};
+	system: ProjectSystem<Fonts>;
 	output: TfsProjectOutput;
 }
 
-export interface TfsProject<Fonts extends Record<string, ProjectFont> = Record<string, ProjectFont>>
-	extends TfsProjectInput<Fonts> {
+export interface TfsProject<
+	Fonts extends Record<string, ProjectFont> = Record<string, ProjectFont>,
+> extends TfsProjectInput<Fonts> {
 	kind: 'three-forma-styli/project';
 	schemaVersion: 1;
 }

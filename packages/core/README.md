@@ -79,3 +79,5 @@ a Display-P3 Figma file. CSS output should stay in native OKLCH; TFS rejects P3
 component bytes passed to `generateCss()` as CSS hex.
 
 See the [main repo](https://github.com/dick-jo/three-forma-styli) for full documentation.
+The repository's [validation policy](https://github.com/dick-jo/three-forma-styli/blob/master/docs/validation.md)
+documents naming, numeric, reference, font-capability, and collision failures.

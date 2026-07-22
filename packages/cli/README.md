@@ -13,24 +13,28 @@ npm install --save-dev @three-forma-styli/cli
 npx tfs --help
 ```
 
-A global install is convenient for the initial `tfs init`, but generated
-projects install their own local CLI and should run that local executable.
+For the initial scaffold, `npx @three-forma-styli/cli init my-design-system`
+avoids a global install. Generated projects install their own local CLI and run
+that locked executable through package scripts.
 
 ## Commands
 
 ### `tfs init`
 
-Scaffold a new theme project with TypeScript files:
+Scaffold a complete design-system source project with pinned local tooling:
 
 ```bash
 tfs init
 ```
 
-Creates theme files (color.ts, spacing.ts, etc.), package.json, and tsconfig.json.
+Creates authored system files, `tfs.config.ts`, a programmatic `index.ts`, local
+build/check/specimen scripts, package metadata, TypeScript configuration, and a
+project README. The scaffold pins core and CLI to the same compatible release;
+it never writes independent `latest` ranges.
 
 Options:
 
-- `-t, --theme <name>` - Choose starter theme (default: "default")
+- `-t, --theme <name>` - Choose the starter source preset (default: "default")
 - `--skip-install` - Skip automatic dependency installation
 
 ### `tfs build`
@@ -188,17 +192,15 @@ formula, profile limits and browser-comparison guidance.
 ## Example Workflow
 
 ```bash
-# Create new project
-mkdir my-theme && cd my-theme
-
-# Initialize with starter files
-tfs init
+# Create a new project from the default preset
+tfs init my-design-system
+cd my-design-system
 
 # Edit your theme files
 # (full IntelliSense from @three-forma-styli/core)
 
 # Generate the complete dist/ handoff
-tfs build .
+npm run check
 ```
 
 See the [main repo](https://github.com/dick-jo/three-forma-styli) for full documentation.

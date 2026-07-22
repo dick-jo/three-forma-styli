@@ -15,16 +15,16 @@ export const SPACING_MODES: Record<string, SpacingMode> = {
 	small: {
 		tokens: {
 			unit: 'px',
-			base: 4,
-			min: 2,
+			base: 6,
+			min: 3,
 			range: 12,
 		},
 	},
 	large: {
 		tokens: {
 			unit: 'px',
-			base: 16,
-			min: 8,
+			base: 10,
+			min: 5,
 			range: 12,
 		},
 	},

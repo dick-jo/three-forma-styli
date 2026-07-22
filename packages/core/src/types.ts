@@ -204,12 +204,25 @@ export interface TypographyRole extends TypographySettings {
 	defaultStyle?: TypographyFontStyle;
 }
 
-export interface TypographySystem {
+interface TypographyScaleSystem {
 	modes: Array<TypographyMode & { name: string }>;
-	/** Optional semantic layer; existing --fs-* generation remains unchanged. */
-	fonts?: Record<string, TypographyFont>;
-	roles?: Record<string, TypographyRole>;
 }
+
+/**
+ * Atomic font-size modes may stand alone. A semantic layer is self-contained:
+ * roles can only exist alongside the font registry they reference.
+ */
+export type TypographySystem = TypographyScaleSystem &
+	(
+		| {
+				fonts: Record<string, TypographyFont>;
+				roles?: Record<string, TypographyRole>;
+		  }
+		| {
+				fonts?: undefined;
+				roles?: undefined;
+		  }
+	);
 
 export interface PreparedFontManifestLike {
 	schemaVersion: number;

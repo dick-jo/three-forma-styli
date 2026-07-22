@@ -11,16 +11,14 @@
  * Enterprise plan required for Variables API access.
  */
 
-import fs from 'fs-extra';
-import path from 'path';
-import os from 'os';
 import chalk from 'chalk';
-import * as esbuild from 'esbuild';
 import {
 	generateFigmaJson,
-	type DesignSystem,
+	type PartialDesignSystem,
 	type FigmaCollection,
 } from '@three-forma-styli/core';
+import { loadConfigModule, resolveDesignSystemExport } from '../config/load-module.js';
+import type { TfsProject } from '../project.js';
 
 // ─── Figma API Types ──────────────────────────────────────────
 
@@ -273,52 +271,21 @@ export function buildPayload(
 /**
  * Load a DesignSystem from a TypeScript theme file (same logic as build command)
  */
-async function loadDesignSystem(filePath: string): Promise<DesignSystem> {
-	let inputPath = path.resolve(process.cwd(), filePath);
-
-	if (await fs.pathExists(inputPath)) {
-		const stats = await fs.stat(inputPath);
-		if (stats.isDirectory()) {
-			inputPath = path.join(inputPath, 'index.ts');
-		}
+async function loadColorSystem(filePath: string): Promise<PartialDesignSystem> {
+	const loaded = await loadConfigModule(filePath);
+	console.log(chalk.cyan(`Loading design system from: ${loaded.inputPath}`));
+	const possibleProject = loaded.module.default as Partial<TfsProject> | undefined;
+	const designSystem =
+		possibleProject?.kind === 'three-forma-styli/project'
+			? possibleProject.system
+			: resolveDesignSystemExport(loaded.module);
+	if (!designSystem?.colors) {
+		throw new Error('Figma sync requires a design system with colors');
 	}
-
-	if (!(await fs.pathExists(inputPath))) {
-		throw new Error(`File not found: ${inputPath}`);
-	}
-
-	console.log(chalk.cyan(`Loading theme from: ${path.relative(process.cwd(), inputPath)}`));
-
-	const tempFile = path.join(os.tmpdir(), `tfs-figma-${Date.now()}.mjs`);
-
-	try {
-		await esbuild.build({
-			entryPoints: [inputPath],
-			bundle: true,
-			outfile: tempFile,
-			format: 'esm',
-			platform: 'node',
-			target: 'node18',
-		});
-
-		const mod = await import(`${tempFile}?t=${Date.now()}`);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const exported: any = mod.default || mod.theme || mod.designSystem;
-		let ds: DesignSystem;
-		if (exported && !exported.colors && (exported.default || exported.designSystem)) {
-			ds = exported.default || exported.designSystem;
-		} else {
-			ds = exported;
-		}
-		if (!ds || !ds.colors) {
-			throw new Error('No valid design system found (must have colors property)');
-		}
-		return ds;
-	} finally {
-		if (await fs.pathExists(tempFile)) {
-			await fs.remove(tempFile);
-		}
-	}
+	// Figma sync is deliberately color-only. Do not leak a project typography
+	// input (whose fonts are resolved by the full project compiler) into the core
+	// PartialDesignSystem contract.
+	return { colors: designSystem.colors };
 }
 
 export interface FigmaSyncOptions {
@@ -332,16 +299,13 @@ export interface FigmaSyncOptions {
 export async function figmaSyncCommand(filePath: string, options: FigmaSyncOptions): Promise<void> {
 	const token = options.token || process.env.FIGMA_TOKEN;
 	if (!options.dryRun && !token) {
-		console.error(chalk.red('✗ No Figma token. Set FIGMA_TOKEN env var or pass --figma-token.'));
-		console.error(
-			chalk.yellow('  Create one at: Figma → Settings → Security → Personal access tokens')
+		throw new Error(
+			'No Figma token. Set FIGMA_TOKEN or pass --figma-token; required scopes are file_variables:read and file_variables:write.'
 		);
-		console.error(chalk.yellow('  Required scopes: file_variables:read and file_variables:write'));
-		process.exit(1);
 	}
 
 	// Load design system from theme file
-	const designSystem = await loadDesignSystem(filePath);
+	const designSystem = await loadColorSystem(filePath);
 
 	// Generate profile-aware values. Display-P3 components are meaningful only
 	// when the target Figma file itself uses the Display P3 profile.
@@ -409,9 +373,7 @@ export async function figmaSyncCommand(filePath: string, options: FigmaSyncOptio
 	const result = await figmaPost(options.fileKey, token!, payload);
 
 	if (result.error) {
-		console.error(chalk.red('✗ Figma sync failed'));
-		console.error(result);
-		process.exit(1);
+		throw new Error(`Figma sync failed: ${JSON.stringify(result)}`);
 	}
 
 	const created = result.meta?.tempIdToRealId ? Object.keys(result.meta.tempIdToRealId).length : 0;

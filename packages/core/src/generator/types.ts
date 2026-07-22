@@ -144,23 +144,10 @@ export interface GeneratorConfig {
 		gap: string;
 		typography: string;
 		/** Semantic typography recipe prefix. */
-		typographyRole?: string;
+		typographyRole: string;
 		borderRadius: string;
 		borderWidth: string;
 		time: string;
-	};
-
-	/** Separators for building variable names */
-	separators: {
-		modifier: string;
-		value: string;
-	};
-
-	/** Mode category assignments */
-	modeCategories: {
-		color: string[];
-		size: string[];
-		time: string[];
 	};
 
 	/** Color output format */
@@ -174,8 +161,6 @@ export interface GeneratorConfig {
 /** User-facing generator options. Every nested field is optional. */
 export interface GeneratorOptions {
 	prefixes?: Partial<GeneratorConfig['prefixes']>;
-	separators?: Partial<GeneratorConfig['separators']>;
-	modeCategories?: Partial<GeneratorConfig['modeCategories']>;
 	colorFormat?: Partial<GeneratorConfig['colorFormat']>;
 }
 
@@ -192,15 +177,6 @@ export const defaultGeneratorConfig: GeneratorConfig = {
 		borderRadius: 'bdr',
 		borderWidth: 'bdw',
 		time: 't',
-	},
-	separators: {
-		modifier: '-',
-		value: '-',
-	},
-	modeCategories: {
-		color: ['colors'],
-		size: ['spacing', 'gap', 'typography', 'borderRadius', 'borderWidth'],
-		time: ['time'],
 	},
 	colorFormat: {
 		base: 'oklch',

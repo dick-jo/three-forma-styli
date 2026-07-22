@@ -63,15 +63,16 @@ holistic project and does not replace `examples/project/generated`.
 
 ## Verification snapshot — 22 July 2026
 
-- `pnpm check:release`: 160 core tests, 60 CLI tests, both type suites, zero
+- `pnpm check:release`: 169 core tests, 63 CLI tests, both type suites, zero
   Svelte diagnostics, every workspace build, and the isolated packed-consumer
   test passed.
 - `pnpm audit --prod --audit-level=moderate`: no known vulnerabilities.
 - Core, themes and CLI tarball dry-runs contained their intended declarations,
   executable and exports.
 - Real `pnpm pack` tarballs rewrote `workspace:^` dependencies to ordinary
-  semver, installed together in a clean disposable consumer, and built the
-  complete 10-file default project successfully.
+  semver, installed together in a clean disposable consumer, passed strict
+  external TypeScript compilation, and built the complete default project
+  successfully.
 
 No package was published. The three public package manifests are prepared as one
 coordinated `0.2.0` release, and the release check proves their packed form works
@@ -135,10 +136,10 @@ modify the dirty Splinter worktree.
 - Preload policy and subset policy; neither should be inferred from mere file
   availability.
 
-Supreme's official delivery route and local technical proof are now known, but
-publishing or self-hosting it remains blocked on the project owner's review of
-the actual license terms. TFS's font checks record technical evidence and
-project attestations; they do not grant legal permission.
+Supreme's local technical proof is known. The project owner—not TFS—decides how
+the files are licensed and delivered. TFS records an explicit project attestation
+and technical capabilities; it neither grants permission nor silently redesigns
+the build around a speculative licensing interpretation.
 
 ## Positioning
 

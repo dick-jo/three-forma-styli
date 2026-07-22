@@ -1,0 +1,84 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import fs from 'fs-extra';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
+import { initCommand } from './init.js';
+import { buildCommand } from './build.js';
+import { figmaSyncCommand } from './figma-sync.js';
+
+const originalCwd = process.cwd();
+const require = createRequire(import.meta.url);
+const temporaryRoots: string[] = [];
+
+afterEach(async () => {
+	process.chdir(originalCwd);
+	vi.restoreAllMocks();
+	await Promise.all(temporaryRoots.splice(0).map((root) => fs.remove(root)));
+});
+
+describe('tfs init', () => {
+	it('creates a pinned, documented project that builds through the public workflow', async () => {
+		const temporaryRoot = await fs.mkdtemp(path.join(originalCwd, '.tfs-init-test-'));
+		temporaryRoots.push(temporaryRoot);
+		process.chdir(temporaryRoot);
+		vi.spyOn(console, 'log').mockImplementation(() => undefined);
+		vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+		await initCommand('gold-standard-system', { theme: 'default', skipInstall: true });
+		const projectRoot = path.join(temporaryRoot, 'gold-standard-system');
+		const manifest = await fs.readJson(path.join(projectRoot, 'package.json'));
+
+		expect(manifest.version).toBeUndefined();
+		expect(manifest.dependencies['@three-forma-styli/core']).toBe('^0.2.0');
+		expect(manifest.devDependencies['@three-forma-styli/cli']).toBe('^0.2.0');
+		expect(manifest.scripts).toEqual({
+			build: 'tfs build .',
+			check: 'tsc --noEmit && tfs build .',
+			specimen: 'tfs specimen serve .',
+		});
+		expect(await fs.pathExists(path.join(projectRoot, 'config.ts'))).toBe(false);
+		expect(await fs.pathExists(path.join(projectRoot, 'README.md'))).toBe(true);
+		execFileSync(
+			process.execPath,
+			[require.resolve('typescript/bin/tsc'), '--noEmit', '-p', projectRoot],
+			{
+				cwd: projectRoot,
+				stdio: 'inherit',
+			}
+		);
+
+		await buildCommand(projectRoot, {});
+		const buildManifest = await fs.readJson(path.join(projectRoot, 'dist/build.manifest.json'));
+		expect(buildManifest.tool.version).toBe('0.2.0');
+		expect(buildManifest.artifacts['tokens.css']).toBeDefined();
+		expect(buildManifest.artifacts['typography.specimen.html']).toBeDefined();
+
+		await expect(
+			figmaSyncCommand(projectRoot, { fileKey: 'dry-run', dryRun: true })
+		).resolves.toBeUndefined();
+	});
+
+	it('rejects path-like and otherwise unsafe non-interactive project names', async () => {
+		const temporaryRoot = await fs.mkdtemp(path.join(originalCwd, '.tfs-init-test-'));
+		temporaryRoots.push(temporaryRoot);
+		process.chdir(temporaryRoot);
+
+		await expect(
+			initCommand('../outside', { theme: 'default', skipInstall: true })
+		).rejects.toThrow(/must not contain a path/);
+		expect(await fs.pathExists(path.resolve(temporaryRoot, '../outside'))).toBe(false);
+	});
+
+	it('rejects unknown preset names instead of treating them as filesystem paths', async () => {
+		const temporaryRoot = await fs.mkdtemp(path.join(originalCwd, '.tfs-init-test-'));
+		temporaryRoots.push(temporaryRoot);
+		process.chdir(temporaryRoot);
+
+		await expect(
+			initCommand('safe-project', { theme: '../default', skipInstall: true })
+		).rejects.toThrow(/Starter preset/);
+		expect(await fs.pathExists(path.join(temporaryRoot, 'safe-project'))).toBe(false);
+	});
+});

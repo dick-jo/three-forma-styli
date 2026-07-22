@@ -21,6 +21,52 @@ export class ValidationError extends Error {
 	}
 }
 
+const tokenNamePattern = /^[a-z][a-z0-9-]*$/i;
+const cssUnitPattern = /^(?:%|[a-z][a-z0-9-]*)$/i;
+const openTypeTagPattern = /^[\x20-\x7e]{4}$/;
+
+type NamedMode = { name: string; isDefault?: boolean };
+
+function validateNamedModes(modes: NamedMode[], path: string, label: string): void {
+	const seen = new Map<string, number>();
+	const defaults: string[] = [];
+
+	for (const [index, mode] of modes.entries()) {
+		if (!mode.name) {
+			throw new ValidationError(`${label} mode at index ${index} must have a name`);
+		}
+		if (!tokenNamePattern.test(mode.name)) {
+			throw new ValidationError(`${path}[${index}].name "${mode.name}" is not CSS-token safe`);
+		}
+		const previous = seen.get(mode.name);
+		if (previous !== undefined) {
+			throw new ValidationError(
+				`${path} contains duplicate mode name "${mode.name}" at indexes ${previous} and ${index}`
+			);
+		}
+		seen.set(mode.name, index);
+		if (mode.isDefault === true) defaults.push(mode.name);
+	}
+
+	if (defaults.length > 1) {
+		throw new ValidationError(
+			`${path} must have at most one default mode; found ${defaults.map((name) => `"${name}"`).join(', ')}`
+		);
+	}
+}
+
+function validateCssUnit(unit: unknown, path: string): asserts unit is string {
+	if (typeof unit !== 'string' || !cssUnitPattern.test(unit)) {
+		throw new ValidationError(`${path} must be a CSS-safe unit such as "px", "rem", "%", or "ms"`);
+	}
+}
+
+function validateFiniteNumber(value: unknown, path: string): asserts value is number {
+	if (typeof value !== 'number' || !Number.isFinite(value)) {
+		throw new ValidationError(`${path} must be a finite number`);
+	}
+}
+
 /**
  * Validates a complete DesignSystem, throwing on any invalid input
  */
@@ -78,13 +124,13 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 		validateSpacingPartial(ds.spacing!);
 	}
 	if (hasGap) {
-		validateGapPartial(ds.gap!);
+		validateGapPartial(ds.gap!, ds.spacing!);
 	}
 	if (hasTypography) {
 		validateTypographyPartial(ds.typography!);
 	}
 	if (hasBorder) {
-		validateBorderPartial(ds.border!);
+		validateBorderPartial(ds.border!, ds.spacing);
 	}
 	if (hasTime) {
 		validateTimePartial(ds.time!);
@@ -99,15 +145,44 @@ function validateColorsPartial(colors: NonNullable<PartialDesignSystem['colors']
 	if (colors.modes.length === 0) {
 		throw new ValidationError('colors.modes must have at least one mode');
 	}
+	validateNamedModes(colors.modes, 'colors.modes', 'Color');
 
 	colors.modes.forEach((mode, index) => {
-		if (!mode.name) {
-			throw new ValidationError(`Color mode at index ${index} must have a name`);
-		}
 		if (!mode.tokens || typeof mode.tokens !== 'object') {
 			throw new ValidationError(`Color mode "${mode.name}" must have tokens`);
 		}
+		for (const [tokenName, color] of Object.entries(mode.tokens)) {
+			const path = `colors.modes["${mode.name}"].tokens.${tokenName}`;
+			if (!tokenNamePattern.test(tokenName)) {
+				throw new ValidationError(`${path} is not CSS-token safe`);
+			}
+			if (!color || typeof color !== 'object' || color.mode !== 'oklch') {
+				throw new ValidationError(`${path} must be an OKLCH color object`);
+			}
+			validateFiniteNumber(color.l, `${path}.l`);
+			if (color.l < 0 || color.l > 1) {
+				throw new ValidationError(`${path}.l must be between 0 and 1`);
+			}
+			const chroma = color.c ?? 0;
+			validateFiniteNumber(chroma, `${path}.c`);
+			if (chroma < 0) throw new ValidationError(`${path}.c must be non-negative`);
+			if (color.h !== undefined) validateFiniteNumber(color.h, `${path}.h`);
+			if (color.alpha !== undefined) {
+				validateFiniteNumber(color.alpha, `${path}.alpha`);
+				if (color.alpha !== 1) {
+					throw new ValidationError(
+						`${path}.alpha must be 1; define transparency through colors.alphaSchedule`
+					);
+				}
+			}
+		}
 	});
+	const defaultMode = colors.modes.find((mode) => mode.isDefault) ?? colors.modes[0];
+	if (Object.keys(defaultMode.tokens).length === 0) {
+		throw new ValidationError(
+			`Default color mode "${defaultMode.name}" must define at least one token`
+		);
+	}
 
 	if (colors.alphaSchedule) {
 		validateAlphaSchedule(colors.alphaSchedule, 'colors.alphaSchedule');
@@ -135,24 +210,20 @@ function validateSpacingPartial(spacing: NonNullable<PartialDesignSystem['spacin
 	if (spacing.modes.length === 0) {
 		throw new ValidationError('spacing.modes must have at least one mode');
 	}
+	validateNamedModes(spacing.modes, 'spacing.modes', 'Spacing');
 
-	spacing.modes.forEach((mode, index) => {
-		if (!mode.name) {
-			throw new ValidationError(`Spacing mode at index ${index} must have a name`);
-		}
+	spacing.modes.forEach((mode) => {
 		if (!mode.tokens) {
 			throw new ValidationError(`Spacing mode "${mode.name}" must have tokens`);
 		}
 
 		const { unit, base, min, range } = mode.tokens;
 
-		if (!unit || typeof unit !== 'string') {
-			throw new ValidationError(`Spacing mode "${mode.name}" must have a unit string`);
-		}
-		if (typeof base !== 'number' || base <= 0) {
+		validateCssUnit(unit, `spacing.modes["${mode.name}"].tokens.unit`);
+		if (typeof base !== 'number' || !Number.isFinite(base) || base <= 0) {
 			throw new ValidationError(`Spacing mode "${mode.name}" base must be a positive number`);
 		}
-		if (typeof min !== 'number' || min < 0) {
+		if (typeof min !== 'number' || !Number.isFinite(min) || min < 0) {
 			throw new ValidationError(`Spacing mode "${mode.name}" min must be a non-negative number`);
 		}
 		if (typeof range !== 'number' || range < 1 || !Number.isInteger(range)) {
@@ -161,7 +232,54 @@ function validateSpacingPartial(spacing: NonNullable<PartialDesignSystem['spacin
 	});
 }
 
-function validateGapPartial(gap: NonNullable<PartialDesignSystem['gap']>): void {
+function validateSpacingDerivedTokens(
+	tokens: Record<string, unknown>,
+	modeName: string,
+	spacing: NonNullable<PartialDesignSystem['spacing']>,
+	path: string
+): void {
+	const allowedKeys = new Set(['unit', 'spacingMode', 'min', 's', 'l', 'max']);
+	for (const key of Object.keys(tokens)) {
+		if (!allowedKeys.has(key)) {
+			throw new ValidationError(`${path} contains unsupported key "${key}"`);
+		}
+	}
+	if (tokens.unit !== undefined) validateCssUnit(tokens.unit, `${path}.unit`);
+	if (tokens.spacingMode !== undefined && typeof tokens.spacingMode !== 'string') {
+		throw new ValidationError(`${path}.spacingMode must be a mode name`);
+	}
+
+	const requestedSpacingMode = tokens.spacingMode as string | undefined;
+	const spacingMode = requestedSpacingMode
+		? spacing.modes.find((mode) => mode.name === requestedSpacingMode)
+		: (spacing.modes.find((mode) => mode.name === modeName) ??
+			spacing.modes.find((mode) => mode.isDefault) ??
+			spacing.modes[0]);
+	if (!spacingMode) {
+		throw new ValidationError(
+			`${path}.spacingMode references unknown spacing mode "${requestedSpacingMode}"`
+		);
+	}
+
+	for (const key of ['min', 's', 'l', 'max'] as const) {
+		const value = tokens[key];
+		if (value === 'min') continue;
+		if (
+			!Number.isInteger(value) ||
+			(value as number) < 1 ||
+			(value as number) > spacingMode.tokens.range
+		) {
+			throw new ValidationError(
+				`${path}.${key} must be "min" or an integer from 1 to ${spacingMode.tokens.range} for spacing mode "${spacingMode.name}"`
+			);
+		}
+	}
+}
+
+function validateGapPartial(
+	gap: NonNullable<PartialDesignSystem['gap']>,
+	spacing: NonNullable<PartialDesignSystem['spacing']>
+): void {
 	if (!gap.modes || !Array.isArray(gap.modes)) {
 		throw new ValidationError('gap.modes must be an array');
 	}
@@ -169,14 +287,18 @@ function validateGapPartial(gap: NonNullable<PartialDesignSystem['gap']>): void 
 	if (gap.modes.length === 0) {
 		throw new ValidationError('gap.modes must have at least one mode');
 	}
+	validateNamedModes(gap.modes, 'gap.modes', 'Gap');
 
-	gap.modes.forEach((mode, index) => {
-		if (!mode.name) {
-			throw new ValidationError(`Gap mode at index ${index} must have a name`);
-		}
+	gap.modes.forEach((mode) => {
 		if (!mode.tokens) {
 			throw new ValidationError(`Gap mode "${mode.name}" must have tokens`);
 		}
+		validateSpacingDerivedTokens(
+			mode.tokens as unknown as Record<string, unknown>,
+			mode.name,
+			spacing,
+			`gap.modes["${mode.name}"].tokens`
+		);
 	});
 }
 
@@ -190,21 +312,17 @@ function validateTypographyPartial(
 	if (typography.modes.length === 0) {
 		throw new ValidationError('typography.modes must have at least one mode');
 	}
+	validateNamedModes(typography.modes, 'typography.modes', 'Typography');
 
-	typography.modes.forEach((mode, index) => {
-		if (!mode.name) {
-			throw new ValidationError(`Typography mode at index ${index} must have a name`);
-		}
+	typography.modes.forEach((mode) => {
 		if (!mode.tokens) {
 			throw new ValidationError(`Typography mode "${mode.name}" must have tokens`);
 		}
 
 		const { unit, base, min, increment, range } = mode.tokens;
 
-		if (!unit || typeof unit !== 'string') {
-			throw new ValidationError(`Typography mode "${mode.name}" must have a unit string`);
-		}
-		if (typeof base !== 'number' || base <= 0) {
+		validateCssUnit(unit, `typography.modes["${mode.name}"].tokens.unit`);
+		if (typeof base !== 'number' || !Number.isFinite(base) || base <= 0) {
 			throw new ValidationError(`Typography mode "${mode.name}" base must be a positive number`);
 		}
 		if (typeof min !== 'number' || !Number.isFinite(min) || min <= 0 || min >= base) {
@@ -224,9 +342,6 @@ function validateTypographyPartial(
 
 	validateTypographySemanticLayer(typography);
 }
-
-const tokenNamePattern = /^[a-z][a-z0-9-]*$/i;
-const openTypeTagPattern = /^[\x20-\x7e]{4}$/;
 
 function supportsTypographyWeight(
 	available: number[] | { min: number; max: number },
@@ -504,9 +619,9 @@ function validateTypographySemanticLayer(
 		}
 		const defaultStyleSelection = styles[defaultStyle]!;
 
+		if (!role.base) throw new ValidationError(`Typography role "${roleName}" must define base`);
 		const smallestModeRange = Math.min(...typography.modes.map((mode) => mode.tokens.range));
 		const recipes = [['base', role.base] as const, ...Object.entries(role.variants ?? {})];
-		if (!role.base) throw new ValidationError(`Typography role "${roleName}" must define base`);
 		if (role.variants && 'base' in role.variants) {
 			throw new ValidationError(
 				`Typography role "${roleName}" variant "base" is reserved for the unsuffixed role recipe`
@@ -665,7 +780,10 @@ function validateTypographySemanticLayer(
 	}
 }
 
-function validateBorderPartial(border: NonNullable<PartialDesignSystem['border']>): void {
+function validateBorderPartial(
+	border: NonNullable<PartialDesignSystem['border']>,
+	spacing: PartialDesignSystem['spacing']
+): void {
 	// Validate radius if present
 	if (border.radius) {
 		if (!border.radius.modes || !Array.isArray(border.radius.modes)) {
@@ -675,14 +793,21 @@ function validateBorderPartial(border: NonNullable<PartialDesignSystem['border']
 		if (border.radius.modes.length === 0) {
 			throw new ValidationError('border.radius.modes must have at least one mode');
 		}
+		validateNamedModes(border.radius.modes, 'border.radius.modes', 'Border radius');
 
-		border.radius.modes.forEach((mode, index) => {
-			if (!mode.name) {
-				throw new ValidationError(`Border radius mode at index ${index} must have a name`);
-			}
+		border.radius.modes.forEach((mode) => {
 			if (!mode.tokens) {
 				throw new ValidationError(`Border radius mode "${mode.name}" must have tokens`);
 			}
+			if (!spacing) {
+				throw new ValidationError('Border radius requires spacing');
+			}
+			validateSpacingDerivedTokens(
+				mode.tokens as unknown as Record<string, unknown>,
+				mode.name,
+				spacing,
+				`border.radius.modes["${mode.name}"].tokens`
+			);
 		});
 	}
 
@@ -695,21 +820,17 @@ function validateBorderPartial(border: NonNullable<PartialDesignSystem['border']
 		if (border.width.modes.length === 0) {
 			throw new ValidationError('border.width.modes must have at least one mode');
 		}
+		validateNamedModes(border.width.modes, 'border.width.modes', 'Border width');
 
-		border.width.modes.forEach((mode, index) => {
-			if (!mode.name) {
-				throw new ValidationError(`Border width mode at index ${index} must have a name`);
-			}
+		border.width.modes.forEach((mode) => {
 			if (!mode.tokens) {
 				throw new ValidationError(`Border width mode "${mode.name}" must have tokens`);
 			}
 
 			const { unit, value } = mode.tokens;
 
-			if (!unit || typeof unit !== 'string') {
-				throw new ValidationError(`Border width mode "${mode.name}" must have a unit string`);
-			}
-			if (typeof value !== 'number' || value < 0) {
+			validateCssUnit(unit, `border.width.modes["${mode.name}"].tokens.unit`);
+			if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
 				throw new ValidationError(
 					`Border width mode "${mode.name}" value must be a non-negative number`
 				);
@@ -726,11 +847,9 @@ function validateTimePartial(time: NonNullable<PartialDesignSystem['time']>): vo
 	if (time.modes.length === 0) {
 		throw new ValidationError('time.modes must have at least one mode');
 	}
+	validateNamedModes(time.modes, 'time.modes', 'Time');
 
-	time.modes.forEach((mode, index) => {
-		if (!mode.name) {
-			throw new ValidationError(`Time mode at index ${index} must have a name`);
-		}
+	time.modes.forEach((mode) => {
 		if (!mode.tokens) {
 			throw new ValidationError(`Time mode "${mode.name}" must have tokens`);
 		}
@@ -747,8 +866,11 @@ function validateAlphaSchedule(schedule: AlphaSchedule, path: string): void {
 	}
 
 	for (const [level, value] of entries) {
-		if (typeof value !== 'number') {
-			throw new ValidationError(`${path}.${level} must be a number`);
+		if (!tokenNamePattern.test(level)) {
+			throw new ValidationError(`${path} alpha level "${level}" is not CSS-token safe`);
+		}
+		if (typeof value !== 'number' || !Number.isFinite(value)) {
+			throw new ValidationError(`${path}.${level} must be a finite number`);
 		}
 		if (value < 0 || value > 1) {
 			throw new ValidationError(`${path}.${level} must be between 0 and 1 (got ${value})`);
@@ -767,7 +889,7 @@ function validateGap(ds: DesignSystem): void {
 	if (!ds.gap) {
 		throw new ValidationError('DesignSystem.gap is required');
 	}
-	validateGapPartial(ds.gap);
+	validateGapPartial(ds.gap, ds.spacing);
 }
 
 function validateTypography(ds: DesignSystem): void {
@@ -790,7 +912,7 @@ function validateBorder(ds: DesignSystem): void {
 		throw new ValidationError('DesignSystem.border.width is required');
 	}
 
-	validateBorderPartial(ds.border);
+	validateBorderPartial(ds.border, ds.spacing);
 }
 
 function validateTime(ds: DesignSystem): void {
@@ -804,13 +926,11 @@ function validateTimeTokens(
 	tokens: { unit: string; base: number; min: number; range: number },
 	path: string
 ): void {
-	if (!tokens.unit || typeof tokens.unit !== 'string') {
-		throw new ValidationError(`${path} must have a unit string`);
-	}
-	if (typeof tokens.base !== 'number' || tokens.base < 0) {
+	validateCssUnit(tokens.unit, `${path}.unit`);
+	if (typeof tokens.base !== 'number' || !Number.isFinite(tokens.base) || tokens.base < 0) {
 		throw new ValidationError(`${path}.base must be a non-negative number`);
 	}
-	if (typeof tokens.min !== 'number' || tokens.min < 0) {
+	if (typeof tokens.min !== 'number' || !Number.isFinite(tokens.min) || tokens.min < 0) {
 		throw new ValidationError(`${path}.min must be a non-negative number`);
 	}
 	if (typeof tokens.range !== 'number' || tokens.range < 1 || !Number.isInteger(tokens.range)) {

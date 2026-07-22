@@ -14,15 +14,13 @@ Generate CSS custom properties from TypeScript-defined design systems. Built for
 ## Quick Start
 
 ```bash
-# Use a global CLI only for the initial scaffold
-npm install -g @three-forma-styli/cli
-
-# Initialize a new theme project
-tfs init
+# Run the published CLI once; the scaffold installs its own local copy
+npx @three-forma-styli/cli init my-design-system
+cd my-design-system
 
 # Edit your theme files (with full TypeScript IntelliSense)
 # Then generate the configured portable dist/ directory
-tfs build .
+npm run check
 
 # A targeted single-file build can emit one format
 tfs build ./index.ts --format dtcg --output tokens.json
@@ -54,8 +52,9 @@ tooling, not a published package or consumer dependency. Installing the CLI/core
 does not install or bundle Svelte.
 
 The public packages share a coordinated release version and are verified as
-packed artifacts before publishing. See [the package architecture](docs/package-architecture.md)
-and [release procedure](docs/releasing.md).
+packed artifacts—including an external TypeScript consumer—before publishing.
+See [the package architecture](docs/package-architecture.md),
+[validation policy](docs/validation.md), and [release procedure](docs/releasing.md).
 
 ## Architecture
 
@@ -259,9 +258,7 @@ For apps that generate themes at runtime:
 import { generate, toCss, oklch } from '@three-forma-styli/core';
 import type { DesignSystem } from '@three-forma-styli/core';
 
-const system: DesignSystem = {
-	/* ... */
-};
+const system: DesignSystem = {/* ... */};
 const css = toCss(generate(system));
 ```
 
@@ -275,9 +272,7 @@ import type { PartialDesignSystem } from '@three-forma-styli/core';
 
 // Only generate colors - no spacing, typography, etc.
 const colorOverlay: PartialDesignSystem = {
-	colors: {
-		/* ... */
-	},
+	colors: {/* ... */},
 };
 
 const css = toCss(generate(colorOverlay));
@@ -285,7 +280,7 @@ const css = toCss(generate(colorOverlay));
 
 ## Configuration
 
-Customize token prefixes, separators, and selectors:
+Customize token prefixes and selectors:
 
 ```typescript
 const config = {
@@ -321,9 +316,11 @@ consumer update procedure.
 
 Current implementation references:
 
+- [Overnight hardening handoff](docs/overnight-hardening-2026-07-22.md)
 - [Verified implementation state](docs/audit-2026-07-22.md)
 - [Typography foundation](docs/typography-foundation.md)
 - [Typography fallback metrics](docs/typography-fallback-metrics.md)
+- [Validation and failure policy](docs/validation.md)
 - [Scatter source reconciliation](docs/scatter-source-reconciliation.md)
 
 ## Design Decisions

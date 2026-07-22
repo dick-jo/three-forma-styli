@@ -334,12 +334,6 @@ interface GeneratorConfig {
     time: string;         // default: 't'
   };
 
-  // Mode grouping for output
-  modeCategories: {
-    color: string[];  // default: ['colors']
-    size: string[];   // default: ['spacing', 'gap', 'typography', 'borderRadius', 'borderWidth']
-    time: string[];   // default: ['time']
-  };
 }
 ```
 

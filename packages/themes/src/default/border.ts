@@ -48,13 +48,13 @@ const BORDER_WIDTH_MODES: Record<string, BorderWidthMode> = {
 	small: {
 		tokens: {
 			unit: 'px',
-			value: 0.5, // 0.5px border width
+			value: 1, // Density modes do not thin structural borders
 		},
 	},
 	large: {
 		tokens: {
 			unit: 'px',
-			value: 2, // 2px border width
+			value: 1, // Density modes do not thicken structural borders
 		},
 	},
 };

@@ -93,7 +93,7 @@ function recipeTokens(
 	role: TypographyRole,
 	config: GeneratorConfig
 ): { tokens: TokenValue[]; contract: TypographyContractRecipe } {
-	const rolePrefix = `${config.prefixes.typographyRole ?? 'typo'}-${roleName}`;
+	const rolePrefix = `${config.prefixes.typographyRole}-${roleName}`;
 	const recipePrefix = variantName ? `${rolePrefix}-${variantName}` : rolePrefix;
 	const settings = resolvedSettings(role, role.base, recipe);
 	const tokens: TokenValue[] = [
@@ -198,7 +198,7 @@ export function generateTypographyContract(
 	);
 	const roles = Object.fromEntries(
 		Object.entries(typography.roles).map(([roleName, role]) => {
-			const rolePrefix = `${config.prefixes.typographyRole ?? 'typo'}-${roleName}`;
+			const rolePrefix = `${config.prefixes.typographyRole}-${roleName}`;
 			const styles = normalizedStyles(role);
 			const base = recipeTokens(roleName, undefined, role.base, role, config).contract;
 			const variants = Object.fromEntries(
@@ -238,7 +238,7 @@ export function generateTypographyContract(
 		})
 	);
 	return {
-		namespace: config.prefixes.typographyRole ?? 'text',
+		namespace: config.prefixes.typographyRole,
 		fonts,
 		roles,
 	};
@@ -251,7 +251,7 @@ function generateSemanticTokens(
 	if (!typography.fonts || !typography.roles) return [];
 	const tokens: TokenValue[] = [];
 	for (const [roleName, role] of Object.entries(typography.roles)) {
-		const rolePrefix = `${config.prefixes.typographyRole ?? 'typo'}-${roleName}`;
+		const rolePrefix = `${config.prefixes.typographyRole}-${roleName}`;
 		const font = typography.fonts[role.font];
 		tokens.push({
 			family: 'typography',

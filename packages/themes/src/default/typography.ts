@@ -21,6 +21,24 @@ export const TYPOGRAPHY_MODES: Record<string, TypographyMode> = {
 			range: 12,
 		},
 	},
+	small: {
+		tokens: {
+			unit: 'rem',
+			base: 0.6875,
+			min: 0.625,
+			increment: 0.125,
+			range: 12,
+		},
+	},
+	large: {
+		tokens: {
+			unit: 'rem',
+			base: 0.8125,
+			min: 0.6875,
+			increment: 0.125,
+			range: 12,
+		},
+	},
 };
 
 /** Physical stacks only. Semantic weight aliases belong to roles. */
@@ -103,8 +121,8 @@ export const TYPOGRAPHY_ROLES: Record<string, TypographyRole> = {
 	},
 };
 
-export const typography: DesignSystem['typography'] = {
+export const typography = {
 	modes: Object.entries(TYPOGRAPHY_MODES).map(([name, mode]) => ({ name, ...mode })),
 	fonts: TYPOGRAPHY_FONTS,
 	roles: TYPOGRAPHY_ROLES,
-};
+} satisfies DesignSystem['typography'];

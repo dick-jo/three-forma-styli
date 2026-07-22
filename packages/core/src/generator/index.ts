@@ -43,6 +43,31 @@ const emptyResult: GeneratorResult = {
 	modeInfo: { default: '', overrides: [] },
 };
 
+const cssNamespacePattern = /^[a-z][a-z0-9-]*$/i;
+
+function validateConfig(config: GeneratorConfig): void {
+	for (const [name, prefix] of Object.entries(config.prefixes)) {
+		if (!cssNamespacePattern.test(prefix)) {
+			throw new ValidationError(
+				`Generator prefix "${name}" must be a CSS-safe namespace beginning with a letter`
+			);
+		}
+	}
+	if (!cssNamespacePattern.test(config.colorFormat.alphaModifier)) {
+		throw new ValidationError('Generator colorFormat.alphaModifier must be CSS-token safe');
+	}
+	if (!['hex', 'hex-p3', 'oklch', 'rgb'].includes(config.colorFormat.base)) {
+		throw new ValidationError(
+			`Unsupported generator base color format "${config.colorFormat.base}"`
+		);
+	}
+	if (!['rgba', 'oklch', 'hexa', 'hexa-p3'].includes(config.colorFormat.alpha)) {
+		throw new ValidationError(
+			`Unsupported generator alpha color format "${config.colorFormat.alpha}"`
+		);
+	}
+}
+
 /**
  * Merge user config with defaults
  */
@@ -56,14 +81,6 @@ function mergeConfig(userConfig?: GeneratorOptions): GeneratorConfig {
 			...defaultGeneratorConfig.prefixes,
 			...userConfig.prefixes,
 		},
-		separators: {
-			...defaultGeneratorConfig.separators,
-			...userConfig.separators,
-		},
-		modeCategories: {
-			...defaultGeneratorConfig.modeCategories,
-			...userConfig.modeCategories,
-		},
 		colorFormat: {
 			...defaultGeneratorConfig.colorFormat,
 			...userConfig.colorFormat,
@@ -74,9 +91,16 @@ function mergeConfig(userConfig?: GeneratorOptions): GeneratorConfig {
 /**
  * Convert array of tokens to record keyed by token name
  */
-function tokensToRecord(tokens: TokenValue[]): Record<string, TokenValue> {
+function tokensToRecord(tokens: TokenValue[], context: string): Record<string, TokenValue> {
 	const record: Record<string, TokenValue> = {};
 	for (const token of tokens) {
+		const previous = record[token.name];
+		if (previous) {
+			throw new ValidationError(
+				`Generated token "--${token.name}" collides between ${previous.family} and ${token.family} in ${context}. ` +
+					'Choose distinct authored names or generator prefixes.'
+			);
+		}
 		record[token.name] = token;
 	}
 	return record;
@@ -96,7 +120,9 @@ function validateOverrideModeIdentity(colorOverrides: string[], sizeOverrides: s
 		throw new ValidationError(
 			`Override mode name${collisions.length === 1 ? '' : 's'} ${collisions
 				.map((name) => `"${name}"`)
-				.join(', ')} ${collisions.length === 1 ? 'is' : 'are'} used by both color and size categories. ` +
+				.join(
+					', '
+				)} ${collisions.length === 1 ? 'is' : 'are'} used by both color and size categories. ` +
 				'Use distinct names so each override maps to exactly one CSS selector category.'
 		);
 	}
@@ -129,6 +155,7 @@ export function generate(
 
 	// Merge config
 	const config = mergeConfig(userConfig);
+	validateConfig(config);
 
 	// Generate tokens for each family (if provided)
 	const colorResult = designSystem.colors
@@ -219,7 +246,7 @@ export function generate(
 		}
 
 		if (modeTokens.length > 0) {
-			overrideTokens[modeName] = tokensToRecord(modeTokens);
+			overrideTokens[modeName] = tokensToRecord(modeTokens, `mode "${modeName}"`);
 		}
 	}
 
@@ -242,7 +269,7 @@ export function generate(
 		)?.modeInfo.default ?? '';
 
 	return {
-		tokens: tokensToRecord(allDefaultTokens),
+		tokens: tokensToRecord(allDefaultTokens, 'the default token set'),
 		typography: designSystem.typography
 			? generateTypographyContract(designSystem.typography, config)
 			: undefined,

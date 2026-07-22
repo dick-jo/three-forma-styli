@@ -2,6 +2,7 @@
 	"name": "@three-forma-styli/core",
 	"version": "0.2.0",
 	"type": "module",
+	"sideEffects": false,
 	"description": "Core design token generation library - framework-agnostic, browser and Node.js compatible",
 	"exports": {
 		".": {
@@ -10,7 +11,8 @@
 		}
 	},
 	"files": [
-		"dist"
+		"dist",
+		"CHANGELOG.md"
 	],
 	"scripts": {
 		"build": "node ../../scripts/clean.mjs && tsc",
@@ -38,7 +40,7 @@
 		"access": "public"
 	},
 	"engines": {
-		"node": ">=18"
+		"node": ">=22"
 	},
 	"dependencies": {
 		"culori": "^4.0.1"
