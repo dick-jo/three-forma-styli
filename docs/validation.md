@@ -21,6 +21,14 @@ the stable CSS/TypeScript output safely.
 Every family must have unique mode names and at most one explicit default. When no
 mode is marked, the first remains the deliberate backwards-compatible default.
 
+Families in one category do not need identical override sets. A mode may affect
+only typography, for example. Reusing the same size-mode name across spacing,
+gap, typography, radius, and width intentionally combines their declarations
+under one selector; omitting that name from a family leaves its defaults intact.
+Semantic typography font-size aliases are rebound in every authored typography
+mode; other semantic role properties remain inherited because the mode does not
+change them.
+
 ## Numbers and units
 
 - All numeric inputs must be finite. `NaN` and infinities never reach formatting.

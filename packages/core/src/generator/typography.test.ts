@@ -102,7 +102,7 @@ describe('generateTypographyTokens', () => {
 		expect(tokens['ff-editorial']).toBeUndefined();
 	});
 
-	it('keeps semantic references stable while atomic modes change', () => {
+	it('rebinds semantic size aliases inside atomic modes so descendant scopes resolve them', () => {
 		const typography: DesignSystem['typography'] = {
 			...semanticTypography,
 			modes: [
@@ -114,9 +114,35 @@ describe('generateTypographyTokens', () => {
 			],
 		};
 		const result = generateTypographyTokens(typography, defaultGeneratorConfig);
-		expect(result.overrideTokens.compact.some((token) => token.name.startsWith('text-'))).toBe(
-			false
-		);
+		expect(
+			Object.fromEntries(result.overrideTokens.compact.map((token) => [token.name, token.value]))
+		).toMatchObject({
+			'text-copy-font-size': 'var(--fs-2)',
+			'text-copy-compact-font-size': 'var(--fs-1)',
+			'text-copy-display-font-size': 'var(--fs-7)',
+		});
+		expect(
+			result.overrideTokens.compact.filter((token) => token.name.startsWith('text-'))
+		).toHaveLength(3);
+		expect(
+			result.overrideTokens.compact.some(
+				(token) => token.name.startsWith('text-') && !token.name.endsWith('-font-size')
+			)
+		).toBe(false);
+	});
+
+	it('does not invent semantic rebindings for an atomic-only typography system', () => {
+		const typography: DesignSystem['typography'] = {
+			modes: [
+				...basicTypography.modes,
+				{
+					name: 'compact',
+					tokens: { unit: 'rem', base: 0.875, min: 0.5, increment: 0.1, range: 8 },
+				},
+			],
+		};
+		const result = generateTypographyTokens(typography, defaultGeneratorConfig);
+		expect(result.overrideTokens.compact.every((token) => token.name.startsWith('fs-'))).toBe(true);
 	});
 
 	it('strictly rejects a role weight unavailable in a prepared static face', () => {

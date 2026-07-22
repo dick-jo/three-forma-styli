@@ -54,6 +54,9 @@ interface DesignSystem {
 ```
 
 Each token family has **modes** - a default mode plus optional override modes.
+Override participation is family-selective: families may share a mode name to
+coordinate one selector, but a family is never required to implement every mode
+used by another family in the same category.
 
 ### Mode Categories
 
@@ -583,6 +586,17 @@ Constraints system works with any color names. Users can follow conventions (bg,
 
 ### Why separate mode categories?
 Avoids selector collision. Color modes and size modes are independent concerns - a dark theme can be small or large.
+
+### Must every size family implement every size mode?
+No. Modes are authored per family. Shared names coordinate deliberate overrides;
+unique names support focused contexts such as a typography-only fixed-canvas
+`display` mode. Missing family participation means “keep its default tokens,” not
+“derive an override.”
+
+Semantic font-size aliases are the deliberate exception to “atomic tokens only”
+inside a typography override block. TFS re-declares those aliases alongside the
+new `--fs-*` ruler so a mode scoped below `:root` resolves role recipes against
+the local scale instead of the already-resolved root scale.
 
 ### Why resolve gap/border-radius to values (not var references)?
 Simpler debugging (see actual value in devtools). No dependency chain issues. Works across different mode selectors.

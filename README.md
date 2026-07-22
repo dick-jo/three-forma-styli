@@ -250,6 +250,17 @@ Typography may define multiple atomic size modes just like spacing. Semantic rol
 continue to reference the stable `--fs-*` names, so a compact mode can alter the
 atomic scale without coupling density to a second set of role names.
 
+Size-mode participation is family-selective. A fixed-canvas `display` mode may
+override typography alone, while a responsive `small` mode can coordinate
+spacing, gaps, typography, radii, and borders under the same selector. TFS emits
+only the families that explicitly author that mode; it never invents companion
+overrides.
+
+When semantic typography roles are present, each typography mode also rebinds
+their `--text-*-font-size` aliases within the mode selector. This is required by
+CSS custom-property inheritance: overriding only `--fs-*` on a descendant does
+not retarget an alias that was inherited after resolving in `:root`.
+
 ## Programmatic Usage
 
 For apps that generate themes at runtime:

@@ -46,6 +46,22 @@ function typographyReference(reference: FontSizeReference, prefix: string): stri
 	return `var(--${prefix}-${reference})`;
 }
 
+function recipeFontSizeToken(
+	roleName: string,
+	variantName: string | undefined,
+	recipe: TypographyRecipe,
+	config: GeneratorConfig
+): TokenValue {
+	const rolePrefix = `${config.prefixes.typographyRole}-${roleName}`;
+	const recipePrefix = variantName ? `${rolePrefix}-${variantName}` : rolePrefix;
+	return {
+		family: 'typography',
+		name: `${recipePrefix}-font-size`,
+		value: typographyReference(recipe.fontSize, config.prefixes.typography),
+		reference: `${config.prefixes.typography}-${recipe.fontSize}`,
+	};
+}
+
 function featureSettings(features: Record<string, TypographyFeatureValue>): string {
 	return Object.entries(features)
 		.sort(([left], [right]) => left.localeCompare(right))
@@ -97,12 +113,7 @@ function recipeTokens(
 	const recipePrefix = variantName ? `${rolePrefix}-${variantName}` : rolePrefix;
 	const settings = resolvedSettings(role, role.base, recipe);
 	const tokens: TokenValue[] = [
-		{
-			family: 'typography',
-			name: `${recipePrefix}-font-size`,
-			value: typographyReference(recipe.fontSize, config.prefixes.typography),
-			reference: `${config.prefixes.typography}-${recipe.fontSize}`,
-		},
+		recipeFontSizeToken(roleName, variantName, recipe, config),
 		{
 			family: 'typography',
 			name: `${recipePrefix}-font-weight`,
@@ -288,6 +299,30 @@ function generateSemanticTokens(
 	return tokens;
 }
 
+/**
+ * Re-declare semantic size aliases inside every atomic typography mode.
+ *
+ * A custom property inherited from :root resolves references in :root's
+ * context. Replacing only --fs-* on a descendant would therefore leave
+ * --text-*-font-size pinned to the default scale. Rebinding the aliases in
+ * the mode selector preserves the public semantic token contract and makes
+ * descendant-scoped size modes work in real CSS.
+ */
+function generateSemanticFontSizeTokens(
+	typography: DesignSystem['typography'],
+	config: GeneratorConfig
+): TokenValue[] {
+	if (!typography.roles) return [];
+	const tokens: TokenValue[] = [];
+	for (const [roleName, role] of Object.entries(typography.roles)) {
+		tokens.push(recipeFontSizeToken(roleName, undefined, role.base, config));
+		for (const [variantName, recipe] of Object.entries(role.variants ?? {})) {
+			tokens.push(recipeFontSizeToken(roleName, variantName, recipe, config));
+		}
+	}
+	return tokens;
+}
+
 function generateTokensForMode(
 	mode: TypographyMode & { name: string },
 	config: GeneratorConfig
@@ -328,7 +363,10 @@ export function generateTypographyTokens(
 	];
 	const overrideTokens: Record<string, TokenValue[]> = {};
 	for (const mode of overrideModes) {
-		overrideTokens[mode.name] = generateTokensForMode(mode, config);
+		overrideTokens[mode.name] = [
+			...generateTokensForMode(mode, config),
+			...generateSemanticFontSizeTokens(typography, config),
+		];
 	}
 	return {
 		defaultTokens,

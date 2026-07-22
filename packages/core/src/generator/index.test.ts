@@ -87,4 +87,37 @@ describe('generate mode identity', () => {
 		expect(result.modes.size.overrides).toEqual(['compact']);
 		expect(result.overrideTokens.compact).toBeDefined();
 	});
+
+	it('allows a size mode to participate in only the family that needs it', () => {
+		const result = generate({
+			spacing: {
+				modes: [
+					{
+						name: 'default',
+						isDefault: true,
+						tokens: { unit: 'px', base: 8, min: 4, range: 4 },
+					},
+				],
+			},
+			typography: {
+				modes: [
+					{
+						name: 'default',
+						isDefault: true,
+						tokens: { unit: 'rem', base: 0.75, min: 0.625, increment: 0.125, range: 4 },
+					},
+					{
+						name: 'display',
+						tokens: { unit: 'px', base: 24, min: 16, increment: 16, range: 4 },
+					},
+				],
+			},
+		});
+
+		expect(result.modes.size.overrides).toEqual(['display']);
+		expect(Object.values(result.overrideTokens.display)).toHaveLength(5);
+		expect(
+			Object.values(result.overrideTokens.display).every(({ family }) => family === 'typography')
+		).toBe(true);
+	});
 });
