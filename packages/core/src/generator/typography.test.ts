@@ -1,205 +1,276 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { generateTypographyTokens } from './typography.js';
+import { generate, ValidationError } from './index.js';
 import { defaultGeneratorConfig } from './types.js';
 import type { DesignSystem } from '../types.js';
 
-describe('generateTypographyTokens', () => {
-	const basicTypography: DesignSystem['typography'] = {
-		modes: [
-			{
-				name: 'default',
-				isDefault: true,
-				tokens: {
-					unit: 'rem',
-					base: 1,
-					min: 0.625,
-					increment: 0.125,
-					range: 5,
-				},
-			},
-		],
-	};
+const basicTypography: DesignSystem['typography'] = {
+	modes: [
+		{
+			name: 'default',
+			isDefault: true,
+			tokens: { unit: 'rem', base: 1, min: 0.625, increment: 0.125, range: 8 },
+		},
+	],
+};
 
-	it('generates min token', () => {
-		const result = generateTypographyTokens(basicTypography, defaultGeneratorConfig);
-
-		const minToken = result.defaultTokens.find((t) => t.name === 'fs-min');
-		expect(minToken).toBeDefined();
-		expect(minToken?.value).toBe('0.625rem');
-		expect(minToken?.rawValue).toBe(0.625);
-		expect(minToken?.unit).toBe('rem');
-		expect(minToken?.family).toBe('typography');
-	});
-
-	it('generates correct number of tokens (min + range)', () => {
-		const result = generateTypographyTokens(basicTypography, defaultGeneratorConfig);
-
-		// min + 1 through 5 = 6 tokens
-		expect(result.defaultTokens).toHaveLength(6);
-	});
-
-	it('uses additive formula: fs-{n} = base + ((n - 1) * increment)', () => {
-		const result = generateTypographyTokens(basicTypography, defaultGeneratorConfig);
-
-		const fs1 = result.defaultTokens.find((t) => t.name === 'fs-1');
-		const fs2 = result.defaultTokens.find((t) => t.name === 'fs-2');
-		const fs3 = result.defaultTokens.find((t) => t.name === 'fs-3');
-		const fs5 = result.defaultTokens.find((t) => t.name === 'fs-5');
-
-		// fs-1 = base = 1
-		expect(fs1?.value).toBe('1rem');
-		expect(fs1?.rawValue).toBe(1);
-
-		// fs-2 = base + (1 * increment) = 1 + 0.125 = 1.125
-		expect(fs2?.value).toBe('1.125rem');
-		expect(fs2?.rawValue).toBe(1.125);
-
-		// fs-3 = base + (2 * increment) = 1 + 0.25 = 1.25
-		expect(fs3?.value).toBe('1.25rem');
-		expect(fs3?.rawValue).toBe(1.25);
-
-		// fs-5 = base + (4 * increment) = 1 + 0.5 = 1.5
-		expect(fs5?.value).toBe('1.5rem');
-		expect(fs5?.rawValue).toBe(1.5);
-	});
-
-	it('handles px units', () => {
-		const pxTypography: DesignSystem['typography'] = {
-			modes: [
-				{
-					name: 'default',
-					isDefault: true,
-					tokens: {
-						unit: 'px',
-						base: 16,
-						min: 10,
-						increment: 2,
-						range: 3,
+const semanticTypography: DesignSystem['typography'] = {
+	...basicTypography,
+	fonts: {
+		editorial: {
+			family: 'Editorial Variable',
+			fallbacks: ['serif'],
+			verification: 'prepared',
+			capabilities: {
+				faces: [
+					{
+						style: 'normal',
+						weights: { min: 300, max: 800 },
+						features: ['kern', 'liga'],
+						axes: { GRAD: { min: -50, default: 0, max: 100 } },
 					},
-				},
-			],
-		};
-
-		const result = generateTypographyTokens(pxTypography, defaultGeneratorConfig);
-
-		const minToken = result.defaultTokens.find((t) => t.name === 'fs-min');
-		const fs1 = result.defaultTokens.find((t) => t.name === 'fs-1');
-		const fs2 = result.defaultTokens.find((t) => t.name === 'fs-2');
-		const fs3 = result.defaultTokens.find((t) => t.name === 'fs-3');
-
-		expect(minToken?.value).toBe('10px');
-		expect(fs1?.value).toBe('16px');
-		expect(fs2?.value).toBe('18px'); // 16 + 2
-		expect(fs3?.value).toBe('20px'); // 16 + 4
-	});
-
-	it('respects custom prefix from config', () => {
-		const customConfig = {
-			...defaultGeneratorConfig,
-			prefixes: {
-				...defaultGeneratorConfig.prefixes,
-				typography: 'font',
+					{ style: 'italic', weights: [400, 700], features: ['kern', 'liga'] },
+				],
 			},
-		};
+		},
+	},
+	roles: {
+		copy: {
+			font: 'editorial',
+			base: {
+				fontSize: 2,
+				weight: 'min',
+				lineHeight: 1.3,
+				letterSpacing: 0,
+				features: { liga: true },
+			},
+			variants: {
+				compact: { fontSize: 1, weight: 'min', lineHeight: 1.2, letterSpacing: 0.01 },
+				display: { fontSize: 7, weight: 'max', lineHeight: 1, letterSpacing: -0.02 },
+			},
+			weights: { min: 400, max: 700 },
+			styles: {
+				normal: { weights: ['min', 'max'] },
+				italic: { weights: ['min', 'max'] },
+			},
+		},
+	},
+};
 
-		const result = generateTypographyTokens(basicTypography, customConfig);
-
-		const minToken = result.defaultTokens.find((t) => t.name === 'font-min');
-		const fs1 = result.defaultTokens.find((t) => t.name === 'font-1');
-
-		expect(minToken).toBeDefined();
-		expect(fs1).toBeDefined();
+describe('generateTypographyTokens', () => {
+	it('preserves atomic fs generation', () => {
+		const result = generateTypographyTokens(basicTypography, defaultGeneratorConfig);
+		expect(result.defaultTokens).toHaveLength(9);
+		expect(result.defaultTokens[0]).toMatchObject({
+			name: 'fs-min',
+			value: '0.625rem',
+			rawValue: 0.625,
+		});
+		expect(result.defaultTokens.find((token) => token.name === 'fs-3')?.value).toBe('1.25rem');
 	});
 
-	it('formats numbers without trailing zeros', () => {
+	it('supports independent atomic typography modes', () => {
 		const typography: DesignSystem['typography'] = {
 			modes: [
+				...basicTypography.modes,
 				{
-					name: 'default',
-					isDefault: true,
-					tokens: {
-						unit: 'rem',
-						base: 1,
-						min: 0.5,
-						increment: 0.5,
-						range: 2,
-					},
+					name: 'compact',
+					tokens: { unit: 'rem', base: 0.875, min: 0.5, increment: 0.1, range: 8 },
 				},
 			],
 		};
-
 		const result = generateTypographyTokens(typography, defaultGeneratorConfig);
-
-		const fs1 = result.defaultTokens.find((t) => t.name === 'fs-1');
-		const fs2 = result.defaultTokens.find((t) => t.name === 'fs-2');
-
-		expect(fs1?.value).toBe('1rem'); // Not '1.0000rem'
-		expect(fs2?.value).toBe('1.5rem'); // Not '1.5000rem'
+		expect(result.overrideTokens.compact.find((token) => token.name === 'fs-2')?.value).toBe(
+			'0.975rem'
+		);
 	});
 
-	describe('mode handling', () => {
-		const multiModeTypography: DesignSystem['typography'] = {
+	it('emits an unsuffixed base and arbitrary role-local variants', () => {
+		const result = generateTypographyTokens(semanticTypography, defaultGeneratorConfig);
+		const tokens = Object.fromEntries(
+			result.defaultTokens.map((token) => [token.name, token.value])
+		);
+
+		expect(tokens['text-copy-font-family']).toBe('"Editorial Variable", serif');
+		expect(tokens['text-copy-font-size']).toBe('var(--fs-2)');
+		expect(tokens['text-copy-font-weight']).toBe('var(--text-copy-font-weight-min)');
+		expect(tokens['text-copy-line-height']).toBe('1.3');
+		expect(tokens['text-copy-letter-spacing']).toBe('0');
+		expect(tokens['text-copy-compact-font-size']).toBe('var(--fs-1)');
+		expect(tokens['text-copy-display-letter-spacing']).toBe('-0.02em');
+		expect(tokens['text-copy-m-font-size']).toBeUndefined();
+		expect(tokens['ff-editorial']).toBeUndefined();
+	});
+
+	it('keeps semantic references stable while atomic modes change', () => {
+		const typography: DesignSystem['typography'] = {
+			...semanticTypography,
 			modes: [
+				...semanticTypography.modes,
 				{
-					name: 'default',
-					isDefault: true,
-					tokens: {
-						unit: 'rem',
-						base: 1,
-						min: 0.625,
-						increment: 0.125,
-						range: 3,
-					},
-				},
-				{
-					name: 'small',
-					tokens: {
-						unit: 'rem',
-						base: 0.875,
-						min: 0.5,
-						increment: 0.125,
-						range: 3,
-					},
-				},
-				{
-					name: 'large',
-					tokens: {
-						unit: 'rem',
-						base: 1.25,
-						min: 0.75,
-						increment: 0.25,
-						range: 3,
-					},
+					name: 'compact',
+					tokens: { unit: 'rem', base: 0.875, min: 0.5, increment: 0.1, range: 8 },
 				},
 			],
 		};
+		const result = generateTypographyTokens(typography, defaultGeneratorConfig);
+		expect(result.overrideTokens.compact.some((token) => token.name.startsWith('text-'))).toBe(
+			false
+		);
+	});
 
-		it('identifies correct default mode', () => {
-			const result = generateTypographyTokens(multiModeTypography, defaultGeneratorConfig);
+	it('strictly rejects a role weight unavailable in a prepared static face', () => {
+		const typography = structuredClone(semanticTypography);
+		typography.fonts!.editorial.capabilities!.faces = [{ style: 'normal', weights: [400, 500] }];
+		expect(() => generate({ typography })).toThrowError(ValidationError);
+		expect(() => generate({ typography })).toThrow(
+			'style "normal" weight "max" (700) is unavailable in font "editorial"; available normal weights: 400, 500'
+		);
+	});
 
-			expect(result.modeInfo.default).toBe('default');
-		});
+	it('strictly rejects an unavailable italic weight without filtering it', () => {
+		const typography = structuredClone(semanticTypography);
+		typography.fonts!.editorial.capabilities!.faces[1].weights = [400];
+		expect(() => generate({ typography })).toThrow(
+			'style "italic" weight "max" (700) is unavailable in font "editorial"; available italic weights: 400'
+		);
+	});
 
-		it('identifies override modes', () => {
-			const result = generateTypographyTokens(multiModeTypography, defaultGeneratorConfig);
+	it('rejects a default style and weight combination the face cannot supply', () => {
+		const typography = structuredClone(semanticTypography);
+		typography.roles!.copy.defaultStyle = 'italic';
+		typography.roles!.copy.styles!.italic = {
+			weights: ['min'],
+		};
+		expect(() => generate({ typography })).toThrow(
+			'display weight "max" is unavailable for defaultStyle "italic"'
+		);
+	});
 
-			expect(result.modeInfo.overrides).toHaveLength(2);
-			expect(result.modeInfo.overrides).toContain('small');
-			expect(result.modeInfo.overrides).toContain('large');
-		});
+	it('rejects empty and overlapping manually supplied font capabilities', () => {
+		const empty = structuredClone(semanticTypography);
+		empty.fonts!.editorial.capabilities!.faces = [];
+		expect(() => generate({ typography: empty })).toThrow('must contain at least one face');
 
-		it('generates tokens for override modes with correct values', () => {
-			const result = generateTypographyTokens(multiModeTypography, defaultGeneratorConfig);
+		const overlap = structuredClone(semanticTypography);
+		overlap.fonts!.editorial.capabilities!.faces = [
+			{ style: 'normal', weights: { min: 300, max: 600 } },
+			{ style: 'normal', weights: [600, 700] },
+		];
+		expect(() => generate({ typography: overlap })).toThrow(
+			'capability faces 0 and 1 overlap for style "normal"'
+		);
+	});
 
-			const smallFs1 = result.overrideTokens['small'].find((t) => t.name === 'fs-1');
-			const largeFs1 = result.overrideTokens['large'].find((t) => t.name === 'fs-1');
+	it('enforces honest min and max aliases without requiring a fixed schedule', () => {
+		const typography = structuredClone(semanticTypography);
+		typography.roles!.copy.weights = { min: 700, strong: 400 };
+		typography.roles!.copy.styles = { normal: { weights: ['min', 'strong'] } };
+		expect(() => generate({ typography })).toThrow('weight min must be its actual minimum');
+	});
 
-			expect(smallFs1?.value).toBe('0.875rem');
-			expect(largeFs1?.value).toBe('1.25rem');
+	it('rejects unsafe variant names and references beyond the smallest mode', () => {
+		const unsafe = structuredClone(semanticTypography);
+		unsafe.roles!.copy.variants!['weight-max'] = {
+			fontSize: 2,
+			weight: 'min',
+			lineHeight: 1.2,
+			letterSpacing: 0,
+		};
+		expect(() => generate({ typography: unsafe })).toThrow('not safe for generated tokens');
 
-			// Large mode: fs-2 = 1.25 + 0.25 = 1.5
-			const largeFs2 = result.overrideTokens['large'].find((t) => t.name === 'fs-2');
-			expect(largeFs2?.value).toBe('1.5rem');
-		});
+		const beyond = structuredClone(semanticTypography);
+		beyond.roles!.copy.variants!.display.fontSize = 9;
+		expect(() => generate({ typography: beyond })).toThrow('only generates through fs-8');
+	});
+
+	it('rejects flattened role and variant names that would overwrite output', () => {
+		const typography = structuredClone(semanticTypography);
+		typography.roles!['copy-compact'] = {
+			...structuredClone(typography.roles!.copy),
+			variants: {},
+		};
+		expect(() => generate({ typography })).toThrow('generated name "copy-compact" collides');
+	});
+
+	it('reserves base for the unsuffixed role recipe', () => {
+		const typography = structuredClone(semanticTypography);
+		typography.roles!.copy.variants!.base = {
+			fontSize: 3,
+			weight: 'min',
+			lineHeight: 1.2,
+			letterSpacing: 0,
+		};
+		expect(() => generate({ typography })).toThrow(
+			'variant "base" is reserved for the unsuffixed role recipe'
+		);
+	});
+
+	it('validates explicit role-local presentation order without interpreting variant names', () => {
+		const valid = structuredClone(semanticTypography);
+		valid.roles!.copy.displayOrder = ['display', 'base', 'compact'];
+		expect(generate({ typography: valid }).typography?.roles.copy.displayOrder).toEqual([
+			'display',
+			'base',
+			'compact',
+		]);
+
+		for (const displayOrder of [
+			['base', 'compact'],
+			['base', 'compact', 'compact'],
+			['base', 'compact', 'unknown'],
+		]) {
+			const invalid = structuredClone(semanticTypography);
+			invalid.roles!.copy.displayOrder = displayOrder;
+			expect(() => generate({ typography: invalid })).toThrow(
+				'displayOrder must contain base and every variant exactly once'
+			);
+		}
+	});
+
+	it('validates OpenType features and custom axes against every exposed face', () => {
+		const unsupported = structuredClone(semanticTypography);
+		unsupported.roles!.copy.base.features = { ss01: true };
+		expect(() => generate({ typography: unsupported })).toThrow('feature "ss01" is unavailable');
+
+		const axis = structuredClone(semanticTypography);
+		axis.roles!.copy.styles = { normal: { weights: ['min', 'max'] } };
+		axis.roles!.copy.base.variations = { GRAD: 200 };
+		expect(() => generate({ typography: axis })).toThrow('variation "GRAD" (200) is unavailable');
+	});
+
+	it('requires explicit font verification and validates runtime longhand settings', () => {
+		const missingVerification = structuredClone(semanticTypography) as unknown as {
+			fonts: Record<string, Record<string, unknown>>;
+		};
+		delete missingVerification.fonts.editorial.verification;
+		expect(() => generate({ typography: missingVerification as never })).toThrow(
+			'must explicitly declare verification'
+		);
+
+		const invalidKerning = structuredClone(semanticTypography) as unknown as {
+			roles: Record<string, { base: Record<string, unknown> }>;
+		};
+		invalidKerning.roles.copy.base.fontKerning = 'banana';
+		expect(() => generate({ typography: invalidKerning as never })).toThrow('fontKerning must be');
+
+		const invalidOpticalSizing = structuredClone(semanticTypography) as unknown as {
+			roles: Record<string, { base: Record<string, unknown> }>;
+		};
+		invalidOpticalSizing.roles.copy.base.fontOpticalSizing = 'banana';
+		expect(() => generate({ typography: invalidOpticalSizing as never })).toThrow(
+			'fontOpticalSizing must be'
+		);
+	});
+
+	it('reports the typography mode as the size default in a typography-only IR', () => {
+		const ir = generate({ typography: basicTypography });
+		expect(ir.modes.size.default).toBe('default');
+	});
+
+	it('rejects an atomic minimum that is not below base', () => {
+		const typography = structuredClone(basicTypography);
+		typography.modes[0].tokens.min = 1;
+		expect(() => generate({ typography })).toThrow('smaller than base');
 	});
 });

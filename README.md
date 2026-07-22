@@ -21,18 +21,18 @@ npm install -g @three-forma-styli/cli
 tfs init
 
 # Edit your theme files (with full TypeScript IntelliSense)
-# Then generate CSS
-tfs build . --output tokens.css
+# Then generate the configured portable dist/ directory
+tfs build .
 
-# Or emit standards-based DTCG JSON
-tfs build . --format dtcg --output tokens.json
+# A targeted single-file build can emit one format
+tfs build ./index.ts --format dtcg --output tokens.json
 ```
 
 Display-P3 Figma files are supported explicitly. The selected color space must
 match the target file profile:
 
 ```bash
-tfs build . --format figma-variables --color-space display-p3 --output figma.json
+tfs build ./index.ts --format figma-variables --color-space display-p3 --output figma.json
 tfs figma-sync . --file-key "$FIGMA_FILE_KEY" --color-space display-p3
 ```
 
@@ -43,11 +43,11 @@ both `file_variables:read` and `file_variables:write` scopes. Run with
 
 ## Packages
 
-| Package | Description |
-|---------|-------------|
-| `@three-forma-styli/core` | Core library for generating design tokens |
-| `@three-forma-styli/cli` | CLI tool (`tfs` command) |
-| `@three-forma-styli/themes` | Starter/reference themes |
+| Package                     | Description                               |
+| --------------------------- | ----------------------------------------- |
+| `@three-forma-styli/core`   | Core library for generating design tokens |
+| `@three-forma-styli/cli`    | CLI tool (`tfs` command)                  |
+| `@three-forma-styli/themes` | Starter/reference themes                  |
 
 ## Architecture
 
@@ -97,6 +97,7 @@ colors: {
 ```
 
 **Output:**
+
 ```css
 --clr-bg: oklch(0.15 0 0);
 --clr-bg-a-min: oklch(0.15 0 0 / 0.07);
@@ -112,11 +113,13 @@ Range-based generation with multiplicative increments:
 
 ```typescript
 spacing: {
-  modes: [{
-    name: 'default',
-    isDefault: true,
-    tokens: { unit: 'px', base: 8, min: 4, range: 12 }
-  }]
+	modes: [
+		{
+			name: 'default',
+			isDefault: true,
+			tokens: { unit: 'px', base: 8, min: 4, range: 12 },
+		},
+	];
 }
 ```
 
@@ -128,11 +131,13 @@ Semantic shortcuts that reference spacing:
 
 ```typescript
 gap: {
-  modes: [{
-    name: 'default',
-    isDefault: true,
-    tokens: { min: 'min', s: 1, l: 2, max: 3 }  // References sp-min, sp-1, sp-2, sp-3
-  }]
+	modes: [
+		{
+			name: 'default',
+			isDefault: true,
+			tokens: { min: 'min', s: 1, l: 2, max: 3 }, // References sp-min, sp-1, sp-2, sp-3
+		},
+	];
 }
 ```
 
@@ -140,19 +145,66 @@ gap: {
 
 ### Typography
 
-Range-based font sizes with additive increments:
+Typography has an atomic foundation and a semantic layer. Atomic modes generate
+the permanent `--fs-*` scale. Arbitrarily named roles then define one unsuffixed
+base recipe and any role-local variants the project actually needs:
 
 ```typescript
-typography: {
-  modes: [{
-    name: 'default',
-    isDefault: true,
-    tokens: { unit: 'rem', base: 1, min: 0.875, increment: 0.125, range: 8 }
-  }]
-}
+const typography = {
+	modes: [
+		{
+			name: 'default',
+			isDefault: true,
+			tokens: { unit: 'rem', base: 0.75, min: 0.625, increment: 0.125, range: 12 },
+		},
+	],
+	fonts: {
+		sans: { family: 'system-ui', fallbacks: ['sans-serif'], verification: 'unavailable' },
+	},
+	roles: {
+		prose: {
+			font: 'sans',
+			base: { fontSize: 2, weight: 'lo', lineHeight: 1.25, letterSpacing: 0 },
+			variants: {
+				s: { fontSize: 1, weight: 'min', lineHeight: 1.3, letterSpacing: 0.005 },
+				l: { fontSize: 3, weight: 'lo', lineHeight: 1.225, letterSpacing: -0.0025 },
+			},
+			weights: { min: 300, lo: 400, hi: 500, max: 700 },
+		},
+	},
+};
 ```
 
-**Output:** `--fs-min: 0.875rem`, `--fs-1: 1rem`, `--fs-2: 1.125rem`, ...
+**Output:** atomic sizes such as `--fs-min` and `--fs-1` through `--fs-12`,
+plus an unsuffixed semantic tuple such as `--text-prose-font-size` and
+`--text-prose-font-weight`, and optional
+variant tuples such as `--text-prose-s-line-height`.
+
+The default theme contains inspectable `prose`, `heading`, and `label` opinions.
+Core does not know those names. `deriveTypographyRange()` can interpolate repetitive
+size/line-height/tracking points from explicit anchors. Weight is a required,
+non-interpolable choice on every recipe. The helper's result is the same
+visible `base`/`variants` data and it never invents font roles or weight aliases.
+
+For a complete movable handoff, define a project and run `tfs build .`. Project
+mode prepares licensed local fonts, resolves their real capabilities, then stages
+CSS, typed system/mode and typography contracts, helper classes, a specimen,
+JSON interchange, and a hashed ownership manifest before replacing the output directory once. See
+`examples/project/tfs.config.ts`.
+
+Review that generated specimen over localhost with `tfs specimen serve .`.
+Pass `--open` only when the CLI should launch the browser; use `--port 4400`
+when a fixed review port is required.
+
+Prepared `sans` and `mono` project fonts can also receive automatic
+per-style/per-weight adjusted fallback faces for physical upright and italic
+cuts. Those faces are generated from exact font instances. The factual
+`fonts/fallbacks.manifest.json` records inputs, measurements, profile provenance
+and warnings without inventing an approval lifecycle.
+
+Prepared custom fonts provide authoritative face capabilities. Roles explicitly
+choose supported weights and styles; unavailable cuts fail instead of being
+silently remapped. See [the typography foundation](docs/typography-foundation.md).
 
 ### Border & Time
 
@@ -166,10 +218,10 @@ Validate color relationships for accessibility:
 import { validateLuminance } from '@three-forma-styli/core';
 
 const result = validateLuminance(colors, {
-  polarity: 'dark',  // dark background, light foreground
-  minDelta: 0.4,     // minimum luminance difference
-  backgroundColors: ['bg', 'ev'],
-  foregroundColors: ['primary', 'neutral', 'ink'],
+	polarity: 'dark', // dark background, light foreground
+	minDelta: 0.4, // minimum luminance difference
+	backgroundColors: ['bg', 'ev'],
+	foregroundColors: ['primary', 'neutral', 'ink'],
 });
 
 // Returns per-color diagnostics
@@ -181,13 +233,15 @@ const result = validateLuminance(colors, {
 
 Modes are grouped into categories with separate CSS selectors:
 
-| Category | Token Families | Selector |
-|----------|---------------|----------|
-| `color` | colors | `[data-color-mode="..."]` |
-| `size` | spacing, gap, typography, border | `[data-size-mode="..."]` |
-| `time` | time | `[data-time-mode="..."]` |
+| Category | Token Families                   | Selector                  |
+| -------- | -------------------------------- | ------------------------- |
+| `color`  | colors                           | `[data-color-mode="..."]` |
+| `size`   | spacing, gap, typography, border | `[data-size-mode="..."]`  |
+| `time`   | time                             | `[data-time-mode="..."]`  |
 
-This allows independent switching - a dark theme can be small or large.
+Typography may define multiple atomic size modes just like spacing. Semantic roles
+continue to reference the stable `--fs-*` names, so a compact mode can alter the
+atomic scale without coupling density to a second set of role names.
 
 ## Programmatic Usage
 
@@ -197,7 +251,9 @@ For apps that generate themes at runtime:
 import { generate, toCss, oklch } from '@three-forma-styli/core';
 import type { DesignSystem } from '@three-forma-styli/core';
 
-const system: DesignSystem = { /* ... */ };
+const system: DesignSystem = {
+	/* ... */
+};
 const css = toCss(generate(system));
 ```
 
@@ -211,7 +267,9 @@ import type { PartialDesignSystem } from '@three-forma-styli/core';
 
 // Only generate colors - no spacing, typography, etc.
 const colorOverlay: PartialDesignSystem = {
-  colors: { /* ... */ }
+	colors: {
+		/* ... */
+	},
 };
 
 const css = toCss(generate(colorOverlay));
@@ -223,14 +281,15 @@ Customize token prefixes, separators, and selectors:
 
 ```typescript
 const config = {
-  prefixes: {
-    color: 'c',      // --c-primary instead of --clr-primary
-    spacing: 's',    // --s-1 instead of --sp-1
-  },
-  selectors: {
-    root: ':root',
-    colorMode: '[data-theme="{mode}"]',
-  }
+	prefixes: {
+		color: 'c', // --c-primary instead of --clr-primary
+		spacing: 's', // --s-1 instead of --sp-1
+		typographyRole: 'copy', // --copy-prose-* and .copy--prose
+	},
+	selectors: {
+		root: ':root',
+		colorMode: '[data-theme="{mode}"]',
+	},
 };
 
 const css = toCss(generate(system, config), config);
@@ -251,6 +310,13 @@ pnpm --filter @three-forma-styli/core test
 
 See [docs/releasing.md](docs/releasing.md) for the npm release and production
 consumer update procedure.
+
+Current implementation references:
+
+- [Verified implementation state](docs/audit-2026-07-22.md)
+- [Typography foundation](docs/typography-foundation.md)
+- [Typography fallback metrics](docs/typography-fallback-metrics.md)
+- [Scatter source reconciliation](docs/scatter-source-reconciliation.md)
 
 ## Design Decisions
 

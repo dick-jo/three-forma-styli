@@ -328,6 +328,7 @@ interface GeneratorConfig {
     spacing: string;      // default: 'sp'
     gap: string;          // default: 'gap'
     typography: string;   // default: 'fs'
+    typographyRole: string; // default: 'text'
     borderRadius: string; // default: 'bdr'
     borderWidth: string;  // default: 'bdw'
     time: string;         // default: 't'

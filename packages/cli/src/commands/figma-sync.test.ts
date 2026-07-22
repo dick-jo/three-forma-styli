@@ -6,14 +6,16 @@ const collection: FigmaCollection = {
 	name: 'Color',
 	defaultMode: 'light',
 	modes: ['light', 'dark'],
-	variables: [{
-		name: 'clr-ink',
-		type: 'COLOR',
-		values: {
-			light: { hex: '#000000', rgba: { r: 0, g: 0, b: 0, a: 1 } },
-			dark: { hex: '#ffffff', rgba: { r: 1, g: 1, b: 1, a: 1 } },
+	variables: [
+		{
+			name: 'clr-ink',
+			type: 'COLOR',
+			values: {
+				light: { hex: '#000000', rgba: { r: 0, g: 0, b: 0, a: 1 } },
+				dark: { hex: '#ffffff', rgba: { r: 1, g: 1, b: 1, a: 1 } },
+			},
 		},
-	}],
+	],
 };
 
 describe('buildPayload', () => {
@@ -89,20 +91,22 @@ describe('buildPayload', () => {
 	});
 
 	it('fails rather than silently preserving a conflicting Figma default mode', () => {
-		expect(() => buildPayload(collection, {
-			variables: {},
-			variableCollections: {
-				collection: {
-					id: 'collection',
-					name: 'Color',
-					modes: [
-						{ modeId: 'dark-id', name: 'dark' },
-						{ modeId: 'light-id', name: 'light' },
-					],
-					defaultModeId: 'dark-id',
-					variableIds: [],
+		expect(() =>
+			buildPayload(collection, {
+				variables: {},
+				variableCollections: {
+					collection: {
+						id: 'collection',
+						name: 'Color',
+						modes: [
+							{ modeId: 'dark-id', name: 'dark' },
+							{ modeId: 'light-id', name: 'light' },
+						],
+						defaultModeId: 'dark-id',
+						variableIds: [],
+					},
 				},
-			},
-		})).toThrow('Align the default mode in Figma before syncing');
+			})
+		).toThrow('Align the default mode in Figma before syncing');
 	});
 });

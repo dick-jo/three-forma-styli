@@ -316,6 +316,7 @@
 		{#if showHandle}
 			<div
 				class="handle"
+				role="presentation"
 				style="--loc-left: {handlePercent}%; --loc-clr-bg: {handleColor}; --loc-clr-border: {handleBorderColor};"
 				onpointerdown={(e) => handlePointerDown(e, 'handle')}
 				onpointermove={handlePointerMove}

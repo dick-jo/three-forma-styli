@@ -59,6 +59,59 @@ export interface ModeInfo {
 	overrides: string[];
 }
 
+export interface TypographyContractRecipe {
+	fontSizeToken: string;
+	fontWeightToken: string;
+	weight: string;
+	lineHeightToken: string;
+	letterSpacingToken: string;
+	atomicFontSizeToken: string;
+	fontSizeReference: import('../types.js').FontSizeReference;
+	lineHeight: number;
+	letterSpacingEm: number;
+	fontKerningToken?: string;
+	fontOpticalSizingToken?: string;
+	fontFeatureSettingsToken?: string;
+	fontVariationSettingsToken?: string;
+}
+
+export interface TypographyContract {
+	/** Shared semantic namespace for --{namespace}-* tokens and global helper classes. */
+	namespace: string;
+	fonts: Record<
+		string,
+		{
+			family: string;
+			fallbacks: string[];
+			verified: boolean;
+			warnings: string[];
+		}
+	>;
+	roles: Record<
+		string,
+		{
+			font: string;
+			fontFamilyToken: string;
+			fontStyleToken: string;
+			defaultStyle: 'normal' | 'italic' | 'oblique';
+			weights: Record<string, number>;
+			weightTokens: Record<string, string>;
+			styles: Partial<
+				Record<
+					'normal' | 'italic' | 'oblique',
+					{
+						value: 'normal' | 'italic' | 'oblique';
+						weights: string[];
+					}
+				>
+			>;
+			base: TypographyContractRecipe;
+			variants: Record<string, TypographyContractRecipe>;
+			displayOrder: string[];
+		}
+	>;
+}
+
 /**
  * The complete Intermediate Representation
  */
@@ -75,6 +128,9 @@ export interface IR {
 
 	/** Override tokens by mode name, only contains tokens that differ from default */
 	overrideTokens: Record<string, Record<string, TokenValue>>;
+
+	/** Structured typography decisions for typed and non-CSS transformers. */
+	typography?: TypographyContract;
 }
 
 /**
@@ -87,6 +143,8 @@ export interface GeneratorConfig {
 		spacing: string;
 		gap: string;
 		typography: string;
+		/** Semantic typography recipe prefix. */
+		typographyRole?: string;
 		borderRadius: string;
 		borderWidth: string;
 		time: string;
@@ -130,6 +188,7 @@ export const defaultGeneratorConfig: GeneratorConfig = {
 		spacing: 'sp',
 		gap: 'gap',
 		typography: 'fs',
+		typographyRole: 'text',
 		borderRadius: 'bdr',
 		borderWidth: 'bdw',
 		time: 't',

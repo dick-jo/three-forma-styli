@@ -6,18 +6,33 @@
  */
 
 import type { DesignSystem, PartialDesignSystem } from '../types.js';
-import type { IR, TokenValue, GeneratorConfig, GeneratorOptions, GeneratorResult, ModeInfo } from './types.js';
+import type {
+	IR,
+	TokenValue,
+	GeneratorConfig,
+	GeneratorOptions,
+	GeneratorResult,
+	ModeInfo,
+} from './types.js';
 import { defaultGeneratorConfig } from './types.js';
 import { validatePartialDesignSystem, ValidationError } from './validate.js';
 import { generateColorTokens } from './colors.js';
 import { generateSpacingTokens } from './spacing.js';
 import { generateGapTokens } from './gap.js';
-import { generateTypographyTokens } from './typography.js';
+import { generateTypographyContract, generateTypographyTokens } from './typography.js';
 import { generateBorderRadiusTokens, generateBorderWidthTokens } from './border.js';
 import { generateTimeTokens } from './time.js';
 
 export { ValidationError };
-export type { IR, TokenValue, GeneratorConfig, GeneratorOptions, GeneratorResult, ModeInfo };
+export type {
+	IR,
+	TokenValue,
+	GeneratorConfig,
+	GeneratorOptions,
+	GeneratorResult,
+	ModeInfo,
+	TypographyContract,
+} from './types.js';
 
 /**
  * Empty generator result for when a family is not provided
@@ -68,6 +83,26 @@ function tokensToRecord(tokens: TokenValue[]): Record<string, TokenValue> {
 }
 
 /**
+ * overrideTokens is intentionally keyed by mode name for backwards compatibility.
+ * A name may be shared by several size families (spacing, typography, borders),
+ * but it cannot also identify a color mode: CSS would otherwise have no reliable
+ * way to decide which selector category owns the merged override block.
+ */
+function validateOverrideModeIdentity(colorOverrides: string[], sizeOverrides: string[]): void {
+	const sizeNames = new Set(sizeOverrides);
+	const collisions = colorOverrides.filter((name) => sizeNames.has(name));
+
+	if (collisions.length > 0) {
+		throw new ValidationError(
+			`Override mode name${collisions.length === 1 ? '' : 's'} ${collisions
+				.map((name) => `"${name}"`)
+				.join(', ')} ${collisions.length === 1 ? 'is' : 'are'} used by both color and size categories. ` +
+				'Use distinct names so each override maps to exactly one CSS selector category.'
+		);
+	}
+}
+
+/**
  * Generate the complete Intermediate Representation from a DesignSystem or PartialDesignSystem
  *
  * @example Full design system
@@ -105,17 +140,19 @@ export function generate(
 		: emptyResult;
 
 	// Gap and borderRadius depend on spacing
-	const gapResult = designSystem.gap && designSystem.spacing
-		? generateGapTokens(designSystem.gap, designSystem.spacing, config)
-		: emptyResult;
+	const gapResult =
+		designSystem.gap && designSystem.spacing
+			? generateGapTokens(designSystem.gap, designSystem.spacing, config)
+			: emptyResult;
 
 	const typographyResult = designSystem.typography
 		? generateTypographyTokens(designSystem.typography, config)
 		: emptyResult;
 
-	const borderRadiusResult = designSystem.border?.radius && designSystem.spacing
-		? generateBorderRadiusTokens(designSystem.border.radius, designSystem.spacing, config)
-		: emptyResult;
+	const borderRadiusResult =
+		designSystem.border?.radius && designSystem.spacing
+			? generateBorderRadiusTokens(designSystem.border.radius, designSystem.spacing, config)
+			: emptyResult;
 
 	const borderWidthResult = designSystem.border?.width
 		? generateBorderWidthTokens(designSystem.border.width, config)
@@ -198,16 +235,24 @@ export function generate(
 		}
 	);
 	const sizeOverrides = Array.from(sizeOverridesSet);
+	validateOverrideModeIdentity(colorOverrides, sizeOverrides);
+	const sizeDefault =
+		[spacingResult, gapResult, typographyResult, borderRadiusResult, borderWidthResult].find(
+			(result) => result.modeInfo.default
+		)?.modeInfo.default ?? '';
 
 	return {
 		tokens: tokensToRecord(allDefaultTokens),
+		typography: designSystem.typography
+			? generateTypographyContract(designSystem.typography, config)
+			: undefined,
 		modes: {
 			color: {
 				default: colorResult.modeInfo.default,
 				overrides: colorOverrides,
 			},
 			size: {
-				default: spacingResult.modeInfo.default,
+				default: sizeDefault,
 				overrides: sizeOverrides,
 			},
 			time: {

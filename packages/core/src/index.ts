@@ -13,6 +13,7 @@ export type {
 	GeneratorOptions,
 	GeneratorResult,
 	ModeInfo,
+	TypographyContract,
 } from './generator/index.js';
 
 // Transformers - convert IR to output formats
@@ -20,6 +21,11 @@ export { toCss, defaultCssConfig } from './transformers/index.js';
 export type { CssTransformerConfig, FileHeaderConfig } from './transformers/index.js';
 
 export { toFigmaJson } from './transformers/index.js';
+export { toTypographyTypescript } from './transformers/index.js';
+export { toTypographySpecimen } from './transformers/index.js';
+export { toTypographyCss, toTypographyCssModuleTypes } from './transformers/index.js';
+export type { TypographySpecimenConfig } from './transformers/index.js';
+export type { TypographyCssConfig } from './transformers/index.js';
 export type {
 	FigmaJsonTransformerConfig,
 	FigmaJsonFormat,
@@ -36,7 +42,7 @@ export type { FileHeaderInfo, CommentStyle } from './transformers/index.js';
 // CONVENIENCE FUNCTION
 // ===========================================
 
-import type { DesignSystem } from './types.js';
+import type { DesignSystem, PartialDesignSystem } from './types.js';
 import type { GeneratorOptions } from './generator/index.js';
 import type { CssTransformerConfig } from './transformers/index.js';
 import type { FigmaJsonTransformerConfig } from './transformers/index.js';
@@ -44,6 +50,8 @@ import type { FigmaJsonFormat } from './transformers/index.js';
 import { generate } from './generator/index.js';
 import { toCss } from './transformers/index.js';
 import { toFigmaJson } from './transformers/index.js';
+import { toTypographyTypescript } from './transformers/index.js';
+import { toTypographySpecimen } from './transformers/index.js';
 
 /**
  * Combined config for the convenience function
@@ -63,11 +71,13 @@ export interface GenerateCssConfig extends GeneratorOptions, CssTransformerConfi
  * ```
  */
 export function generateCss(
-	designSystem: DesignSystem,
+	designSystem: DesignSystem | PartialDesignSystem,
 	config?: GenerateCssConfig
 ): string {
 	if (config?.colorFormat?.base === 'hex-p3' || config?.colorFormat?.alpha === 'hexa-p3') {
-		throw new Error('Display-P3 component bytes cannot be emitted as CSS hex; use OKLCH CSS or generateFigmaJson()');
+		throw new Error(
+			'Display-P3 component bytes cannot be emitted as CSS hex; use OKLCH CSS or generateFigmaJson()'
+		);
 	}
 	const ir = generate(designSystem, config);
 	return toCss(ir, config);
@@ -98,7 +108,7 @@ export interface GenerateFigmaJsonConfig {
  * ```
  */
 export function generateFigmaJson(
-	designSystem: DesignSystem,
+	designSystem: DesignSystem | PartialDesignSystem,
 	config?: GenerateFigmaJsonConfig,
 	format: FigmaJsonFormat = 'dtcg'
 ): string {
@@ -114,6 +124,27 @@ export function generateFigmaJson(
 	return toFigmaJson(ir, config?.transformer, format);
 }
 
+/** Generate the typed, framework-neutral typography manifest used by local UI primitives. */
+export function generateTypographyTypescript(
+	designSystem: DesignSystem | PartialDesignSystem,
+	config?: GeneratorOptions
+): string {
+	return toTypographyTypescript(generate(designSystem, config));
+}
+
+export interface GenerateTypographySpecimenConfig {
+	generator?: GeneratorOptions;
+	specimen?: import('./transformers/index.js').TypographySpecimenConfig;
+}
+
+/** Generate a standalone visual calibration document for semantic typography. */
+export function generateTypographySpecimen(
+	designSystem: DesignSystem | PartialDesignSystem,
+	config?: GenerateTypographySpecimenConfig
+): string {
+	return toTypographySpecimen(generate(designSystem, config?.generator), config?.specimen);
+}
+
 // ===========================================
 // LEGACY API (removed)
 // ===========================================
@@ -126,6 +157,7 @@ export function generateFigmaJson(
 // ===========================================
 
 export * from './types.js';
+export { defineTypography, deriveTypographyRange, fontFromManifest } from './typography/index.js';
 
 // ===========================================
 // UTILITIES

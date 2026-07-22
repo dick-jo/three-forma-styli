@@ -1,25 +1,25 @@
 {
-  "name": "@three-forma-styli/preview",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Preview webapp for testing and visualizing generated themes",
-  "type": "module",
-  "scripts": {
-    "dev": "vite dev",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "@sveltejs/adapter-auto": "^3.0.0",
-    "@sveltejs/kit": "^2.0.0",
-    "@sveltejs/vite-plugin-svelte": "^4.0.0",
-    "svelte": "^5.0.0",
-    "svelte-check": "^4.7.3",
-    "vite": "^5.4.0"
-  },
-  "dependencies": {
-    "@three-forma-styli/core": "workspace:*",
-    "@three-forma-styli/themes": "workspace:*"
-  }
+	"name": "@three-forma-styli/preview",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Preview webapp for testing and visualizing generated themes",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/kit": "^2.70.1",
+		"@sveltejs/vite-plugin-svelte": "^5.1.1",
+		"svelte": "^5.56.7",
+		"svelte-check": "^4.7.3",
+		"vite": "^6.4.3"
+	},
+	"dependencies": {
+		"@three-forma-styli/core": "workspace:*",
+		"@three-forma-styli/themes": "workspace:*"
+	}
 }

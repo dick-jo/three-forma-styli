@@ -1,50 +1,67 @@
 {
-  "name": "@three-forma-styli/cli",
-  "version": "0.1.4",
-  "type": "module",
-  "description": "CLI tool for generating design tokens from TypeScript definitions",
-  "bin": {
-    "tfs": "dist/index.js"
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "node ../../scripts/clean.mjs && tsc",
-    "dev": "nodemon --watch 'src/**' --ext 'ts' --exec 'ts-node src/index.ts'",
-    "start": "node dist/index.js",
-    "prepack": "pnpm build",
-    "test": "vitest run"
-  },
-  "keywords": ["design-tokens", "cli", "css-variables"],
-  "author": "three",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dick-jo/three-forma-styli.git",
-    "directory": "packages/cli"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "@inquirer/prompts": "^7.2.0",
-    "@three-forma-styli/core": "workspace:^",
-    "@three-forma-styli/themes": "workspace:^",
-    "chalk": "4.1.2",
-    "commander": "^13.1.0",
-    "esbuild": "^0.28.1",
-    "fs-extra": "^11.3.0"
-  },
-  "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.13.9",
-    "nodemon": "^3.1.9",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.2",
-    "vitest": "^2.1.0"
-  }
+	"name": "@three-forma-styli/cli",
+	"version": "0.1.4",
+	"type": "module",
+	"description": "CLI tool for generating design tokens from TypeScript definitions",
+	"bin": {
+		"tfs": "dist/index.js"
+	},
+	"exports": {
+		"./project": {
+			"types": "./dist/project.d.ts",
+			"import": "./dist/project.js"
+		},
+		"./fonts": {
+			"types": "./dist/fonts/prepare.d.ts",
+			"import": "./dist/fonts/prepare.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "node ../../scripts/clean.mjs && tsc",
+		"dev": "nodemon --watch 'src/**' --ext 'ts' --exec 'ts-node src/index.ts'",
+		"start": "node dist/index.js",
+		"prepack": "pnpm build",
+		"test": "vitest run && pnpm test:types",
+		"test:types": "tsc -p tsconfig.type-tests.json"
+	},
+	"keywords": [
+		"design-tokens",
+		"cli",
+		"css-variables"
+	],
+	"author": "three",
+	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/dick-jo/three-forma-styli.git",
+		"directory": "packages/cli"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"dependencies": {
+		"@inquirer/prompts": "^7.2.0",
+		"@three-forma-styli/core": "workspace:^",
+		"@three-forma-styli/themes": "workspace:^",
+		"chalk": "4.1.2",
+		"commander": "^13.1.0",
+		"esbuild": "^0.28.1",
+		"fontkit": "2.0.4",
+		"fs-extra": "^11.3.0"
+	},
+	"devDependencies": {
+		"@types/fontkit": "2.0.9",
+		"@types/fs-extra": "^11.0.4",
+		"@types/node": "^22.13.9",
+		"nodemon": "^3.1.14",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.8.2",
+		"vitest": "^3.2.7"
+	}
 }

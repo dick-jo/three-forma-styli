@@ -111,7 +111,7 @@ describe('toFigmaJson', () => {
 		});
 
 		expect(() => toFigmaJson(spacingOnly)).toThrow(
-			'Figma JSON generation requires a color token family'
+			'DTCG/Figma Variables JSON is currently color-only'
 		);
 	});
 });

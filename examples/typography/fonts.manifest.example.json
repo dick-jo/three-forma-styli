@@ -1,0 +1,533 @@
+{
+	"schemaVersion": 2,
+	"families": {
+		"supreme": {
+			"family": "Supreme",
+			"display": "swap",
+			"license": {
+				"id": "ITF-FFL",
+				"file": "licenses/supreme-FFL.txt",
+				"webEmbeddingAllowed": false,
+				"webEmbeddingBasis": "PENDING written Fontshare/ITF self-hosting permission.",
+				"transformationsAllowed": false
+			},
+			"faces": [
+				{
+					"source": {
+						"file": "Supreme-Variable.woff2",
+						"format": "woff2",
+						"sha256": "example-only"
+					},
+					"file": "Supreme-Variable.woff2",
+					"url": "./Supreme-Variable.woff2",
+					"format": "woff2",
+					"style": "normal",
+					"weight": {
+						"min": 100,
+						"max": 800
+					},
+					"bytes": 30712,
+					"sha256": "example-only",
+					"strategy": "copy",
+					"version": "Version 1.100",
+					"copyright": "Copyright 2016-2021 Indian Type Foundry. All rights reserved.",
+					"names": {
+						"family": "Supreme Variable",
+						"subfamily": "Regular",
+						"full": "Supreme Variable Extrabold",
+						"postscript": "SupremeVariable-Extrabold"
+					},
+					"sourceStyle": {
+						"weight": 800,
+						"width": 5,
+						"italic": false,
+						"oblique": false,
+						"italicAngle": 0
+					},
+					"axes": {
+						"wght": {
+							"name": "Weight",
+							"min": 100,
+							"default": 800,
+							"max": 800
+						}
+					},
+					"namedInstances": {
+						"Bold": {
+							"wght": 700
+						},
+						"Extrabold": {
+							"wght": 800
+						},
+						"Extralight": {
+							"wght": 200
+						},
+						"Light": {
+							"wght": 300
+						},
+						"Medium": {
+							"wght": 500
+						},
+						"Regular": {
+							"wght": 400
+						},
+						"Thin": {
+							"wght": 100
+						}
+					},
+					"metrics": {
+						"unitsPerEm": 1000,
+						"hhea": {
+							"ascent": 980,
+							"descent": -280,
+							"lineGap": 90
+						},
+						"win": {
+							"ascent": 980,
+							"descent": 280
+						},
+						"useTypoMetrics": true,
+						"ascent": 980,
+						"descent": -280,
+						"lineGap": 90,
+						"capHeight": 700,
+						"xHeight": 506,
+						"naturalLineHeight": 1.35,
+						"capHeightRatio": 0.7,
+						"xHeightRatio": 0.506,
+						"typo": {
+							"ascent": 980,
+							"descent": -280,
+							"lineGap": 90,
+							"naturalLineHeight": 1.35
+						}
+					},
+					"coverage": {
+						"glyphs": 387,
+						"codePoints": 384
+					},
+					"features": ["aalt", "frac", "kern", "liga", "ordn", "salt", "sups"],
+					"embedding": {
+						"noEmbedding": false,
+						"viewOnly": false,
+						"editable": false,
+						"noSubsetting": false,
+						"bitmapOnly": false
+					},
+					"warnings": [
+						"Variable axis \"wght\" defaults to its maximum boundary (800).",
+						"Configured CSS family \"Supreme\" unifies detected family \"Supreme Variable\"."
+					]
+				},
+				{
+					"source": {
+						"file": "Supreme-VariableItalic.woff2",
+						"format": "woff2",
+						"sha256": "example-only"
+					},
+					"file": "Supreme-VariableItalic.woff2",
+					"url": "./Supreme-VariableItalic.woff2",
+					"format": "woff2",
+					"style": "italic",
+					"weight": {
+						"min": 100,
+						"max": 800
+					},
+					"bytes": 36812,
+					"sha256": "example-only",
+					"strategy": "copy",
+					"version": "Version 1.100",
+					"copyright": "Copyright 2016-2021 Indian Type Foundry. All rights reserved.",
+					"names": {
+						"family": "Supreme Variable",
+						"subfamily": "Italic",
+						"full": "Supreme Variable Extrabold Italic",
+						"postscript": "SupremeVariable-ExtraboldItalic"
+					},
+					"sourceStyle": {
+						"weight": 800,
+						"width": 5,
+						"italic": true,
+						"oblique": false,
+						"italicAngle": -11
+					},
+					"axes": {
+						"wght": {
+							"name": "Weight",
+							"min": 100,
+							"default": 800,
+							"max": 800
+						}
+					},
+					"namedInstances": {
+						"Bold Italic": {
+							"wght": 700
+						},
+						"Extrabold Italic": {
+							"wght": 800
+						},
+						"Extralight Italic": {
+							"wght": 200
+						},
+						"Italic": {
+							"wght": 400
+						},
+						"Light Italic": {
+							"wght": 300
+						},
+						"Medium Italic": {
+							"wght": 500
+						},
+						"Thin Italic": {
+							"wght": 100
+						}
+					},
+					"metrics": {
+						"unitsPerEm": 1000,
+						"hhea": {
+							"ascent": 1000,
+							"descent": -280,
+							"lineGap": 90
+						},
+						"win": {
+							"ascent": 1000,
+							"descent": 280
+						},
+						"useTypoMetrics": true,
+						"ascent": 1000,
+						"descent": -280,
+						"lineGap": 90,
+						"capHeight": 700,
+						"xHeight": 506,
+						"naturalLineHeight": 1.37,
+						"capHeightRatio": 0.7,
+						"xHeightRatio": 0.506,
+						"typo": {
+							"ascent": 1000,
+							"descent": -280,
+							"lineGap": 90,
+							"naturalLineHeight": 1.37
+						}
+					},
+					"coverage": {
+						"glyphs": 387,
+						"codePoints": 384
+					},
+					"features": ["aalt", "frac", "kern", "liga", "ordn", "salt", "sups"],
+					"embedding": {
+						"noEmbedding": false,
+						"viewOnly": false,
+						"editable": false,
+						"noSubsetting": false,
+						"bitmapOnly": false
+					},
+					"warnings": [
+						"Variable axis \"wght\" defaults to its maximum boundary (800).",
+						"Configured CSS family \"Supreme\" unifies detected family \"Supreme Variable\"."
+					]
+				}
+			]
+		},
+		"jetbrains": {
+			"family": "JetBrains Mono",
+			"display": "swap",
+			"license": {
+				"id": "OFL-1.1",
+				"file": "licenses/jetbrains-OFL.txt",
+				"webEmbeddingAllowed": true,
+				"webEmbeddingBasis": "SIL Open Font License 1.1 permits web redistribution.",
+				"transformationsAllowed": true
+			},
+			"faces": [
+				{
+					"source": {
+						"file": "JetBrainsMono[wght].ttf",
+						"format": "ttf",
+						"sha256": "example-only"
+					},
+					"file": "JetBrainsMono-Variable.woff2",
+					"url": "./JetBrainsMono-Variable.woff2",
+					"format": "woff2",
+					"style": "normal",
+					"weight": {
+						"min": 100,
+						"max": 800
+					},
+					"bytes": 113504,
+					"sha256": "example-only",
+					"strategy": "woff2",
+					"version": "Version 2.304",
+					"copyright": "Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)",
+					"names": {
+						"family": "JetBrains Mono",
+						"subfamily": "Regular",
+						"full": "JetBrains Mono Regular",
+						"postscript": "JetBrainsMono-Regular"
+					},
+					"sourceStyle": {
+						"weight": 400,
+						"width": 5,
+						"italic": false,
+						"oblique": false,
+						"italicAngle": 0
+					},
+					"axes": {
+						"wght": {
+							"name": "Weight",
+							"min": 100,
+							"default": 400,
+							"max": 800
+						}
+					},
+					"namedInstances": {
+						"Bold": {
+							"wght": 700
+						},
+						"ExtraBold": {
+							"wght": 800
+						},
+						"ExtraLight": {
+							"wght": 200
+						},
+						"Light": {
+							"wght": 300
+						},
+						"Medium": {
+							"wght": 500
+						},
+						"Regular": {
+							"wght": 400
+						},
+						"SemiBold": {
+							"wght": 600
+						},
+						"Thin": {
+							"wght": 100
+						}
+					},
+					"metrics": {
+						"unitsPerEm": 1000,
+						"hhea": {
+							"ascent": 1020,
+							"descent": -300,
+							"lineGap": 0
+						},
+						"win": {
+							"ascent": 1020,
+							"descent": 300
+						},
+						"useTypoMetrics": true,
+						"ascent": 1020,
+						"descent": -300,
+						"lineGap": 0,
+						"capHeight": 730,
+						"xHeight": 550,
+						"naturalLineHeight": 1.32,
+						"capHeightRatio": 0.73,
+						"xHeightRatio": 0.55,
+						"typo": {
+							"ascent": 1020,
+							"descent": -300,
+							"lineGap": 0,
+							"naturalLineHeight": 1.32
+						}
+					},
+					"coverage": {
+						"glyphs": 1743,
+						"codePoints": 1363
+					},
+					"features": [
+						"aalt",
+						"calt",
+						"case",
+						"ccmp",
+						"cv01",
+						"cv02",
+						"cv03",
+						"cv04",
+						"cv05",
+						"cv06",
+						"cv07",
+						"cv08",
+						"cv09",
+						"cv10",
+						"cv11",
+						"cv12",
+						"cv14",
+						"cv15",
+						"cv16",
+						"cv17",
+						"cv18",
+						"cv19",
+						"cv20",
+						"cv99",
+						"frac",
+						"mark",
+						"mkmk",
+						"ordn",
+						"sinf",
+						"ss01",
+						"ss02",
+						"ss19",
+						"ss20",
+						"subs",
+						"sups",
+						"zero"
+					],
+					"embedding": {
+						"noEmbedding": false,
+						"viewOnly": false,
+						"editable": false,
+						"noSubsetting": false,
+						"bitmapOnly": false
+					},
+					"warnings": []
+				},
+				{
+					"source": {
+						"file": "JetBrainsMono-Italic[wght].ttf",
+						"format": "ttf",
+						"sha256": "example-only"
+					},
+					"file": "JetBrainsMono-VariableItalic.woff2",
+					"url": "./JetBrainsMono-VariableItalic.woff2",
+					"format": "woff2",
+					"style": "italic",
+					"weight": {
+						"min": 100,
+						"max": 800
+					},
+					"bytes": 122444,
+					"sha256": "example-only",
+					"strategy": "woff2",
+					"version": "Version 2.304",
+					"copyright": "Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)",
+					"names": {
+						"family": "JetBrains Mono",
+						"subfamily": "Italic",
+						"full": "JetBrains Mono Italic",
+						"postscript": "JetBrainsMono-Italic"
+					},
+					"sourceStyle": {
+						"weight": 400,
+						"width": 5,
+						"italic": true,
+						"oblique": false,
+						"italicAngle": -9
+					},
+					"axes": {
+						"wght": {
+							"name": "Weight",
+							"min": 100,
+							"default": 400,
+							"max": 800
+						}
+					},
+					"namedInstances": {
+						"Bold Italic": {
+							"wght": 700
+						},
+						"ExtraBold Italic": {
+							"wght": 800
+						},
+						"ExtraLight Italic": {
+							"wght": 200
+						},
+						"Italic": {
+							"wght": 400
+						},
+						"Light Italic": {
+							"wght": 300
+						},
+						"Medium Italic": {
+							"wght": 500
+						},
+						"SemiBold Italic": {
+							"wght": 600
+						},
+						"Thin Italic": {
+							"wght": 100
+						}
+					},
+					"metrics": {
+						"unitsPerEm": 1000,
+						"hhea": {
+							"ascent": 1020,
+							"descent": -300,
+							"lineGap": 0
+						},
+						"win": {
+							"ascent": 1020,
+							"descent": 300
+						},
+						"useTypoMetrics": true,
+						"ascent": 1020,
+						"descent": -300,
+						"lineGap": 0,
+						"capHeight": 730,
+						"xHeight": 550,
+						"naturalLineHeight": 1.32,
+						"capHeightRatio": 0.73,
+						"xHeightRatio": 0.55,
+						"typo": {
+							"ascent": 1020,
+							"descent": -300,
+							"lineGap": 0,
+							"naturalLineHeight": 1.32
+						}
+					},
+					"coverage": {
+						"glyphs": 1730,
+						"codePoints": 1363
+					},
+					"features": [
+						"aalt",
+						"calt",
+						"case",
+						"ccmp",
+						"cv01",
+						"cv02",
+						"cv03",
+						"cv04",
+						"cv05",
+						"cv06",
+						"cv07",
+						"cv08",
+						"cv09",
+						"cv10",
+						"cv11",
+						"cv12",
+						"cv14",
+						"cv15",
+						"cv16",
+						"cv17",
+						"cv18",
+						"cv19",
+						"cv20",
+						"cv99",
+						"frac",
+						"mark",
+						"mkmk",
+						"ordn",
+						"sinf",
+						"ss01",
+						"ss02",
+						"ss19",
+						"ss20",
+						"subs",
+						"sups",
+						"zero"
+					],
+					"embedding": {
+						"noEmbedding": false,
+						"viewOnly": false,
+						"editable": false,
+						"noSubsetting": false,
+						"bitmapOnly": false
+					},
+					"warnings": []
+				}
+			]
+		}
+	}
+}

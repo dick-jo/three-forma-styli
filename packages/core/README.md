@@ -16,19 +16,33 @@ import type { DesignSystem, PartialDesignSystem } from '@three-forma-styli/core'
 
 // Full design system
 const system: DesignSystem = {
-  colors: { /* ... */ },
-  spacing: { /* ... */ },
-  gap: { /* ... */ },
-  typography: { /* ... */ },
-  border: { /* ... */ },
-  time: { /* ... */ }
+	colors: {
+		/* ... */
+	},
+	spacing: {
+		/* ... */
+	},
+	gap: {
+		/* ... */
+	},
+	typography: {
+		/* ... */
+	},
+	border: {
+		/* ... */
+	},
+	time: {
+		/* ... */
+	},
 };
 
 const css = toCss(generate(system));
 
 // Partial generation (e.g., just colors)
 const partial: PartialDesignSystem = {
-  colors: { /* ... */ }
+	colors: {
+		/* ... */
+	},
 };
 
 const colorsCss = toCss(generate(partial));
@@ -40,8 +54,17 @@ const colorsCss = toCss(generate(partial));
 - `toCss(ir, config?)` - Transform IR to CSS string
 - `oklch(l, c, h)` - Create OKLCH color object
 - `generateCss(designSystem, config?)` - Convenience function combining generate + toCss
-- `generateFigmaJson(designSystem, config?, format?)` - Generate DTCG or Figma Variables JSON
+- `generateFigmaJson(designSystem, config?, format?)` - Generate color-only DTCG or Figma Variables JSON
 - `toFigmaJson(ir, config?, format?)` - Transform a hex/profile-aware IR to JSON
+- `defineTypography(system)` - Preserve literal font/role/variant names for an explicit typography system; adds no hidden defaults
+- `deriveTypographyRange(input)` - Optionally derive caller-named role variants from explicit anchors
+- `fontFromManifest(manifest, id, options?)` - Bind prepared font capabilities into typography validation
+- `generateTypographyTypescript(designSystem, config?)` - Generate a typed semantic typography contract
+- `toTypographyTypescript(ir)` - Transform structured typography IR into TypeScript
+- `generateTypographySpecimen(designSystem, config?)` - Generate a static calibration workbench
+- `toTypographySpecimen(ir, config?)` - Transform structured typography IR into HTML
+- `toTypographyCss(ir, config?)` - Generate global or local CSS Module recipes with explicit specificity policy
+- `toTypographyCssModuleTypes(ir)` - Generate literal declarations for the CSS Module recipe keys
 
 ## Types
 

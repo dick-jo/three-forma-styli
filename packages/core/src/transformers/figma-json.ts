@@ -110,7 +110,9 @@ function getColorTokens(tokens: Record<string, TokenValue>): Record<string, Toke
 function getColorModes(ir: IR): { defaultMode: string; allModes: string[] } {
 	const defaultMode = ir.modes.color.default;
 	if (!defaultMode) {
-		throw new Error('Figma JSON generation requires a color token family');
+		throw new Error(
+			'DTCG/Figma Variables JSON is currently color-only and requires a color token family'
+		);
 	}
 
 	return {

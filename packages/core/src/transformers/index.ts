@@ -14,6 +14,12 @@ export type {
 	FigmaColor,
 } from './figma-json.js';
 
+export { toTypographyTypescript } from './typography-typescript.js';
+export { toTypographySpecimen } from './typography-specimen.js';
+export type { TypographySpecimenConfig } from './typography-specimen.js';
+export { toTypographyCss, toTypographyCssModuleTypes } from './typography-css.js';
+export type { TypographyCssConfig } from './typography-css.js';
+
 // Re-export header utilities for other transformers
 export { getHeaderLines, formatHeaderComment } from '../header.js';
 export type { FileHeaderInfo, CommentStyle } from '../header.js';

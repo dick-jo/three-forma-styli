@@ -1,5 +1,5 @@
 // Updated types.ts with consistent patterns for all token types
-import type { Oklch } from "culori";
+import type { Oklch } from 'culori';
 
 // COLOURS ---------------------------------------------- //
 
@@ -24,22 +24,27 @@ import type { Oklch } from "culori";
  */
 export type ColorTokens = Record<string, Oklch>;
 
+/** Portable author-owned facts attached to a mode (for example a label or polarity). */
+export type ModeMetadata = Readonly<Record<string, string | number | boolean | null>>;
+
 /**
  * Default color mode - defines the base color tokens
  */
 export interface DefaultColorMode {
-  isDefault: true;
-  tokens: ColorTokens;
-  alphaSchedule?: AlphaSchedule;
+	isDefault: true;
+	metadata?: ModeMetadata;
+	tokens: ColorTokens;
+	alphaSchedule?: AlphaSchedule;
 }
 
 /**
  * Override color mode - only needs to specify tokens that differ from default
  */
 export interface OverrideColorMode {
-  isDefault?: false;
-  tokens: ColorTokens;  // Partial by nature - only override what changes
-  alphaSchedule?: AlphaSchedule;
+	isDefault?: false;
+	metadata?: ModeMetadata;
+	tokens: ColorTokens; // Partial by nature - only override what changes
+	alphaSchedule?: AlphaSchedule;
 }
 
 /**
@@ -59,84 +64,215 @@ export type ColorMode = DefaultColorMode | OverrideColorMode;
  *   { non: 0, low: 0.25, high: 0.75 }
  */
 export interface AlphaSchedule {
-  [level: string]: number;
+	[level: string]: number;
 }
 
 // SPACING ---------------------------------------------- //
 export interface SpacingSystem {
-  unit: string;
-  base: number;
-  min: number;
-  range: number;
+	unit: string;
+	base: number;
+	min: number;
+	range: number;
 }
 
 export interface SpacingMode {
-  isDefault?: boolean;
-  tokens: SpacingSystem;
+	isDefault?: boolean;
+	metadata?: ModeMetadata;
+	tokens: SpacingSystem;
 }
 
 // GAP ---------------------------------------------- //
 export interface GapSystem {
-  spacingMode?: string; // If not specified, uses the default spacing mode
-  unit?: string;
-  min: number | "min";
-  s: number | "min";
-  l: number | "min";
-  max: number | "min";
+	spacingMode?: string; // If not specified, uses the default spacing mode
+	unit?: string;
+	min: number | 'min';
+	s: number | 'min';
+	l: number | 'min';
+	max: number | 'min';
 }
 
 export interface GapMode {
-  isDefault?: boolean;
-  tokens: GapSystem;
+	isDefault?: boolean;
+	metadata?: ModeMetadata;
+	tokens: GapSystem;
 }
 
 // TYPOGRAPHY ------------------------------------------- //
 export interface FontSizeSystem {
-  unit: string; // e.g., 'rem'
-  base: number; // Base font size (1rem = 16px typically)
-  min: number; // Minimum font size (smaller than base)
-  increment: number; // Fixed increment between sizes (e.g., 0.25rem)
-  range: number; // Number of steps in the scale
+	unit: string; // e.g., 'rem'
+	base: number; // Base font size (1rem = 16px typically)
+	min: number; // Minimum font size (smaller than base)
+	increment: number; // Fixed increment between sizes (e.g., 0.25rem)
+	range: number; // Number of steps in the scale
 }
 
 export interface TypographyMode {
-  isDefault?: boolean;
-  tokens: FontSizeSystem;
+	isDefault?: boolean;
+	metadata?: ModeMetadata;
+	tokens: FontSizeSystem;
+}
+
+export type FontSizeReference = 'min' | number;
+export type TypographyFontStyle = 'normal' | 'italic' | 'oblique';
+export type TypographyAvailableWeights = number[] | { min: number; max: number };
+
+export interface TypographyVariableAxis {
+	min: number;
+	default?: number;
+	max: number;
+}
+
+export interface TypographyFontFaceCapabilities {
+	style: TypographyFontStyle;
+	/** Physical CSS oblique angle, when the prepared face declares one. */
+	obliqueAngle?: number;
+	/** Exact static cuts or inclusive variable-font range for this face style. */
+	weights: TypographyAvailableWeights;
+	/** OpenType feature tags reported by the prepared face. */
+	features?: string[];
+	/** Variable axes reported by the prepared face. */
+	axes?: Record<string, TypographyVariableAxis>;
+}
+
+interface TypographyFontIdentity {
+	/** CSS font-family name, without fallback families. */
+	family: string;
+	/** CSS fallback family names, in priority order. */
+	fallbacks?: string[];
+}
+
+/** A physical font source with explicit verification status. */
+export type TypographyFont = TypographyFontIdentity &
+	(
+		| {
+				/** Authoritative capabilities supplied by TFS font preparation. */
+				verification: 'prepared';
+				capabilities: { faces: TypographyFontFaceCapabilities[] };
+				diagnostics?: { warnings: string[] };
+		  }
+		| {
+				/** Explicit escape hatch for system or externally managed font stacks. */
+				verification: 'unavailable';
+				capabilities?: never;
+		  }
+	);
+
+export type TypographyFeatureValue = boolean | number;
+
+export interface TypographySettings {
+	/** Prefer normal CSS properties where they exist; this is the OpenType escape hatch. */
+	features?: Record<string, TypographyFeatureValue>;
+	/** Variable-axis values other than weight/style, which have dedicated role fields. */
+	variations?: Record<string, number>;
+	fontKerning?: 'auto' | 'normal' | 'none';
+	fontOpticalSizing?: 'auto' | 'none';
+}
+
+/** A complete role-local size recipe. Letter spacing is expressed in em. */
+export interface TypographyRecipe extends TypographySettings {
+	fontSize: FontSizeReference;
+	/** Role-local weight alias selected by this complete recipe. */
+	weight: string;
+	lineHeight: number;
+	letterSpacing: number;
+}
+
+export interface TypographyRoleStyle {
+	/** Role weight aliases intentionally permitted for this style. */
+	weights: string[];
+}
+
+export interface TypographyRole extends TypographySettings {
+	/** Key of a font in typography.fonts. */
+	font: string;
+	/** The unsuffixed/default recipe, emitted as --text-{role}-* by default. */
+	base: TypographyRecipe;
+	/** Optional, arbitrarily named alternatives such as min, s, l, and max. */
+	variants?: Record<string, TypographyRecipe>;
+	/**
+	 * Optional specimen/presentation order. Must contain `base` and every variant
+	 * exactly once. This is authored per role; core assigns no semantic meaning to names.
+	 */
+	displayOrder?: string[];
+	/** Role-local semantic aliases mapped to intentional CSS weight values. */
+	weights: Record<string, number>;
+	/**
+	 * Explicit style/weight combinations. When omitted, normal exposes all role weights.
+	 * Prepared font capabilities validate every requested combination.
+	 */
+	styles?: Partial<Record<TypographyFontStyle, TypographyRoleStyle>>;
+	defaultStyle?: TypographyFontStyle;
+}
+
+export interface TypographySystem {
+	modes: Array<TypographyMode & { name: string }>;
+	/** Optional semantic layer; existing --fs-* generation remains unchanged. */
+	fonts?: Record<string, TypographyFont>;
+	roles?: Record<string, TypographyRole>;
+}
+
+export interface PreparedFontManifestLike {
+	schemaVersion: number;
+	families: Record<
+		string,
+		{
+			family: string;
+			faces: Array<{
+				/** Kept as string so imported JSON manifests are accepted without a cast. */
+				style: string;
+				obliqueAngle?: number;
+				weight: number | { min: number; max: number };
+				stretch?: number | { min: number; max: number };
+				features?: string[];
+				axes?: Record<string, TypographyVariableAxis>;
+				warnings?: string[];
+			}>;
+		}
+	>;
+}
+
+export interface PreparedTypographyFontOptions {
+	/** Derive a safe generic fallback stack without spelling out CSS families. */
+	category?: 'sans' | 'serif' | 'mono';
+	/** Advanced explicit stack. Takes precedence over category. */
+	fallbacks?: string[];
 }
 
 // BORDER ----------------------------------------------- //
 export interface BorderRadiusSystem {
-  spacingMode?: string; // If not specified, uses the default spacing mode
-  unit?: string;
-  min: number | "min";
-  s: number | "min";
-  l: number | "min";
-  max: number | "min";
+	spacingMode?: string; // If not specified, uses the default spacing mode
+	unit?: string;
+	min: number | 'min';
+	s: number | 'min';
+	l: number | 'min';
+	max: number | 'min';
 }
 
 export interface BorderRadiusMode {
-  isDefault?: boolean;
-  tokens: BorderRadiusSystem;
+	isDefault?: boolean;
+	metadata?: ModeMetadata;
+	tokens: BorderRadiusSystem;
 }
 
 export interface BorderWidthSystem {
-  unit: string; // Unit for border width (px, rem, etc.)
-  value: number; // Single discrete value
+	unit: string; // Unit for border width (px, rem, etc.)
+	value: number; // Single discrete value
 }
 
 export interface BorderWidthMode {
-  isDefault?: boolean;
-  tokens: BorderWidthSystem;
+	isDefault?: boolean;
+	metadata?: ModeMetadata;
+	tokens: BorderWidthSystem;
 }
 
 export interface BorderSystem {
-  radius: {
-    modes: Array<BorderRadiusMode & { name: string }>;
-  };
-  width: {
-    modes: Array<BorderWidthMode & { name: string }>;
-  };
-  // Future border properties can be added here
+	radius: {
+		modes: Array<BorderRadiusMode & { name: string }>;
+	};
+	width: {
+		modes: Array<BorderWidthMode & { name: string }>;
+	};
+	// Future border properties can be added here
 }
 
 // TIME ------------------------------------------------- //
@@ -156,15 +292,16 @@ export interface BorderSystem {
  *   // Generates: --t-1, --t-2, ..., --t-anim-1, --t-anim-2, ...
  */
 export interface TimeSystem {
-  unit: string;   // e.g., 'ms'
-  base: number;   // base increment (e.g., 100)
-  min: number;    // minimum time value
-  range: number;  // number of steps
+	unit: string; // e.g., 'ms'
+	base: number; // base increment (e.g., 100)
+	min: number; // minimum time value
+	range: number; // number of steps
 }
 
 export interface TimeMode {
-  isDefault?: boolean;
-  tokens: TimeSystem;
+	isDefault?: boolean;
+	metadata?: ModeMetadata;
+	tokens: TimeSystem;
 }
 
 // MAIN CONFIG ------------------------------------------ //
@@ -174,23 +311,21 @@ export interface TimeMode {
  * Use this when generating a complete design system.
  */
 export interface DesignSystem {
-  colors: {
-    modes: Array<ColorMode & { name: string }>;
-    alphaSchedule: AlphaSchedule;
-  };
-  spacing: {
-    modes: Array<SpacingMode & { name: string }>;
-  };
-  gap: {
-    modes: Array<GapMode & { name: string }>;
-  };
-  typography: {
-    modes: Array<TypographyMode & { name: string }>;
-  };
-  border: BorderSystem;
-  time: {
-    modes: Array<TimeMode & { name: string }>;
-  };
+	colors: {
+		modes: Array<ColorMode & { name: string }>;
+		alphaSchedule: AlphaSchedule;
+	};
+	spacing: {
+		modes: Array<SpacingMode & { name: string }>;
+	};
+	gap: {
+		modes: Array<GapMode & { name: string }>;
+	};
+	typography: TypographySystem;
+	border: BorderSystem;
+	time: {
+		modes: Array<TimeMode & { name: string }>;
+	};
 }
 
 /**
@@ -213,21 +348,19 @@ export interface DesignSystem {
  * ```
  */
 export interface PartialDesignSystem {
-  colors?: {
-    modes: Array<ColorMode & { name: string }>;
-    alphaSchedule: AlphaSchedule;
-  };
-  spacing?: {
-    modes: Array<SpacingMode & { name: string }>;
-  };
-  gap?: {
-    modes: Array<GapMode & { name: string }>;
-  };
-  typography?: {
-    modes: Array<TypographyMode & { name: string }>;
-  };
-  border?: BorderSystem;
-  time?: {
-    modes: Array<TimeMode & { name: string }>;
-  };
+	colors?: {
+		modes: Array<ColorMode & { name: string }>;
+		alphaSchedule: AlphaSchedule;
+	};
+	spacing?: {
+		modes: Array<SpacingMode & { name: string }>;
+	};
+	gap?: {
+		modes: Array<GapMode & { name: string }>;
+	};
+	typography?: TypographySystem;
+	border?: BorderSystem;
+	time?: {
+		modes: Array<TimeMode & { name: string }>;
+	};
 }
