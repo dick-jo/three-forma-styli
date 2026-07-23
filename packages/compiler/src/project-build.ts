@@ -1,5 +1,3 @@
-import { createHash } from 'node:crypto';
-import os from 'node:os';
 import path from 'node:path';
 import fs from 'fs-extra';
 import {
@@ -28,8 +26,6 @@ import type {
 	LegacyTfsProjectOutput,
 	ProjectFontAssetUrlPolicy,
 	ProjectFont,
-	ProjectJsonOutput,
-	ProjectOutputFormat,
 	TfsProject,
 	WorkspacePackageOutput,
 } from './project.js';
@@ -41,99 +37,39 @@ import { planWorkspacePackage } from './workspace/plan.js';
 import { workspacePlanContext } from './workspace/context.js';
 import { assertGeneratedOutputCurrent } from './generated-check.js';
 import { fontAssetUrl, relativeUrl, validateFontAssetUrlPolicy } from './font-url.js';
-import { assertPortableConfiguredPath } from './portable-path.js';
-import { inspectFontFiles } from './fonts/inspect.js';
 import { acquireBuildLock } from './build-lock.js';
+import {
+	fontAssetsOptions,
+	jsonOutput,
+	legacyOutputPlan,
+	tokenCssOptions,
+	typographyCssOptions,
+	validateLegacyOutputPlan,
+	type LegacyOutputPlan,
+} from './legacy-output.js';
+import {
+	assertOwnedOutput,
+	commitOutputDirectory,
+	listOutputFiles,
+	outputFileMetadata,
+	validateFontSourcesOutsideOutput,
+	validateOutputRoot,
+	writeOutputFile,
+} from './output-directory.js';
+import {
+	addPlannedArtifact,
+	appendFontArtifacts,
+	plannedFontInputs,
+	projectLayout,
+	type ProjectBuildPlan,
+	type ProjectPlanArtifact,
+} from './project-plan.js';
 
-interface OutputPlan {
-	css?: string;
-	indexCss?: string;
-	typographyCss?: string;
-	typographyModule?: string;
-	typescript?: string;
-	systemTypescript?: string;
-	specimen?: string;
-	dtcg?: string;
-	figmaVariables?: string;
-}
-
-export interface ProjectPlanArtifact {
-	path: string;
-	kind: 'runtime' | 'review' | 'design' | 'asset' | 'evidence';
-	dependencies: string[];
-}
-
-export interface ProjectPlanFontSource {
-	font: string;
-	source: string;
-	output: string;
-	strategy: 'copy' | 'woff2';
-	exists: boolean;
-}
-
-export interface ProjectBuildPlan {
-	schemaVersion: 1;
-	project: { schemaVersion: 1; config: string };
-	output: {
-		layout: 'flat' | 'workspace-package';
-		directory: string;
-		ownership: 'atomic-directory';
-	};
-	artifacts: ProjectPlanArtifact[];
-	fonts: {
-		sources: ProjectPlanFontSource[];
-		licenses: Array<{ font: string; source: string; exists: boolean }>;
-		discoveredAtBuild: string[];
-	};
-	prerequisites: {
-		externalTools: Array<{
-			id: 'fonttools';
-			reason: string;
-			requiredBy: string[];
-		}>;
-	};
-	hostPackage?: {
-		manifest: string;
-		generatedFromHost: string;
-		requiredExports: Array<{
-			subpath: string;
-			target: string | Readonly<Record<string, string>>;
-		}>;
-	};
-}
-
-function selectedFile(
-	option: boolean | ProjectOutputFormat | undefined,
-	fallback: string
-): string | undefined {
-	if (!option) return undefined;
-	return option === true ? fallback : (option.file ?? fallback);
-}
-
-function typographyCssOptions(output: LegacyTfsProjectOutput) {
-	const configured =
-		output.typographyCss && output.typographyCss !== true ? output.typographyCss : {};
-	return {
-		classPrefix: configured.classPrefix,
-		specificity: configured.specificity ?? 'class',
-		fontFaces: configured.fontFaces ?? 'include',
-	};
-}
-
-function tokenCssOptions(output: LegacyTfsProjectOutput) {
-	const configured = output.css && output.css !== true ? output.css : {};
-	return { selectors: configured.selectors };
-}
-
-function fontAssetsOptions(output: LegacyTfsProjectOutput) {
-	return {
-		directory: assertPortableRelativePath(
-			output.fontAssets?.directory ?? 'fonts',
-			'output.fontAssets.directory'
-		),
-		urls: output.fontAssets?.urls ?? ({ mode: 'relative' } as const),
-	};
-}
+export type {
+	ProjectBuildPlan,
+	ProjectPlanArtifact,
+	ProjectPlanFontSource,
+} from './project-plan.js';
 
 function validateFontUrlPolicy(policy: ProjectFontAssetUrlPolicy): void {
 	validateFontAssetUrlPolicy(policy, 'output.fontAssets.urls');
@@ -146,178 +82,6 @@ function fontFaceUrl(
 	face: PreparedFontFace
 ): string {
 	return fontAssetUrl(targetStylesheet, fontDirectory, policy, face.file);
-}
-
-function outputPlan(output: LegacyTfsProjectOutput): OutputPlan {
-	const typographyCss = selectedFile(output.typographyCss, 'typography.css');
-	const typographyModule = selectedFile(output.typographyModule, 'typography.generated.module.css');
-	const typescript = selectedFile(output.typescript, 'typography.generated.ts');
-	const tokenCss = selectedFile(output.css, 'tokens.css');
-	return {
-		// Semantic CSS/TS outputs contain var(--*) references, so project builds
-		// always close that dependency with the token stylesheet.
-		css: tokenCss ?? (typographyCss || typographyModule || typescript ? 'tokens.css' : undefined),
-		indexCss: selectedFile(output.indexCss, 'index.css'),
-		typographyCss,
-		typographyModule,
-		typescript,
-		systemTypescript: selectedFile(output.systemTypescript, 'system.generated.ts'),
-		specimen: selectedFile(output.specimen, 'typography.specimen.html'),
-		dtcg: selectedFile(output.dtcg, 'figma/colors.dtcg.json'),
-		figmaVariables: selectedFile(output.figmaVariables, 'figma/variables.json'),
-	};
-}
-
-function assertPortableRelativePath(value: string, label: string): string {
-	if (!value || path.isAbsolute(value)) throw new Error(`${label} must be a relative output path.`);
-	assertPortableConfiguredPath(value.split(path.sep).join('/'), label);
-	const normalized = path.normalize(value);
-	if (normalized === '..' || normalized.startsWith(`..${path.sep}`)) {
-		throw new Error(`${label} must stay inside the project output directory.`);
-	}
-	return normalized;
-}
-
-function validatePlan(plan: OutputPlan): void {
-	const claimed = new Map<string, string>();
-	for (const [kind, configured] of Object.entries(plan)) {
-		if (!configured) continue;
-		const relative = assertPortableRelativePath(configured, `output.${kind}.file`);
-		const key = relative.toLowerCase();
-		const previous = claimed.get(key);
-		if (previous)
-			throw new Error(`Output collision: ${previous} and ${kind} both use ${relative}.`);
-		claimed.set(key, kind);
-	}
-	if (plan.typographyModule) {
-		const declaration = `${plan.typographyModule}.d.ts`.toLowerCase();
-		if (claimed.has(declaration)) {
-			throw new Error(
-				`Output collision: typographyModule declaration conflicts with ${declaration}.`
-			);
-		}
-	}
-}
-
-function jsonOutput(
-	option: boolean | ProjectJsonOutput | undefined
-): Required<Pick<ProjectJsonOutput, 'colorSpace' | 'collectionName'>> {
-	const configured = option && option !== true ? option : {};
-	return {
-		colorSpace: configured.colorSpace ?? 'srgb',
-		collectionName: configured.collectionName ?? 'Color',
-	};
-}
-
-async function writeText(root: string, relative: string, contents: string): Promise<void> {
-	const destination = path.join(root, assertPortableRelativePath(relative, 'output file'));
-	await fs.ensureDir(path.dirname(destination));
-	await fs.writeFile(destination, contents);
-}
-
-async function allFiles(directory: string, root = directory): Promise<string[]> {
-	const entries = await fs.readdir(directory, { withFileTypes: true });
-	return (
-		await Promise.all(
-			entries.map(async (entry) => {
-				const absolute = path.join(directory, entry.name);
-				if (entry.isDirectory()) return allFiles(absolute, root);
-				if (!entry.isFile()) throw new Error(`Project output must be a regular file: ${absolute}`);
-				return [path.relative(root, absolute).split(path.sep).join('/')];
-			})
-		)
-	).flat();
-}
-
-async function fileMetadata(root: string, relative: string) {
-	const data = await fs.readFile(path.join(root, relative));
-	return {
-		path: relative,
-		bytes: data.byteLength,
-		sha256: createHash('sha256').update(data).digest('hex'),
-	};
-}
-
-async function assertOwnedOutput(outputDirectory: string): Promise<void> {
-	if (!(await fs.pathExists(outputDirectory))) return;
-	const stats = await fs.lstat(outputDirectory);
-	if (stats.isSymbolicLink()) throw new Error('Project output directory must not be a symlink.');
-	if (!stats.isDirectory()) throw new Error('Project output path exists and is not a directory.');
-	if ((await fs.readdir(outputDirectory)).length === 0) return;
-	const manifestPath = path.join(outputDirectory, 'build.manifest.json');
-	if (!(await fs.pathExists(manifestPath))) {
-		throw new Error(
-			`Refusing to replace non-empty unowned directory ${outputDirectory}; build.manifest.json is missing.`
-		);
-	}
-	let manifest: unknown;
-	try {
-		manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
-	} catch {
-		throw new Error(`Refusing to replace ${outputDirectory}; build.manifest.json is invalid.`);
-	}
-	if ((manifest as { tool?: { name?: unknown } }).tool?.name !== 'three-forma-styli') {
-		throw new Error(`Refusing to replace ${outputDirectory}; it is not marked as TFS-owned.`);
-	}
-}
-
-async function commitOutput(staging: string, outputDirectory: string): Promise<void> {
-	await assertOwnedOutput(outputDirectory);
-	const backup = `${outputDirectory}.tfs-backup-${process.pid}`;
-	if (await fs.pathExists(backup)) throw new Error(`Build backup already exists: ${backup}`);
-	let movedPrevious = false;
-	try {
-		if (await fs.pathExists(outputDirectory)) {
-			await fs.move(outputDirectory, backup);
-			movedPrevious = true;
-		}
-		await fs.move(staging, outputDirectory);
-		if (movedPrevious) await fs.remove(backup);
-	} catch (error) {
-		if (!(await fs.pathExists(outputDirectory)) && movedPrevious && (await fs.pathExists(backup))) {
-			await fs.move(backup, outputDirectory);
-		}
-		throw error;
-	}
-}
-
-function validateOutputRoot(outputDirectory: string, configDirectory: string): void {
-	const forbidden = new Set([
-		path.parse(outputDirectory).root,
-		path.resolve(os.homedir()),
-		path.resolve(configDirectory),
-	]);
-	if (forbidden.has(path.resolve(outputDirectory))) {
-		throw new Error(
-			'Project output directory must not be the filesystem root, home, or config directory.'
-		);
-	}
-}
-
-function isInside(directory: string, candidate: string): boolean {
-	const relative = path.relative(directory, candidate);
-	return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
-}
-
-function validateFontSourcesOutsideOutput(
-	fonts: Record<string, ProjectFont>,
-	configDirectory: string,
-	outputDirectory: string
-): void {
-	for (const [id, font] of Object.entries(fonts)) {
-		const paths = [
-			...font.sources.map((source) => (typeof source === 'string' ? source : source.path)),
-			font.license.file,
-		];
-		for (const configured of paths) {
-			const resolved = path.resolve(configDirectory, configured);
-			if (isInside(outputDirectory, resolved)) {
-				throw new Error(
-					`fonts.${id} source/license files must live outside the TFS-owned output directory.`
-				);
-			}
-		}
-	}
 }
 
 function fontFallback(font: ProjectFont): {
@@ -338,7 +102,7 @@ type LegacyProject = TfsProject & { output: LegacyTfsProjectOutput };
 interface LegacyProjectContext {
 	configDirectory: string;
 	outputDirectory: string;
-	plan: OutputPlan;
+	plan: LegacyOutputPlan;
 	typographyOutput: ReturnType<typeof typographyCssOptions>;
 	fontFacesMode: 'include' | 'separate' | 'none';
 	fontAssets: ReturnType<typeof fontAssetsOptions>;
@@ -357,8 +121,8 @@ async function legacyProjectContext(
 	validateOutputRoot(outputDirectory, configDirectory);
 	validateFontSourcesOutsideOutput(project.fonts ?? {}, configDirectory, outputDirectory);
 	await assertOwnedOutput(outputDirectory);
-	const plan = outputPlan(project.output);
-	validatePlan(plan);
+	const plan = legacyOutputPlan(project.output);
+	validateLegacyOutputPlan(plan);
 	const typographyOutput = typographyCssOptions(project.output);
 	const fontFacesMode = plan.typographyCss
 		? typographyOutput.fontFaces
@@ -469,7 +233,7 @@ async function buildLegacyProject(
 				typography = adjustedFallbacks.typography;
 				preparedFonts.css = joinFontFaceCss(preparedFonts.css, adjustedFallbacks.css);
 				await fs.writeFile(preparedFonts.cssPath, preparedFonts.css);
-				await writeText(
+				await writeOutputFile(
 					staging,
 					path.join(fontAssets.directory, 'fallbacks.manifest.json'),
 					`${JSON.stringify(adjustedFallbacks.manifest, null, 2)}\n`
@@ -480,7 +244,7 @@ async function buildLegacyProject(
 		const ir = generate(system, project.generator);
 
 		if (plan.css)
-			await writeText(
+			await writeOutputFile(
 				staging,
 				plan.css,
 				generateCss(system, { ...project.generator, ...tokenCssOptions(project.output) })
@@ -497,7 +261,7 @@ async function buildLegacyProject(
 							adjustedFallbacks?.css
 						)
 					: undefined;
-			await writeText(
+			await writeOutputFile(
 				staging,
 				plan.typographyCss,
 				toTypographyCss(ir, {
@@ -508,18 +272,30 @@ async function buildLegacyProject(
 			);
 		}
 		if (plan.typographyModule) {
-			await writeText(staging, plan.typographyModule, toTypographyCss(ir, { scope: 'module' }));
-			await writeText(staging, `${plan.typographyModule}.d.ts`, toTypographyCssModuleTypes(ir));
+			await writeOutputFile(
+				staging,
+				plan.typographyModule,
+				toTypographyCss(ir, { scope: 'module' })
+			);
+			await writeOutputFile(
+				staging,
+				`${plan.typographyModule}.d.ts`,
+				toTypographyCssModuleTypes(ir)
+			);
 		}
 		if (plan.typescript) {
-			await writeText(
+			await writeOutputFile(
 				staging,
 				plan.typescript,
 				generateTypographyTypescript(system, project.generator)
 			);
 		}
 		if (plan.systemTypescript) {
-			await writeText(staging, plan.systemTypescript, generateProjectSystemTypescript(system, ir));
+			await writeOutputFile(
+				staging,
+				plan.systemTypescript,
+				generateProjectSystemTypescript(system, ir)
+			);
 		}
 		if (plan.specimen) {
 			const specimenOption = project.output.specimen;
@@ -530,7 +306,7 @@ async function buildLegacyProject(
 						? path.join(fontAssets.directory, 'fonts.css')
 						: undefined;
 			const fontHref = faceStylesheet ? relativeUrl(plan.specimen, faceStylesheet) : undefined;
-			await writeText(
+			await writeOutputFile(
 				staging,
 				plan.specimen,
 				generateTypographySpecimen(system, {
@@ -554,7 +330,7 @@ async function buildLegacyProject(
 		}
 		if (plan.dtcg) {
 			const options = jsonOutput(project.output.dtcg);
-			await writeText(
+			await writeOutputFile(
 				staging,
 				plan.dtcg,
 				generateFigmaJson(
@@ -569,7 +345,7 @@ async function buildLegacyProject(
 		}
 		if (plan.figmaVariables) {
 			const options = jsonOutput(project.output.figmaVariables);
-			await writeText(
+			await writeOutputFile(
 				staging,
 				plan.figmaVariables,
 				generateFigmaJson(
@@ -589,7 +365,7 @@ async function buildLegacyProject(
 				plan.css,
 				plan.typographyCss,
 			].filter((value): value is string => Boolean(value));
-			await writeText(
+			await writeOutputFile(
 				staging,
 				plan.indexCss,
 				`${imports
@@ -598,10 +374,10 @@ async function buildLegacyProject(
 			);
 		}
 
-		const files = (await allFiles(staging)).sort();
+		const files = (await listOutputFiles(staging)).sort();
 		const artifacts = Object.fromEntries(
 			await Promise.all(
-				files.map(async (file) => [file, await fileMetadata(staging, file)] as const)
+				files.map(async (file) => [file, await outputFileMetadata(staging, file)] as const)
 			)
 		);
 		const preparedFontArtifacts = preparedFonts
@@ -688,168 +464,13 @@ async function buildLegacyProject(
 				typescript: plan.typescript ? 'semantic typography contract' : undefined,
 			},
 		};
-		await writeText(staging, 'build.manifest.json', `${JSON.stringify(manifest, null, 2)}\n`);
+		await writeOutputFile(staging, 'build.manifest.json', `${JSON.stringify(manifest, null, 2)}\n`);
 		if (mode === 'check') await assertGeneratedOutputCurrent(staging, outputDirectory);
-		else await commitOutput(staging, outputDirectory);
+		else await commitOutputDirectory(staging, outputDirectory);
 		return { outputDirectory, files: [...files, 'build.manifest.json'].sort() };
 	} finally {
 		await lock.release();
 		await fs.remove(staging);
-	}
-}
-
-function projectLayout(project: TfsProject): 'flat' | 'workspace-package' {
-	const output = project.output as unknown as Record<string, unknown>;
-	const layout = output.layout;
-	if (layout !== undefined && layout !== 'flat' && layout !== 'workspace-package') {
-		throw new Error(`Unknown TFS output layout ${JSON.stringify(layout)}.`);
-	}
-	const legacyKeys = [
-		'fontAssets',
-		'css',
-		'indexCss',
-		'typographyCss',
-		'typographyModule',
-		'typescript',
-		'systemTypescript',
-		'specimen',
-		'dtcg',
-		'figmaVariables',
-	];
-	const workspaceKeys = ['hostPackage', 'assets', 'targets'];
-	if (layout === 'workspace-package') {
-		const mixed = legacyKeys.filter((key) => output[key] !== undefined);
-		if (mixed.length > 0) {
-			throw new Error(`workspace-package output cannot use legacy keys: ${mixed.join(', ')}.`);
-		}
-		return 'workspace-package';
-	}
-	const mixed = workspaceKeys.filter((key) => output[key] !== undefined);
-	if (mixed.length > 0) {
-		throw new Error(`Flat output cannot use workspace-package keys: ${mixed.join(', ')}.`);
-	}
-	return 'flat';
-}
-
-function normalizedFontSource(value: string | { path: string; output?: string }): {
-	path: string;
-	output?: string;
-} {
-	return typeof value === 'string' ? { path: value } : value;
-}
-
-async function plannedFontInputs(
-	project: TfsProject,
-	configDirectory: string
-): Promise<Pick<ProjectBuildPlan, 'fonts' | 'prerequisites'>> {
-	const sources: ProjectPlanFontSource[] = [];
-	const licenses: Array<{ font: string; source: string; exists: boolean }> = [];
-	const fontToolsRequiredBy = new Set<string>();
-	const typography = project.system.typography;
-	const adjustedFallbackFonts = new Set(
-		typography && 'roles' in typography && typography.roles
-			? Object.values(typography.roles)
-					.map((role) => role.font)
-					.filter((fontId) => {
-						const font = project.fonts?.[fontId];
-						return (
-							Boolean(font) &&
-							(font!.category === 'sans' || font!.category === 'mono') &&
-							!font!.fallbacks?.length
-						);
-					})
-			: []
-	);
-	for (const [font, family] of Object.entries(project.fonts ?? {})) {
-		const licensePath = path.resolve(configDirectory, family.license.file);
-		licenses.push({ font, source: licensePath, exists: await fs.pathExists(licensePath) });
-		for (const value of family.sources) {
-			const source = normalizedFontSource(value);
-			const sourcePath = path.resolve(configDirectory, source.path);
-			const extension = path.extname(source.path).toLowerCase();
-			const strategy = family.strategy ?? (['.ttf', '.otf'].includes(extension) ? 'woff2' : 'copy');
-			const original = path.basename(source.path);
-			const output =
-				source.output ??
-				(strategy === 'woff2'
-					? `${path.basename(original, path.extname(original))}.woff2`
-					: original);
-			const exists = await fs.pathExists(sourcePath);
-			sources.push({
-				font,
-				source: sourcePath,
-				output,
-				strategy,
-				exists,
-			});
-			if (strategy === 'woff2') {
-				fontToolsRequiredBy.add(`${font}/${output}`);
-			} else if (adjustedFallbackFonts.has(font) && extension === '.woff2' && exists) {
-				const [inspection] = inspectFontFiles([sourcePath], configDirectory);
-				if (inspection?.axes.wght) fontToolsRequiredBy.add(`${font}/${output}`);
-			}
-		}
-	}
-	sources.sort((left, right) =>
-		`${left.font}/${left.output}`.localeCompare(`${right.font}/${right.output}`)
-	);
-	licenses.sort((left, right) => left.font.localeCompare(right.font));
-	return {
-		fonts: {
-			sources,
-			licenses,
-			discoveredAtBuild:
-				sources.length > 0
-					? [
-							'prepared font metadata and byte hashes',
-							'adjusted fallback evidence when configured typography produces a fallback',
-						]
-					: [],
-		},
-		prerequisites: {
-			externalTools:
-				fontToolsRequiredBy.size > 0
-					? [
-							{
-								id: 'fonttools',
-								reason:
-									'Convert configured sources or decompress variable WOFF2 faces for exact adjusted-fallback sampling.',
-								requiredBy: [...fontToolsRequiredBy].sort(),
-							},
-						]
-					: [],
-		},
-	};
-}
-
-function addPlannedArtifact(artifacts: ProjectPlanArtifact[], artifact: ProjectPlanArtifact): void {
-	if (artifacts.some((existing) => existing.path === artifact.path)) return;
-	artifacts.push(artifact);
-}
-
-function appendFontArtifacts(
-	artifacts: ProjectPlanArtifact[],
-	directory: string,
-	fonts: ProjectBuildPlan['fonts']
-): void {
-	const normalizedDirectory = directory.split(path.sep).join('/');
-	for (const source of fonts.sources) {
-		addPlannedArtifact(artifacts, {
-			path: path.posix.join(normalizedDirectory, source.output),
-			kind: 'asset',
-			dependencies: [],
-		});
-	}
-	for (const license of fonts.licenses) {
-		addPlannedArtifact(artifacts, {
-			path: path.posix.join(
-				normalizedDirectory,
-				'licenses',
-				`${license.font}-${path.basename(license.source)}`
-			),
-			kind: 'evidence',
-			dependencies: [],
-		});
 	}
 }
 
@@ -893,7 +514,7 @@ export async function planProject(
 	} else {
 		const context = await legacyProjectContext(project as LegacyProject, resolvedConfig);
 		outputDirectory = context.outputDirectory;
-		const kindFor = (name: keyof OutputPlan): ProjectPlanArtifact['kind'] =>
+		const kindFor = (name: keyof LegacyOutputPlan): ProjectPlanArtifact['kind'] =>
 			name === 'specimen'
 				? 'review'
 				: name === 'dtcg' || name === 'figmaVariables'
@@ -903,7 +524,7 @@ export async function planProject(
 		const fontArtifacts = fontPlan.fonts.sources.map((source) =>
 			path.posix.join(plannedFontDirectory, source.output)
 		);
-		const dependenciesFor = (name: keyof OutputPlan): string[] => {
+		const dependenciesFor = (name: keyof LegacyOutputPlan): string[] => {
 			if (name === 'typographyCss') {
 				return [
 					...(context.plan.css ? [context.plan.css] : []),
@@ -933,7 +554,7 @@ export async function planProject(
 			return [];
 		};
 		artifacts = Object.entries(context.plan)
-			.filter((entry): entry is [keyof OutputPlan, string] => Boolean(entry[1]))
+			.filter((entry): entry is [keyof LegacyOutputPlan, string] => Boolean(entry[1]))
 			.map(([name, file]) => ({
 				path: file,
 				kind: kindFor(name),

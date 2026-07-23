@@ -55,3 +55,17 @@ interactions.
    product/API distinction.
 7. Canary publication, independent installation, and the isolated Scatter
    package adoption remain operational release gates.
+
+### Structural-debt progress
+
+The first behavior-preserving split landed on 2026-07-23:
+
+- `project-build.ts` fell from 1,010 to 631 lines. Portable legacy output
+  planning, atomic output ownership/replacement, and read-only project/font
+  planning now have separate modules.
+- `validate.ts` fell from 1,381 to 1,084 lines. Shared validation primitives and
+  the time/motion/shadow domain now have separate modules.
+
+This finding remains open: semantic typography validation is still one large
+domain block and should move as a unit rather than being sliced into arbitrary
+line-count-driven helpers.

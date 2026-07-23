@@ -8,65 +8,27 @@ import type {
 	AlphaSchedule,
 	DesignSystem,
 	PartialDesignSystem,
-	TimeReference,
 	TypographyFontStyle,
 	TypographyRecipe,
 	TypographyRole,
 	TypographyRoleStyle,
 } from '../types.js';
+import {
+	ValidationError,
+	tokenNamePattern,
+	validateCssUnit,
+	validateFiniteNumber,
+	validateNamedModes,
+} from './validation-shared.js';
+import {
+	validateMotionPartial,
+	validateShadowsPartial,
+	validateTimePartial,
+} from './validate-motion-shadows.js';
 
-export class ValidationError extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = 'ValidationError';
-	}
-}
+export { ValidationError } from './validation-shared.js';
 
-const tokenNamePattern = /^[a-z][a-z0-9-]*$/i;
-const cssUnitPattern = /^(?:%|[a-z][a-z0-9-]*)$/i;
 const openTypeTagPattern = /^[\x20-\x7e]{4}$/;
-
-type NamedMode = { name: string; isDefault?: boolean };
-
-function validateNamedModes(modes: NamedMode[], path: string, label: string): void {
-	const seen = new Map<string, number>();
-	const defaults: string[] = [];
-
-	for (const [index, mode] of modes.entries()) {
-		if (!mode.name) {
-			throw new ValidationError(`${label} mode at index ${index} must have a name`);
-		}
-		if (!tokenNamePattern.test(mode.name)) {
-			throw new ValidationError(`${path}[${index}].name "${mode.name}" is not CSS-token safe`);
-		}
-		const previous = seen.get(mode.name);
-		if (previous !== undefined) {
-			throw new ValidationError(
-				`${path} contains duplicate mode name "${mode.name}" at indexes ${previous} and ${index}`
-			);
-		}
-		seen.set(mode.name, index);
-		if (mode.isDefault === true) defaults.push(mode.name);
-	}
-
-	if (defaults.length > 1) {
-		throw new ValidationError(
-			`${path} must have at most one default mode; found ${defaults.map((name) => `"${name}"`).join(', ')}`
-		);
-	}
-}
-
-function validateCssUnit(unit: unknown, path: string): asserts unit is string {
-	if (typeof unit !== 'string' || !cssUnitPattern.test(unit)) {
-		throw new ValidationError(`${path} must be a CSS-safe unit such as "px", "rem", "%", or "ms"`);
-	}
-}
-
-function validateFiniteNumber(value: unknown, path: string): asserts value is number {
-	if (typeof value !== 'number' || !Number.isFinite(value)) {
-		throw new ValidationError(`${path} must be a finite number`);
-	}
-}
 
 function validateColorNameList(
 	value: unknown,
@@ -1057,249 +1019,6 @@ function validateBorderPartial(
 	}
 }
 
-function validateTimePartial(time: NonNullable<PartialDesignSystem['time']>): void {
-	if (!time.scales || !Array.isArray(time.scales)) {
-		throw new ValidationError('time.scales must be an array');
-	}
-
-	if (time.scales.length === 0) {
-		throw new ValidationError('time.scales must have at least one scale');
-	}
-	validateNamedModes(time.scales, 'time.scales', 'Time scale');
-
-	time.scales.forEach((scale) => {
-		if (!scale.tokens) {
-			throw new ValidationError(`Time scale "${scale.name}" must have tokens`);
-		}
-
-		validateTimeTokens(scale.tokens, `time.scales["${scale.name}"].tokens`);
-	});
-}
-
-function validateTimeReference(
-	reference: TimeReference,
-	time: NonNullable<PartialDesignSystem['time']>,
-	path: string,
-	allowZero: boolean
-): void {
-	if (reference === 0 && allowZero) return;
-	const defaultScale = time.scales.find((scale) => scale.isDefault) ?? time.scales[0];
-	const scaleName = typeof reference === 'object' ? reference.scale : defaultScale?.name;
-	const step = typeof reference === 'object' ? reference.step : reference;
-	const scale = time.scales.find((candidate) => candidate.name === scaleName);
-
-	if (!scale) {
-		throw new ValidationError(`${path} references unknown time scale "${scaleName}"`);
-	}
-	if (scale.tokens.unit !== 'ms' && scale.tokens.unit !== 's') {
-		throw new ValidationError(
-			`${path} references time scale "${scaleName}" with unit "${scale.tokens.unit}"; motion requires "ms" or "s"`
-		);
-	}
-	if (step !== 'min' && (!Number.isInteger(step) || step < 1 || step > scale.tokens.range)) {
-		throw new ValidationError(
-			`${path} step must be "min" or an integer from 1 through ${scale.tokens.range}`
-		);
-	}
-}
-
-function validateMotionPartial(
-	motion: NonNullable<PartialDesignSystem['motion']>,
-	time: NonNullable<PartialDesignSystem['time']>
-): void {
-	if (!motion.easings || typeof motion.easings !== 'object' || Array.isArray(motion.easings)) {
-		throw new ValidationError('motion.easings must be an object');
-	}
-	if (Object.keys(motion.easings).length === 0) {
-		throw new ValidationError('motion.easings must contain at least one easing');
-	}
-	for (const [name, easing] of Object.entries(motion.easings)) {
-		if (!tokenNamePattern.test(name)) {
-			throw new ValidationError(`motion.easings name "${name}" is not CSS-token safe`);
-		}
-		if (!Array.isArray(easing) || easing.length !== 4 || !easing.every(Number.isFinite)) {
-			throw new ValidationError(`motion.easings.${name} must be four finite Bézier values`);
-		}
-		if (easing[0] < 0 || easing[0] > 1 || easing[2] < 0 || easing[2] > 1) {
-			throw new ValidationError(
-				`motion.easings.${name} Bézier x coordinates must be between 0 and 1`
-			);
-		}
-	}
-
-	if (!motion.recipes || typeof motion.recipes !== 'object' || Array.isArray(motion.recipes)) {
-		throw new ValidationError('motion.recipes must be an object');
-	}
-	if (Object.keys(motion.recipes).length === 0) {
-		throw new ValidationError('motion.recipes must contain at least one recipe');
-	}
-	for (const [recipeName, recipe] of Object.entries(motion.recipes)) {
-		if (!tokenNamePattern.test(recipeName)) {
-			throw new ValidationError(`motion.recipes name "${recipeName}" is not CSS-token safe`);
-		}
-		if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe) || !recipe.base) {
-			throw new ValidationError(`motion.recipes.${recipeName}.base is required`);
-		}
-		if ('base' in (recipe.variants ?? {})) {
-			throw new ValidationError(
-				`motion.recipes.${recipeName}.variants must not contain reserved name "base"`
-			);
-		}
-		for (const variantName of Object.keys(recipe.variants ?? {})) {
-			if (!tokenNamePattern.test(variantName)) {
-				throw new ValidationError(
-					`motion.recipes.${recipeName}.variants name "${variantName}" is not CSS-token safe`
-				);
-			}
-		}
-		if (recipe.displayOrder) {
-			const expected = ['base', ...Object.keys(recipe.variants ?? {})].sort();
-			const received = [...recipe.displayOrder].sort();
-			if (
-				expected.length !== received.length ||
-				expected.some((name, index) => name !== received[index])
-			) {
-				throw new ValidationError(
-					`motion.recipes.${recipeName}.displayOrder must contain base and every variant exactly once`
-				);
-			}
-		}
-
-		for (const [variantName, variant] of [
-			['base', recipe.base] as const,
-			...Object.entries(recipe.variants ?? {}),
-		]) {
-			const path = `motion.recipes.${recipeName}.${variantName}`;
-			if (!variant || typeof variant !== 'object' || Array.isArray(variant)) {
-				throw new ValidationError(`${path} must be an object`);
-			}
-			const allowed = new Set(['duration', 'easing', 'delay']);
-			for (const key of Object.keys(variant)) {
-				if (!allowed.has(key)) throw new ValidationError(`${path} contains unknown field "${key}"`);
-			}
-			const duration = variant.duration ?? recipe.base.duration;
-			const easing = variant.easing ?? recipe.base.easing;
-			const delay = variant.delay ?? recipe.base.delay ?? 0;
-			if (duration === undefined) throw new ValidationError(`${path}.duration is required`);
-			if (typeof easing !== 'string' || !motion.easings[easing]) {
-				throw new ValidationError(`${path}.easing references unknown easing "${String(easing)}"`);
-			}
-			validateTimeReference(duration, time, `${path}.duration`, false);
-			validateTimeReference(delay, time, `${path}.delay`, true);
-		}
-	}
-}
-
-function validateShadowsPartial(
-	shadows: NonNullable<PartialDesignSystem['shadows']>,
-	colors: NonNullable<PartialDesignSystem['colors']>
-): void {
-	validateCssUnit(shadows.unit, 'shadows.unit');
-	if (['%', 'ms', 's', 'deg'].includes(shadows.unit)) {
-		throw new ValidationError(`shadows.unit "${shadows.unit}" is not a CSS length unit`);
-	}
-	const box = shadows.box ?? {};
-	const text = shadows.text ?? {};
-	if (Object.keys(box).length === 0 && Object.keys(text).length === 0) {
-		throw new ValidationError('shadows must contain at least one box or text recipe');
-	}
-	const defaultColorMode = colors.modes.find((mode) => mode.isDefault) ?? colors.modes[0];
-	const colorNames = new Set(Object.keys(defaultColorMode?.tokens ?? {}));
-	const alphaNames = new Set(
-		Object.keys(defaultColorMode?.alphaSchedule ?? colors.alphaSchedule ?? {})
-	);
-
-	for (const [kind, recipes] of [['box', box] as const, ['text', text] as const]) {
-		for (const [recipeName, recipe] of Object.entries(recipes)) {
-			const path = `shadows.${kind}.${recipeName}`;
-			if (!tokenNamePattern.test(recipeName)) {
-				throw new ValidationError(`${path} name is not CSS-token safe`);
-			}
-			if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe)) {
-				throw new ValidationError(`${path} must be an object`);
-			}
-			if ('base' in (recipe.variants ?? {})) {
-				throw new ValidationError(`${path}.variants must not contain reserved name "base"`);
-			}
-			for (const variantName of Object.keys(recipe.variants ?? {})) {
-				if (!tokenNamePattern.test(variantName)) {
-					throw new ValidationError(`${path}.variants name "${variantName}" is not CSS-token safe`);
-				}
-			}
-			if (recipe.displayOrder) {
-				const expected = ['base', ...Object.keys(recipe.variants ?? {})].sort();
-				const received = [...recipe.displayOrder].sort();
-				if (
-					expected.length !== received.length ||
-					expected.some((name, index) => name !== received[index])
-				) {
-					throw new ValidationError(
-						`${path}.displayOrder must contain base and every variant exactly once`
-					);
-				}
-			}
-			for (const [variantName, layers] of [
-				['base', recipe.base] as const,
-				...Object.entries(recipe.variants ?? {}),
-			]) {
-				const layerPath = `${path}.${variantName}`;
-				if (!Array.isArray(layers) || layers.length === 0) {
-					throw new ValidationError(`${layerPath} must contain at least one layer`);
-				}
-				for (const [index, layer] of layers.entries()) {
-					const current = `${layerPath}[${index}]`;
-					if (!layer || typeof layer !== 'object' || Array.isArray(layer)) {
-						throw new ValidationError(`${current} must be an object`);
-					}
-					const allowed = new Set([
-						'x',
-						'y',
-						'blur',
-						'color',
-						...(kind === 'box' ? ['spread', 'inset'] : []),
-					]);
-					for (const key of Object.keys(layer)) {
-						if (!allowed.has(key)) {
-							throw new ValidationError(`${current} contains unsupported field "${key}"`);
-						}
-					}
-					for (const field of ['x', 'y', 'blur'] as const) {
-						validateFiniteNumber(layer[field], `${current}.${field}`);
-					}
-					if (layer.blur < 0) {
-						throw new ValidationError(`${current}.blur must be non-negative`);
-					}
-					if (kind === 'box') {
-						const boxLayer = layer as (typeof box)[string]['base'][number];
-						if (boxLayer.spread !== undefined) {
-							validateFiniteNumber(boxLayer.spread, `${current}.spread`);
-						}
-						if (boxLayer.inset !== undefined && typeof boxLayer.inset !== 'boolean') {
-							throw new ValidationError(`${current}.inset must be boolean`);
-						}
-					}
-					if (!layer.color || typeof layer.color !== 'object' || Array.isArray(layer.color)) {
-						throw new ValidationError(`${current}.color must reference a color token`);
-					}
-					if (!tokenNamePattern.test(layer.color.color)) {
-						throw new ValidationError(`${current}.color.color is not CSS-token safe`);
-					}
-					if (!colorNames.has(layer.color.color)) {
-						throw new ValidationError(
-							`${current}.color references unknown default color "${layer.color.color}"`
-						);
-					}
-					if (layer.color.alpha !== undefined && !alphaNames.has(layer.color.alpha)) {
-						throw new ValidationError(
-							`${current}.color references unknown alpha level "${layer.color.alpha}"`
-						);
-					}
-				}
-			}
-		}
-	}
-}
-
 function validateAlphaSchedule(schedule: AlphaSchedule, path: string): void {
 	const entries = Object.entries(schedule);
 
@@ -1362,20 +1081,4 @@ function validateTime(ds: DesignSystem): void {
 		throw new ValidationError('DesignSystem.time is required');
 	}
 	validateTimePartial(ds.time);
-}
-
-function validateTimeTokens(
-	tokens: { unit: string; base: number; min: number; range: number },
-	path: string
-): void {
-	validateCssUnit(tokens.unit, `${path}.unit`);
-	if (typeof tokens.base !== 'number' || !Number.isFinite(tokens.base) || tokens.base < 0) {
-		throw new ValidationError(`${path}.base must be a non-negative number`);
-	}
-	if (typeof tokens.min !== 'number' || !Number.isFinite(tokens.min) || tokens.min < 0) {
-		throw new ValidationError(`${path}.min must be a non-negative number`);
-	}
-	if (typeof tokens.range !== 'number' || tokens.range < 1 || !Number.isInteger(tokens.range)) {
-		throw new ValidationError(`${path}.range must be a positive integer`);
-	}
 }

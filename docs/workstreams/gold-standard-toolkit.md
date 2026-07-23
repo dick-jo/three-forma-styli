@@ -102,6 +102,10 @@ remaining work so decisions do not depend on one chat transcript.
 - [x] Expand DTCG 2025.10 output across dimensions, duration, easing,
       transitions, semantic typography, colors, and shadows while namespacing
       modes and CSS-only facts.
+- [ ] Finish the behavior-preserving structural split. Compiler output
+      ownership, legacy planning, and project/font planning are separated;
+      time/motion/shadow validation is separated. Semantic typography
+      validation remains the next coherent extraction.
 
 ## Active Scatter design-system work
 
