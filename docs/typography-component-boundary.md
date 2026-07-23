@@ -41,7 +41,7 @@ That is the stable seam for a local component:
 // Deliberately illustrative: the host decides its exact polymorphic/ref API.
 export function Text({
 	as: Element = 'span',
-	role = 'prose',
+	kind = 'prose',
 	variant,
 	fontStyle,
 	weight,
@@ -51,7 +51,7 @@ export function Text({
 	return (
 		<Element
 			className={[
-				typographyClassName({ role, variant, fontStyle, weight }, typographyClasses),
+				typographyClassName({ role: kind, variant, fontStyle, weight }, typographyClasses),
 				className,
 			]
 				.filter(Boolean)
@@ -66,6 +66,12 @@ The concrete Scatter component will be designed and tested in Scatter. In a
 Next App Router application it should remain server-compatible unless a real
 interaction requires a client boundary. TFS must not inject `"use client"` into
 the host merely to select a class.
+
+The real Scatter trial validated one additional host concern: a component prop
+named `role` collides with the native ARIA `role` attribute. Scatter therefore
+uses `kind` for the generated visual role and preserves markup such as
+`role="status"`. That name remains a host-component choice; TFS's portable
+contract continues to call the design-system concept `role`.
 
 ## Why framework files are not normal generated output
 

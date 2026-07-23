@@ -119,7 +119,7 @@ remaining work so decisions do not depend on one chat transcript.
 - [x] Preserve protected production token parity and the deliberate new modes,
       fonts, semantic typography, and native themes.
 - [x] Verify packed-package exports and isolated Next.js consumption.
-- [ ] Add the package to an isolated Scatter worktree in a package-only change.
+- [x] Add the package to an isolated Scatter worktree in a package-only change.
       Do not import it from an application or change production behaviour in that
       adoption step.
 - [x] Reconcile the separate `claude/mktgfx-typography-tuning` worktree after its
@@ -222,7 +222,7 @@ reference evidence, not hardcoded policy.
       preserve runtime collection-owner themes.
 - [ ] Test real-page cold-cache font loading, fallback reflow, CLS, P3 colour,
       native/custom themes, and independent size modes.
-- [ ] Build and trial Scatter's local `<Text />` primitive from generated CSS
+- [x] Build and trial Scatter's local `<Text />` primitive from generated CSS
       Module and TypeScript contracts.
 - [ ] Perform the broader typography migration only after representative visual
       approval.
@@ -368,3 +368,12 @@ reference evidence, not hardcoded policy.
   source only after real React and Svelte consumers prove a common contract; it
   will not become continuously regenerated output. See
   `docs/typography-component-boundary.md`.
+- **2026-07-23 — real Scatter package and Text trial.** The isolated
+  `codex/tfs-integration` worktree adopts the canonical private package without
+  switching production CSS, links it through the normal pnpm workspace graph,
+  and validates the package host hash plus every generated artifact. Its
+  host-owned React 19 `Text` trial uses `kind` for visual typography so native
+  ARIA `role` remains available, keeps a finite semantic `as` surface, has no
+  client boundary, and is proven by exact type tests, server rendering, a
+  production Storybook bundle, and Chromium-computed Supreme/JetBrains styles.
+  Broader typography migration remains gated on representative visual approval.

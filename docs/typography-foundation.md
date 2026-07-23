@@ -365,9 +365,9 @@ A future Scatter `<Text>` component can consume the generated contract with
 `variant` optional:
 
 ```tsx
-<Text role="prose">Ordinary text</Text>
-<Text role="heading" variant="max">Display heading</Text>
-<Text role="label" fontStyle="italic" weight="lo">Status</Text>
+<Text kind="prose">Ordinary text</Text>
+<Text kind="heading" variant="max">Display heading</Text>
+<Text kind="label" fontStyle="italic" weight="lo">Status</Text>
 ```
 
 Components such as `Button` may own a default selection internally. Explicitly
