@@ -681,7 +681,9 @@ async function buildLegacyProject(
 					}
 				: undefined,
 			limitations: {
-				dtcg: plan.dtcg ? 'color-only' : undefined,
+				dtcg: plan.dtcg
+					? 'DTCG 2025.10 color, dimension, duration, cubicBezier, transition, typography, and shadow; TFS modes and CSS-only metadata use namespaced extensions'
+					: undefined,
 				figmaVariables: plan.figmaVariables ? 'color-only file output; no network sync' : undefined,
 				typescript: plan.typescript ? 'semantic typography contract' : undefined,
 			},

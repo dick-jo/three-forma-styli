@@ -96,6 +96,12 @@ remaining work so decisions do not depend on one chat transcript.
       FontTools planning/provenance, inspectable recoverable build locks, and a
       mandatory Browser/Next/Turborepo release matrix. See
       `docs/audit-2026-07-23-independent.md`.
+- [x] Make Figma sync semantics explicit: safe merge by default, separately
+      named authoritative reconciliation, exact token-backed remote dry run,
+      ambiguity/type checks, and confirmation-gated deletion.
+- [x] Expand DTCG 2025.10 output across dimensions, duration, easing,
+      transitions, semantic typography, colors, and shadows while namespacing
+      modes and CSS-only facts.
 
 ## Active Scatter design-system work
 

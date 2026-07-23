@@ -80,6 +80,7 @@ describe('toFigmaJson', () => {
 								y: 8,
 								blur: 24,
 								spread: -4,
+								inset: true,
 								color: { color: 'ink', alpha: 'half' },
 							},
 						],
@@ -106,6 +107,9 @@ describe('toFigmaJson', () => {
 			blur: { value: 24, unit: 'px' },
 			spread: { value: -4, unit: 'px' },
 		});
+		expect(output.shadow['box-elevation'].$extensions['com.three-forma-styli'].insetLayers).toEqual(
+			[false, true]
+		);
 		expect(output.shadow['text-glow'].$value.spread).toEqual({
 			value: 0,
 			unit: 'px',
@@ -158,7 +162,7 @@ describe('toFigmaJson', () => {
 		);
 	});
 
-	it('fails loudly when the IR contains no color family', () => {
+	it('exports standards-based dimensions without requiring a color family', () => {
 		const spacingOnly = generate({
 			spacing: {
 				modes: [
@@ -171,6 +175,136 @@ describe('toFigmaJson', () => {
 			},
 		});
 
-		expect(() => toFigmaJson(spacingOnly)).toThrow('Design JSON requires a color token family');
+		const output = JSON.parse(toFigmaJson(spacingOnly));
+		expect(output).not.toHaveProperty('color');
+		expect(output.dimension.$type).toBe('dimension');
+		expect(output.dimension['sp-min'].$value).toEqual({ value: 4, unit: 'px' });
+		expect(output.dimension['sp-2'].$value).toEqual({ value: 16, unit: 'px' });
+	});
+
+	it('exports durations, easing curves, transitions, and semantic typography composites', () => {
+		const ir = generate({
+			typography: {
+				modes: [
+					{
+						name: 'default',
+						isDefault: true,
+						tokens: { unit: 'rem', base: 0.875, min: 0.625, increment: 0.125, range: 6 },
+					},
+					{
+						name: 'large',
+						tokens: { unit: 'rem', base: 1, min: 0.75, increment: 0.125, range: 6 },
+					},
+				],
+				fonts: {
+					sans: {
+						family: 'Proof Sans',
+						fallbacks: ['Arial', 'sans-serif'],
+						verification: 'prepared',
+						capabilities: {
+							faces: [{ style: 'normal', weights: { min: 300, max: 700 } }],
+						},
+					},
+				},
+				roles: {
+					prose: {
+						font: 'sans',
+						base: {
+							fontSize: 2,
+							weight: 'base',
+							lineHeight: 1.25,
+							letterSpacing: 0.01,
+						},
+						variants: {
+							max: {
+								fontSize: 4,
+								weight: 'max',
+								lineHeight: 1.1,
+								letterSpacing: -0.01,
+							},
+						},
+						modeOverrides: {
+							large: { base: { lineHeight: 1.2, weight: 'max' } },
+						},
+						displayOrder: ['base', 'max'],
+						weights: { base: 400, max: 700 },
+					},
+				},
+			},
+			time: {
+				scales: [
+					{
+						name: 'default',
+						isDefault: true,
+						tokens: { unit: 'ms', base: 100, min: 50, range: 3 },
+					},
+				],
+			},
+			motion: {
+				easings: { standard: [0.2, 0, 0.38, 0.9] },
+				recipes: {
+					hover: {
+						base: { duration: 2, easing: 'standard' },
+						variants: { max: { duration: 3, delay: 1 } },
+					},
+				},
+			},
+		});
+		const output = JSON.parse(toFigmaJson(ir));
+
+		expect(output.duration['t-2'].$value).toEqual({ value: 200, unit: 'ms' });
+		expect(output.easing.standard.$value).toEqual([0.2, 0, 0.38, 0.9]);
+		expect(output.transition['hover-max'].$value).toEqual({
+			duration: { value: 300, unit: 'ms' },
+			delay: { value: 100, unit: 'ms' },
+			timingFunction: [0.2, 0, 0.38, 0.9],
+		});
+		expect(output.typography.prose.$value).toEqual({
+			fontFamily: ['Proof Sans', 'Arial', 'sans-serif'],
+			fontSize: { value: 1, unit: 'rem' },
+			fontWeight: 400,
+			letterSpacing: { value: 0.01, unit: 'rem' },
+			lineHeight: 1.25,
+		});
+		expect(output.typography.prose.$extensions['com.three-forma-styli'].modes.large).toMatchObject({
+			fontSize: { value: 1.125, unit: 'rem' },
+			fontWeight: 700,
+			lineHeight: 1.2,
+		});
+	});
+
+	it('fails when an authored CSS unit has no valid DTCG composite representation', () => {
+		const ir = generate(
+			{
+				...colors,
+				shadows: {
+					unit: 'em',
+					box: {
+						elevation: {
+							base: [{ x: 0, y: 1, blur: 2, color: { color: 'ink' } }],
+						},
+					},
+				},
+			},
+			{ colorFormat: { base: 'hex', alpha: 'hexa', alphaModifier: 'a' } }
+		);
+		expect(() => toFigmaJson(ir)).toThrow('DTCG 2025.10 dimensions support only px and rem');
+	});
+
+	it('fails rather than silently dropping a non-representable dimension family', () => {
+		const ir = generate({
+			spacing: {
+				modes: [
+					{
+						name: 'default',
+						isDefault: true,
+						tokens: { unit: 'em', base: 1, min: 0.5, range: 2 },
+					},
+				],
+			},
+		});
+		expect(() => toFigmaJson(ir)).toThrow(
+			'Token --sp-min uses CSS unit "em", but DTCG 2025.10 dimensions support only px and rem'
+		);
 	});
 });

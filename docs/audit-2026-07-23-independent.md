@@ -39,9 +39,13 @@ interactions.
 
 1. Workbench still needs executable viewport/capture output, diagnostics,
    baseline comparison, patch import, and optional pinned screenshots.
-2. Figma sync is additive. It needs explicit merge versus authoritative policy,
-   a dry-run diff, and deletion safeguards.
-3. DTCG coverage remains narrower than the complete TFS system.
+2. ~~Figma sync is additive. It needs explicit merge versus authoritative
+   policy, a dry-run diff, and deletion safeguards.~~ Closed on 2026-07-23:
+   merge remains the default; authoritative deletion is separately named,
+   dry-runnable against remote state, and confirmation-gated.
+3. ~~DTCG coverage remains narrower than the complete TFS system.~~ Closed on
+   2026-07-23 for every losslessly representable 2025.10 family. CSS-only facts
+   and modes are carried in the TFS extension.
 4. Large validation and project-build orchestration modules need domain splits
    without public behavior changes.
 5. Font fallback calibration needs documented/custom corpora and broader

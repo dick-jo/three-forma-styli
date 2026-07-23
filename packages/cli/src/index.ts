@@ -91,13 +91,20 @@ program
 	.option('--figma-token <token>', 'Figma personal access token (prefer FIGMA_TOKEN env)')
 	.option('--collection <name>', 'Figma collection name', 'Color')
 	.option('--color-space <space>', 'target Figma file color space: srgb or display-p3', 'srgb')
-	.option('--dry-run', 'show payload without sending to Figma')
+	.option('--policy <policy>', 'sync policy: merge or authoritative', 'merge')
+	.option('--yes', 'confirm deletions from an authoritative sync')
+	.option(
+		'--dry-run',
+		'show the remote diff without sending (tokenless previews assume an empty file)'
+	)
 	.action(async (filePath, options) => {
 		await figmaSyncCommand(filePath, {
 			fileKey: options.fileKey,
 			token: options.figmaToken,
 			collectionName: options.collection,
 			colorSpace: options.colorSpace,
+			policy: options.policy,
+			yes: options.yes,
 			dryRun: options.dryRun,
 		});
 	});

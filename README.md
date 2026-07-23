@@ -50,7 +50,10 @@ tfs figma-sync . --file-key "$FIGMA_FILE_KEY" --color-space display-p3
 The sync command uses Figma's Variables REST API, which currently requires an
 Enterprise organization, an eligible full seat, edit access, and a token with
 both `file_variables:read` and `file_variables:write` scopes. Run with
-`--dry-run` to inspect the atomic payload without a token or network write.
+`--dry-run` and a token for an exact remote diff. Tokenless dry runs preview
+creation against an empty file. Sync defaults to non-destructive `merge`;
+`--policy authoritative` can remove stale local modes/variables only after a
+dry run is reviewed and live execution is explicitly confirmed with `--yes`.
 
 ## Packages
 

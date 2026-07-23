@@ -1,7 +1,7 @@
 # @three-forma-styli/cli
 
 CLI tool for generating CSS, typed design-system and typography contracts,
-color-only DTCG/Figma Variables JSON, and visual Workbench artifacts from TypeScript definitions.
+DTCG 2025.10/Figma Variables JSON, and visual Workbench artifacts from TypeScript definitions.
 
 ## Installation
 
@@ -131,8 +131,10 @@ tfs build ./theme.ts --output tokens.css
 Options:
 
 - `--output, -o <path>` - Output file path (prints to stdout if omitted)
-- `--format, -f <format>` - `css`, `dtcg` (color-only), `figma-variables`
-  (color-only), `typescript` (typography), or `specimen` (typography)
+- `--format, -f <format>` - `css`, `dtcg` (standards-based colors, dimensions,
+  durations, easing curves, transitions, typography, and shadows),
+  `figma-variables` (color-only), `typescript` (typography), or `specimen`
+  (typography)
 - `--collection <name>` - Figma collection name
 - `--color-space <space>` - `srgb` or `display-p3`; must match the Figma file profile
 - `--font-css <path>` - Link prepared font CSS from specimen output (requires `--output`)
@@ -200,12 +202,18 @@ Create or update color variables through Figma's Variables REST API:
 
 ```bash
 FIGMA_TOKEN=... tfs figma-sync . --file-key ... --color-space display-p3
-tfs figma-sync . --file-key dry-run --dry-run
+FIGMA_TOKEN=... tfs figma-sync . --file-key ... --dry-run
+tfs figma-sync . --file-key empty-preview --dry-run
+FIGMA_TOKEN=... tfs figma-sync . --file-key ... --policy authoritative --dry-run
+FIGMA_TOKEN=... tfs figma-sync . --file-key ... --policy authoritative --yes
 ```
 
 Live sync requires Figma Enterprise access and both `file_variables:read` and
-`file_variables:write` token scopes. The command does not delete variables or
-modes that are absent from the source.
+`file_variables:write` token scopes. `merge` is the default and never removes
+variables or modes absent from the source. `authoritative` computes those
+deletions, but live execution refuses them without `--yes`. A token-backed dry
+run fetches the file and prints the exact atomic diff; a tokenless dry run is
+clearly labelled as a creation preview against an empty file.
 
 ### `tfs fonts inspect`
 

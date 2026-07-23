@@ -329,8 +329,12 @@ dist/
 └── build.manifest.json
 ```
 
-DTCG and Figma JSON are currently color-only; the build manifest states that
-limitation. DTCG is the Design Tokens Community Group interchange format.
+DTCG 2025.10 output includes semantic typography composites. Because the
+standard typography type does not model CSS font style, transforms, kerning,
+optical sizing, feature settings, variation settings, or TFS modes, those facts
+are preserved in the `com.three-forma-styli` extension. Figma Variables output
+and network sync remain deliberately color-only. DTCG is the Design Tokens
+Community Group interchange format.
 
 ## Calibration specimen
 

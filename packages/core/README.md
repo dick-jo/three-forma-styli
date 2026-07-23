@@ -40,7 +40,9 @@ const colorsCss = toCss(generate(partial));
 - `toCss(ir, config?)` - Transform IR to CSS string
 - `oklch(l, c, h)` - Create OKLCH color object
 - `generateCss(designSystem, config?)` - Convenience function combining generate + toCss
-- `generateFigmaJson(designSystem, config?, format?)` - Generate color-only DTCG or Figma Variables JSON
+- `generateFigmaJson(designSystem, config?, format?)` - Generate DTCG 2025.10 interchange
+  (color, dimension, duration, easing, transition, typography, and shadow) or
+  color-only Figma Variables JSON
 - `toFigmaJson(ir, config?, format?)` - Transform a hex/profile-aware IR to JSON
 - `defineTypography(system)` - Preserve literal font/role/variant names for an explicit typography system; adds no hidden defaults
 - `deriveTypographyRange(input)` - Optionally derive caller-named role variants from explicit anchors
