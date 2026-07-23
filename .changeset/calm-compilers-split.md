@@ -12,3 +12,6 @@ runtime, review, design-tool, and shared font-asset trees. Runtime output can
 include browser-ready CSS, dependency-free ESM contracts, declarations, and a
 compact native-colour-mode contract while the host package remains explicitly
 owned and validated by its author.
+
+Export the intermediate project-font and project-system authoring types so
+split source files retain literal font-ID validation with `satisfies`.

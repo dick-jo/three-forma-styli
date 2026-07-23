@@ -10,6 +10,11 @@ Author a project without loading the heavy build graph:
 import { defineTfsProject } from '@three-forma-styli/compiler';
 ```
 
+For projects that keep physical font inputs and semantic system decisions in
+separate source files, use the exported `ProjectFont` and `ProjectSystem` types
+with `satisfies`. This preserves literal font IDs and validates role references
+before the thin `tfs.config.ts` assembly step.
+
 Compile an already-loaded project programmatically:
 
 ```ts

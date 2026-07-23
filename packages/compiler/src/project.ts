@@ -12,14 +12,14 @@ export interface ProjectFont extends FontPreparationFamily {
 	fallbacks?: string[];
 }
 
-type ProjectTypographyRole<Fonts extends Record<string, ProjectFont>> = Omit<
+export type ProjectTypographyRole<Fonts extends Record<string, ProjectFont>> = Omit<
 	TypographyRole,
 	'font'
 > & {
 	font: Extract<keyof Fonts, string>;
 };
 
-type ProjectTypographyInput<Fonts extends Record<string, ProjectFont>> = Omit<
+export type ProjectTypographyInput<Fonts extends Record<string, ProjectFont>> = Omit<
 	TypographySystem,
 	'fonts' | 'roles'
 > & {
@@ -28,7 +28,7 @@ type ProjectTypographyInput<Fonts extends Record<string, ProjectFont>> = Omit<
 
 type SelfContainedTypographySystem = TypographySystem;
 
-type ProjectSystem<Fonts extends Record<string, ProjectFont>> = Omit<
+export type ProjectSystem<Fonts extends Record<string, ProjectFont>> = Omit<
 	PartialDesignSystem,
 	'typography'
 > & {

@@ -1,5 +1,10 @@
 import { defineTfsProject } from '../src/api.js';
-import type { LegacyTfsProjectOutput, TfsProjectOutput } from '../src/api.js';
+import type {
+	LegacyTfsProjectOutput,
+	ProjectFont,
+	ProjectSystem,
+	TfsProjectOutput,
+} from '../src/api.js';
 
 const fonts = {
 	supreme: {
@@ -20,6 +25,38 @@ const mode = {
 	isDefault: true as const,
 	tokens: { unit: 'rem', base: 1, min: 0.75, increment: 0.25, range: 12 },
 };
+
+const splitFonts = {
+	prose: {
+		family: 'Work Sans',
+		sources: ['./WorkSans.woff2'],
+		license: {
+			id: 'example',
+			file: './license.txt',
+			allowWebEmbedding: true,
+			webEmbeddingBasis: 'Test fixture only.',
+		},
+	},
+} as const satisfies Record<string, ProjectFont>;
+
+const splitSystem = {
+	typography: {
+		modes: [mode],
+		roles: {
+			prose: {
+				font: 'prose',
+				base: { fontSize: 2, weight: 'base', lineHeight: 1.4, letterSpacing: 0 },
+				weights: { base: 400 },
+			},
+		},
+	},
+} satisfies ProjectSystem<typeof splitFonts>;
+
+defineTfsProject({
+	fonts: splitFonts,
+	system: splitSystem,
+	output: { directory: './generated' },
+});
 
 defineTfsProject({
 	fonts,
