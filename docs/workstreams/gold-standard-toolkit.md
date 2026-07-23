@@ -149,3 +149,9 @@ remaining work so decisions do not depend on one chat transcript.
   fast routine checks, explicit generation, and dedicated CI regeneration.
   Routine builds use a separate manifest/hash/package validator and therefore
   remain independent of FontTools.
+- **2026-07-23 — canonical package adopts the generic contract.** `tfs-scatter`
+  commit `3f4f61d` uses the generic lightweight validator in its ordinary check
+  path and the generic staged drift checker in dedicated CI. The fast path
+  validates all 24 committed files, exact package wiring, production parity,
+  and P3 without font preparation; the heavy path still proves regeneration,
+  conversion, packing, and an isolated Next.js consumer.
