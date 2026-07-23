@@ -453,6 +453,30 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 			patch.operations[0].path,
 			'/typography/roles/prose/modeOverrides/large/base/lineHeight'
 		);
+		await page.getByRole('button', { name: 'discard all edits' }).click();
+		await page.getByText('0 edits', { exact: true }).waitFor();
+		await page.getByTestId('patch-input').setInputFiles({
+			name: 'tfs.review.patch.json',
+			mimeType: 'application/json',
+			buffer: Buffer.from(JSON.stringify(patch)),
+		});
+		await page.getByText('Imported 1 reviewed edit', { exact: true }).waitFor();
+		await page.getByText('1 edits', { exact: true }).waitFor();
+		assert.equal(
+			await page.getByRole('spinbutton', { name: 'line height value' }).inputValue(),
+			'1.31'
+		);
+		await page.getByRole('button', { name: 'discard all edits' }).click();
+		const foreignPatch = { ...patch, systemFingerprint: 'foreign-system' };
+		await page.getByTestId('patch-input').setInputFiles({
+			name: 'foreign.review.patch.json',
+			mimeType: 'application/json',
+			buffer: Buffer.from(JSON.stringify(foreignPatch)),
+		});
+		await page
+			.getByText('Review patch belongs to a different generated design system', { exact: true })
+			.waitFor();
+		await page.getByText('0 edits', { exact: true }).waitFor();
 
 		await labNavigation.getByRole('button', { name: /motion/i }).click();
 		const motionMatrix = page.locator('.case-matrix[data-lab="motion"]');

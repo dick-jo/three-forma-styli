@@ -38,7 +38,9 @@ interactions.
 ## Remaining ranked findings
 
 1. Workbench still needs executable viewport/capture output, diagnostics,
-   baseline comparison, patch import, and optional pinned screenshots.
+   baseline comparison, and optional pinned screenshots. Strict, fingerprint-
+   and contract-bound patch import landed on 2026-07-23 with a real Chromium
+   import/rejection regression.
 2. ~~Figma sync is additive. It needs explicit merge versus authoritative
    policy, a dry-run diff, and deletion safeguards.~~ Closed on 2026-07-23:
    merge remains the default; authoritative deletion is separately named,

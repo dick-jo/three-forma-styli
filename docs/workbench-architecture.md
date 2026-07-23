@@ -181,7 +181,7 @@ fingerprint. Reset operates at control, recipe, lab, and project levels.
 
 Initial promotion mechanisms:
 
-1. export the versioned `tfs.review.patch.json`;
+1. export and re-import the versioned `tfs.review.patch.json`;
 2. copy a tool-agnostic agent handoff containing that exact patch, the system
    fingerprint, selected cases, and build/check commands;
 3. show exact JSON-pointer-like source paths beside their resolved effects.
@@ -197,6 +197,12 @@ coherent source plus generated result. TFS supplies facts and verification;
 version control credentials and code-writing authority remain with the agent and
 host repository. A thin MCP/agent adapter can eventually automate transport of
 the same schema without changing its semantics.
+
+Patch import is contract-bound rather than a blind JSON merge. Workbench rejects
+foreign fingerprints, stale baseline values, duplicate or unknown paths,
+unknown cases, invalid select values, out-of-range numbers, unsupported schema
+versions, and files above its bounded import size. A valid import is one
+undoable transaction and may replace an existing disposable draft.
 
 ### 6. Named cases are executable cases
 
@@ -301,7 +307,7 @@ foundation does not prevent a carefully scoped authoring server later.
 
 - color and foundation labs;
 - before/draft comparison;
-- patch export/import and copyable authored values;
+- patch export/import and copyable authored values; **implemented**
 - domain diagnostics and source hints.
 
 ### Automation

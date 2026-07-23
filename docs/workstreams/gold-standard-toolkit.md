@@ -106,6 +106,9 @@ remaining work so decisions do not depend on one chat transcript.
       ownership, legacy planning, and project/font planning are separated;
       time/motion/shadow validation is separated. Semantic typography
       validation remains the next coherent extraction.
+- [x] Add strict Workbench patch import with fingerprint, baseline, case,
+      path, type, range, option, duplicate, schema, and size validation; prove
+      successful and foreign imports in Chromium.
 
 ## Active Scatter design-system work
 

@@ -163,6 +163,10 @@ button:disabled {
 	gap: 6px;
 }
 
+.patch-input {
+	display: none;
+}
+
 .actions button,
 .actions span {
 	font-size: 10px;
@@ -178,6 +182,13 @@ button:disabled {
 	border-color: var(--wb-accent);
 	background: var(--wb-accent-soft);
 	color: var(--wb-accent);
+}
+
+.actions .action-status {
+	max-width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .navigation {

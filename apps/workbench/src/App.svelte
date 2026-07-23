@@ -8,7 +8,13 @@
 	import { untrack } from 'svelte';
 	import CaseMatrix from './lib/CaseMatrix.svelte';
 	import ColorCase from './lib/ColorCase.svelte';
-	import { agentHandoff, downloadJson, patchFromDraft, type DraftValues } from './lib/draft';
+	import {
+		agentHandoff,
+		downloadJson,
+		importReviewPatch,
+		patchFromDraft,
+		type DraftValues,
+	} from './lib/draft';
 	import FoundationCase from './lib/FoundationCase.svelte';
 	import Inspector from './lib/Inspector.svelte';
 	import MotionCase from './lib/MotionCase.svelte';
@@ -86,6 +92,7 @@
 			''
 	);
 	let handoffStatus = $state('');
+	let patchInput = $state<HTMLInputElement>();
 
 	let activeLab = $derived(contract.labs.find((lab) => lab.id === activeLabId) ?? contract.labs[0]);
 	let cases = $derived(
@@ -325,6 +332,47 @@
 		draft = {};
 	}
 
+	async function importPatch(event: Event): Promise<void> {
+		const input = event.currentTarget as HTMLInputElement;
+		const file = input.files?.[0];
+		input.value = '';
+		if (!file) return;
+		try {
+			if (file.size > 1_000_000) throw new Error('Review patch exceeds the 1 MB import limit');
+			const imported = importReviewPatch(
+				JSON.parse(await file.text()),
+				contract.systemFingerprint,
+				contractControls(contract),
+				new Set(
+					contract.labs.flatMap((lab) =>
+						lab.kind === 'overview' ? [] : lab.cases.map((item) => item.id)
+					)
+				)
+			);
+			const changes = [...new Set([...Object.keys(draft), ...Object.keys(imported.draft)])]
+				.map((path) => ({
+					path,
+					previous: draft[path] ?? baseValues[path] ?? null,
+					value: imported.draft[path] ?? baseValues[path] ?? null,
+				}))
+				.filter((change) => change.previous !== change.value);
+			if (changes.length > 0) undo = [...undo, { changes }];
+			redo = [];
+			draft = imported.draft;
+			const selectedCase = imported.patch.selectedCases[0];
+			if (selectedCase) {
+				const selectedLab = contract.labs.find(
+					(lab) => lab.kind !== 'overview' && lab.cases.some((item) => item.id === selectedCase)
+				);
+				if (selectedLab) selectCaseFromLab(selectedLab, selectedCase);
+			}
+			const importedCount = imported.patch.operations.length;
+			handoffStatus = `Imported ${importedCount} reviewed edit${importedCount === 1 ? '' : 's'}`;
+		} catch (error) {
+			handoffStatus = error instanceof Error ? error.message : 'Unable to import review patch';
+		}
+	}
+
 	async function copyHandoff(): Promise<void> {
 		const handoff = agentHandoff(
 			patch,
@@ -389,6 +437,16 @@
 			<button onclick={undoDraft} disabled={undo.length === 0} aria-label="Undo draft">↶</button>
 			<button onclick={redoDraft} disabled={redo.length === 0} aria-label="Redo draft">↷</button>
 			<span class:dirty={patch.operations.length > 0}>{patch.operations.length} edits</span>
+			<input
+				bind:this={patchInput}
+				class="patch-input"
+				type="file"
+				accept="application/json,.json"
+				aria-label="Import review patch"
+				onchange={importPatch}
+				data-testid="patch-input"
+			/>
+			<button onclick={() => patchInput?.click()}>import</button>
 			<button
 				onclick={() => downloadJson('tfs.review.patch.json', patch)}
 				disabled={patch.operations.length === 0}
@@ -398,7 +456,9 @@
 			<button onclick={copyHandoff} disabled={patch.operations.length === 0}
 				>copy agent handoff</button
 			>
-			<span class="sr-only" aria-live="polite">{handoffStatus}</span>
+			{#if handoffStatus}
+				<span class="action-status" aria-live="polite">{handoffStatus}</span>
+			{/if}
 		</div>
 	</header>
 
