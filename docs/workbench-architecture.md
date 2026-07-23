@@ -215,8 +215,37 @@ Each case has a stable permalink containing only durable IDs:
 Controls may update the URL when values are serializable, following Storybook's
 useful args/permalink idea without adopting its component-story model.
 
-The compiler enumerates canonical capture states in the contract. A future
-`tfs review test` consumes those states and verifies:
+The compiler expands each case's capture policy into
+`generated/review/captures.json`. Every state contains a stable screenshot ID,
+exact permalink, viewport dimensions, and resolved color/size modes. The plan
+always includes the whole-system overview; domain policies then avoid a
+meaningless full Cartesian product (for example, a typography case captures its
+own size mode against the default color mode, while shadows exercise every
+color mode).
+
+The output is deliberately runner-neutral. A project can opt into Playwright
+baselines without importing the Workbench source application:
+
+```ts
+import { readFile } from 'node:fs/promises';
+import { test, expect } from '@playwright/test';
+
+const plan = JSON.parse(await readFile('generated/review/captures.json', 'utf8'));
+
+for (const state of plan.states) {
+	test(state.id, async ({ page }) => {
+		await page.setViewportSize(state.viewport);
+		await page.goto(`/review/${state.url.slice(2)}`);
+		await page.locator('html[data-tfs-workbench-ready="true"]').waitFor();
+		await expect(page).toHaveScreenshot(`${state.id}.png`);
+	});
+}
+```
+
+TFS's packed-consumer integration suite consumes the same generated states in
+real Chromium and verifies their viewport, permalink, case, and modes. A future
+dedicated `tfs review test` may provide convenience orchestration, but it must
+not change this portable data boundary. A project-owned runner should verify:
 
 - page and font readiness;
 - no browser errors or warnings;
@@ -230,6 +259,10 @@ browser version, viewport, media, animation state, fonts, and operating
 environment. Playwright explicitly warns that host OS, hardware, settings and
 browser versions affect rendered pixels, so arbitrary developer-machine
 screenshots cannot be treated as portable truth.
+
+Baseline updates are therefore an explicit project review operation. TFS never
+silently creates, repairs, or accepts screenshot changes during `build` or
+`check`.
 
 Wide-gamut correctness additionally requires declaration/computed-style tests:
 ordinary screenshot pipelines are not sufficient proof that P3 chroma survived.

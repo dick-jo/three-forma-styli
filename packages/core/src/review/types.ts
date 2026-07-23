@@ -60,8 +60,34 @@ export type ReviewControl = ReviewNumberControl | ReviewSelectControl;
 export interface ReviewCapturePolicy {
 	enabled: boolean;
 	viewports: string[];
+	/** Authored mode names, `*` for every mode, or `$default` for the category default. */
 	colorModes: string[];
+	/** Authored mode names, `*` for every mode, or `$default` for the category default. */
 	sizeModes: string[];
+}
+
+export interface ReviewCaptureState {
+	/** Stable, human-readable identity suitable for snapshot filenames. */
+	id: string;
+	lab: ReviewLabId;
+	caseId?: string;
+	viewport: {
+		id: string;
+		width: number;
+		height: number;
+	};
+	colorMode?: string;
+	sizeMode?: string;
+	/** URL relative to the generated review directory. */
+	url: string;
+}
+
+export interface TfsReviewCapturePlan {
+	kind: 'three-forma-styli/review-captures';
+	schemaVersion: 1;
+	systemFingerprint: string;
+	entrypoint: './index.html';
+	states: ReviewCaptureState[];
 }
 
 export interface ReviewCaseBase {

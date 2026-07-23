@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import fs from 'fs-extra';
 import {
 	createWorkbenchContract,
+	createReviewCapturePlan,
 	fontFromManifest,
 	generate,
 	generateCss,
@@ -355,12 +356,14 @@ export async function renderWorkspacePackage(
 					)
 				: undefined,
 		});
+		const captures = createReviewCapturePlan(contract);
 		await Promise.all([
 			writeText(staging, 'review/index.html', await workbenchAsset('index.html')),
 			writeText(staging, 'review/workbench.css', await workbenchAsset('workbench.css')),
 			writeText(staging, 'review/workbench.js', await workbenchAsset('workbench.js')),
 			writeText(staging, 'review/system.css', systemCss),
 			writeText(staging, 'review/workbench.json', `${JSON.stringify(contract, null, 2)}\n`),
+			writeText(staging, 'review/captures.json', `${JSON.stringify(captures, null, 2)}\n`),
 		]);
 	}
 	if (plan.review.shadowSpecimen) {

@@ -34,27 +34,44 @@ interactions.
 - The strongest Next.js, Turborepo, and Chromium proof was optional.
   `check:release` and the browser-consumer CI job now run the full integration
   matrix.
+- Workbench fallback evidence treated `document.fonts.check()` as proof that a
+  named face loaded, even though browsers may return `true` when generic
+  fallback can render the text. Evidence now requires matching loaded
+  `FontFace` objects, and the packed Chromium gate deliberately supplies a
+  nonexistent primary family to prove that no misleading delta is reported.
+- Review cases shallow-copied a default capture policy whose nested arrays
+  remained shared. Capture policies are now freshly allocated per case, with
+  cross-case and cross-contract mutation covered by a regression test.
+
+A second hostile pass over these fixes found no remaining P0/P1 issue in the
+current batch. It independently reproduced the browser font-loading semantics
+and reran the focused core and packed Chromium proofs.
 
 ## Remaining ranked findings
 
-1. Workbench still needs executable viewport/capture output, diagnostics,
-   baseline comparison, and optional pinned screenshots. Strict, fingerprint-
-   and contract-bound patch import landed on 2026-07-23 with a real Chromium
-   import/rejection regression.
+1. Workbench still needs baseline/draft comparison and optional project-owned
+   pinned screenshots. Executable viewport/mode capture output, real font
+   diagnostics, strict fingerprint-bound patch import, and Chromium consumption
+   landed on 2026-07-23.
 2. ~~Figma sync is additive. It needs explicit merge versus authoritative
    policy, a dry-run diff, and deletion safeguards.~~ Closed on 2026-07-23:
    merge remains the default; authoritative deletion is separately named,
    dry-runnable against remote state, and confirmation-gated.
 3. ~~DTCG coverage remains narrower than the complete TFS system.~~ Closed on
    2026-07-23 for every losslessly representable 2025.10 family. CSS-only facts
-   and modes are carried in the TFS extension.
-4. Large validation and project-build orchestration modules need domain splits
-   without public behavior changes.
+   and modes are carried in the TFS extension. A representative complete export
+   is validated offline against the provenance-recorded official bundled schema.
+4. ~~Large validation and project-build orchestration modules need domain splits
+   without public behavior changes.~~ Closed on 2026-07-23: project planning,
+   output ownership, shared validation, time/motion/shadow validation, and
+   typography validation now live behind coherent internal boundaries.
 5. Font fallback calibration needs documented/custom corpora and broader
    script/platform evidence before the word “universal” applies to that
    subsystem.
-6. Runtime luminance measurement versus enforcement must remain an explicit
-   product/API distinction.
+6. ~~Runtime luminance measurement versus enforcement must remain an explicit
+   product/API distinction.~~ Closed on 2026-07-23: measurement/editor and
+   enforcement boundaries are separately named, and constraint failure has a
+   distinct error type from malformed untrusted input.
 7. Canary publication, independent installation, and the isolated Scatter
    package adoption remain operational release gates.
 
@@ -65,9 +82,7 @@ The first behavior-preserving split landed on 2026-07-23:
 - `project-build.ts` fell from 1,010 to 631 lines. Portable legacy output
   planning, atomic output ownership/replacement, and read-only project/font
   planning now have separate modules.
-- `validate.ts` fell from 1,381 to 1,084 lines. Shared validation primitives and
-  the time/motion/shadow domain now have separate modules.
-
-This finding remains open: semantic typography validation is still one large
-domain block and should move as a unit rather than being sliced into arbitrary
-line-count-driven helpers.
+- `validate.ts` fell from 1,381 to 476 lines. Shared validation primitives,
+  time/motion/shadow validation, and the complete semantic typography validator
+  now have separate modules. The typography block moved intact as one domain;
+  this was not a line-count-driven rewrite.

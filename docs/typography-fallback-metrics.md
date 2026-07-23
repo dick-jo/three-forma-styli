@@ -124,9 +124,20 @@ evidence about a deployment environment rather than a TFS-owned lifecycle state.
 
 ## Browser-comparison guidance
 
-The generated specimen can force the primary, adjusted fallback or completely unadjusted state.
-Review every role, size, exposed weight and style at fixed widths. A useful observation record
-names:
+The generated specimen can force the primary, adjusted fallback or completely
+unadjusted state. The Workbench first verifies that both the intended primary
+family/style/weight and private adjusted face are available; without those
+checks, comparing two unintended fallback renderings can produce a dangerously
+reassuring zero delta. It then reports three separate observations:
+
+- editable phrase inline-width delta;
+- constrained prose line-count delta;
+- hostile uppercase, lowercase, numeric, currency and punctuation width delta.
+
+These are deliberately not collapsed into one approval score. A fallback may be
+excellent for ordinary prose and still diverge on a punctuation-heavy label.
+Review every role, size, exposed weight and style at fixed widths. A useful
+observation record names:
 
 - browser, version, OS and available local face;
 - resolved face;
@@ -143,9 +154,11 @@ Suggested comparison thresholds are stable role-default line counts, block-heigh
 
 - Android/Roboto-compatible and other platform profile chains;
 - oblique built-in fallback profiles;
-- non-Latin calibration corpora;
+- non-Latin and per-role calibration corpora. A custom primary corpus alone
+  would be mathematically invalid because the fallback average must be measured
+  against the exact same corpus; future support therefore needs a paired,
+  provenance-bearing fallback-profile contract rather than a freeform text box;
 - optical-size and arbitrary custom-axis policies;
-- per-role calibration corpora;
 - OS-conditional CSS and automatic Unicode-range partitioning.
 
 ## Standards and implementation anchors

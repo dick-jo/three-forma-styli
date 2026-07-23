@@ -1,7 +1,20 @@
+import { readFileSync } from 'node:fs';
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 import { describe, expect, it } from 'vitest';
 import { generate } from '../generator/index.js';
 import type { PartialDesignSystem } from '../types.js';
 import { toFigmaJson } from './figma-json.js';
+
+const dtcgSchema = JSON.parse(
+	readFileSync(
+		new URL('../../test/fixtures/dtcg-2025.10/format.schema.json', import.meta.url),
+		'utf8'
+	)
+) as object;
+const dtcgAjv = new Ajv({ allErrors: true, strict: true });
+addFormats(dtcgAjv);
+const validatesDtcg = dtcgAjv.compile(dtcgSchema);
 
 const colors: PartialDesignSystem = {
 	colors: {
@@ -271,6 +284,100 @@ describe('toFigmaJson', () => {
 			fontWeight: 700,
 			lineHeight: 1.2,
 		});
+	});
+
+	it('conforms to the pinned official DTCG 2025.10 JSON Schema', () => {
+		const ir = generate(
+			{
+				...colors,
+				spacing: {
+					modes: [
+						{
+							name: 'default',
+							isDefault: true,
+							tokens: { unit: 'rem', base: 0.5, min: 0.25, range: 3 },
+						},
+					],
+				},
+				typography: {
+					modes: [
+						{
+							name: 'default',
+							isDefault: true,
+							tokens: {
+								unit: 'rem',
+								base: 0.875,
+								min: 0.625,
+								increment: 0.125,
+								range: 6,
+							},
+						},
+					],
+					fonts: {
+						sans: {
+							family: 'Proof Sans',
+							fallbacks: ['Arial', 'sans-serif'],
+							verification: 'prepared',
+							capabilities: {
+								faces: [{ style: 'normal', weights: { min: 300, max: 700 } }],
+							},
+						},
+					},
+					roles: {
+						prose: {
+							font: 'sans',
+							base: {
+								fontSize: 2,
+								weight: 'base',
+								lineHeight: 1.25,
+								letterSpacing: 0.01,
+							},
+							variants: {
+								max: {
+									fontSize: 4,
+									weight: 'max',
+									lineHeight: 1.1,
+									letterSpacing: -0.01,
+								},
+							},
+							displayOrder: ['base', 'max'],
+							weights: { base: 400, max: 700 },
+						},
+					},
+				},
+				time: {
+					scales: [
+						{
+							name: 'default',
+							isDefault: true,
+							tokens: { unit: 'ms', base: 100, min: 50, range: 3 },
+						},
+					],
+				},
+				motion: {
+					easings: { standard: [0.2, 0, 0.38, 0.9] },
+					recipes: {
+						hover: {
+							base: { duration: 2, easing: 'standard' },
+							variants: { max: { duration: 3, delay: 1 } },
+						},
+					},
+				},
+				shadows: {
+					unit: 'px',
+					box: {
+						elevation: {
+							base: [{ x: 0, y: 1, blur: 3, color: { color: 'ink', alpha: 'half' } }],
+						},
+					},
+				},
+			},
+			{ colorFormat: { base: 'hex', alpha: 'hexa', alphaModifier: 'a' } }
+		);
+		const output = JSON.parse(toFigmaJson(ir));
+		const valid = validatesDtcg(output);
+
+		expect(valid, JSON.stringify(validatesDtcg.errors, null, 2)).toBe(true);
 	});
 
 	it('fails when an authored CSS unit has no valid DTCG composite representation', () => {

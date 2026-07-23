@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
 	generateRuntimeColorTheme,
+	enforceRuntimeColorTheme,
 	parseRuntimeColorTheme,
 	RuntimeColorThemeValidationError,
+	RuntimeLuminanceConstraintError,
 } from './index.js';
 import { applyAlpha, oklchToCss } from '../utils.js';
 
@@ -362,5 +364,36 @@ describe('generateRuntimeColorTheme', () => {
 				},
 			})
 		).toThrowError('config generates duplicate custom property "--clr-ink-a-lo"');
+	});
+});
+
+describe('enforceRuntimeColorTheme', () => {
+	it('returns the same frozen result when the configured luminance constraint passes', () => {
+		const result = enforceRuntimeColorTheme(theme, config);
+
+		expect(result.luminance.deltaValid).toBe(true);
+		expect(Object.isFrozen(result)).toBe(true);
+	});
+
+	it('separates valid payload parsing from explicit luminance enforcement', () => {
+		const failingTheme = {
+			...theme,
+			colors: {
+				canvas: { ...theme.colors.canvas, l: 0.4 },
+				ink: { ...theme.colors.ink, l: 0.5 },
+			},
+		};
+		const measured = generateRuntimeColorTheme(failingTheme, config);
+		expect(measured.luminance.deltaValid).toBe(false);
+
+		try {
+			enforceRuntimeColorTheme(failingTheme, config);
+			expect.unreachable();
+		} catch (error) {
+			expect(error).toBeInstanceOf(RuntimeLuminanceConstraintError);
+			expect(error).not.toBeInstanceOf(RuntimeColorThemeValidationError);
+			expect((error as RuntimeLuminanceConstraintError).result).toEqual(measured);
+			expect((error as Error).message).toContain('measured delta 0.1, requires at least 0.6');
+		}
 	});
 });

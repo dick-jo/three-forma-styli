@@ -53,3 +53,22 @@ export class RuntimeColorThemeValidationError extends TypeError {
 		this.path = path;
 	}
 }
+
+/**
+ * A valid runtime payload whose emitted palette violates the configured TFS
+ * OKLCH-L separation constraint. This is distinct from malformed input.
+ */
+export class RuntimeLuminanceConstraintError<
+	ColorNames extends readonly string[] = readonly string[],
+> extends Error {
+	readonly result: RuntimeColorThemeResult<ColorNames>;
+
+	constructor(result: RuntimeColorThemeResult<ColorNames>) {
+		const { actualDelta, requiredDelta, metric } = result.luminance;
+		super(
+			`Runtime theme violates the ${metric} luminance constraint: measured delta ${actualDelta}, requires at least ${requiredDelta}.`
+		);
+		this.name = 'RuntimeLuminanceConstraintError';
+		this.result = result;
+	}
+}

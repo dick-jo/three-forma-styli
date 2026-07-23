@@ -1,0 +1,4 @@
+# Vite's minified Workbench bundle embeds a JavaScript whitespace-character
+# template literal. The first physical line therefore intentionally ends in a
+# tab; source files and every other generated artifact retain normal checks.
+packages/compiler/workbench-assets/*.js whitespace=-trailing-space

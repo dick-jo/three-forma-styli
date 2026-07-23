@@ -7,7 +7,7 @@ import type {
 	RuntimeColorThemeSchema,
 	RuntimeOklchColor,
 } from './types.js';
-import { RuntimeColorThemeValidationError } from './types.js';
+import { RuntimeColorThemeValidationError, RuntimeLuminanceConstraintError } from './types.js';
 
 const tokenNamePattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/i;
 const rootKeys = ['colors', 'polarity'] as const;
@@ -241,4 +241,21 @@ export function generateRuntimeColorTheme<const ColorNames extends readonly stri
 		customProperties: Object.freeze(customProperties),
 		luminance: frozenDiagnostics,
 	});
+}
+
+/**
+ * Generate a runtime theme and reject a valid payload when its emitted palette
+ * violates the configured TFS OKLCH-L separation constraint.
+ *
+ * Use `generateRuntimeColorTheme` when invalid separation is useful diagnostic
+ * state in an editor. Use this explicit enforcing boundary before persistence
+ * or application when the host requires the constraint.
+ */
+export function enforceRuntimeColorTheme<const ColorNames extends readonly string[]>(
+	input: unknown,
+	config: RuntimeColorThemeConfig<ColorNames>
+): RuntimeColorThemeResult<ColorNames> {
+	const result = generateRuntimeColorTheme(input, config);
+	if (!result.luminance.deltaValid) throw new RuntimeLuminanceConstraintError(result);
+	return result;
 }

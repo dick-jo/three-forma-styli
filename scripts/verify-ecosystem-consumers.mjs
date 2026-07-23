@@ -176,6 +176,21 @@ async function exerciseScaffolds() {
 	assert.ok(workbench.labs.some((lab) => lab.kind === 'typography' && lab.cases.length > 0));
 	assert.ok(workbench.labs.some((lab) => lab.kind === 'shadows' && lab.cases.length > 0));
 	assert.ok(workbench.labs.some((lab) => lab.kind === 'motion' && lab.cases.length > 0));
+	const captures = JSON.parse(
+		await readFile(path.join(workspaceRoot, 'generated/review/captures.json'), 'utf8')
+	);
+	assert.equal(captures.kind, 'three-forma-styli/review-captures');
+	assert.equal(captures.systemFingerprint, workbench.systemFingerprint);
+	assert.ok(captures.states.length > 0);
+	assert.ok(
+		captures.states.every(
+			(state) =>
+				typeof state.url === 'string' &&
+				state.url.startsWith('./index.html?') &&
+				state.viewport.width > 0 &&
+				state.viewport.height > 0
+		)
+	);
 	assert.match(
 		await readFile(path.join(workspaceRoot, 'generated/review/index.html'), 'utf8'),
 		/workbench\.js/
@@ -231,13 +246,16 @@ async function buildBrowserConsumer(designSystemTarball, coreTarball) {
 import typographyClasses from 'workspace-system/typography.module.css';
 import { nativeColorModes } from 'workspace-system/native-color-modes';
 import { runtimeColorThemeConfig } from 'workspace-system/runtime-color-theme';
-import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
+import {
+  enforceRuntimeColorTheme,
+  generateRuntimeColorTheme,
+} from '@three-forma-styli/core/runtime';
 
 const storedTheme = JSON.parse(JSON.stringify({
   polarity: 'negative',
   colors: nativeColorModes.modes.find((mode) => mode.isDefault)?.source.colors,
 }));
-const generated = generateRuntimeColorTheme(storedTheme, runtimeColorThemeConfig);
+const generated = enforceRuntimeColorTheme(storedTheme, runtimeColorThemeConfig);
 
 let hostilePayloadRejected = false;
 try {
@@ -249,6 +267,16 @@ try {
   hostilePayloadRejected = true;
 }
 
+const invalidLuminance = JSON.parse(JSON.stringify(storedTheme));
+for (const color of Object.values(invalidLuminance.colors) as Array<{ l: number }>) color.l = 0.5;
+let luminanceConstraintRejected = false;
+try {
+  enforceRuntimeColorTheme(invalidLuminance, runtimeColorThemeConfig);
+} catch {
+  luminanceConstraintRejected = true;
+}
+const measuredInvalid = generateRuntimeColorTheme(invalidLuminance, runtimeColorThemeConfig);
+
 const root = document.documentElement;
 for (const [property, value] of Object.entries(generated.customProperties)) {
   root.style.setProperty(property, value);
@@ -256,6 +284,8 @@ for (const [property, value] of Object.entries(generated.customProperties)) {
 root.dataset.runtimeValid = String(generated.luminance.deltaValid);
 root.dataset.nativeModeCount = String(nativeColorModes.modes.length);
 root.dataset.hostilePayloadRejected = String(hostilePayloadRejected);
+root.dataset.luminanceConstraintRejected = String(luminanceConstraintRejected);
+root.dataset.measuredInvalidLuminance = String(measuredInvalid.luminance.deltaValid);
 const app = document.querySelector<HTMLElement>('#app');
 if (!app) throw new Error('Missing app root');
 app.className = typographyClasses.prose;
@@ -375,6 +405,8 @@ async function runBrowserProof(browserRoot) {
 				runtimeValid: document.documentElement.dataset.runtimeValid,
 				nativeModeCount: document.documentElement.dataset.nativeModeCount,
 				hostilePayloadRejected: document.documentElement.dataset.hostilePayloadRejected,
+				luminanceConstraintRejected: document.documentElement.dataset.luminanceConstraintRejected,
+				measuredInvalidLuminance: document.documentElement.dataset.measuredInvalidLuminance,
 				canvas: document.documentElement.style.getPropertyValue('--clr-bg'),
 				oklchSupported: CSS.supports('color', 'oklch(0.8 0.2 145)'),
 			};
@@ -385,6 +417,8 @@ async function runBrowserProof(browserRoot) {
 		assert.equal(evidence.runtimeValid, 'true');
 		assert.equal(evidence.nativeModeCount, '1');
 		assert.equal(evidence.hostilePayloadRejected, 'true');
+		assert.equal(evidence.luminanceConstraintRejected, 'true');
+		assert.equal(evidence.measuredInvalidLuminance, 'false');
 		assert.equal(evidence.canvas, 'oklch(0.2603 0.0000 129.63)');
 		assert.equal(evidence.oklchSupported, true);
 		assert.notEqual(evidence.fontSize, '16px');
@@ -397,7 +431,21 @@ async function runBrowserProof(browserRoot) {
 
 async function runWorkbenchBrowserProof(workspaceRoot) {
 	const { chromium } = await import('@playwright/test');
+	const workbenchPath = path.join(workspaceRoot, 'generated/review/workbench.json');
+	const workbench = JSON.parse(await readFile(workbenchPath, 'utf8'));
+	const typographyLab = workbench.labs.find((lab) => lab.kind === 'typography');
+	const typographyCase = typographyLab?.cases.find(
+		(reviewCase) => reviewCase.role === 'prose' && reviewCase.variant === null
+	);
+	assert.ok(typographyCase, 'Generated Workbench omitted the prose base typography case');
+	typographyCase.font.family = '__tfs-missing-primary';
+	typographyCase.font.adjustedFallback = '__tfs-missing-adjusted';
+	await writeJson(workbenchPath, workbench);
+
 	const server = await startStaticServer(path.join(workspaceRoot, 'generated'));
+	const capturePlan = JSON.parse(
+		await readFile(path.join(workspaceRoot, 'generated/review/captures.json'), 'utf8')
+	);
 	const browser = await chromium.launch({ headless: true });
 	try {
 		const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
@@ -433,6 +481,11 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 		await typographyMatrix.waitFor();
 		assert.ok((await typographyMatrix.locator('.matrix-card').count()) > 1);
 		await typographyMatrix.locator('.matrix-card').filter({ hasText: 'prose / base' }).click();
+		const fallbackEvidence = page.locator('.type-tools output');
+		await fallbackEvidence
+			.filter({ hasText: /primary face unavailable: __tfs-missing-primary/ })
+			.waitFor();
+		assert.doesNotMatch((await fallbackEvidence.textContent()) ?? '', /(?:width|lines) Δ/);
 		const lineHeight = page.getByRole('spinbutton').first();
 		await lineHeight.fill('1.3');
 		await page.getByText('1 edits', { exact: true }).waitFor();
@@ -525,6 +578,25 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 		assert.equal(evidence.sizeMode, 'large');
 		assert.ok(Number.parseFloat(evidence.lineHeight) > 0);
 		assert.ok(evidence.fontSizeToken.length > 0);
+
+		const capture = capturePlan.states.find(
+			(state) => state.lab === 'typography' && state.sizeMode === 'large'
+		);
+		assert.ok(capture, 'Generated capture plan omitted the large typography state');
+		await page.setViewportSize({
+			width: capture.viewport.width,
+			height: capture.viewport.height,
+		});
+		await page.goto(`${server.url}/review/${capture.url.slice(2)}`, {
+			waitUntil: 'networkidle',
+		});
+		await page.locator('html[data-tfs-workbench-ready="true"]').waitFor();
+		assert.equal(new URL(page.url()).searchParams.get('case'), capture.caseId);
+		assert.equal(new URL(page.url()).searchParams.get('size'), capture.sizeMode);
+		assert.deepEqual(await page.viewportSize(), {
+			width: capture.viewport.width,
+			height: capture.viewport.height,
+		});
 	} finally {
 		await browser.close();
 		await server.close();

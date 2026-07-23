@@ -618,9 +618,12 @@ Generates const objects with token values and type definitions.
 
 ### DTCG/Figma JSON Transformer
 
-Generates DTCG 2025.10 color tokens or a structured Figma Variables API model.
-The transformer preserves color modes and supports explicit sRGB and Display-P3
-components. Display-P3 output must match the target Figma file profile.
+Generates standards-validated DTCG 2025.10 colors, dimensions, durations,
+easings, transitions, semantic typography and shadows, or a structured Figma
+Variables API color model. CSS-only facts and TFS modes live in a namespaced
+extension. The transformer preserves color modes and supports explicit sRGB and
+Display-P3 components. Display-P3 output must match the target Figma file
+profile.
 
 ---
 
@@ -632,6 +635,18 @@ separate `colors.runtimeThemes.colorNames` list identifies the exact
 user-editable subset; static palette members do not silently become runtime
 fields. When both policies exist, the workspace compiler emits their shared
 contract as `runtime-color-theme` for strict browser theme generation.
+
+Runtime generation has two explicit policies:
+
+- `generateRuntimeColorTheme()` strictly validates input and returns OKLCH-L
+  diagnostics even when the separation constraint fails. Use it in editors.
+- `enforceRuntimeColorTheme()` performs the same work but raises
+  `RuntimeLuminanceConstraintError` when the valid palette violates the
+  constraint. Use it before accepting or applying a theme when separation is a
+  product invariant.
+
+Malformed untrusted data continues to raise the separate, path-aware
+`RuntimeColorThemeValidationError`.
 
 ```typescript
 import { validateLuminance } from '@three-forma-styli/core';

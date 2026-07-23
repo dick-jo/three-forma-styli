@@ -168,9 +168,11 @@ export * from './types.js';
 export { defineTypography, deriveTypographyRange, fontFromManifest } from './typography/index.js';
 export { deriveShadowRange } from './shadows/index.js';
 export { createWorkbenchContract } from './review/contract.js';
+export { createReviewCapturePlan } from './review/capture.js';
 export type {
 	ReviewAssetContract,
 	ReviewCapturePolicy,
+	ReviewCaptureState,
 	ColorReviewCase,
 	ColorReviewLab,
 	MotionReviewCase,
@@ -188,6 +190,7 @@ export type {
 	TfsAgentHandoff,
 	TfsReviewPatch,
 	TfsWorkbenchContract,
+	TfsReviewCapturePlan,
 	TypographyReviewCase,
 	WorkbenchContractOptions,
 	WorkbenchDraftOperation,

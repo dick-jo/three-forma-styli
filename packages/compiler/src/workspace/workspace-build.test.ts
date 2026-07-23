@@ -162,6 +162,7 @@ describe('workspace-package build', () => {
 				'runtime/styles/index.css',
 				'review/index.html',
 				'review/workbench.json',
+				'review/captures.json',
 				'design/tokens.dtcg.json',
 			])
 		);
@@ -202,6 +203,7 @@ describe('workspace-package build', () => {
 				'review/workbench.css',
 				'review/workbench.js',
 				'review/workbench.json',
+				'review/captures.json',
 				'review/system.css',
 				'design/tokens.dtcg.json',
 				'design/figma.variables.json',

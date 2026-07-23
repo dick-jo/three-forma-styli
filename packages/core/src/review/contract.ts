@@ -11,6 +11,7 @@ import type {
 	MotionReviewCase,
 	FoundationReviewCase,
 	ReviewControl,
+	ReviewDiagnostic,
 	ReviewModeGroup,
 	ShadowReviewCase,
 	TfsWorkbenchContract,
@@ -19,12 +20,16 @@ import type {
 	WorkbenchContractOptions,
 } from './types.js';
 
-const defaultCapture: ReviewCapturePolicy = {
-	enabled: true,
-	viewports: ['desktop'],
-	colorModes: ['*'],
-	sizeModes: ['*'],
-};
+function capturePolicy(
+	overrides: Partial<Pick<ReviewCapturePolicy, 'colorModes' | 'sizeModes' | 'viewports'>> = {}
+): ReviewCapturePolicy {
+	return {
+		enabled: true,
+		viewports: [...(overrides.viewports ?? ['desktop'])],
+		colorModes: [...(overrides.colorModes ?? ['$default'])],
+		sizeModes: [...(overrides.sizeModes ?? ['$default'])],
+	};
+}
 
 /**
  * Encode an authored name as one unambiguous case-ID segment.
@@ -115,10 +120,7 @@ function colorCases(system: PartialDesignSystem, ir: IR): ColorReviewCase[] {
 							unit: 'deg',
 						},
 					],
-					capture: {
-						...defaultCapture,
-						colorModes: [mode.name],
-					},
+					capture: capturePolicy({ colorModes: [mode.name] }),
 				},
 			];
 		});
@@ -379,10 +381,7 @@ function typographyCases(
 					),
 					recipe,
 					controls: recipeControls(sourcePath, sourceRole, recipe, sizes),
-					capture: {
-						...defaultCapture,
-						sizeModes: [mode.name],
-					},
+					capture: capturePolicy({ sizeModes: [mode.name] }),
 				};
 			});
 		});
@@ -482,7 +481,7 @@ function shadowRecipeCases(
 		unit,
 		layers: value.layers,
 		controls: shadowLayerControls(kind, name, variantName, value.layers, unit),
-		capture: defaultCapture,
+		capture: capturePolicy({ colorModes: ['*'] }),
 	}));
 }
 
@@ -529,7 +528,7 @@ function motionCases(ir: IR): MotionReviewCase[] {
 			},
 			easing: value.easing,
 			controls: [],
-			capture: defaultCapture,
+			capture: capturePolicy(),
 		}));
 	});
 }
@@ -561,8 +560,34 @@ function foundationCases(ir: IR): FoundationReviewCase[] {
 				family,
 				tokens,
 				controls: [],
-				capture: defaultCapture,
+				capture: capturePolicy({ sizeModes: ['*'] }),
 			},
+		];
+	});
+}
+
+function reviewDiagnostics(ir: IR): ReviewDiagnostic[] {
+	if (!ir.typography) return [];
+	return Object.entries(ir.typography.fonts).flatMap(([fontId, font]) => {
+		const path = `/typography/fonts/${pointerSegment(fontId)}`;
+		const warnings: ReviewDiagnostic[] = font.verified
+			? []
+			: [
+					{
+						id: `typography-font-${caseIdSegment(fontId)}-unverified`,
+						severity: 'info',
+						message: `Font "${fontId}" is externally managed; TFS did not verify a prepared font manifest.`,
+						path,
+					},
+				];
+		return [
+			...warnings,
+			...font.warnings.map((message, index) => ({
+				id: `typography-font-${caseIdSegment(fontId)}-warning-${index + 1}`,
+				severity: 'warning' as const,
+				message,
+				path,
+			})),
 		];
 	});
 }
@@ -640,7 +665,7 @@ export function createWorkbenchContract(
 					]
 				: []),
 		],
-		diagnostics: [],
+		diagnostics: reviewDiagnostics(ir),
 		agent: {
 			verification: {
 				generate: options.verification?.generate ?? 'tfs build .',

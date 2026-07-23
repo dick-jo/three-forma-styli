@@ -15,6 +15,7 @@
 	let forceFallback = $state(false);
 	let typeSample = $state<HTMLElement | undefined>();
 	let wrapSample = $state<HTMLElement | undefined>();
+	let glyphSample = $state<HTMLElement | undefined>();
 	let metricProbe = $state<HTMLElement | undefined>();
 	let baselineProbe = $state<HTMLElement | undefined>();
 	let capProbe = $state<HTMLElement | undefined>();
@@ -57,23 +58,40 @@
 		return new Set(tops).size;
 	}
 
-	function measureTypography(forceAdjustedFallback: boolean): { width: number; lines: number } {
-		if (!typeSample || !wrapSample) return { width: 0, lines: 0 };
+	function measureTypography(
+		forceAdjustedFallback: boolean,
+		text: string,
+		width?: number
+	): { width: number; lines: number } {
 		const style = typographyStyle(reviewCase, draft, {
 			forceFallback: forceAdjustedFallback,
 			wcagSpacing,
 		});
-		const inline = document.createElement('span');
-		inline.textContent = typeSample.textContent;
-		inline.style.cssText = `${style};position:fixed;left:-100000px;top:0;visibility:hidden;display:inline-block;width:max-content;max-width:none;white-space:pre`;
-		const wrap = document.createElement('div');
-		wrap.textContent = wrapSample.textContent;
-		wrap.style.cssText = `${style};position:fixed;left:-100000px;top:0;visibility:hidden;width:${wrapSample.getBoundingClientRect().width}px`;
-		document.body.append(inline, wrap);
-		const result = { width: inline.getBoundingClientRect().width, lines: renderedLineCount(wrap) };
-		inline.remove();
-		wrap.remove();
+		const probe = document.createElement(width === undefined ? 'span' : 'div');
+		probe.textContent = text;
+		probe.style.cssText =
+			width === undefined
+				? `${style};position:fixed;left:-100000px;top:0;visibility:hidden;display:inline-block;width:max-content;max-width:none;white-space:pre`
+				: `${style};position:fixed;left:-100000px;top:0;visibility:hidden;width:${width}px`;
+		document.body.append(probe);
+		const result = {
+			width: probe.getBoundingClientRect().width,
+			lines: width === undefined ? 1 : renderedLineCount(probe),
+		};
+		probe.remove();
 		return result;
+	}
+
+	async function hasLoadedFace(family: string, style: string, weight: number, text: string) {
+		try {
+			const faces = await document.fonts.load(
+				`${style} ${weight} 16px ${JSON.stringify(family)}`,
+				text
+			);
+			return faces.some((face) => face.status === 'loaded');
+		} catch {
+			return false;
+		}
 	}
 
 	async function refreshFallbackEvidence(): Promise<void> {
@@ -84,14 +102,58 @@
 		}
 		await document.fonts.ready;
 		if (run !== fallbackMeasurementRun) return;
-		const primary = measureTypography(false);
-		const adjusted = measureTypography(true);
-		if (run !== fallbackMeasurementRun || primary.width === 0) return;
-		const widthDelta = adjusted.width - primary.width;
-		const percent = (widthDelta / primary.width) * 100;
+		if (!typeSample || !wrapSample || !glyphSample) return;
+		const weightControl = reviewCase.controls.find((control) => control.id === 'weight');
+		const weightAlias =
+			weightControl && typeof draft[weightControl.path] === 'string'
+				? String(draft[weightControl.path])
+				: reviewCase.weight.alias;
+		const weight =
+			reviewCase.availableWeights.find((entry) => entry.alias === weightAlias)?.value ??
+			reviewCase.weight.value;
+		const sampleText = typeSample.textContent ?? '';
+		const primaryReady = await hasLoadedFace(
+			reviewCase.font.family,
+			reviewCase.style,
+			weight,
+			sampleText
+		);
+		if (run !== fallbackMeasurementRun) return;
+		if (!primaryReady) {
+			fallbackEvidence = `primary face unavailable: ${reviewCase.font.family} ${reviewCase.style} ${weight}`;
+			return;
+		}
+		const adjustedReady = await hasLoadedFace(
+			reviewCase.font.adjustedFallback,
+			reviewCase.style,
+			weight,
+			sampleText
+		);
+		if (run !== fallbackMeasurementRun) return;
+		if (!adjustedReady) {
+			fallbackEvidence = `adjusted fallback unavailable: ${reviewCase.font.adjustedFallback} ${reviewCase.style} ${weight}`;
+			return;
+		}
+		const widthEvidence = (text: string) => {
+			const primary = measureTypography(false, text);
+			const adjusted = measureTypography(true, text);
+			const delta = adjusted.width - primary.width;
+			return { delta, percent: primary.width === 0 ? 0 : (delta / primary.width) * 100 };
+		};
+		const phrase = widthEvidence(typeSample.textContent ?? '');
+		const glyphs = widthEvidence(glyphSample.textContent ?? '');
+		const wrapWidth = wrapSample.getBoundingClientRect().width;
+		const primaryWrap = measureTypography(false, wrapSample.textContent ?? '', wrapWidth);
+		const adjustedWrap = measureTypography(true, wrapSample.textContent ?? '', wrapWidth);
+		if (run !== fallbackMeasurementRun) return;
 		const signed = (value: number, digits: number) =>
 			`${value > 0 ? '+' : ''}${value.toFixed(digits)}`;
-		fallbackEvidence = `inline width Δ ${signed(widthDelta, 2)}px (${signed(percent, 2)}%) · line count Δ ${adjusted.lines - primary.lines >= 0 ? '+' : ''}${adjusted.lines - primary.lines} (${primary.lines}→${adjusted.lines})`;
+		const lineDelta = adjustedWrap.lines - primaryWrap.lines;
+		fallbackEvidence = [
+			`phrase width Δ ${signed(phrase.delta, 2)}px (${signed(phrase.percent, 2)}%)`,
+			`narrow lines Δ ${lineDelta >= 0 ? '+' : ''}${lineDelta} (${primaryWrap.lines}→${adjustedWrap.lines})`,
+			`glyph stress width Δ ${signed(glyphs.delta, 2)}px (${signed(glyphs.percent, 2)}%)`,
+		].join(' · ');
 	}
 </script>
 
@@ -161,6 +223,7 @@
 				<span class="type-caption">glyph stress</span>
 				<p
 					class="glyph-stress"
+					bind:this={glyphSample}
 					style={typographyStyle(reviewCase, draft, { forceFallback, wcagSpacing })}
 				>
 					ABCDEFGHIJKLMNOPQRSTUVWXYZ · abcdefghijklmnopqrstuvwxyz · 0123456789 · $€£¥ ₿ ± × ÷ → ← ↑

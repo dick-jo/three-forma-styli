@@ -498,6 +498,77 @@ button:disabled {
 	margin: auto;
 }
 
+.overview-diagnostics {
+	display: grid;
+	gap: 1px;
+	border: 1px solid var(--clr-neu-a-lo-x, #444);
+	background: var(--clr-neu-a-lo-x, #444);
+}
+
+.overview-diagnostics > header,
+.overview-diagnostics li {
+	background: var(--clr-bg, #181916);
+}
+
+.overview-diagnostics > header {
+	display: flex;
+	align-items: end;
+	justify-content: space-between;
+	padding: 16px 18px;
+}
+
+.overview-diagnostics > header div,
+.overview-diagnostics li div {
+	display: grid;
+	gap: 4px;
+}
+
+.overview-diagnostics > header span,
+.overview-diagnostics > header small,
+.overview-diagnostics li > span {
+	color: var(--clr-neu, #aaa);
+	font-size: 9px;
+	text-transform: uppercase;
+}
+
+.overview-diagnostics > header strong {
+	font-size: 20px;
+	font-weight: 500;
+}
+
+.overview-diagnostics ul {
+	display: grid;
+	gap: 1px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.overview-diagnostics li {
+	display: grid;
+	grid-template-columns: 84px 1fr;
+	gap: 16px;
+	padding: 14px 18px;
+}
+
+.overview-diagnostics li[data-severity='error'] > span {
+	color: #ff5478;
+}
+
+.overview-diagnostics li[data-severity='warning'] > span {
+	color: #f2b84b;
+}
+
+.overview-diagnostics li strong {
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.overview-diagnostics li code {
+	color: var(--clr-neu, #aaa);
+	font-size: 10px;
+}
+
 .overview-section {
 	display: grid;
 	gap: 14px;

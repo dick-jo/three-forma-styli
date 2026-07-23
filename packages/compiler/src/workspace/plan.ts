@@ -358,6 +358,7 @@ export function planWorkspacePackage(
 				'review/workbench.json',
 				['review/system.css', ...(context.hasFonts ? [`${fontDirectory}/fonts.css`] : [])],
 			],
+			['review/captures.json', ['review/index.html', 'review/workbench.json']],
 			['review/system.css', []],
 		] as const) {
 			add(artifacts, {

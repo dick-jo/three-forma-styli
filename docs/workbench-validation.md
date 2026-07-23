@@ -21,6 +21,8 @@ browser warnings/errors and verifies:
 - typography editing, scoped reset, undo and size-mode switching;
 - semantic motion playback;
 - stable lab/case/mode permalinks.
+- generated framework-neutral capture states with exact viewport/mode URLs,
+  consumed by the same Chromium proof.
 
 The ordinary release proof also asserts that the compiler tarball contains the
 three dependency-free Workbench assets, while generated runtime package tarballs
@@ -63,11 +65,16 @@ source model.
 Still planned:
 
 - baseline/draft split comparison;
-- patch import;
 - project-owned pinned screenshot baselines;
 - structured motion/time-reference editing;
 - color relationship, gamut and luminance-constraint diagnostics;
 - a reduced-motion review context.
+
+Strict fingerprint- and contract-bound patch import is implemented. Typography
+fallback evidence now refuses to report a comparison when the intended primary
+or adjusted face is unavailable and separates phrase width, constrained line
+count, and hostile glyph-corpus width instead of hiding residual behavior behind
+one score.
 
 These are tracked in
 [`docs/workstreams/gold-standard-toolkit.md`](workstreams/gold-standard-toolkit.md).

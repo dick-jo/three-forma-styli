@@ -110,16 +110,17 @@ their CSS in the browser. `data-size-mode` remains independent.
 Only genuinely user-authored collection themes use the strict runtime:
 
 ```ts
-import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
+import { enforceRuntimeColorTheme } from '@three-forma-styli/core/runtime';
 import { runtimeColorThemeConfig } from '@repo/design-system/runtime-color-theme';
 
-const result = generateRuntimeColorTheme(untrustedThemeData, runtimeColorThemeConfig);
+const result = enforceRuntimeColorTheme(untrustedThemeData, runtimeColorThemeConfig);
 ```
 
 The app owns persistence-envelope validation, route precedence, cookie
 migration, DOM assignment and cleanup. TFS owns exact inner payload validation,
-native OKLCH/P3-preserving declarations, alpha generation and OKLCH-L separation
-diagnostics.
+native OKLCH/P3-preserving declarations, alpha generation and explicit OKLCH-L
+separation enforcement. An editor that must display invalid drafts can call
+`generateRuntimeColorTheme` instead and inspect `result.luminance.deltaValid`.
 
 ## One remaining Scatter-specific adapter
 

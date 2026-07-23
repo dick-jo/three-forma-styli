@@ -174,6 +174,14 @@ describe('workbench review contract', () => {
 			generate: 'tfs build .',
 			check: 'tfs check .',
 		});
+		expect(contract.diagnostics).toEqual([
+			{
+				id: 'typography-font-sans-unverified',
+				severity: 'info',
+				message: 'Font "sans" is externally managed; TFS did not verify a prepared font manifest.',
+				path: '/typography/fonts/sans',
+			},
+		]);
 	});
 
 	it('identifies an adjusted fallback without duplicating it in the ordinary stack', () => {
@@ -196,6 +204,35 @@ describe('workbench review contract', () => {
 			adjustedFallback: '__tfs-sans-adjusted-fallback',
 			fallbacks: ['Arial', 'sans-serif'],
 		});
+	});
+
+	it('does not share mutable capture policy arrays between cases or contracts', () => {
+		const first = createWorkbenchContract(system, generate(system), {
+			systemFingerprint: 'first',
+			toolVersion: '0.2.0',
+			stylesheets: ['./system.css'],
+		});
+		const second = createWorkbenchContract(system, generate(system), {
+			systemFingerprint: 'second',
+			toolVersion: '0.2.0',
+			stylesheets: ['./system.css'],
+		});
+		const firstCases = first.labs.flatMap((lab) => (lab.kind === 'overview' ? [] : lab.cases));
+		const secondCases = second.labs.flatMap((lab) => (lab.kind === 'overview' ? [] : lab.cases));
+		const mutated = firstCases[0]!;
+		const sibling = firstCases[1]!;
+		const fresh = secondCases[0]!;
+
+		mutated.capture.viewports.push('mutation');
+		mutated.capture.colorModes.push('mutation');
+		mutated.capture.sizeModes.push('mutation');
+
+		expect(sibling.capture.viewports).not.toContain('mutation');
+		expect(sibling.capture.colorModes).not.toContain('mutation');
+		expect(sibling.capture.sizeModes).not.toContain('mutation');
+		expect(fresh.capture.viewports).not.toContain('mutation');
+		expect(fresh.capture.colorModes).not.toContain('mutation');
+		expect(fresh.capture.sizeModes).not.toContain('mutation');
 	});
 
 	it('preserves arbitrary author vocabulary while emitting safe, collision-free case IDs', () => {

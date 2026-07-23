@@ -100,6 +100,7 @@ export async function createWorkspaceManifest(
 					? {
 							entrypoint: plan.review.workbench ? 'review/index.html' : undefined,
 							contract: plan.review.workbench ? 'review/workbench.json' : undefined,
+							captures: plan.review.workbench ? 'review/captures.json' : undefined,
 							legacy:
 								plan.review.specimen || plan.review.shadowSpecimen
 									? {

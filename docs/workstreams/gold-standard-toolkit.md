@@ -102,10 +102,10 @@ remaining work so decisions do not depend on one chat transcript.
 - [x] Expand DTCG 2025.10 output across dimensions, duration, easing,
       transitions, semantic typography, colors, and shadows while namespacing
       modes and CSS-only facts.
-- [ ] Finish the behavior-preserving structural split. Compiler output
+- [x] Finish the behavior-preserving structural split. Compiler output
       ownership, legacy planning, and project/font planning are separated;
-      time/motion/shadow validation is separated. Semantic typography
-      validation remains the next coherent extraction.
+      time/motion/shadow validation and semantic typography validation are
+      separated behind coherent domain modules.
 - [x] Add strict Workbench patch import with fingerprint, baseline, case,
       path, type, range, option, duplicate, schema, and size validation; prove
       successful and foreign imports in Chromium.
@@ -169,8 +169,8 @@ reference evidence, not hardcoded policy.
 - [x] Add non-destructive typed draft overlays, transaction-safe undo/redo,
       scoped resets, patch export, and a source-aware agent handoff. Automatic
       TypeScript source mutation remains deliberately outside the browser.
-- [ ] Add baseline/draft comparison and patch import on top of that immutable
-      draft foundation.
+- [ ] Add baseline/draft comparison on top of the immutable draft foundation.
+      Strict contract-bound patch import is complete.
 - [x] Migrate color, typography and shadow interactions into domain labs without
       iframe-composing the current generated HTML documents.
 - [x] Add a whole-system proof sheet plus domain matrices so authors and browser
@@ -181,7 +181,9 @@ reference evidence, not hardcoded policy.
 - [x] Add packed-package Chromium smoke/interaction verification for loading,
       modes, calibration edits, scoped reset and undo.
 - [ ] Add optional
-      project-owned screenshots in a pinned rendering environment.
+      project-owned screenshots in a pinned rendering environment. The
+      framework-neutral `review/captures.json` state plan and real Chromium
+      consumption are complete; a checked-in consumer baseline remains opt-in.
 
 ## Universal product boundary
 
@@ -195,9 +197,14 @@ reference evidence, not hardcoded policy.
 - [ ] Add maintained minimal, editorial, display, Vite, Next.js, workspace and
       runtime-theme fixtures to the release matrix. Scatter may exercise them,
       but must not be their only implementation.
-- [ ] Add explicit framework-neutral review-runner output so pinned screenshot
+- [x] Add explicit framework-neutral review-runner output so pinned screenshot
       projects can enumerate the same versioned cases without importing the
       Workbench source application.
+- [x] Make fallback evidence fail closed unless both the authored primary and
+      adjusted fallback resolve to matching loaded browser faces. Cover a
+      deliberately nonexistent primary face in the packed Chromium gate.
+- [x] Ensure every generated capture policy owns independent mutable arrays;
+      prove isolation across sibling cases and separately generated contracts.
 
 ## Deferred application rollout
 
@@ -347,5 +354,7 @@ reference evidence, not hardcoded policy.
   names, alpha schedule, generator naming and separation groups as
   `runtime-color-theme`; browser consumers pass that generated contract directly
   to the strict runtime API instead of duplicating it. Static palette tokens do
-  not silently become part of the runtime schema. The public field is
-  `minimumLuminanceDelta`; diagnostics remain explicitly `oklch-l`.
+  not silently become part of the runtime schema. Measurement and enforcement
+  are separate named APIs; constraint failure is not confused with malformed
+  input. The public field is `minimumLuminanceDelta`; diagnostics remain
+  explicitly `oklch-l`.

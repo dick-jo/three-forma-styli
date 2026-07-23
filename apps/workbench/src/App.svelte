@@ -543,6 +543,28 @@
 							<article><span>{readableIdentifier(label)}</span><strong>{value}</strong></article>
 						{/each}
 					</div>
+					{#if contract.diagnostics.length > 0}
+						<section class="overview-diagnostics" aria-label="Build diagnostics">
+							<header>
+								<div>
+									<span>build evidence</span>
+									<strong>diagnostics</strong>
+								</div>
+								<small>{contract.diagnostics.length}</small>
+							</header>
+							<ul>
+								{#each contract.diagnostics as diagnostic}
+									<li data-severity={diagnostic.severity}>
+										<span>{diagnostic.severity}</span>
+										<div>
+											<strong>{diagnostic.message}</strong>
+											{#if diagnostic.path}<code>{diagnostic.path}</code>{/if}
+										</div>
+									</li>
+								{/each}
+							</ul>
+						</section>
+					{/if}
 					{#each contract.labs.filter((lab) => lab.kind !== 'overview') as lab}
 						<section class="overview-section">
 							<header>
