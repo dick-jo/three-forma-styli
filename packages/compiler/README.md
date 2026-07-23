@@ -23,6 +23,18 @@ import { buildProject } from '@three-forma-styli/compiler/build';
 await buildProject(project, '/absolute/path/to/tfs.config.ts');
 ```
 
+Dedicated CI can prove committed output without mutating it:
+
+```ts
+import { checkProject } from '@three-forma-styli/compiler/build';
+
+await checkProject(project, '/absolute/path/to/tfs.config.ts');
+```
+
+The checker runs the same complete compiler in a locked sibling stage and
+rejects missing, changed, or unexpected files byte-for-byte. It does not repair
+the output directory.
+
 Font preparation and inspection APIs live at
 `@three-forma-styli/compiler/fonts`. Use `@three-forma-styli/cli` when you want
 the `tfs` executable, config loading, scaffolding, browser specimen server, or

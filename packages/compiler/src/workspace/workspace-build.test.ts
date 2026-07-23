@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import { afterEach, describe, expect, it } from 'vitest';
 import { typography as defaultTypography } from '@three-forma-styli/themes/default';
 import { defineTfsProject } from '../project.js';
-import { buildProject } from '../project-build.js';
+import { buildProject, checkProject } from '../project-build.js';
 import { buildWorkspacePackageProject } from './build.js';
 
 const execFileAsync = promisify(execFile);
@@ -193,6 +193,26 @@ describe('workspace-package build', () => {
 		const manifest = JSON.parse(secondManifest.toString('utf8'));
 		expect(manifest).toMatchObject({ schemaVersion: 2, layout: 'workspace-package' });
 		expect(manifest.targets.runtime.entrypoints).not.toHaveProperty('./design/dtcg');
+	});
+
+	it('checks a package-shaped tree without replacing or repairing it', async () => {
+		const { directory, configPath, packagePath } = await fixture();
+		const project = fullProject();
+		const built = await buildProject(project, configPath);
+		const packageBefore = await fs.readFile(packagePath);
+		await expect(checkProject(project, configPath)).resolves.toEqual(built);
+
+		const specimenPath = path.join(built.outputDirectory, 'review/typography.html');
+		await fs.remove(specimenPath);
+		await fs.writeFile(path.join(built.outputDirectory, 'unexpected.txt'), 'leave me alone\n');
+		await expect(checkProject(project, configPath)).rejects.toThrow(
+			/missing review\/typography\.html[\s\S]*unexpected unexpected\.txt/
+		);
+		expect(await fs.pathExists(specimenPath)).toBe(false);
+		expect(await fs.readFile(path.join(built.outputDirectory, 'unexpected.txt'), 'utf8')).toBe(
+			'leave me alone\n'
+		);
+		expect(await fs.readFile(packagePath)).toEqual(packageBefore);
 	});
 
 	it('accepts explicit target subsets and requires only their exact exports', async () => {

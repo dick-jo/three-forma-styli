@@ -15,6 +15,7 @@ const require = createRequire(import.meta.url);
 export interface InitOptions {
 	theme?: string;
 	skipInstall?: boolean;
+	workspacePackage?: boolean;
 }
 
 const projectNamePattern = /^[a-z0-9][a-z0-9-]*$/;
@@ -112,16 +113,22 @@ export async function initCommand(projectName?: string, options: InitOptions = {
 		const moduleNames = themeSourceFiles.map((f) => f.replace('.ts', ''));
 		const indexContent = generateIndexFile(moduleNames);
 		await fs.writeFile(path.join(targetDir, 'index.ts'), indexContent);
-		await fs.writeFile(path.join(targetDir, 'tfs.config.ts'), generateProjectFile(moduleNames));
+		await fs.writeFile(
+			path.join(targetDir, 'tfs.config.ts'),
+			generateProjectFile(moduleNames, options.workspacePackage === true)
+		);
 
 		// Step 8: Generate package metadata and local instructions
-		const packageJsonContent = generatePackageJson(name);
+		const packageJsonContent = generatePackageJson(name, options.workspacePackage === true);
 		await fs.writeFile(path.join(targetDir, 'package.json'), packageJsonContent);
 
 		// Step 9: Generate TypeScript config
 		const tsconfigContent = generateTsConfig();
 		await fs.writeFile(path.join(targetDir, 'tsconfig.json'), tsconfigContent);
-		await fs.writeFile(path.join(targetDir, 'README.md'), generateReadme(name));
+		await fs.writeFile(
+			path.join(targetDir, 'README.md'),
+			generateReadme(name, options.workspacePackage === true)
+		);
 
 		// Summary
 		const allFiles = [
@@ -159,8 +166,14 @@ export async function initCommand(projectName?: string, options: InitOptions = {
 		if (options.skipInstall) console.log(chalk.white(`  npm install`));
 		console.log(chalk.white(`  # Edit the authored TypeScript source`));
 		console.log(chalk.white(`  npm run build`));
+		const generatedDirectory = options.workspacePackage ? 'generated' : 'dist';
+		const specimen = options.workspacePackage
+			? 'review/typography.html'
+			: 'typography.specimen.html';
 		console.log(
-			chalk.white(`  # Inspect dist/build.manifest.json and dist/typography.specimen.html`)
+			chalk.white(
+				`  # Inspect ${generatedDirectory}/build.manifest.json and ${generatedDirectory}/${specimen}`
+			)
 		);
 	} catch (error: unknown) {
 		// Handle Ctrl+C gracefully
@@ -201,20 +214,20 @@ async function getAvailableThemes(
 	return themes.sort((left, right) => left.name.localeCompare(right.name));
 }
 
-function generateProjectFile(moduleNames: string[]): string {
+function generateProjectFile(moduleNames: string[], workspacePackage: boolean): string {
 	const imports = moduleNames.map((name) => `import { ${name} } from "./${name}.js";`).join('\n');
 	const properties = moduleNames
 		.map((name) => (name === 'color' ? '    colors: color,' : `    ${name},`))
 		.join('\n');
-	return `import { defineTfsProject } from "@three-forma-styli/compiler";
-${imports}
-
-export default defineTfsProject({
-  system: {
-${properties}
-  },
-  output: {
-    directory: "./dist",
+	const output = workspacePackage
+		? `    layout: "workspace-package",
+    directory: "./generated",
+    targets: {
+      runtime: true,
+      review: true,
+      design: true,
+    },`
+		: `    directory: "./dist",
     css: true,
     indexCss: true,
     typographyCss: true,
@@ -223,7 +236,16 @@ ${properties}
     systemTypescript: true,
     specimen: true,
     dtcg: true,
-    figmaVariables: true,
+    figmaVariables: true,`;
+	return `import { defineTfsProject } from "@three-forma-styli/compiler";
+${imports}
+
+export default defineTfsProject({
+  system: {
+${properties}
+  },
+  output: {
+${output}
   },
 });
 `;
@@ -262,24 +284,64 @@ export { ${exportList} };
 /**
  * Generate package.json
  */
-function generatePackageJson(projectName: string): string {
+function generatePackageJson(projectName: string, workspacePackage: boolean): string {
+	const scripts = workspacePackage
+		? {
+				generate: 'tfs build .',
+				build: 'tsc --noEmit',
+				check: 'tsc --noEmit',
+				'check:generated': 'tfs check .',
+				specimen: 'tfs specimen serve .',
+			}
+		: {
+				build: 'tfs build .',
+				check: 'tsc --noEmit && tfs build .',
+				specimen: 'tfs specimen serve .',
+			};
+	const workspaceFields = workspacePackage
+		? {
+				files: ['generated/runtime', 'generated/assets', 'README.md'],
+				sideEffects: ['./generated/runtime/styles/*.css'],
+				exports: {
+					'.': {
+						types: './generated/runtime/index.d.ts',
+						import: './generated/runtime/index.js',
+					},
+					'./system': {
+						types: './generated/runtime/system.d.ts',
+						import: './generated/runtime/system.js',
+					},
+					'./typography': {
+						types: './generated/runtime/typography.d.ts',
+						import: './generated/runtime/typography.js',
+					},
+					'./native-color-modes': {
+						types: './generated/runtime/native-color-modes.d.ts',
+						import: './generated/runtime/native-color-modes.js',
+					},
+					'./styles.css': './generated/runtime/styles/index.css',
+					'./tokens.css': './generated/runtime/styles/tokens.css',
+					'./typography.css': './generated/runtime/styles/typography.css',
+					'./typography.module.css': './generated/runtime/styles/typography.module.css',
+					'./package.json': './package.json',
+				},
+			}
+		: {};
 	return (
 		JSON.stringify(
 			{
 				name: projectName,
 				private: true,
 				type: 'module',
-				scripts: {
-					build: 'tfs build .',
-					check: 'tsc --noEmit && tfs build .',
-					specimen: 'tfs specimen serve .',
-				},
-				dependencies: {
-					'@three-forma-styli/core': `^${CLI_VERSION}`,
-				},
+				...workspaceFields,
+				scripts,
+				...(workspacePackage
+					? {}
+					: { dependencies: { '@three-forma-styli/core': `^${CLI_VERSION}` } }),
 				devDependencies: {
 					'@three-forma-styli/cli': `^${CLI_VERSION}`,
 					'@three-forma-styli/compiler': `^${CLI_VERSION}`,
+					...(workspacePackage ? { '@three-forma-styli/core': `^${CLI_VERSION}` } : {}),
 					typescript: '^5.9.3',
 				},
 				engines: { node: '>=22' },
@@ -316,7 +378,27 @@ function generateTsConfig(): string {
 	);
 }
 
-function generateReadme(projectName: string): string {
+function generateReadme(projectName: string, workspacePackage: boolean): string {
+	if (workspacePackage) {
+		return `# ${projectName}
+
+Private, package-shaped design-system source generated by Three-Forma-Styli.
+
+## Commands
+
+\`\`\`sh
+npm run check             # fast type/package check; does not run FontTools
+npm run generate          # explicit authoring operation; replace generated/
+npm run check:generated   # CI proof; regenerate privately and reject drift
+npm run specimen          # serve the generated typography workbench
+\`\`\`
+
+Edit the root TypeScript source files and \`tfs.config.ts\`; do not hand-edit
+\`generated/\`. Applications consume the declared package exports, especially
+\`./styles.css\` and the generated TypeScript contracts. Review and design-tool
+artifacts stay outside the package export boundary.
+`;
+	}
 	return `# ${projectName}
 
 Portable design-system source generated by Three-Forma-Styli.

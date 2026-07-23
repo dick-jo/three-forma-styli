@@ -107,7 +107,8 @@ export interface WorkspaceTransaction {
 export async function withWorkspaceTransaction<T>(
 	outputDirectory: string,
 	work: (transaction: WorkspaceTransaction) => Promise<T>,
-	hooks: WorkspaceTransactionHooks = {}
+	hooks: WorkspaceTransactionHooks = {},
+	options: { requireCommit?: boolean } = {}
 ): Promise<T> {
 	await assertOwnedWorkspaceOutput(outputDirectory);
 	await fs.ensureDir(path.dirname(outputDirectory));
@@ -136,7 +137,9 @@ export async function withWorkspaceTransaction<T>(
 				}
 			},
 		});
-		if (!committed) throw new Error('Workspace transaction completed without committing output.');
+		if (!committed && options.requireCommit !== false) {
+			throw new Error('Workspace transaction completed without committing output.');
+		}
 		return result;
 	} finally {
 		await lock?.close();

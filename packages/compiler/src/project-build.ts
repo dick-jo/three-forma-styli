@@ -36,6 +36,7 @@ import type {
 import { COMPILER_VERSION } from './version.js';
 import { generateProjectSystemTypescript } from './system-typescript.js';
 import { buildWorkspacePackageProject } from './workspace/build.js';
+import { assertGeneratedOutputCurrent } from './generated-check.js';
 
 interface OutputPlan {
 	css?: string;
@@ -306,7 +307,8 @@ function joinFontFaceCss(primary: string, adjusted?: string): string {
 
 async function buildLegacyProject(
 	project: TfsProject & { output: LegacyTfsProjectOutput },
-	configPath: string
+	configPath: string,
+	mode: 'build' | 'check'
 ): Promise<{ outputDirectory: string; files: string[] }> {
 	if (project.schemaVersion !== 1) throw new Error('Unsupported TFS project schemaVersion.');
 	const configDirectory = path.dirname(configPath);
@@ -622,7 +624,8 @@ async function buildLegacyProject(
 			},
 		};
 		await writeText(staging, 'build.manifest.json', `${JSON.stringify(manifest, null, 2)}\n`);
-		await commitOutput(staging, outputDirectory);
+		if (mode === 'check') await assertGeneratedOutputCurrent(staging, outputDirectory);
+		else await commitOutput(staging, outputDirectory);
 		return { outputDirectory, files: [...files, 'build.manifest.json'].sort() };
 	} finally {
 		await lock?.close();
@@ -631,9 +634,10 @@ async function buildLegacyProject(
 	}
 }
 
-export async function buildProject(
+async function runProject(
 	project: TfsProject,
-	configPath: string
+	configPath: string,
+	mode: 'build' | 'check'
 ): Promise<{ outputDirectory: string; files: string[] }> {
 	const output = project.output as unknown as Record<string, unknown>;
 	const layout = output.layout;
@@ -658,11 +662,31 @@ export async function buildProject(
 		if (mixed.length > 0) {
 			throw new Error(`workspace-package output cannot use legacy keys: ${mixed.join(', ')}.`);
 		}
-		return buildWorkspacePackageProject(project, configPath);
+		return buildWorkspacePackageProject(project, configPath, {}, mode);
 	}
 	const mixed = workspaceKeys.filter((key) => output[key] !== undefined);
 	if (mixed.length > 0) {
 		throw new Error(`Flat output cannot use workspace-package keys: ${mixed.join(', ')}.`);
 	}
-	return buildLegacyProject(project as TfsProject & { output: LegacyTfsProjectOutput }, configPath);
+	return buildLegacyProject(
+		project as TfsProject & { output: LegacyTfsProjectOutput },
+		configPath,
+		mode
+	);
+}
+
+/** Generate and atomically replace the configured TFS-owned output directory. */
+export async function buildProject(
+	project: TfsProject,
+	configPath: string
+): Promise<{ outputDirectory: string; files: string[] }> {
+	return runProject(project, configPath, 'build');
+}
+
+/** Fully regenerate in a sibling stage and fail on byte-level drift without mutating output. */
+export async function checkProject(
+	project: TfsProject,
+	configPath: string
+): Promise<{ outputDirectory: string; files: string[] }> {
+	return runProject(project, configPath, 'check');
 }

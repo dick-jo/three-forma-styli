@@ -3,7 +3,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import fs from 'fs-extra';
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildProject } from './project-build.js';
+import { buildProject, checkProject } from './project-build.js';
 import { defineTfsProject } from './project.js';
 import { typography as defaultTypography } from '@three-forma-styli/themes/default';
 
@@ -118,6 +118,24 @@ describe('portable project build', () => {
 			'typography.specimen.html':
 				'e0e56eea4b320c9a1b26e5318e6849fcab68ec17af3cbae889b21f86c44f0317',
 		});
+	});
+
+	it('checks exact generated output without mutating drift', async () => {
+		const directory = await fixtureDirectory();
+		const project = defineTfsProject({
+			system: { typography: defaultTypography },
+			output: { directory: './dist', css: true, typographyCss: true },
+		});
+		const configPath = path.join(directory, 'tfs.config.ts');
+		const built = await buildProject(project, configPath);
+		await expect(checkProject(project, configPath)).resolves.toEqual(built);
+
+		const tokensPath = path.join(built.outputDirectory, 'tokens.css');
+		await fs.writeFile(tokensPath, 'human drift\n');
+		await expect(checkProject(project, configPath)).rejects.toThrow(
+			/Generated output is out of date[\s\S]*changed tokens\.css[\s\S]*tfs build/
+		);
+		expect(await fs.readFile(tokensPath, 'utf8')).toBe('human drift\n');
 	});
 
 	it('passes an explicit zero-specificity policy to global helpers', async () => {

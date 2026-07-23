@@ -7,6 +7,7 @@ import { createWorkspaceManifest } from './manifest.js';
 import { planWorkspacePackage } from './plan.js';
 import { renderWorkspacePackage, type WorkspaceProject } from './render.js';
 import { withWorkspaceTransaction, type WorkspaceTransactionHooks } from './transaction.js';
+import { assertGeneratedOutputCurrent } from '../generated-check.js';
 
 export interface WorkspaceBuildHooks extends WorkspaceTransactionHooks {
 	/** Test-only synchronization point after rendering and before the host re-hash. */
@@ -55,7 +56,8 @@ function validateFontSourcesOutsideOutput(
 export async function buildWorkspacePackageProject(
 	project: TfsProject,
 	configPath: string,
-	hooks: WorkspaceBuildHooks = {}
+	hooks: WorkspaceBuildHooks = {},
+	mode: 'build' | 'check' = 'build'
 ): Promise<{ outputDirectory: string; files: string[] }> {
 	if (project.schemaVersion !== 1) throw new Error('Unsupported TFS project schemaVersion.');
 	if (project.output.layout !== 'workspace-package') {
@@ -101,12 +103,17 @@ export async function buildWorkspacePackageProject(
 				`${JSON.stringify(manifest, null, 2)}\n`
 			);
 			await assertHostPackageUnchanged(host);
-			await transaction.commit(() => assertHostPackageUnchanged(host));
+			if (mode === 'check') {
+				await assertGeneratedOutputCurrent(transaction.staging, outputDirectory);
+			} else {
+				await transaction.commit(() => assertHostPackageUnchanged(host));
+			}
 			return {
 				outputDirectory,
 				files: [...files, 'build.manifest.json'].sort(),
 			};
 		},
-		hooks
+		hooks,
+		{ requireCommit: mode === 'build' }
 	);
 }

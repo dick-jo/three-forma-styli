@@ -1,1 +1,1 @@
-export { buildProject } from './project-build.js';
+export { buildProject, checkProject } from './project-build.js';

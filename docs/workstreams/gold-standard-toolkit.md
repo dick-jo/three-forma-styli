@@ -50,6 +50,9 @@ remaining work so decisions do not depend on one chat transcript.
       where that materially reduces downstream workspace surface area.
 - [x] Add non-mutating generated-output drift verification and prerequisite
       diagnostics suitable for CI.
+- [x] Promote drift verification to the generic compiler/CLI contract and add a
+      monorepo-ready scaffold whose routine checks remain independent of font
+      tooling.
 - [x] Run the complete release gate, packed-package consumer fixture, security
       audit, and deterministic legacy-output checks.
 - [x] Run the final P3, prepared-font, specimen-server, and real-browser
@@ -137,3 +140,8 @@ remaining work so decisions do not depend on one chat transcript.
   confirming its weight concern was withdrawn. The tighter Supreme leading is
   global because the author confirmed Scatter headings are always all-caps; no
   obsolete generated layout or dist artifact was imported.
+- **2026-07-23 — generated output is a checked contract.** TFS now provides a
+  first-class non-mutating check for both flat and workspace-package projects.
+  It fully renders to a locked sibling stage and reports byte-level drift rather
+  than silently repairing it. The opt-in workspace-package scaffold separates
+  fast routine checks, explicit generation, and dedicated CI regeneration.

@@ -26,6 +26,16 @@ npm run check
 tfs build ./index.ts --format dtcg --output tokens.json
 ```
 
+For a co-located monorepo package instead of a standalone handoff:
+
+```bash
+npx @three-forma-styli/cli init design-system --workspace-package
+cd design-system
+npm run generate          # explicit authoring operation
+npm run check             # fast routine check
+npm run check:generated   # dedicated byte-for-byte CI proof
+```
+
 Display-P3 Figma files are supported explicitly. The selected color space must
 match the target file profile:
 
@@ -209,6 +219,12 @@ mode prepares licensed local fonts, resolves their real capabilities, then stage
 CSS, typed system/mode and typography contracts, helper classes, a specimen,
 JSON interchange, and a hashed ownership manifest before replacing the output directory once. See
 `examples/project/tfs.config.ts`.
+
+Run `tfs check .` in dedicated CI to perform that same complete build in a
+private sibling stage and reject missing, changed, or unexpected committed
+artifacts without modifying them. `tfs init --workspace-package` scaffolds the
+package exports and separates this heavier regeneration proof from routine
+monorepo checks.
 
 Review that generated specimen over localhost with `tfs specimen serve .`.
 Pass `--open` only when the CLI should launch the browser; use `--port 4400`

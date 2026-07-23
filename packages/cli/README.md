@@ -35,7 +35,21 @@ release; it never writes independent `latest` ranges.
 Options:
 
 - `-t, --theme <name>` - Choose the starter source preset (default: "default")
+- `--workspace-package` - Scaffold a private, monorepo-ready package whose
+  generated runtime is consumed through explicit package exports
 - `--skip-install` - Skip automatic dependency installation
+
+The default standalone scaffold writes a complete portable handoff to `dist/`.
+The workspace-package scaffold writes a generated package boundary to
+`generated/`: runtime CSS/contracts are exportable, while specimens and
+design-tool JSON remain local review artifacts. Its scripts deliberately keep
+routine `build`/`check` independent of FontTools:
+
+```bash
+npm run check             # fast TypeScript check
+npm run generate          # explicit authoring operation
+npm run check:generated   # dedicated CI drift proof
+```
 
 ### `tfs build`
 
@@ -58,6 +72,21 @@ import { defineTfsProject } from '@three-forma-styli/compiler';
 
 Existing imports from `@three-forma-styli/cli`, `/project`, and `/fonts` remain
 supported compatibility paths.
+
+### `tfs check`
+
+Prove that committed output exactly matches its authored project without
+changing either one:
+
+```bash
+tfs check .
+```
+
+TFS performs the complete build—including font preparation and fallback
+measurement—in a locked sibling stage. It compares every byte and reports
+missing, changed, and unexpected files. The staged candidate is then removed;
+TFS never repairs drift during a check. Run `tfs build .` deliberately to accept
+and review regenerated output.
 
 The legacy single-file workflow remains available:
 

@@ -7,6 +7,7 @@ import { buildCommand } from './commands/build.js';
 import { figmaSyncCommand } from './commands/figma-sync.js';
 import { inspectFontsCommand, prepareFontsCommand } from './commands/fonts.js';
 import { serveSpecimenCommand } from './commands/specimen.js';
+import { checkCommand } from './commands/check.js';
 import { CLI_VERSION } from './version.js';
 
 const program = new Command();
@@ -27,6 +28,7 @@ program
 	.command('init [project-name]')
 	.description('Create a new theme project')
 	.option('-t, --theme <name>', 'starter theme to use (skips prompt)')
+	.option('--workspace-package', 'scaffold a monorepo-ready generated package boundary')
 	.option('--skip-install', 'skip automatic npm install')
 	.action(async (projectName, options) => {
 		await initCommand(projectName, options);
@@ -46,6 +48,13 @@ program
 	.option('--font-css <path>', 'generated @font-face CSS to link from specimen output')
 	.action(async (filePath, options) => {
 		await buildCommand(filePath, options);
+	});
+
+program
+	.command('check <path>')
+	.description('Regenerate privately and fail when committed project output has drifted')
+	.action(async (filePath) => {
+		await checkCommand(filePath);
 	});
 
 // Figma sync command
