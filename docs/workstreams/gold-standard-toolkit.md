@@ -67,7 +67,7 @@ remaining work so decisions do not depend on one chat transcript.
 - [ ] Add the package to an isolated Scatter worktree in a package-only change.
       Do not import it from an application or change production behaviour in that
       adoption step.
-- [ ] Reconcile the separate `claude/mktgfx-typography-tuning` worktree after its
+- [x] Reconcile the separate `claude/mktgfx-typography-tuning` worktree after its
       hands-on marketing calibration. Treat its authored values as proposals;
       do not overwrite or silently absorb them during the output-layout migration.
 
@@ -124,5 +124,16 @@ remaining work so decisions do not depend on one chat transcript.
   design-tool and review artifacts. Its complete CI gate proves production token
   parity, reproducible generation, preserved P3 declarations, font conversion,
   package boundaries, an isolated production Next.js build, and browser-loaded
-  primary and adjusted-fallback faces. Hands-on typography values remain subject
-  to the explicitly separate marketing calibration branch.
+  primary and adjusted-fallback faces. Hands-on typography values were kept
+  separate until the later explicit marketing-calibration reconciliation.
+- **2026-07-23 — mode-aware typography calibration.** TFS commits `25d8ea3`
+  and `c056036` add strict, role-local tuple overrides for non-default typography
+  modes and make the generated specimen a real multi-mode editor. Browser proof
+  against Scatter verified all four size modes, resolved controls and metadata,
+  mode-scoped draft output, double-click reset, primary/adjusted font availability,
+  and a clean console.
+- **2026-07-23 — marketing tuning reconciled.** Canonical `tfs-scatter` commit
+  `838e93e` applies the five source values from Claude's clean tuning branch after
+  confirming its weight concern was withdrawn. The tighter Supreme leading is
+  global because the author confirmed Scatter headings are always all-caps; no
+  obsolete generated layout or dist artifact was imported.
