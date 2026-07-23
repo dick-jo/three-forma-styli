@@ -90,6 +90,32 @@ in `em` so it follows the selected size. Roles deliberately exclude color,
 margin, layout, and text transform. Generated CSS uses font longhands because the
 `font` shorthand resets related properties that TFS does not necessarily own.
 
+## Optional mode-specific calibration
+
+Atomic typography modes normally change `--fs-*` while semantic recipes retain
+their authored tuple. A genuinely different context—such as fixed-canvas display
+graphics—can opt into explicit role-local tuple changes without creating another
+role vocabulary:
+
+```ts
+heading: {
+  // base, variants, weights, and font omitted here
+  modeOverrides: {
+    display: {
+      base: { fontSize: 6, lineHeight: 0.85, letterSpacing: -0.02 },
+      variants: {
+        max: { fontSize: 12, weight: 'max', lineHeight: 0.8 },
+      },
+    },
+  },
+}
+```
+
+The mode must exist in `typography.modes` and must not be the default mode.
+Variant and weight aliases must already exist on the role. Overrides may change
+only the four composite tuple fields; TFS preserves every omitted decision and
+does not derive an aesthetic calibration from font metrics.
+
 ## Optional anchor derivation
 
 `deriveTypographyRange()` removes repetitive interpolation without becoming a

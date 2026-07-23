@@ -777,6 +777,102 @@ function validateTypographySemanticLayer(
 				);
 			}
 		}
+
+		const defaultTypographyMode =
+			typography.modes.find((mode) => mode.isDefault) ?? typography.modes[0];
+		const allowedModeOverrideFields = new Set([
+			'fontSize',
+			'weight',
+			'lineHeight',
+			'letterSpacing',
+		]);
+		for (const [modeName, modeOverride] of Object.entries(role.modeOverrides ?? {})) {
+			const mode = typography.modes.find((candidate) => candidate.name === modeName);
+			if (!mode) {
+				throw new ValidationError(
+					`Typography role "${roleName}" modeOverrides references unknown typography mode "${modeName}"`
+				);
+			}
+			if (mode === defaultTypographyMode) {
+				throw new ValidationError(
+					`Typography role "${roleName}" modeOverrides must not redefine default mode "${modeName}"; author the base recipes instead`
+				);
+			}
+			if (!modeOverride || typeof modeOverride !== 'object' || Array.isArray(modeOverride)) {
+				throw new ValidationError(
+					`Typography role "${roleName}" modeOverrides.${modeName} must be an object`
+				);
+			}
+			for (const key of Object.keys(modeOverride)) {
+				if (key !== 'base' && key !== 'variants') {
+					throw new ValidationError(
+						`Typography role "${roleName}" modeOverrides.${modeName} contains unknown field "${key}"`
+					);
+				}
+			}
+
+			const overrideRecipes = [
+				...(modeOverride.base ? [['base', role.base, modeOverride.base] as const] : []),
+				...Object.entries(modeOverride.variants ?? {}).map(([variantName, override]) => {
+					const recipe = role.variants?.[variantName];
+					if (!recipe) {
+						throw new ValidationError(
+							`Typography role "${roleName}" modeOverrides.${modeName} references unknown variant "${variantName}"`
+						);
+					}
+					return [variantName, recipe, override] as const;
+				}),
+			];
+			if (overrideRecipes.length === 0) {
+				throw new ValidationError(
+					`Typography role "${roleName}" modeOverrides.${modeName} must override base or at least one variant`
+				);
+			}
+
+			for (const [variantName, recipe, override] of overrideRecipes) {
+				const path = `Typography role "${roleName}" modeOverrides.${modeName}.${variantName}`;
+				if (!override || typeof override !== 'object' || Array.isArray(override)) {
+					throw new ValidationError(`${path} must be an object`);
+				}
+				const overrideFields = Object.keys(override);
+				if (overrideFields.length === 0) {
+					throw new ValidationError(`${path} must override at least one tuple field`);
+				}
+				for (const field of overrideFields) {
+					if (!allowedModeOverrideFields.has(field)) {
+						throw new ValidationError(`${path} contains unsupported field "${field}"`);
+					}
+				}
+				const resolved = { ...recipe, ...override };
+				if (!(resolved.weight in exposedWeights)) {
+					throw new ValidationError(
+						`${path} weight "${resolved.weight}" must be exposed by the role`
+					);
+				}
+				if (!defaultStyleSelection.weights.includes(resolved.weight)) {
+					throw new ValidationError(
+						`${path} weight "${resolved.weight}" is unavailable for defaultStyle "${defaultStyle}"`
+					);
+				}
+				if (
+					resolved.fontSize !== 'min' &&
+					(!Number.isInteger(resolved.fontSize) || resolved.fontSize < 1)
+				) {
+					throw new ValidationError(`${path} fontSize must be "min" or a positive integer`);
+				}
+				if (resolved.fontSize !== 'min' && resolved.fontSize > mode.tokens.range) {
+					throw new ValidationError(
+						`${path} references fs-${resolved.fontSize}, but mode "${modeName}" only generates through fs-${mode.tokens.range}`
+					);
+				}
+				if (!Number.isFinite(resolved.lineHeight) || resolved.lineHeight <= 0) {
+					throw new ValidationError(`${path} lineHeight must be positive and finite`);
+				}
+				if (!Number.isFinite(resolved.letterSpacing)) {
+					throw new ValidationError(`${path} letterSpacing must be finite`);
+				}
+			}
+		}
 	}
 }
 

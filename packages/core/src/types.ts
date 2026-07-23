@@ -177,6 +177,19 @@ export interface TypographyRecipe extends TypographySettings {
 	letterSpacing: number;
 }
 
+/**
+ * Deliberate changes to one complete semantic recipe inside an atomic typography
+ * mode. Core derives nothing here: omitted fields retain the authored recipe.
+ */
+export type TypographyModeRecipeOverride = Partial<
+	Pick<TypographyRecipe, 'fontSize' | 'weight' | 'lineHeight' | 'letterSpacing'>
+>;
+
+export interface TypographyRoleModeOverride {
+	base?: TypographyModeRecipeOverride;
+	variants?: Record<string, TypographyModeRecipeOverride>;
+}
+
 export interface TypographyRoleStyle {
 	/** Role weight aliases intentionally permitted for this style. */
 	weights: string[];
@@ -189,6 +202,12 @@ export interface TypographyRole extends TypographySettings {
 	base: TypographyRecipe;
 	/** Optional, arbitrarily named alternatives such as min, s, l, and max. */
 	variants?: Record<string, TypographyRecipe>;
+	/**
+	 * Optional tuple changes keyed by an existing non-default typography mode.
+	 * This keeps role calibration explicit when display or compact contexts need
+	 * more than a globally scaled --fs-* ramp.
+	 */
+	modeOverrides?: Record<string, TypographyRoleModeOverride>;
 	/**
 	 * Optional specimen/presentation order. Must contain `base` and every variant
 	 * exactly once. This is authored per role; core assigns no semantic meaning to names.

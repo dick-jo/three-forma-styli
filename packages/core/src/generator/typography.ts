@@ -5,6 +5,7 @@ import type {
 	FontSizeReference,
 	TypographyFeatureValue,
 	TypographyMode,
+	TypographyModeRecipeOverride,
 	TypographyRecipe,
 	TypographyRole,
 	TypographySettings,
@@ -60,6 +61,13 @@ function recipeFontSizeToken(
 		value: typographyReference(recipe.fontSize, config.prefixes.typography),
 		reference: `${config.prefixes.typography}-${recipe.fontSize}`,
 	};
+}
+
+function applyModeOverride(
+	recipe: TypographyRecipe,
+	override: TypographyModeRecipeOverride
+): TypographyRecipe {
+	return { ...recipe, ...override };
 }
 
 function featureSettings(features: Record<string, TypographyFeatureValue>): string {
@@ -308,16 +316,40 @@ function generateSemanticTokens(
  * the mode selector preserves the public semantic token contract and makes
  * descendant-scoped size modes work in real CSS.
  */
-function generateSemanticFontSizeTokens(
+function generateSemanticModeTokens(
 	typography: DesignSystem['typography'],
+	modeName: string,
 	config: GeneratorConfig
 ): TokenValue[] {
 	if (!typography.roles) return [];
 	const tokens: TokenValue[] = [];
 	for (const [roleName, role] of Object.entries(typography.roles)) {
-		tokens.push(recipeFontSizeToken(roleName, undefined, role.base, config));
+		const modeOverride = role.modeOverrides?.[modeName];
+		const baseOverride = modeOverride?.base;
+		tokens.push(
+			...(baseOverride
+				? recipeTokens(
+						roleName,
+						undefined,
+						applyModeOverride(role.base, baseOverride),
+						role,
+						config
+					).tokens
+				: [recipeFontSizeToken(roleName, undefined, role.base, config)])
+		);
 		for (const [variantName, recipe] of Object.entries(role.variants ?? {})) {
-			tokens.push(recipeFontSizeToken(roleName, variantName, recipe, config));
+			const variantOverride = modeOverride?.variants?.[variantName];
+			tokens.push(
+				...(variantOverride
+					? recipeTokens(
+							roleName,
+							variantName,
+							applyModeOverride(recipe, variantOverride),
+							role,
+							config
+						).tokens
+					: [recipeFontSizeToken(roleName, variantName, recipe, config)])
+			);
 		}
 	}
 	return tokens;
@@ -365,7 +397,7 @@ export function generateTypographyTokens(
 	for (const mode of overrideModes) {
 		overrideTokens[mode.name] = [
 			...generateTokensForMode(mode, config),
-			...generateSemanticFontSizeTokens(typography, config),
+			...generateSemanticModeTokens(typography, mode.name, config),
 		];
 	}
 	return {

@@ -165,6 +165,10 @@ const typography = {
 			isDefault: true,
 			tokens: { unit: 'rem', base: 0.75, min: 0.625, increment: 0.125, range: 12 },
 		},
+		{
+			name: 'display',
+			tokens: { unit: 'rem', base: 1.5, min: 1, increment: 0.5, range: 12 },
+		},
 	],
 	fonts: {
 		sans: { family: 'system-ui', fallbacks: ['sans-serif'], verification: 'unavailable' },
@@ -176,6 +180,12 @@ const typography = {
 			variants: {
 				s: { fontSize: 1, weight: 'min', lineHeight: 1.3, letterSpacing: 0.005 },
 				l: { fontSize: 3, weight: 'lo', lineHeight: 1.225, letterSpacing: -0.0025 },
+			},
+			modeOverrides: {
+				display: {
+					base: { fontSize: 4, weight: 'hi', lineHeight: 0.9 },
+					variants: { l: { fontSize: 7, lineHeight: 0.85, letterSpacing: -0.01 } },
+				},
 			},
 			weights: { min: 300, lo: 400, hi: 500, max: 700 },
 		},
@@ -261,6 +271,13 @@ When semantic typography roles are present, each typography mode also rebinds
 their `--text-*-font-size` aliases within the mode selector. This is required by
 CSS custom-property inheritance: overriding only `--fs-*` on a descendant does
 not retarget an alias that was inherited after resolving in `:root`.
+
+When scaling the atomic ramp is insufficient, a role may explicitly author
+`modeOverrides` for any non-default typography mode. Each override is a partial
+tuple: omitted fields retain the role recipe, while authored `fontSize`,
+`weight`, `lineHeight`, or `letterSpacing` values are emitted only inside that
+mode selector. Mode and variant names are validated; TFS never guesses which
+roles should tighten, grow, or become heavier.
 
 ## Programmatic Usage
 

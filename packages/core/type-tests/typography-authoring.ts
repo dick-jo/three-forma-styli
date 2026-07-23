@@ -6,10 +6,15 @@ const mode = {
 	tokens: { unit: 'rem', base: 1, min: 0.75, increment: 0.25, range: 12 },
 };
 
+const displayMode = {
+	name: 'display',
+	tokens: { unit: 'rem', base: 1.5, min: 1, increment: 0.5, range: 12 },
+};
+
 defineTypography({ modes: [mode] });
 
 const explicit = defineTypography({
-	modes: [mode],
+	modes: [mode, displayMode],
 	fonts: {
 		supreme: {
 			family: 'Supreme',
@@ -30,6 +35,12 @@ const explicit = defineTypography({
 				compact: { fontSize: 1, weight: 'regular', lineHeight: 1.2, letterSpacing: 0.01 },
 			},
 			weights: { regular: 400, strong: 700 },
+			modeOverrides: {
+				display: {
+					base: { fontSize: 4, weight: 'strong', lineHeight: 0.85 },
+					variants: { compact: { letterSpacing: -0.01 } },
+				},
+			},
 		},
 	},
 });
