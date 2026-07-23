@@ -1,0 +1,305 @@
+# TFS workbench architecture
+
+## Product position
+
+The workbench is TFS's generated visual calibration and verification surface.
+It is not a component catalogue, a replacement for Storybook, or a second source
+of truth. It turns one compiled design-system IR into executable review cases
+that humans and browsers inspect through the same interface.
+
+The governing loop is:
+
+```text
+authored system
+    ↓ tfs build
+resolved IR + diagnostics
+    ↓
+versioned review contract
+    ↓
+portable workbench
+    ├── interactive calibration
+    ├── named comparison matrices
+    └── automated browser verification
+```
+
+The authored project remains canonical. Workbench edits are a disposable draft
+overlay until the author explicitly promotes them.
+
+## What exists today
+
+- `apps/preview` is a private, color-only Svelte experiment coupled directly to
+  the default preset. It does not load an arbitrary built TFS project.
+- Typography and shadow specimens are independently generated HTML documents.
+  They prove useful domain interactions but duplicate their own shells, styles,
+  controls, state, and test hooks.
+- `build.manifest.json` still represents review through a singular typography
+  `specimen` entrypoint even when shadow review output also exists.
+- Review cases are implicit markup. They are not a stable, enumerable contract
+  that a browser runner can consume.
+
+The existing specimens are valuable prototypes. Their domain logic should be
+lifted into workbench labs rather than embedded or iframe-composed unchanged.
+
+## Recommended architecture
+
+### 1. A versioned review contract
+
+The compiler emits `review/workbench.json` from the same resolved IR used for
+runtime output:
+
+```ts
+interface TfsWorkbenchContract {
+  kind: "three-forma-styli/workbench";
+  schemaVersion: 1;
+  systemFingerprint: string;
+  toolVersion: string;
+  assets: {
+    runtimeCss: string;
+    fontCss?: string;
+  };
+  globals: {
+    colorModes: ReviewGlobal[];
+    sizeModes: ReviewGlobal[];
+    viewports: ReviewViewport[];
+    media: ReviewMediaState[];
+  };
+  labs: ReviewLab[];
+  diagnostics: ReviewDiagnostic[];
+}
+```
+
+Every lab owns stable, CSS-safe IDs, its cases, typed controls, source/resolved
+values, diagnostics, and capture policy. Case IDs must survive ordering changes
+and become permalink and screenshot-baseline keys.
+
+The review contract is deliberately distinct from:
+
+- the authored project, which may use helpers and executable TypeScript;
+- the normalized IR, which contains compiler details the UI does not need;
+- runtime contracts, which applications consume and must remain compact.
+
+### 2. One portable generated application
+
+When review output is enabled, TFS produces:
+
+```text
+generated/review/
+├── index.html
+├── workbench.json
+└── assets/
+    ├── workbench.js
+    └── workbench.css
+```
+
+It must work offline through `tfs review serve`, contain no network calls, and
+remain excluded from generated runtime package exports. A generated
+design-system package does not install Svelte, Vite, Playwright, or workbench
+code in an application bundle.
+
+The workbench source may use Svelte. Its published artifact should be a bundled,
+dependency-free browser shell. Framework choice is an implementation concern,
+not part of the review contract.
+
+### 3. Domain labs, not generic token forms
+
+The shell supplies navigation, draft state, comparison, permalinks, keyboard
+handling, and capture mode. Each domain supplies purpose-built visual reasoning:
+
+- **Overview:** build identity, diagnostics, modes, assets, and changed drafts.
+- **Color:** solids/alpha ramps, semantic relationships, gamut diagnostics,
+  theme matrices, and luminance constraints.
+- **Typography:** role recipes, editable tuples, weight/style capability,
+  metrics, fallback comparison, wrapping, glyph stress, and dense UI contexts.
+- **Shadow:** ordered layers, clipping, banding, surface polarity, and text
+  rasterization.
+- **Motion:** easing plots, duration comparison, semantic recipes, interruption,
+  and reduced-motion behavior.
+- **Foundations:** spacing, gap, radius, border, and time scales rendered in
+  comparable physical contexts.
+
+A generic token inspector remains useful as a secondary view. It must not
+replace the visual grammar of each domain.
+
+### 4. Lean workbench chrome
+
+The durable layout is:
+
+```text
+┌──────────┬──────────────────────────────────┬──────────────┐
+│ labs     │ canvas / matrix / compare        │ inspector    │
+│          │                                  │              │
+│ overview │ selected named case              │ value        │
+│ color    │ target system renders here       │ resolved     │
+│ type     │                                  │ source hint  │
+│ shadow   │                                  │ diagnostics  │
+│ motion   │                                  │ draft        │
+└──────────┴──────────────────────────────────┴──────────────┘
+```
+
+The chrome uses a neutral internal visual system so a broken or low-contrast
+target theme cannot make its own editor unusable. Only the canvas is governed by
+the reviewed design system.
+
+Global mode, viewport, surface, draft/baseline, and capture controls belong in a
+small persistent bar. Less common diagnostics use progressive disclosure.
+Keyboard navigation and a command palette prevent the UI becoming toolbar-heavy.
+
+### 5. Non-destructive draft editing
+
+The baseline contract is immutable. Every control creates a typed draft
+operation:
+
+```ts
+interface ReviewDraftOperation {
+  path: string;
+  previous: unknown;
+  value: unknown;
+}
+```
+
+The browser keeps undo/redo history and may persist the draft locally by system
+fingerprint. Reset operates at control, recipe, lab, and project levels.
+
+Initial promotion mechanisms:
+
+1. copy a concise authored-value snippet;
+2. export/import `tfs.review.patch.json`;
+3. show the exact changed values beside their resolved effects.
+
+The browser must not rewrite arbitrary TypeScript configuration. A later
+`tfs review apply` can be designed only for an explicit machine-editable source
+contract; it must never guess how to rewrite helper calls or user code.
+
+### 6. Named cases are executable cases
+
+Each case has a stable permalink containing only durable IDs:
+
+```text
+/review/?lab=typography&case=prose--base&color=light&size=default
+```
+
+Controls may update the URL when values are serializable, following Storybook's
+useful args/permalink idea without adopting its component-story model.
+
+The compiler enumerates canonical capture states in the contract. A future
+`tfs review test` consumes those states and verifies:
+
+- page and font readiness;
+- no browser errors or warnings;
+- expected computed CSS and mode selectors;
+- stable DOM/accessibility invariants;
+- selected visual screenshots;
+- interaction behavior for reset, draft, modes, and comparison.
+
+Visual baselines are opt-in and project-owned. Screenshot capture must pin
+browser version, viewport, media, animation state, fonts, and operating
+environment. Playwright explicitly warns that host OS, hardware, settings and
+browser versions affect rendered pixels, so arbitrary developer-machine
+screenshots cannot be treated as portable truth.
+
+Wide-gamut correctness additionally requires declaration/computed-style tests:
+ordinary screenshot pipelines are not sufficient proof that P3 chroma survived.
+
+### 7. Package boundary
+
+Recommended final responsibility split:
+
+```text
+apps/workbench/                 source application and local dogfood
+packages/workbench/             prebuilt dependency-free browser shell
+packages/core/                  review data/domain derivation
+packages/compiler/              contract/assets/output planning
+packages/cli/                   serve, open, test, and explicit promotion commands
+```
+
+`@three-forma-styli/workbench` would contain static browser assets, not Svelte or
+Vite as runtime dependencies. The compiler includes or copies it only when the
+project requests review output. Application runtime packages never export it.
+
+Before adding that package, prove whether the same boundary can be achieved by
+shipping the bundled assets inside the compiler without meaningfully inflating
+its install or release surface. Package count is not a goal by itself.
+
+## Options considered
+
+### A. Generated TFS workbench — recommended
+
+One portable artifact, one review schema, TFS-specific domain UX, deterministic
+named cases, no host-framework coupling.
+
+Cost: TFS owns a real UI product and its accessibility, release, and visual-test
+quality.
+
+### B. Storybook integration
+
+Generate stories/addons for tokens and specimens.
+
+Benefit: mature navigation, controls, permalinks, collaboration, and visual-test
+ecosystem.
+
+Rejected as the core: forces a component-workbench dependency and framework
+configuration into projects that only need design-system generation. A later
+optional adapter could expose TFS cases inside an existing Storybook.
+
+### C. Dynamic authoring IDE
+
+Run a Node server that imports config, compiles on every edit, and writes source
+files from the browser.
+
+Benefit: tightest possible edit/build loop.
+
+Deferred: executable TypeScript is not safely round-trippable, font preparation
+is too heavy for every slider movement, and source mutation dramatically
+increases the security and failure surface. The portable read/draft/compare
+foundation does not prevent a carefully scoped authoring server later.
+
+## Phased delivery
+
+### Foundation
+
+- review schema and stable IDs;
+- workbench shell boundary and generated `review/index.html`;
+- neutral chrome, routing, global modes, draft store, undo/reset;
+- migrate typography and shadow prototypes without iframes;
+- manifest correctly enumerates all review artifacts and entrypoints.
+
+### Calibration
+
+- color and foundation labs;
+- before/draft comparison;
+- patch export/import and copyable authored values;
+- domain diagnostics and source hints.
+
+### Automation
+
+- `tfs review serve` and `tfs review test`;
+- manifest-driven browser smoke/interaction tests;
+- opt-in pinned screenshot baselines and update workflow;
+- accessible workbench UI and focused sample diagnostics.
+
+### Extensions
+
+- motion and reduced-motion lab;
+- optional host-component fixtures or Storybook adapter;
+- explicitly designed CLI promotion for machine-editable authored sources.
+
+## Industry principles adopted
+
+- Storybook: controls modify serializable case arguments; stable cases are both
+  review surfaces and test inputs; URLs are permalinks.
+- Playwright: visual comparisons use reviewed baselines and a pinned rendering
+  environment, with explicit baseline updates.
+- Tokens Studio: changes remain non-destructive while exploring and theme/mode
+  context is first-class.
+- TFS: the toolkit owns derivation and domain opinions; it does not become an
+  unlimited generic graph editor or transformation marketplace.
+
+References:
+
+- <https://storybook.js.org/docs/essentials/controls>
+- <https://storybook.js.org/docs/writing-stories/args>
+- <https://storybook.js.org/docs/configure/user-interface/sidebar-and-urls>
+- <https://storybook.js.org/docs/writing-tests/index>
+- <https://playwright.dev/docs/test-snapshots>
+- <https://playwright.dev/docs/emulation>
+- <https://docs.tokens.studio/graph-engine/introduction>

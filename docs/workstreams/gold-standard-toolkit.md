@@ -139,6 +139,25 @@ reference evidence, not hardcoded policy.
       core motion model. Investigate optional higher-level interaction recipes
       only after the transition contract works across real consumers.
 
+## First-class visual workbench
+
+- [ ] Replace the private color-only preview and independent specimen shells with
+      one generated, portable workbench driven by a versioned review contract.
+      Follow `docs/workbench-architecture.md`.
+- [ ] Give every review lab and case stable IDs/permalinks. The same enumerated
+      cases must drive human calibration, browser inspection, and CI.
+- [ ] Keep workbench chrome visually neutral and render the target design system
+      only inside its canvas so broken themes cannot break their own editor.
+- [ ] Add non-destructive typed draft overlays, undo/redo, scoped resets,
+      baseline/draft comparison, and patch export/import before considering
+      automatic TypeScript source mutation.
+- [ ] Migrate typography and shadow interactions into domain labs without
+      iframe-composing the current generated HTML documents.
+- [ ] Correct the build manifest so review is a collection with one workbench
+      entrypoint and explicit labs/artifacts, not a singular typography specimen.
+- [ ] Add manifest-driven browser smoke/interaction verification, then optional
+      project-owned screenshots in a pinned rendering environment.
+
 ## Deferred application rollout
 
 - [ ] Replace Scatter's legacy generated CSS boundary with the workspace package.
