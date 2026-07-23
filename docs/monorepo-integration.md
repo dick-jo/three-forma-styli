@@ -101,7 +101,7 @@ safely.
 - Keep `@three-forma-styli/compiler` and `@three-forma-styli/cli` in the design
   package's `devDependencies`, pinned to one exact reviewed release.
 - Applications normally consume only the generated private package. FontTools,
-  fontkit, esbuild, prompts, and the preview application do not enter their
+  fontkit, esbuild, prompts, and the workbench source toolchain do not enter their
   production graph.
 - Applications that compile genuinely user-authored themes may explicitly use
   `@three-forma-styli/core/runtime`. That browser subpath is dependency-free in

@@ -29,16 +29,19 @@ References: [Prettier CLI](https://prettier.io/docs/cli),
 ## Storybook: review cases are executable cases
 
 Storybook treats isolated visual states as both a review surface and real-browser
-test input. TFS adopts that principle without shipping a component workbench:
+test input. TFS adopts that principle without turning design tokens into
+component stories:
 
-- the typography specimen is a generated, isolated, interactive review artifact;
-- `tfs specimen serve` gives it a normal localhost browser boundary;
+- one generated Workbench enumerates stable typography and shadow cases through
+  a versioned, framework-neutral contract;
+- `tfs review serve` gives it a normal localhost browser boundary;
+- draft edits remain overlays until exported as a source-aware agent handoff;
 - packed release tests execute a generated design-system package and strict
   runtime theme in Chromium;
 - browser binaries and Playwright remain repository/release tooling, outside all
   published TFS and generated design-system packages.
 
-Future visual checks should grow from named specimen states, not from a parallel
+Future visual checks should grow from named Workbench cases, not from a parallel
 set of test-only HTML fixtures.
 
 Reference: [Storybook UI testing](https://storybook.js.org/docs/writing-tests/index).

@@ -29,7 +29,7 @@ const compiler = await json('packages/compiler/package.json');
 const cli = await json('packages/cli/package.json');
 const core = await json('packages/core/package.json');
 const themes = await json('packages/themes/package.json');
-const preview = await json('apps/preview/package.json');
+const workbench = await json('apps/workbench/package.json');
 
 assert.deepEqual(Object.keys(compiler.dependencies).sort(), [
 	'@three-forma-styli/core',
@@ -53,10 +53,17 @@ assert.equal(cli.dependencies['@three-forma-styli/compiler'], 'workspace:^');
 assert.equal(cli.dependencies.fontkit, undefined, 'CLI must receive fontkit only through compiler');
 assert.equal(core.dependencies['@three-forma-styli/compiler'], undefined);
 assert.equal(themes.dependencies['@three-forma-styli/compiler'], undefined);
-assert.deepEqual(Object.keys(preview.dependencies).sort(), [
-	'@three-forma-styli/core',
-	'@three-forma-styli/themes',
-]);
+assert.deepEqual(Object.keys(workbench.dependencies).sort(), ['@three-forma-styli/core']);
+assert.equal(
+	compiler.dependencies['@three-forma-styli/workbench-source'],
+	undefined,
+	'The Svelte workbench source must never enter the published compiler graph'
+);
+assert.equal(
+	compiler.devDependencies['@three-forma-styli/workbench-source'],
+	undefined,
+	'The compiler must consume only checked-in dependency-free workbench assets'
+);
 
 const compilerSources = (await sourceFiles(path.join(root, 'packages/compiler/src'))).filter(
 	(file) => file.endsWith('.ts') && !file.endsWith('.test.ts')
@@ -82,7 +89,7 @@ for (const file of compilerSources) {
 	);
 }
 
-for (const directory of ['packages/core/src', 'packages/themes/src', 'apps/preview/src']) {
+for (const directory of ['packages/core/src', 'packages/themes/src', 'apps/workbench/src']) {
 	for (const file of await sourceFiles(path.join(root, directory))) {
 		if (!/\.(?:ts|svelte)$/.test(file)) continue;
 		const source = await readFile(file, 'utf8');

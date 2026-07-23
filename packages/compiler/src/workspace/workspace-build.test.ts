@@ -160,7 +160,8 @@ describe('workspace-package build', () => {
 			expect.arrayContaining([
 				'build.manifest.json',
 				'runtime/styles/index.css',
-				'review/typography.html',
+				'review/index.html',
+				'review/workbench.json',
 				'design/tokens.dtcg.json',
 			])
 		);
@@ -197,7 +198,11 @@ describe('workspace-package build', () => {
 				'runtime/styles/typography.css',
 				'runtime/styles/typography.module.css',
 				'runtime/styles/typography.module.css.d.ts',
-				'review/typography.html',
+				'review/index.html',
+				'review/workbench.css',
+				'review/workbench.js',
+				'review/workbench.json',
+				'review/system.css',
 				'design/tokens.dtcg.json',
 				'design/figma.variables.json',
 				'build.manifest.json',
@@ -310,13 +315,13 @@ describe('workspace-package build', () => {
 		const packageBefore = await fs.readFile(packagePath);
 		await expect(checkProject(project, configPath)).resolves.toEqual(built);
 
-		const specimenPath = path.join(built.outputDirectory, 'review/typography.html');
-		await fs.remove(specimenPath);
+		const workbenchPath = path.join(built.outputDirectory, 'review/index.html');
+		await fs.remove(workbenchPath);
 		await fs.writeFile(path.join(built.outputDirectory, 'unexpected.txt'), 'leave me alone\n');
 		await expect(checkProject(project, configPath)).rejects.toThrow(
-			/missing review\/typography\.html[\s\S]*unexpected unexpected\.txt/
+			/missing review\/index\.html[\s\S]*unexpected unexpected\.txt/
 		);
-		expect(await fs.pathExists(specimenPath)).toBe(false);
+		expect(await fs.pathExists(workbenchPath)).toBe(false);
 		expect(await fs.readFile(path.join(built.outputDirectory, 'unexpected.txt'), 'utf8')).toBe(
 			'leave me alone\n'
 		);
@@ -774,15 +779,21 @@ describe('workspace-package build', () => {
 			path.join(result.outputDirectory, 'assets/fonts/fonts.css'),
 			'utf8'
 		);
-		const reviewHtml = await fs.readFile(
-			path.join(result.outputDirectory, 'review/typography.html'),
+		const reviewContract = JSON.parse(
+			await fs.readFile(
+				path.join(result.outputDirectory, 'review/workbench.json'),
+				'utf8'
+			)
+		) as { assets: { stylesheets: string[] } };
+		const reviewSystemCss = await fs.readFile(
+			path.join(result.outputDirectory, 'review/system.css'),
 			'utf8'
 		);
 		expect(runtimeCss).toContain(`/cdn/tfs-fonts/${faceUrlSegment}`);
 		expect(reviewFontCss).toContain(`./${faceUrlSegment}`);
 		expect(reviewFontCss).not.toContain('/cdn/tfs-fonts');
-		expect(reviewHtml).toContain('../assets/fonts/fonts.css');
-		expect(reviewHtml).not.toContain('/cdn/tfs-fonts');
+		expect(reviewContract.assets.stylesheets).toContain('../assets/fonts/fonts.css');
+		expect(reviewSystemCss).not.toContain('/cdn/tfs-fonts');
 		const matchingAssets = result.files.filter((file) => file.endsWith(`/${faceFile}`));
 		expect(matchingAssets).toEqual([`assets/fonts/${faceFile}`]);
 		const buildManifest = JSON.parse(
@@ -892,7 +903,7 @@ describe('workspace-package build', () => {
 		const files = packed[0]!.files.map((entry) => entry.path);
 		expect(files).toContain('generated/runtime/index.js');
 		expect(files).toContain('generated/runtime/styles/index.css');
-		expect(files).not.toContain('generated/review/typography.html');
+		expect(files).not.toContain('generated/review/index.html');
 		expect(files).not.toContain('generated/design/tokens.dtcg.json');
 	});
 

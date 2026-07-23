@@ -141,21 +141,28 @@ reference evidence, not hardcoded policy.
 
 ## First-class visual workbench
 
-- [ ] Replace the private color-only preview and independent specimen shells with
+- [x] Replace the private color-only preview and independent specimen shells with
       one generated, portable workbench driven by a versioned review contract.
       Follow `docs/workbench-architecture.md`.
-- [ ] Give every review lab and case stable IDs/permalinks. The same enumerated
+- [x] Give every review lab and case stable IDs/permalinks. The same enumerated
       cases must drive human calibration, browser inspection, and CI.
-- [ ] Keep workbench chrome visually neutral and render the target design system
+- [x] Keep workbench chrome visually neutral and render the target design system
       only inside its canvas so broken themes cannot break their own editor.
-- [ ] Add non-destructive typed draft overlays, undo/redo, scoped resets,
-      baseline/draft comparison, and patch export/import before considering
-      automatic TypeScript source mutation.
-- [ ] Migrate typography and shadow interactions into domain labs without
+- [x] Add non-destructive typed draft overlays, transaction-safe undo/redo,
+      scoped resets, patch export, and a source-aware agent handoff. Automatic
+      TypeScript source mutation remains deliberately outside the browser.
+- [ ] Add baseline/draft comparison and patch import on top of that immutable
+      draft foundation.
+- [x] Migrate color, typography and shadow interactions into domain labs without
       iframe-composing the current generated HTML documents.
-- [ ] Correct the build manifest so review is a collection with one workbench
+- [x] Add a whole-system proof sheet plus domain matrices so authors and browser
+      tests can compare broad visual rhythm and then drill into the exact same
+      stable focused cases.
+- [x] Correct the build manifest so review is a collection with one workbench
       entrypoint and explicit labs/artifacts, not a singular typography specimen.
-- [ ] Add manifest-driven browser smoke/interaction verification, then optional
+- [x] Add packed-package Chromium smoke/interaction verification for loading,
+      modes, calibration edits, scoped reset and undo.
+- [ ] Add optional
       project-owned screenshots in a pinned rendering environment.
 
 ## Deferred application rollout

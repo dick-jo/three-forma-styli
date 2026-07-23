@@ -62,7 +62,7 @@ the workspace host-package contract.
 
 Font preparation and inspection APIs live at
 `@three-forma-styli/compiler/fonts`. Use `@three-forma-styli/cli` when you want
-the `tfs` executable, config loading, scaffolding, browser specimen server, or
+the `tfs` executable, config loading, scaffolding, browser Workbench server, or
 Figma network sync.
 
 Prepared-font manifests remain dependency-free facts. Copying existing
@@ -93,8 +93,7 @@ export default defineTfsProject({
 				contracts: {},
 			},
 			review: {
-				specimen: { title: 'Typography review' },
-				shadowSpecimen: { title: 'Shadow review' },
+				workbench: { title: 'Design-system review' },
 			},
 			design: { dtcg: true, figmaVariables: true },
 		},
@@ -106,7 +105,9 @@ An enabled `css: {}` emits the entry, tokens, available semantic typography and
 shadow global/CSS Module targets. An enabled `contracts: {}` emits the system, available
 typography, and available native-color-mode contracts. Set individual fields to
 `false` for explicit opt-outs; `runtime: true`, `review: true`, and
-`design: true` are complete shorthands.
+`design: true` are complete shorthands. The Workbench is one generated
+entrypoint with typed typography and shadow labs; the legacy standalone
+specimen fields remain migration-only.
 
 The generated tree is stable and target-oriented:
 

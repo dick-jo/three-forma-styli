@@ -148,9 +148,17 @@ export interface WorkspaceSpecimenOutput {
 	fonts?: 'prepared';
 }
 
+export interface WorkspaceWorkbenchOutput {
+	title?: string;
+}
+
 export interface WorkspaceReviewOutput {
+	/** Emit the portable, contract-driven visual workbench. */
+	workbench?: boolean | WorkspaceWorkbenchOutput;
+	/** @deprecated Use workbench. Retained temporarily for migration evidence. */
 	specimen?: boolean | WorkspaceSpecimenOutput;
 	/** Layering, clipping, banding and color-mode review for shadow recipes. */
+	/** @deprecated Use workbench. Retained temporarily for migration evidence. */
 	shadowSpecimen?: boolean | Omit<WorkspaceSpecimenOutput, 'fonts'>;
 }
 

@@ -1,7 +1,7 @@
 # @three-forma-styli/cli
 
 CLI tool for generating CSS, typed design-system and typography contracts,
-color-only DTCG/Figma Variables JSON, and typography specimens from TypeScript definitions.
+color-only DTCG/Figma Variables JSON, and visual Workbench artifacts from TypeScript definitions.
 
 ## Installation
 
@@ -137,15 +137,16 @@ Options:
 - `--color-space <space>` - `srgb` or `display-p3`; must match the Figma file profile
 - `--font-css <path>` - Link prepared font CSS from specimen output (requires `--output`)
 
-Generate the configured typography calibration workbench in project mode:
+Generate the configured visual Workbench in project mode:
 
 ```bash
 tfs build .
 ```
 
-Set `output.specimen` in `tfs.config.ts`; prepared font CSS is linked
-automatically. The `--format`, `--output`, and `--font-css` flags belong to the
-targeted single-file workflow, not project builds.
+For workspace-package output, enable `output.targets.review.workbench`; prepared
+font CSS is linked automatically. Legacy flat projects can continue to use
+`output.specimen` during migration. The `--format`, `--output`, and `--font-css`
+flags belong to the targeted single-file workflow, not project builds.
 
 ### Machine-readable operation
 
@@ -175,19 +176,21 @@ requested TFS operation failed (including validation or generated drift), and
 `2` means invalid CLI usage. `--no-color` disables ANSI output for human mode;
 JSON mode always disables it.
 
-### `tfs specimen serve`
+### `tfs review serve`
 
 Serve the generated workbench over localhost so fonts and browser measurements
 run in a normal HTTP document rather than `file://`:
 
 ```bash
-tfs specimen serve .
-tfs specimen serve ./generated/typography.specimen.html --open
-tfs specimen serve . --port 4400
+tfs review serve .
+tfs review serve ./generated/review/index.html --open
+tfs review serve . --port 4400
 ```
 
-A project path reads `output.directory` and the configured `output.specimen.file`.
-Run `tfs build .` first. The default bind is `127.0.0.1`; TFS starts at port 4173
+A project path reads `output.directory` and the configured Workbench target.
+The server deliberately exposes the generated root—not only `review/`—so the
+Workbench can load prepared font assets without copying or rewriting them. Run
+`tfs build .` first. The default bind is `127.0.0.1`; TFS starts at port 4173
 and tries the next available port. An explicit `--port` is strict and reports a
 conflict instead of silently changing. The browser opens only with `--open`.
 

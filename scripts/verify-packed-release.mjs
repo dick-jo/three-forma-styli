@@ -39,6 +39,15 @@ try {
 		assert.ok(tarballName?.endsWith('.tgz'), `Could not find tarball in pnpm output:\n${output}`);
 		const tarballPath = path.resolve(tarballDirectory, tarballName);
 		tarballs.push(tarballPath);
+		if (packageDirectory === 'compiler') {
+			const inventory = run('tar', ['-tzf', tarballPath]).split('\n');
+			for (const file of ['index.html', 'workbench.css', 'workbench.js']) {
+				assert.ok(
+					inventory.includes(`package/workbench-assets/${file}`),
+					`Packed compiler omitted Workbench asset: ${file}`
+				);
+			}
+		}
 		packedManifests[packageDirectory] = JSON.parse(
 			run('tar', ['-xOf', tarballPath, 'package/package.json'])
 		);

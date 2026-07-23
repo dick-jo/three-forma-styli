@@ -5,16 +5,16 @@ import fs from 'fs-extra';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
 	parseServePort,
-	resolveSpecimenTarget,
-	startSpecimenServer,
-	type RunningSpecimenServer,
-} from './specimen.js';
+	resolveReviewTarget,
+	startReviewServer,
+	type RunningReviewServer,
+} from './review.js';
 
 const temporaryDirectories: string[] = [];
-const runningServers: RunningSpecimenServer[] = [];
+const runningServers: RunningReviewServer[] = [];
 
 async function temporaryDirectory(): Promise<string> {
-	const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'tfs-specimen-test-'));
+	const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'tfs-review-test-'));
 	temporaryDirectories.push(directory);
 	return directory;
 }
@@ -35,24 +35,50 @@ afterEach(async () => {
 	await Promise.all(temporaryDirectories.splice(0).map((directory) => fs.remove(directory)));
 });
 
-describe('resolveSpecimenTarget', () => {
+describe('resolveReviewTarget', () => {
 	it('serves an explicit HTML file from its containing directory', async () => {
 		const directory = await temporaryDirectory();
 		const filePath = path.join(directory, 'type proof.html');
 		await fs.writeFile(filePath, '<h1>Proof</h1>');
 
-		await expect(resolveSpecimenTarget(filePath)).resolves.toEqual({
+		await expect(resolveReviewTarget(filePath)).resolves.toEqual({
 			filePath,
 			rootDirectory: directory,
 			urlPath: '/type%20proof.html',
 		});
 	});
 
-	it('reads the output directory and custom specimen filename from a project config', async () => {
+	it('resolves a workspace workbench while serving the entire generated root', async () => {
+		const directory = await temporaryDirectory();
+		const workbench = path.join(directory, 'dist', 'review', 'index.html');
+		await fs.ensureDir(path.dirname(workbench));
+		await fs.writeFile(workbench, '<h1>Project review</h1>');
+		await fs.writeFile(
+			path.join(directory, 'tfs.config.js'),
+			`export default {
+				kind: 'three-forma-styli/project',
+				schemaVersion: 1,
+				system: {},
+				output: {
+					layout: 'workspace-package',
+					directory: './dist',
+					targets: { review: { workbench: true } },
+				},
+			};\n`
+		);
+
+		await expect(resolveReviewTarget(directory)).resolves.toEqual({
+			filePath: workbench,
+			rootDirectory: path.join(directory, 'dist'),
+			urlPath: '/review/index.html',
+		});
+	});
+
+	it('keeps legacy specimen projects available during migration', async () => {
 		const directory = await temporaryDirectory();
 		const specimen = path.join(directory, 'dist', 'review', 'type.html');
 		await fs.ensureDir(path.dirname(specimen));
-		await fs.writeFile(specimen, '<h1>Project proof</h1>');
+		await fs.writeFile(specimen, '<h1>Legacy proof</h1>');
 		await fs.writeFile(
 			path.join(directory, 'tfs.config.js'),
 			`export default {
@@ -63,14 +89,14 @@ describe('resolveSpecimenTarget', () => {
 			};\n`
 		);
 
-		await expect(resolveSpecimenTarget(directory)).resolves.toEqual({
+		await expect(resolveReviewTarget(directory)).resolves.toEqual({
 			filePath: specimen,
 			rootDirectory: path.join(directory, 'dist'),
 			urlPath: '/review/type.html',
 		});
 	});
 
-	it('reports when project specimen output is disabled', async () => {
+	it('reports when workspace review output is disabled', async () => {
 		const directory = await temporaryDirectory();
 		await fs.writeFile(
 			path.join(directory, 'tfs.config.js'),
@@ -78,49 +104,56 @@ describe('resolveSpecimenTarget', () => {
 				kind: 'three-forma-styli/project',
 				schemaVersion: 1,
 				system: {},
-				output: { directory: './dist' },
+				output: {
+					layout: 'workspace-package',
+					directory: './dist',
+					targets: {},
+				},
 			};\n`
 		);
 
-		await expect(resolveSpecimenTarget(directory)).rejects.toThrow(
-			'This project does not generate a specimen'
+		await expect(resolveReviewTarget(directory)).rejects.toThrow(
+			'This project does not generate a workbench'
 		);
 	});
 });
 
-describe('specimen server', () => {
-	it('serves the specimen and its generated assets with browser-safe content types', async () => {
+describe('review server', () => {
+	it('serves the workbench and sibling generated assets with browser-safe content types', async () => {
 		const directory = await temporaryDirectory();
-		const specimen = path.join(directory, 'typography.specimen.html');
-		await fs.writeFile(specimen, '<link rel="stylesheet" href="./fonts.css"><h1>Proof</h1>');
-		await fs.writeFile(path.join(directory, 'fonts.css'), 'h1 { font-weight: 700; }');
-		const target = await resolveSpecimenTarget(specimen);
-		const running = await startSpecimenServer(target, { port: 0 });
+		const reviewDirectory = path.join(directory, 'review');
+		await fs.ensureDir(reviewDirectory);
+		const workbench = path.join(reviewDirectory, 'index.html');
+		await fs.writeFile(workbench, '<script src="./workbench.js"></script><h1>Review</h1>');
+		await fs.writeFile(path.join(reviewDirectory, 'workbench.js'), 'console.log("review");');
+		await fs.outputFile(path.join(directory, 'assets', 'fonts', 'fonts.css'), '@font-face {}');
+		const target = await resolveReviewTarget(workbench);
+		const running = await startReviewServer(target, { port: 0 });
 		runningServers.push(running);
 
 		const redirected = await fetch(`http://127.0.0.1:${running.port}/`, { redirect: 'manual' });
 		expect(redirected.status).toBe(302);
-		expect(redirected.headers.get('location')).toBe('/typography.specimen.html');
+		expect(redirected.headers.get('location')).toBe('/review/index.html');
 
 		const html = await fetch(running.url);
 		expect(html.status).toBe(200);
 		expect(html.headers.get('content-type')).toBe('text/html; charset=utf-8');
 		expect(html.headers.get('cache-control')).toBe('no-store');
-		expect(await html.text()).toContain('<h1>Proof</h1>');
+		expect(await html.text()).toContain('<h1>Review</h1>');
 
-		const css = await fetch(`http://127.0.0.1:${running.port}/fonts.css`);
+		const css = await fetch(`http://127.0.0.1:${running.port}/assets/fonts/fonts.css`);
 		expect(css.headers.get('content-type')).toBe('text/css; charset=utf-8');
-		expect(await css.text()).toContain('font-weight: 700');
+		expect(await css.text()).toContain('@font-face');
 	});
 
-	it('does not serve a symlink outside the generated specimen directory', async () => {
+	it('does not serve a symlink outside the generated review directory', async () => {
 		const directory = await temporaryDirectory();
 		const outside = await temporaryDirectory();
 		const specimen = path.join(directory, 'typography.specimen.html');
 		await fs.writeFile(specimen, '<h1>Proof</h1>');
 		await fs.writeFile(path.join(outside, 'secret.txt'), 'not for the server');
 		await fs.symlink(path.join(outside, 'secret.txt'), path.join(directory, 'linked.txt'));
-		const running = await startSpecimenServer(await resolveSpecimenTarget(specimen), { port: 0 });
+		const running = await startReviewServer(await resolveReviewTarget(specimen), { port: 0 });
 		runningServers.push(running);
 
 		const response = await fetch(`http://127.0.0.1:${running.port}/linked.txt`);
@@ -134,7 +167,7 @@ describe('specimen server', () => {
 			const directory = await temporaryDirectory();
 			const specimen = path.join(directory, 'typography.specimen.html');
 			await fs.writeFile(specimen, '<h1>Proof</h1>');
-			const running = await startSpecimenServer(await resolveSpecimenTarget(specimen), {
+			const running = await startReviewServer(await resolveReviewTarget(specimen), {
 				port: occupied.port,
 			});
 			runningServers.push(running);
@@ -153,7 +186,7 @@ describe('specimen server', () => {
 			const specimen = path.join(directory, 'typography.specimen.html');
 			await fs.writeFile(specimen, '<h1>Proof</h1>');
 			await expect(
-				startSpecimenServer(await resolveSpecimenTarget(specimen), {
+				startReviewServer(await resolveReviewTarget(specimen), {
 					port: occupied.port,
 					strictPort: true,
 				})
@@ -167,7 +200,7 @@ describe('specimen server', () => {
 });
 
 describe('parseServePort', () => {
-	it('uses the conventional preview port by default', () => {
+	it('uses the conventional local review port by default', () => {
 		expect(parseServePort(undefined)).toBe(4173);
 	});
 

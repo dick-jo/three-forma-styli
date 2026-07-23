@@ -3,7 +3,7 @@
 	"private": true,
 	"description": "TypeScript-first design token generator with luminance-based color control",
 	"scripts": {
-		"build": "pnpm -r --filter '!@three-forma-styli/preview' build",
+		"build": "pnpm -r build",
 		"build:all": "pnpm -r build",
 		"test": "pnpm --filter @three-forma-styli/core test && pnpm --filter @three-forma-styli/compiler test && pnpm --filter @three-forma-styli/cli test",
 		"check:versions": "node scripts/verify-package-versions.mjs",
@@ -12,14 +12,17 @@
 		"check:ecosystem": "node scripts/verify-ecosystem-consumers.mjs",
 		"check:browser": "node scripts/verify-ecosystem-consumers.mjs --browser",
 		"check:fonttools": "pnpm --filter @three-forma-styli/compiler build && node scripts/verify-fonttools-provenance.mjs",
-		"check": "pnpm check:versions && pnpm build:all && pnpm check:split && pnpm test && pnpm --filter @three-forma-styli/preview check",
+		"workbench:sync": "pnpm --filter @three-forma-styli/workbench-source sync:compiler",
+		"check:workbench": "pnpm --filter @three-forma-styli/workbench-source check && pnpm --filter @three-forma-styli/workbench-source check:compiler",
+		"check": "pnpm check:versions && pnpm build:all && pnpm check:split && pnpm test && pnpm check:workbench",
 		"check:release": "pnpm check && pnpm check:packages && node scripts/verify-packed-release.mjs && pnpm check:ecosystem",
 		"changeset": "changeset",
 		"release:version": "changeset version",
 		"release:publish": "changeset publish",
 		"typography:review": "pnpm build && node scripts/typography-review.mjs",
+		"review:example": "pnpm build && node packages/cli/dist/index.js build examples/project && node packages/cli/dist/index.js review serve examples/project",
 		"dev": "pnpm --filter @three-forma-styli/cli dev",
-		"preview": "cat dist/tokens.css"
+		"preview": "pnpm review:example"
 	},
 	"keywords": [
 		"design-tokens",

@@ -43,6 +43,8 @@ export interface WorkspacePlan {
 	};
 	contracts: { system: boolean; typography: boolean; nativeColorModes: boolean };
 	review: {
+		workbench: boolean;
+		workbenchTitle?: string;
 		specimen: boolean;
 		title?: string;
 		interactive?: boolean;
@@ -182,8 +184,12 @@ export function planWorkspacePackage(
 	const reviewTarget = output.targets.review;
 	const review =
 		reviewTarget === true
-			? { specimen: context.hasTypography, shadowSpecimen: context.hasShadows }
+			? { workbench: true }
 			: reviewTarget || {};
+	const workbenchOption = review.workbench;
+	const workbench = Boolean(workbenchOption);
+	const workbenchConfig =
+		workbenchOption && workbenchOption !== true ? workbenchOption : {};
 	const specimenOption = review.specimen;
 	const specimen = Boolean(specimenOption);
 	if (specimen && !context.hasTypography) {
@@ -323,6 +329,28 @@ export function planWorkspacePackage(
 			dependencies: context.hasFonts ? [`${fontDirectory}/*`] : [],
 		});
 	}
+	if (workbench) {
+		for (const [file, dependencies] of [
+			['review/index.html', ['review/workbench.js', 'review/workbench.css']],
+			['review/workbench.js', ['review/workbench.json']],
+			['review/workbench.css', []],
+			[
+				'review/workbench.json',
+				[
+					'review/system.css',
+					...(context.hasFonts ? [`${fontDirectory}/fonts.css`] : []),
+				],
+			],
+			['review/system.css', []],
+		] as const) {
+			add(artifacts, {
+				path: file,
+				kind: 'review',
+				target: 'review',
+				dependencies: [...dependencies],
+			});
+		}
+	}
 	if (shadowSpecimen) {
 		add(artifacts, {
 			path: 'review/shadows.html',
@@ -386,6 +414,8 @@ export function planWorkspacePackage(
 		},
 		contracts: { system: systemContract, typography: typographyContract, nativeColorModes },
 		review: {
+			workbench,
+			workbenchTitle: workbenchConfig.title,
 			specimen,
 			title: specimenConfig.title,
 			interactive: specimenConfig.interactive,

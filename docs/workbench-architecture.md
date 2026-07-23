@@ -25,7 +25,7 @@ portable workbench
 The authored project remains canonical. Workbench edits are a disposable draft
 overlay until the author explicitly promotes them.
 
-## What exists today
+## Starting point this architecture replaced
 
 - `apps/preview` is a private, color-only Svelte experiment coupled directly to
   the default preset. It does not load an arbitrary built TFS project.
@@ -37,8 +37,8 @@ overlay until the author explicitly promotes them.
 - Review cases are implicit markup. They are not a stable, enumerable contract
   that a browser runner can consume.
 
-The existing specimens are valuable prototypes. Their domain logic should be
-lifted into workbench labs rather than embedded or iframe-composed unchanged.
+The existing specimens were valuable prototypes. Their domain logic is lifted
+into Workbench labs rather than embedded or iframe-composed unchanged.
 
 ## Recommended architecture
 
@@ -49,22 +49,22 @@ runtime output:
 
 ```ts
 interface TfsWorkbenchContract {
-  kind: "three-forma-styli/workbench";
-  schemaVersion: 1;
-  systemFingerprint: string;
-  toolVersion: string;
-  assets: {
-    runtimeCss: string;
-    fontCss?: string;
-  };
-  globals: {
-    colorModes: ReviewGlobal[];
-    sizeModes: ReviewGlobal[];
-    viewports: ReviewViewport[];
-    media: ReviewMediaState[];
-  };
-  labs: ReviewLab[];
-  diagnostics: ReviewDiagnostic[];
+	kind: 'three-forma-styli/workbench';
+	schemaVersion: 1;
+	systemFingerprint: string;
+	toolVersion: string;
+	assets: {
+		runtimeCss: string;
+		fontCss?: string;
+	};
+	globals: {
+		colorModes: ReviewGlobal[];
+		sizeModes: ReviewGlobal[];
+		viewports: ReviewViewport[];
+		media: ReviewMediaState[];
+	};
+	labs: ReviewLab[];
+	diagnostics: ReviewDiagnostic[];
 }
 ```
 
@@ -86,9 +86,9 @@ When review output is enabled, TFS produces:
 generated/review/
 ├── index.html
 ├── workbench.json
-└── assets/
-    ├── workbench.js
-    └── workbench.css
+├── system.css
+├── workbench.js
+└── workbench.css
 ```
 
 It must work offline through `tfs review serve`, contain no network calls, and
@@ -140,6 +140,25 @@ The chrome uses a neutral internal visual system so a broken or low-contrast
 target theme cannot make its own editor unusable. Only the canvas is governed by
 the reviewed design system.
 
+Every visual domain has two complementary canvas modes:
+
+- **Matrix** is the default entrypoint for a lab. It renders every currently
+  visible case together, using a domain-specific compact specimen so authors and
+  browser tests can spot rhythm, outliers, missing steps and theme-wide
+  regressions.
+- **Case** expands one specimen into its full diagnostic and calibration surface.
+  Selecting any matrix tile drills into the same stable case permalink.
+
+Search and global modes scope the matrix without creating a separate source of
+truth. The inspector describes the matrix while it is visible; it must not show
+controls for a hidden, coincidentally active case.
+
+The top-level Overview is a third, wider zoom level: a whole-system proof sheet.
+It combines the build facts with compact matrices for the active color mode,
+typography, shadows, motion and foundations in one scrollable surface. A tile
+drills directly into its focused case; a domain heading opens that domain's full
+matrix.
+
 Global mode, viewport, surface, draft/baseline, and capture controls belong in a
 small persistent bar. Less common diagnostics use progressive disclosure.
 Keyboard navigation and a command palette prevent the UI becoming toolbar-heavy.
@@ -151,9 +170,9 @@ operation:
 
 ```ts
 interface ReviewDraftOperation {
-  path: string;
-  previous: unknown;
-  value: unknown;
+	path: string;
+	previous: unknown;
+	value: unknown;
 }
 ```
 
@@ -162,13 +181,22 @@ fingerprint. Reset operates at control, recipe, lab, and project levels.
 
 Initial promotion mechanisms:
 
-1. copy a concise authored-value snippet;
-2. export/import `tfs.review.patch.json`;
-3. show the exact changed values beside their resolved effects.
+1. export the versioned `tfs.review.patch.json`;
+2. copy a tool-agnostic agent handoff containing that exact patch, the system
+   fingerprint, selected cases, and build/check commands;
+3. show exact JSON-pointer-like source paths beside their resolved effects.
 
 The browser must not rewrite arbitrary TypeScript configuration. A later
 `tfs review apply` can be designed only for an explicit machine-editable source
 contract; it must never guess how to rewrite helper calls or user code.
+
+The handoff is the first-class agentic boundary. Codex, Claude, or another coding
+agent applies the reviewed decisions to authored TypeScript, preserves helper
+structure, regenerates owned output, runs the declared checks, and commits the
+coherent source plus generated result. TFS supplies facts and verification;
+version control credentials and code-writing authority remain with the agent and
+host repository. A thin MCP/agent adapter can eventually automate transport of
+the same schema without changing its semantics.
 
 ### 6. Named cases are executable cases
 
@@ -205,20 +233,26 @@ ordinary screenshot pipelines are not sufficient proof that P3 chroma survived.
 Recommended final responsibility split:
 
 ```text
-apps/workbench/                 source application and local dogfood
-packages/workbench/             prebuilt dependency-free browser shell
+apps/workbench/                 private source application and local dogfood
+packages/compiler/workbench-assets/
+                                prebuilt dependency-free browser shell
 packages/core/                  review data/domain derivation
 packages/compiler/              contract/assets/output planning
 packages/cli/                   serve, open, test, and explicit promotion commands
 ```
 
-`@three-forma-styli/workbench` would contain static browser assets, not Svelte or
-Vite as runtime dependencies. The compiler includes or copies it only when the
-project requests review output. Application runtime packages never export it.
+The private Svelte/Vite source builds static assets into the compiler package.
+Svelte and Vite are compiler development dependencies, never compiler runtime
+dependencies. The compiler copies those assets only when a project requests
+review output. Application runtime packages never export them. This proves the
+boundary without adding another public package merely to hold three static
+files.
 
-Before adding that package, prove whether the same boundary can be achieved by
-shipping the bundled assets inside the compiler without meaningfully inflating
-its install or release surface. Package count is not a goal by itself.
+`pnpm workbench:sync` is the only intentional source-to-compiler synchronization
+step. Routine builds compile the private app into ignored `apps/workbench/dist`;
+`pnpm check:workbench` byte-compares that canonical build with the committed
+compiler assets and fails on drift. This keeps ordinary checks non-mutating while
+still making the published compiler tarball reproducible.
 
 ## Options considered
 

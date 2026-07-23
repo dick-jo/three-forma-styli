@@ -61,9 +61,10 @@ both `file_variables:read` and `file_variables:write` scopes. Run with
 | `@three-forma-styli/cli`      | CLI tool (`tfs` command)                  |
 | `@three-forma-styli/themes`   | Starter/reference themes                  |
 
-The private Svelte review application lives under `apps/preview`; it is repository
-tooling, not a published package or consumer dependency. Installing the CLI/core
-does not install or bundle Svelte.
+The private Svelte 5 workbench source lives under `apps/workbench`. Its compiled,
+dependency-free browser assets are included only in the Node compiler so projects
+can request a portable review artifact. Generated application runtime packages do
+not install or bundle Svelte, Vite, or workbench code.
 
 The public packages share a coordinated release version and are verified as
 packed artifacts—including an external TypeScript consumer—before publishing.
@@ -221,7 +222,7 @@ visible `base`/`variants` data and it never invents font roles or weight aliases
 
 For a complete movable handoff, define a project and run `tfs build .`. Project
 mode prepares licensed local fonts, resolves their real capabilities, then stages
-CSS, typed system/mode and typography contracts, helper classes, a specimen,
+CSS, typed system/mode and typography contracts, helper classes, a Workbench,
 JSON interchange, and a hashed ownership manifest before replacing the output directory once. See
 `examples/project/tfs.config.ts`.
 
@@ -233,9 +234,15 @@ monorepo checks. `tfs validate .` is the lightweight routine path: it verifies
 the committed manifest, artifact bytes, and package wiring without FontTools or
 regeneration.
 
-Review that generated specimen over localhost with `tfs specimen serve .`.
+Review the generated design system over localhost with `tfs review serve .`.
 Pass `--open` only when the CLI should launch the browser; use `--port 4400`
 when a fixed review port is required.
+
+The generated Workbench unifies color, typography, shadow, motion and foundation
+review behind stable cases and source-aligned draft patches. Its architecture
+and browser evidence are documented in
+[Workbench architecture](docs/workbench-architecture.md) and
+[Workbench validation](docs/workbench-validation.md).
 
 Prepared `sans` and `mono` project fonts can also receive automatic
 per-style/per-weight adjusted fallback faces for physical upright and italic

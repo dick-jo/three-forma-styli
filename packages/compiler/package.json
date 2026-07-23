@@ -25,6 +25,7 @@
 	},
 	"files": [
 		"dist",
+		"workbench-assets",
 		"CHANGELOG.md"
 	],
 	"scripts": {

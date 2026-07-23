@@ -167,6 +167,30 @@ export function generateTypographySpecimen(
 export * from './types.js';
 export { defineTypography, deriveTypographyRange, fontFromManifest } from './typography/index.js';
 export { deriveShadowRange } from './shadows/index.js';
+export { createWorkbenchContract } from './review/contract.js';
+export type {
+	ReviewAssetContract,
+	ReviewCapturePolicy,
+	ColorReviewCase,
+	ColorReviewLab,
+	MotionReviewCase,
+	MotionReviewLab,
+	FoundationReviewCase,
+	FoundationReviewLab,
+	ReviewControl,
+	ReviewDiagnostic,
+	ReviewLab,
+	ReviewLabId,
+	ReviewMode,
+	ReviewModeGroup,
+	ShadowReviewCase,
+	TfsAgentHandoff,
+	TfsReviewPatch,
+	TfsWorkbenchContract,
+	TypographyReviewCase,
+	WorkbenchContractOptions,
+	WorkbenchDraftOperation,
+} from './review/types.js';
 
 // ===========================================
 // UTILITIES

@@ -9,7 +9,8 @@ import type { TfsProject } from '@three-forma-styli/compiler/project';
 
 const DEFAULT_PORT = 4173;
 const DEFAULT_HOST = '127.0.0.1';
-const DEFAULT_SPECIMEN_FILE = 'typography.specimen.html';
+const DEFAULT_WORKBENCH_FILE = path.join('review', 'index.html');
+const DEFAULT_LEGACY_SPECIMEN_FILE = 'typography.specimen.html';
 const MAX_PORT_ATTEMPTS = 20;
 
 const contentTypes: Record<string, string> = {
@@ -30,19 +31,19 @@ const contentTypes: Record<string, string> = {
 	'.woff2': 'font/woff2',
 };
 
-export interface ResolvedSpecimenTarget {
+export interface ResolvedReviewTarget {
 	filePath: string;
 	rootDirectory: string;
 	urlPath: string;
 }
 
-export interface ServeSpecimenOptions {
+export interface ServeReviewOptions {
 	host?: string;
 	port?: string | number;
 	open?: boolean;
 }
 
-export interface RunningSpecimenServer {
+export interface RunningReviewServer {
 	server: Server;
 	host: string;
 	port: number;
@@ -68,66 +69,85 @@ function urlPath(relativePath: string): string {
 	return `/${relativePath.split(path.sep).map(encodeURIComponent).join('/')}`;
 }
 
-async function assertSpecimenFile(
+async function assertReviewFile(
 	filePath: string,
 	rootDirectory: string
-): Promise<ResolvedSpecimenTarget> {
+): Promise<ResolvedReviewTarget> {
 	if (!(await fs.pathExists(filePath))) {
-		throw new Error(`Typography specimen not found: ${filePath}. Run tfs build first.`);
+		throw new Error(`Review entrypoint not found: ${filePath}. Run tfs build first.`);
 	}
 	const stats = await fs.stat(filePath);
-	if (!stats.isFile()) throw new Error(`Typography specimen is not a file: ${filePath}`);
+	if (!stats.isFile()) throw new Error(`Review entrypoint is not a file: ${filePath}`);
 	if (path.extname(filePath).toLowerCase() !== '.html') {
-		throw new Error(`Typography specimen must be an HTML file: ${filePath}`);
+		throw new Error(`Review entrypoint must be an HTML file: ${filePath}`);
 	}
 	const relative = path.relative(rootDirectory, filePath);
 	if (!isInside(rootDirectory, filePath)) {
-		throw new Error(`Typography specimen must stay inside its served root: ${filePath}`);
+		throw new Error(`Review entrypoint must stay inside its served root: ${filePath}`);
 	}
 	return { filePath, rootDirectory, urlPath: urlPath(relative) };
 }
 
-function selectedSpecimenFile(project: TfsProject): string | undefined {
+function selectedLegacySpecimenFile(project: TfsProject): string | undefined {
+	if (project.output.layout === 'workspace-package') return undefined;
 	const configured = project.output.specimen;
 	if (!configured) return undefined;
-	if (configured === true) return DEFAULT_SPECIMEN_FILE;
-	return configured.file ?? DEFAULT_SPECIMEN_FILE;
+	if (configured === true) return DEFAULT_LEGACY_SPECIMEN_FILE;
+	return configured.file ?? DEFAULT_LEGACY_SPECIMEN_FILE;
 }
 
-async function resolveProjectSpecimen(configPath: string): Promise<ResolvedSpecimenTarget> {
+async function resolveProjectReview(configPath: string): Promise<ResolvedReviewTarget> {
 	const loaded = await loadConfigModule(configPath);
 	const project = loaded.module.default;
 	if (!isProject(project)) {
 		throw new Error(`No TFS project exported as default from ${loaded.inputPath}.`);
 	}
-	const specimenFile = selectedSpecimenFile(project);
+	const configDirectory = path.dirname(loaded.inputPath);
+	const rootDirectory = path.resolve(configDirectory, project.output.directory);
+	if (project.output.layout === 'workspace-package') {
+		const review = project.output.targets.review;
+		const workbench =
+			review === true ||
+			(Boolean(review) && typeof review === 'object' && Boolean(review.workbench));
+		if (!workbench) {
+			throw new Error(
+				'This project does not generate a workbench. Enable output.targets.review.workbench, then run tfs build.'
+			);
+		}
+		return assertReviewFile(path.join(rootDirectory, DEFAULT_WORKBENCH_FILE), rootDirectory);
+	}
+
+	const specimenFile = selectedLegacySpecimenFile(project);
 	if (!specimenFile) {
 		throw new Error(
-			`This project does not generate a specimen. Enable output.specimen, then run tfs build.`
+			'This legacy project does not generate a review entrypoint. Enable output.specimen, then run tfs build.'
 		);
 	}
 	if (path.isAbsolute(specimenFile)) {
 		throw new Error('output.specimen.file must be relative to output.directory.');
 	}
-	const configDirectory = path.dirname(loaded.inputPath);
-	const rootDirectory = path.resolve(configDirectory, project.output.directory);
 	const filePath = path.resolve(rootDirectory, specimenFile);
 	if (!isInside(rootDirectory, filePath)) {
 		throw new Error('output.specimen.file must stay inside output.directory.');
 	}
-	return assertSpecimenFile(filePath, rootDirectory);
+	return assertReviewFile(filePath, rootDirectory);
 }
 
-/** Resolve either a project/config or an explicit generated HTML specimen. */
-export async function resolveSpecimenTarget(target = '.'): Promise<ResolvedSpecimenTarget> {
+function explicitHtmlRoot(filePath: string): string {
+	const directory = path.dirname(filePath);
+	return path.basename(directory) === 'review' ? path.dirname(directory) : directory;
+}
+
+/** Resolve either a project/config or an explicit generated review entrypoint. */
+export async function resolveReviewTarget(target = '.'): Promise<ResolvedReviewTarget> {
 	const resolved = path.resolve(process.cwd(), target);
 	if (!(await fs.pathExists(resolved))) throw new Error(`Path not found: ${resolved}`);
 	const stats = await fs.stat(resolved);
 	if (stats.isFile()) {
 		if (path.extname(resolved).toLowerCase() === '.html') {
-			return assertSpecimenFile(resolved, path.dirname(resolved));
+			return assertReviewFile(resolved, explicitHtmlRoot(resolved));
 		}
-		return resolveProjectSpecimen(resolved);
+		return resolveProjectReview(resolved);
 	}
 	if (!stats.isDirectory())
 		throw new Error(`Expected a project, directory, or HTML file: ${resolved}`);
@@ -138,12 +158,20 @@ export async function resolveSpecimenTarget(target = '.'): Promise<ResolvedSpeci
 	if (configs.length > 1) {
 		throw new Error(`Multiple TFS project configs found: ${configs.join(', ')}`);
 	}
-	if (configs[0]) return resolveProjectSpecimen(configs[0]);
+	if (configs[0]) return resolveProjectReview(configs[0]);
 
-	const specimen = path.join(resolved, DEFAULT_SPECIMEN_FILE);
-	if (await fs.pathExists(specimen)) return assertSpecimenFile(specimen, resolved);
+	const directWorkbench =
+		path.basename(resolved) === 'review'
+			? path.join(resolved, 'index.html')
+			: path.join(resolved, DEFAULT_WORKBENCH_FILE);
+	if (await fs.pathExists(directWorkbench)) {
+		const root = path.basename(resolved) === 'review' ? path.dirname(resolved) : resolved;
+		return assertReviewFile(directWorkbench, root);
+	}
+	const legacySpecimen = path.join(resolved, DEFAULT_LEGACY_SPECIMEN_FILE);
+	if (await fs.pathExists(legacySpecimen)) return assertReviewFile(legacySpecimen, resolved);
 	throw new Error(
-		`No tfs.config.ts, tfs.config.js, or ${DEFAULT_SPECIMEN_FILE} found in ${resolved}.`
+		`No tfs.config.ts, tfs.config.js, ${DEFAULT_WORKBENCH_FILE}, or ${DEFAULT_LEGACY_SPECIMEN_FILE} found in ${resolved}.`
 	);
 }
 
@@ -165,7 +193,7 @@ function sendError(response: ServerResponse, status: number, message: string): v
 	response.end(`${message}\n`);
 }
 
-function requestHandler(rootDirectory: string, specimenUrlPath: string) {
+function requestHandler(rootDirectory: string, reviewUrlPath: string) {
 	return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
 		if (request.method !== 'GET' && request.method !== 'HEAD') {
 			response.setHeader('Allow', 'GET, HEAD');
@@ -181,7 +209,7 @@ function requestHandler(rootDirectory: string, specimenUrlPath: string) {
 			return;
 		}
 		if (pathname === '/') {
-			response.writeHead(302, { Location: specimenUrlPath });
+			response.writeHead(302, { Location: reviewUrlPath });
 			response.end();
 			return;
 		}
@@ -251,10 +279,10 @@ function displayHost(host: string): string {
 	return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
 }
 
-export async function startSpecimenServer(
-	target: ResolvedSpecimenTarget,
+export async function startReviewServer(
+	target: ResolvedReviewTarget,
 	options: { host?: string; port?: number; strictPort?: boolean } = {}
-): Promise<RunningSpecimenServer> {
+): Promise<RunningReviewServer> {
 	const host = options.host ?? DEFAULT_HOST;
 	const requestedPort = options.port ?? DEFAULT_PORT;
 	const attempts = options.strictPort ? 1 : MAX_PORT_ATTEMPTS;
@@ -268,7 +296,7 @@ export async function startSpecimenServer(
 			const address = server.address();
 			if (!address || typeof address === 'string') {
 				server.close();
-				throw new Error('Specimen server did not receive a TCP address.');
+				throw new Error('Review server did not receive a TCP address.');
 			}
 			const actualPort = address.port;
 			const url = `http://${displayHost(host)}:${actualPort}${target.urlPath}`;
@@ -280,6 +308,7 @@ export async function startSpecimenServer(
 				close: () =>
 					new Promise((resolve, reject) => {
 						server.close((error) => (error ? reject(error) : resolve()));
+						server.closeAllConnections();
 					}),
 			};
 		} catch (error) {
@@ -295,7 +324,7 @@ export async function startSpecimenServer(
 				: `No available port found from ${requestedPort} to ${Math.min(65_535, requestedPort + attempts - 1)} on ${host}.`
 		);
 	}
-	throw lastError instanceof Error ? lastError : new Error('Unable to start specimen server.');
+	throw lastError instanceof Error ? lastError : new Error('Unable to start review server.');
 }
 
 function openUrl(url: string): void {
@@ -312,7 +341,7 @@ function openUrl(url: string): void {
 	child.unref();
 }
 
-function waitForShutdown(server: RunningSpecimenServer): Promise<void> {
+function waitForShutdown(server: RunningReviewServer): Promise<void> {
 	return new Promise((resolve, reject) => {
 		let stopping = false;
 		const stop = () => {
@@ -326,18 +355,18 @@ function waitForShutdown(server: RunningSpecimenServer): Promise<void> {
 	});
 }
 
-export async function serveSpecimenCommand(
+export async function serveReviewCommand(
 	targetPath: string | undefined,
-	options: ServeSpecimenOptions
+	options: ServeReviewOptions
 ): Promise<void> {
-	const target = await resolveSpecimenTarget(targetPath ?? '.');
+	const target = await resolveReviewTarget(targetPath ?? '.');
 	const explicitlySelectedPort = options.port !== undefined;
-	const running = await startSpecimenServer(target, {
+	const running = await startReviewServer(target, {
 		host: options.host,
 		port: parseServePort(options.port),
 		strictPort: explicitlySelectedPort,
 	});
-	console.log(chalk.green('✓ Typography specimen ready'));
+	console.log(chalk.green('✓ TFS workbench ready'));
 	console.log(chalk.cyan(running.url));
 	console.log(chalk.dim('Press Ctrl+C to stop.'));
 	if (options.open) openUrl(running.url);

@@ -44,7 +44,7 @@ describe('tfs init', () => {
 			build: 'tfs validate .',
 			check: 'tsc --noEmit && tfs validate .',
 			'check:generated': 'tfs check .',
-			specimen: 'tfs specimen serve .',
+			review: 'tfs review serve .',
 		});
 		expect(await fs.pathExists(path.join(projectRoot, 'config.ts'))).toBe(false);
 		expect(await fs.pathExists(path.join(projectRoot, 'README.md'))).toBe(true);
@@ -104,7 +104,7 @@ describe('tfs init', () => {
 			build: 'tfs validate .',
 			check: 'tsc --noEmit && tfs validate .',
 			'check:generated': 'tfs check .',
-			specimen: 'tfs specimen serve .',
+			review: 'tfs review serve .',
 		});
 		expect(manifest.exports['.']).toEqual({
 			types: './generated/runtime/index.d.ts',
@@ -141,7 +141,7 @@ describe('tfs init', () => {
 		).toContain('runtime/styles/typography.module.css.d.ts');
 		expect(
 			dryRun.result.plan.artifacts.map((artifact: { path: string }) => artifact.path)
-		).toContain('review/shadows.html');
+		).toContain('review/workbench.json');
 		expect(await fs.pathExists(path.join(projectRoot, 'generated'))).toBe(false);
 
 		execFileSync(
@@ -161,7 +161,7 @@ describe('tfs init', () => {
 		await expect(checkCommand(projectRoot)).resolves.toBeUndefined();
 		expect(await fs.pathExists(path.join(projectRoot, 'dist'))).toBe(false);
 		expect(await fs.pathExists(path.join(projectRoot, 'generated/runtime/index.js'))).toBe(true);
-		expect(await fs.pathExists(path.join(projectRoot, 'generated/review/typography.html'))).toBe(
+		expect(await fs.pathExists(path.join(projectRoot, 'generated/review/index.html'))).toBe(
 			true
 		);
 	});

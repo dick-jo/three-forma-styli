@@ -163,6 +163,19 @@ async function exerciseScaffolds() {
 		await readFile(path.join(workspaceRoot, 'generated/runtime/styles/typography.css'), 'utf8'),
 		/\.text--prose/
 	);
+	const workbench = JSON.parse(
+		await readFile(path.join(workspaceRoot, 'generated/review/workbench.json'), 'utf8')
+	);
+	assert.equal(workbench.kind, 'three-forma-styli/workbench');
+	assert.equal(workbench.schemaVersion, 1);
+	assert.ok(workbench.labs.some((lab) => lab.kind === 'color' && lab.cases.length > 0));
+	assert.ok(workbench.labs.some((lab) => lab.kind === 'typography' && lab.cases.length > 0));
+	assert.ok(workbench.labs.some((lab) => lab.kind === 'shadows' && lab.cases.length > 0));
+	assert.ok(workbench.labs.some((lab) => lab.kind === 'motion' && lab.cases.length > 0));
+	assert.match(
+		await readFile(path.join(workspaceRoot, 'generated/review/index.html'), 'utf8'),
+		/workbench\.js/
+	);
 
 	return workspaceRoot;
 }
@@ -307,6 +320,8 @@ const contentTypes = {
 	'.css': 'text/css; charset=utf-8',
 	'.html': 'text/html; charset=utf-8',
 	'.js': 'text/javascript; charset=utf-8',
+	'.json': 'application/json; charset=utf-8',
+	'.woff2': 'font/woff2',
 };
 
 async function startStaticServer(rootDirectory) {
@@ -391,6 +406,106 @@ async function runBrowserProof(browserRoot) {
 	}
 }
 
+async function runWorkbenchBrowserProof(workspaceRoot) {
+	const { chromium } = await import('@playwright/test');
+	const server = await startStaticServer(path.join(workspaceRoot, 'generated'));
+	const browser = await chromium.launch({ headless: true });
+	try {
+		const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+		const failures = [];
+		page.on('console', (message) => {
+			if (message.type() === 'error' || message.type() === 'warning') {
+				failures.push(`console.${message.type()}: ${message.text()}`);
+			}
+		});
+		page.on('pageerror', (error) => failures.push(`pageerror: ${error.message}`));
+		await page.goto(`${server.url}/review/index.html`, { waitUntil: 'networkidle' });
+		await page.locator('html[data-tfs-workbench-ready="true"]').waitFor();
+
+		const systemOverview = page.locator('.system-overview');
+		await systemOverview.waitFor();
+		assert.equal(await systemOverview.locator('.overview-section').count(), 5);
+		assert.ok((await systemOverview.locator('.matrix-card').count()) > 5);
+		const labNavigation = page.locator('.navigation > nav');
+
+		await labNavigation.getByRole('button', { name: /color/i }).click();
+		const colorMatrix = page.locator('.case-matrix[data-lab="color"]');
+		await colorMatrix.waitFor();
+		assert.ok((await colorMatrix.locator('.matrix-card').count()) > 1);
+		assert.equal(new URL(page.url()).searchParams.get('view'), 'matrix');
+		await colorMatrix.locator('.matrix-card').first().click();
+		await page.getByRole('spinbutton', { name: 'luminance value' }).fill('0.31');
+		await page.getByText('1 edits', { exact: true }).waitFor();
+		assert.match(await page.locator('.color-hero').getAttribute('style'), /oklch\(0\.31 /);
+		await page.getByRole('button', { name: 'discard all edits' }).click();
+
+		await labNavigation.getByRole('button', { name: /typography/i }).click();
+		const typographyMatrix = page.locator('.case-matrix[data-lab="typography"]');
+		await typographyMatrix.waitFor();
+		assert.ok((await typographyMatrix.locator('.matrix-card').count()) > 1);
+		await typographyMatrix.locator('.matrix-card').filter({ hasText: 'prose / base' }).click();
+		const lineHeight = page.getByRole('spinbutton').first();
+		await lineHeight.fill('1.3');
+		await page.getByText('1 edits', { exact: true }).waitFor();
+		await page.getByRole('button', { name: 'reset case' }).click();
+		await page.getByText('0 edits', { exact: true }).waitFor();
+		await page.getByRole('button', { name: 'Undo draft' }).click();
+		await page.getByText('1 edits', { exact: true }).waitFor();
+		await page.getByLabel('size mode', { exact: true }).selectOption('large');
+
+		await labNavigation.getByRole('button', { name: /motion/i }).click();
+		const motionMatrix = page.locator('.case-matrix[data-lab="motion"]');
+		await motionMatrix.waitFor();
+		assert.ok((await motionMatrix.locator('.matrix-card').count()) > 1);
+		await motionMatrix.locator('.matrix-card').first().click();
+		const motionObject = page.locator('.motion-object');
+		assert.equal(
+			await motionObject.evaluate((element) => getComputedStyle(element).transform),
+			'none'
+		);
+		await page.getByRole('button', { name: 'play once' }).click();
+		await page.waitForTimeout(80);
+		assert.notEqual(
+			await page
+				.locator('.motion-object')
+				.evaluate((element) => getComputedStyle(element).transform),
+			'none'
+		);
+		await labNavigation.getByRole('button', { name: /typography/i }).click();
+		await page
+			.locator('.case-matrix[data-lab="typography"] .matrix-card')
+			.filter({ hasText: 'prose / base' })
+			.click();
+
+		const evidence = await page.evaluate(() => {
+			const canvas = document.querySelector('[data-testid="review-canvas"]');
+			const sample = document.querySelector('.type-short');
+			if (!(canvas instanceof HTMLElement) || !(sample instanceof HTMLElement)) {
+				throw new Error('Missing Workbench canvas or typography sample');
+			}
+			return {
+				title: document.title,
+				lab: new URL(location.href).searchParams.get('lab'),
+				caseId: new URL(location.href).searchParams.get('case'),
+				sizeMode: new URL(location.href).searchParams.get('size'),
+				lineHeight: getComputedStyle(sample).lineHeight,
+				fontSizeToken: canvas.style.getPropertyValue('--fs-2'),
+			};
+		});
+
+		assert.deepEqual(failures, []);
+		assert.equal(evidence.title, 'TFS workbench');
+		assert.equal(evidence.lab, 'typography');
+		assert.equal(evidence.caseId, 'typography--prose--base');
+		assert.equal(evidence.sizeMode, 'large');
+		assert.ok(Number.parseFloat(evidence.lineHeight) > 0);
+		assert.ok(evidence.fontSizeToken.length > 0);
+	} finally {
+		await browser.close();
+		await server.close();
+	}
+}
+
 try {
 	const tarballs = await packTfsPackages();
 	await installPackedToolchain(tarballs);
@@ -398,6 +513,9 @@ try {
 	await exerciseMachineCli(workspaceRoot);
 	const designSystemTarball = await packGeneratedDesignSystem(workspaceRoot);
 	await buildBrowserConsumer(designSystemTarball, tarballs.core);
+	if (browserProofRequested) {
+		await runWorkbenchBrowserProof(workspaceRoot);
+	}
 
 	console.log(
 		`Real tarball installs, standalone/workspace scaffolds, generated-package packing and a production browser bundle${browserProofRequested ? ' executed in Chromium' : ''} all passed.`

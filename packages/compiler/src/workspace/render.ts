@@ -1,6 +1,9 @@
 import path from 'node:path';
+import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import fs from 'fs-extra';
 import {
+	createWorkbenchContract,
 	fontFromManifest,
 	generate,
 	generateCss,
@@ -15,6 +18,7 @@ import {
 	type PartialDesignSystem,
 	type TypographySystem,
 } from '@three-forma-styli/core';
+import { COMPILER_VERSION } from '../version.js';
 import {
 	prepareFonts,
 	renderFontFaceCss,
@@ -53,6 +57,14 @@ async function writeText(staging: string, relative: string, contents: string): P
 	const destination = path.join(staging, relative);
 	await fs.ensureDir(path.dirname(destination));
 	await fs.writeFile(destination, contents);
+}
+
+const workbenchAssetDirectory = fileURLToPath(
+	new URL('../../workbench-assets/', import.meta.url)
+);
+
+async function workbenchAsset(file: 'index.html' | 'workbench.css' | 'workbench.js') {
+	return fs.readFile(path.join(workbenchAssetDirectory, file), 'utf8');
 }
 
 function fontFallback(font: ProjectFont): {
@@ -310,6 +322,45 @@ export async function renderWorkspacePackage(
 				},
 			})
 		);
+	}
+	if (plan.review.workbench) {
+		const systemCss = generateCss(system, {
+			selectors: plan.css.tokenSelectors,
+		});
+		const fingerprint = createHash('sha256')
+			.update(JSON.stringify(ir))
+			.digest('hex');
+		const contract = createWorkbenchContract(system, ir, {
+			title: plan.review.workbenchTitle,
+			systemFingerprint: fingerprint,
+			toolVersion: COMPILER_VERSION,
+			stylesheets: [
+				...(preparedFonts
+					? [
+							relativeUrl(
+								'review/index.html',
+								path.posix.join(plan.fontDirectory, 'fonts.css')
+							),
+						]
+					: []),
+				'./system.css',
+			],
+			adjustedFallbackFamilies: adjustedFallbacks
+				? Object.fromEntries(
+						Object.entries(adjustedFallbacks.manifest.roles).map(([role, entry]) => [
+							role,
+							entry.fallbackFamily,
+						])
+					)
+				: undefined,
+		});
+		await Promise.all([
+			writeText(staging, 'review/index.html', await workbenchAsset('index.html')),
+			writeText(staging, 'review/workbench.css', await workbenchAsset('workbench.css')),
+			writeText(staging, 'review/workbench.js', await workbenchAsset('workbench.js')),
+			writeText(staging, 'review/system.css', systemCss),
+			writeText(staging, 'review/workbench.json', `${JSON.stringify(contract, null, 2)}\n`),
+		]);
 	}
 	if (plan.review.shadowSpecimen) {
 		await writeText(

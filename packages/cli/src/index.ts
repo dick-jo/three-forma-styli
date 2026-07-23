@@ -6,7 +6,7 @@ import { initCommand } from './commands/init.js';
 import { buildCommand } from './commands/build.js';
 import { figmaSyncCommand } from './commands/figma-sync.js';
 import { inspectFontsCommand, prepareFontsCommand } from './commands/fonts.js';
-import { serveSpecimenCommand } from './commands/specimen.js';
+import { serveReviewCommand } from './commands/review.js';
 import { checkCommand } from './commands/check.js';
 import { validateCommand } from './commands/validate.js';
 import { CLI_VERSION } from './version.js';
@@ -113,18 +113,18 @@ fontsCommand
 		await inspectFontsCommand(filePaths, options);
 	});
 
-const specimenCommand = program
-	.command('specimen')
-	.description('Review generated typography specimens');
+const reviewCommand = program
+	.command('review')
+	.description('Review generated design systems in the TFS workbench');
 
-specimenCommand
+reviewCommand
 	.command('serve [path]')
-	.description('Serve a project or generated specimen over localhost')
+	.description('Serve a project or generated workbench over localhost')
 	.option('-p, --port <port>', 'localhost port (default: first available from 4173)')
 	.option('--host <host>', 'host interface', '127.0.0.1')
-	.option('--open', 'open the specimen in the default browser')
+	.option('--open', 'open the workbench in the default browser')
 	.action(async (targetPath, options) => {
-		await serveSpecimenCommand(targetPath, options);
+		await serveReviewCommand(targetPath, options);
 	});
 
 fontsCommand

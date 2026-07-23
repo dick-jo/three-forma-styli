@@ -4,7 +4,7 @@
 
 ```text
 apps/
-└── preview/     private visual workbench; never published
+└── workbench/   private Svelte source; compiled to dependency-free review assets
 
 packages/
 ├── core/        public, browser-safe generator and programmatic runtime
@@ -18,8 +18,9 @@ entering applications that only need the small programmatic core. The
 `@three-forma-styli/core/runtime` browser bundle is dependency-free even though
 Culori remains an install-time dependency of the wider `core` package. A
 separate runtime package is only warranted if install-graph minimalism becomes a
-product requirement. The private Svelte application is an app—not a package—and
-is absent from every published tarball.
+product requirement. The private Svelte application is source tooling—not a
+package. Only its dependency-free browser bundle enters the compiler tarball, and
+only projects requesting review output receive those assets.
 
 All public packages currently share one version and release together. This is a
 fixed release train, not an assertion that every package changed equally. It

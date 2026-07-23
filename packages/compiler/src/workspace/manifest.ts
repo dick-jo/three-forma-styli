@@ -95,7 +95,24 @@ export async function createWorkspaceManifest(
 				entrypoints,
 				fontUrls: render.preparedFonts ? plan.runtimeFontUrls : undefined,
 			},
-			review: plan.review.specimen ? { specimen: 'review/typography.html' } : undefined,
+			review:
+				plan.review.workbench || plan.review.specimen || plan.review.shadowSpecimen
+					? {
+							entrypoint: plan.review.workbench ? 'review/index.html' : undefined,
+							contract: plan.review.workbench ? 'review/workbench.json' : undefined,
+							legacy:
+								plan.review.specimen || plan.review.shadowSpecimen
+									? {
+											typography: plan.review.specimen
+												? 'review/typography.html'
+												: undefined,
+											shadows: plan.review.shadowSpecimen
+												? 'review/shadows.html'
+												: undefined,
+										}
+									: undefined,
+						}
+					: undefined,
 			design: {
 				dtcg: plan.design.dtcg ? 'design/tokens.dtcg.json' : undefined,
 				figmaVariables: plan.design.figmaVariables ? 'design/figma.variables.json' : undefined,

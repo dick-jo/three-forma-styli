@@ -9,7 +9,7 @@ export default defineTfsProject({
 		directory: './generated',
 		targets: {
 			runtime: { css: {}, contracts: {} },
-			review: { specimen: { title: 'TFS workspace package' } },
+			review: { workbench: { title: 'TFS workspace package' } },
 			design: { dtcg: true, figmaVariables: true },
 		},
 	},
