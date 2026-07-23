@@ -199,7 +199,7 @@ function validateColorsPartial(colors: NonNullable<PartialDesignSystem['colors']
 	}
 	validateNamedModes(colors.modes, 'colors.modes', 'Color');
 
-	colors.modes.forEach((mode, index) => {
+	colors.modes.forEach((mode) => {
 		if (!mode.tokens || typeof mode.tokens !== 'object') {
 			throw new ValidationError(`Color mode "${mode.name}" must have tokens`);
 		}

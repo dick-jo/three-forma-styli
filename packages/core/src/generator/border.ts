@@ -3,7 +3,7 @@
  */
 
 import type { DesignSystem, BorderRadiusMode, BorderWidthMode, SpacingMode } from '../types.js';
-import type { TokenValue, GeneratorResult, GeneratorConfig, ModeInfo } from './types.js';
+import type { TokenValue, GeneratorResult, GeneratorConfig } from './types.js';
 import { getDefaultEntry } from './utils.js';
 
 // ============================================

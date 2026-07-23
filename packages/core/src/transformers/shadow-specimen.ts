@@ -14,7 +14,7 @@ function escapeHtml(value: string): string {
 		.replaceAll('"', '&quot;');
 }
 
-function samples(kind: 'box' | 'text', name: string, recipe: ShadowContractRecipe): string {
+function samples(kind: 'box' | 'text', recipe: ShadowContractRecipe): string {
 	return recipe.displayOrder
 		.map((variant) => {
 			const value = variant === 'base' ? recipe.base : recipe.variants[variant]!;
@@ -36,7 +36,7 @@ function samples(kind: 'box' | 'text', name: string, recipe: ShadowContractRecip
 function recipeSection(kind: 'box' | 'text', name: string, recipe: ShadowContractRecipe): string {
 	return `<section>
     <header class="recipe-header"><span>${kind} shadow</span><h2>${escapeHtml(name)}</h2></header>
-    <div class="samples">${samples(kind, name, recipe)}</div>
+	    <div class="samples">${samples(kind, recipe)}</div>
   </section>`;
 }
 

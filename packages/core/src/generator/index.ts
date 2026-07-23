@@ -12,11 +12,7 @@ import type {
 	GeneratorConfig,
 	GeneratorOptions,
 	GeneratorResult,
-	ModeInfo,
-	ScaleInfo,
 	TimeGeneratorResult,
-	MotionGeneratorResult,
-	ShadowGeneratorResult,
 } from './types.js';
 import { defaultGeneratorConfig } from './types.js';
 import { validatePartialDesignSystem, ValidationError } from './validate.js';

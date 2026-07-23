@@ -7,7 +7,6 @@ import type {
 } from '../types.js';
 import type {
 	GeneratorConfig,
-	ShadowContract,
 	ShadowContractLayer,
 	ShadowContractRecipe,
 	ShadowContractValue,

@@ -1,15 +1,11 @@
 import fs from 'fs-extra';
-import path from 'path';
+import path from 'node:path';
 import chalk from 'chalk';
 import { input, select } from '@inquirer/prompts';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { execFileSync } from 'child_process';
-import { createRequire } from 'module';
+import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { CLI_VERSION } from '../version.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 const require = createRequire(import.meta.url);
 
 export interface InitOptions {
