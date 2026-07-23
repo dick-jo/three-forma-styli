@@ -28,7 +28,9 @@ prevents a packed CLI from resolving an older, API-incompatible core from npm.
 workspace before anything is published. Its ecosystem stage uses real tarball
 installs rather than extracting packages into a synthetic workspace, then
 proves both scaffold shapes and a packed generated package in a typed Vite
-production consumer.
+production consumer. A separate release job executes that packed result in
+Chromium; Playwright remains repository-only and is absent from every published
+tarball.
 
 Project configs should use the import-safe compiler root:
 

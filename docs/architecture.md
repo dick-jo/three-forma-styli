@@ -8,7 +8,7 @@ TFS is an opinionated design token generator. It takes user-defined theme inputs
 
 ### Philosophy
 
-1. **Luminosity-First Design** - Lightness relationships determine readability. When luminosity is correct, hue choices become flexible.
+1. **Luminance-First Design** - Explicit OKLCH-L separation controls palette hierarchy while hue and chroma remain flexible.
 2. **Alpha-Based Variations** - Instead of generating solid color variants (blue-100, blue-200...), use alpha/transparency variants of base colors.
 3. **Ergonomic Abstraction** - Limit choices to enforce consistency. Spacing scales, gap shortcuts, and semantic naming reduce decision fatigue.
 4. **Runtime Theming** - CSS custom properties enable theme switching without reloading.

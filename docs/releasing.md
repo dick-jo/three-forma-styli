@@ -15,6 +15,9 @@ not consume the CLI or themes package at runtime.
 - [ ] Confirm the dedicated `font-conversion` CI job passed with the pinned
       Python and FontTools requirements; compare its recorded provenance with
       any project whose generated font bytes are release evidence.
+- [ ] Confirm the dedicated `browser-consumer` CI job passed against the exact
+      release commit; routine Node tests do not substitute for that Chromium
+      proof.
 - [ ] Add the appropriate Changeset for the post-`0.2.0` hardening, scoped
       typography-mode fix, and any other unreleased public changes.
 - [ ] Publish an exact `next` canary, install it in Splinter, and run the full
@@ -32,8 +35,8 @@ No npm publication was performed during the current toolkit/design-system work.
    `pnpm release:version`, and review every version, changelog and lockfile change.
    Commit and merge that release-preparation diff before publishing.
 3. Run `npm whoami` and confirm the account can publish the scope.
-4. Run `pnpm install --frozen-lockfile`, `pnpm check:release`, and
-   `pnpm audit --prod --audit-level=moderate`.
+4. Run `pnpm install --frozen-lockfile`, `pnpm check:release`,
+   `pnpm check:browser`, and `pnpm audit --prod --audit-level=moderate`.
    `check:release` installs all four packed artifacts into a clean temporary
    consumer and checks the import API, public declarations through strict
    TypeScript compilation, and the executable.

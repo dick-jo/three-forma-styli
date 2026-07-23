@@ -1,10 +1,12 @@
 # CLI TypeScript Execution Issue (historical)
 
-> Archived note: this describes the removed pre-generator API. Current commands
-> bundle theme entry points with esbuild and call `generateCss()` or
-> `generateFigmaJson()`; examples below are retained only as debugging history.
+> **Superseded historical note.** The shell/`tsx --eval` implementation and the
+> APIs below no longer exist. Current project loading bundles local config with
+> esbuild, complete Node/font compilation lives in `@three-forma-styli/compiler`,
+> and untrusted browser colours use `@three-forma-styli/core/runtime`. Examples
+> below are retained only as debugging history and must not guide new consumers.
 
-> **Status:** Open issue requiring fix
+> **Status:** Resolved and regression-tested through packed npm scaffolds
 > **Date:** 2025-12-08
 > **Affects:** `@three-forma-styli/cli` package, specifically the `tfs build` command
 

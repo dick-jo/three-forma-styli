@@ -4,7 +4,9 @@ Low-priority cleanup and consistency tasks to tackle when time permits.
 
 ## Terminology Consistency
 
-- [ ] Audit all code and comments for "luminosity" - should be "luminance"
+- [x] Audit active code and current documentation for "luminosity"; public TFS
+      vocabulary remains "luminance", with the actual metric identified as
+      `oklch-l` wherever diagnostics are exposed.
 
 ## Code Cleanup
 
