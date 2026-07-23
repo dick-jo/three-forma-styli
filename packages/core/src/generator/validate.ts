@@ -83,6 +83,7 @@ export function validateDesignSystem(ds: DesignSystem): void {
 	validateBorder(ds);
 	validateTime(ds);
 	if (ds.motion) validateMotionPartial(ds.motion, ds.time);
+	if (ds.shadows) validateShadowsPartial(ds.shadows, ds.colors);
 }
 
 /**
@@ -103,6 +104,7 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 	const hasBorder = !!ds.border;
 	const hasTime = !!ds.time;
 	const hasMotion = !!ds.motion;
+	const hasShadows = !!ds.shadows;
 
 	if (
 		!hasColors &&
@@ -111,7 +113,8 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 		!hasTypography &&
 		!hasBorder &&
 		!hasTime &&
-		!hasMotion
+		!hasMotion &&
+		!hasShadows
 	) {
 		throw new ValidationError('At least one token family must be provided');
 	}
@@ -128,6 +131,9 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 	}
 	if (hasMotion && !hasTime) {
 		throw new ValidationError('Motion requires time (motion durations reference time scales)');
+	}
+	if (hasShadows && !hasColors) {
+		throw new ValidationError('Shadows require colors (shadow layers reference color tokens)');
 	}
 
 	// Validate each provided family
@@ -151,6 +157,9 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 	}
 	if (hasMotion) {
 		validateMotionPartial(ds.motion!, ds.time!);
+	}
+	if (hasShadows) {
+		validateShadowsPartial(ds.shadows!, ds.colors!);
 	}
 }
 
@@ -1106,6 +1115,116 @@ function validateMotionPartial(
 			}
 			validateTimeReference(duration, time, `${path}.duration`, false);
 			validateTimeReference(delay, time, `${path}.delay`, true);
+		}
+	}
+}
+
+function validateShadowsPartial(
+	shadows: NonNullable<PartialDesignSystem['shadows']>,
+	colors: NonNullable<PartialDesignSystem['colors']>
+): void {
+	validateCssUnit(shadows.unit, 'shadows.unit');
+	if (['%', 'ms', 's', 'deg'].includes(shadows.unit)) {
+		throw new ValidationError(`shadows.unit "${shadows.unit}" is not a CSS length unit`);
+	}
+	const box = shadows.box ?? {};
+	const text = shadows.text ?? {};
+	if (Object.keys(box).length === 0 && Object.keys(text).length === 0) {
+		throw new ValidationError('shadows must contain at least one box or text recipe');
+	}
+	const defaultColorMode = colors.modes.find((mode) => mode.isDefault) ?? colors.modes[0];
+	const colorNames = new Set(Object.keys(defaultColorMode?.tokens ?? {}));
+	const alphaNames = new Set(
+		Object.keys(defaultColorMode?.alphaSchedule ?? colors.alphaSchedule ?? {})
+	);
+
+	for (const [kind, recipes] of [['box', box] as const, ['text', text] as const]) {
+		for (const [recipeName, recipe] of Object.entries(recipes)) {
+			const path = `shadows.${kind}.${recipeName}`;
+			if (!tokenNamePattern.test(recipeName)) {
+				throw new ValidationError(`${path} name is not CSS-token safe`);
+			}
+			if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe)) {
+				throw new ValidationError(`${path} must be an object`);
+			}
+			if ('base' in (recipe.variants ?? {})) {
+				throw new ValidationError(`${path}.variants must not contain reserved name "base"`);
+			}
+			for (const variantName of Object.keys(recipe.variants ?? {})) {
+				if (!tokenNamePattern.test(variantName)) {
+					throw new ValidationError(`${path}.variants name "${variantName}" is not CSS-token safe`);
+				}
+			}
+			if (recipe.displayOrder) {
+				const expected = ['base', ...Object.keys(recipe.variants ?? {})].sort();
+				const received = [...recipe.displayOrder].sort();
+				if (
+					expected.length !== received.length ||
+					expected.some((name, index) => name !== received[index])
+				) {
+					throw new ValidationError(
+						`${path}.displayOrder must contain base and every variant exactly once`
+					);
+				}
+			}
+			for (const [variantName, layers] of [
+				['base', recipe.base] as const,
+				...Object.entries(recipe.variants ?? {}),
+			]) {
+				const layerPath = `${path}.${variantName}`;
+				if (!Array.isArray(layers) || layers.length === 0) {
+					throw new ValidationError(`${layerPath} must contain at least one layer`);
+				}
+				for (const [index, layer] of layers.entries()) {
+					const current = `${layerPath}[${index}]`;
+					if (!layer || typeof layer !== 'object' || Array.isArray(layer)) {
+						throw new ValidationError(`${current} must be an object`);
+					}
+					const allowed = new Set([
+						'x',
+						'y',
+						'blur',
+						'color',
+						...(kind === 'box' ? ['spread', 'inset'] : []),
+					]);
+					for (const key of Object.keys(layer)) {
+						if (!allowed.has(key)) {
+							throw new ValidationError(`${current} contains unsupported field "${key}"`);
+						}
+					}
+					for (const field of ['x', 'y', 'blur'] as const) {
+						validateFiniteNumber(layer[field], `${current}.${field}`);
+					}
+					if (layer.blur < 0) {
+						throw new ValidationError(`${current}.blur must be non-negative`);
+					}
+					if (kind === 'box') {
+						const boxLayer = layer as (typeof box)[string]['base'][number];
+						if (boxLayer.spread !== undefined) {
+							validateFiniteNumber(boxLayer.spread, `${current}.spread`);
+						}
+						if (boxLayer.inset !== undefined && typeof boxLayer.inset !== 'boolean') {
+							throw new ValidationError(`${current}.inset must be boolean`);
+						}
+					}
+					if (!layer.color || typeof layer.color !== 'object' || Array.isArray(layer.color)) {
+						throw new ValidationError(`${current}.color must reference a color token`);
+					}
+					if (!tokenNamePattern.test(layer.color.color)) {
+						throw new ValidationError(`${current}.color.color is not CSS-token safe`);
+					}
+					if (!colorNames.has(layer.color.color)) {
+						throw new ValidationError(
+							`${current}.color references unknown default color "${layer.color.color}"`
+						);
+					}
+					if (layer.color.alpha !== undefined && !alphaNames.has(layer.color.alpha)) {
+						throw new ValidationError(
+							`${current}.color references unknown alpha level "${layer.color.alpha}"`
+						);
+					}
+				}
+			}
 		}
 	}
 }

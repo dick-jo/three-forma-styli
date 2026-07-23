@@ -354,6 +354,11 @@ function generatePackageJson(packageName: string, workspacePackage: boolean): st
 						types: './generated/runtime/styles/typography.module.css.d.ts',
 						default: './generated/runtime/styles/typography.module.css',
 					},
+					'./shadows.css': './generated/runtime/styles/shadows.css',
+					'./shadows.module.css': {
+						types: './generated/runtime/styles/shadows.module.css.d.ts',
+						default: './generated/runtime/styles/shadows.module.css',
+					},
 					'./package.json': './package.json',
 				},
 			}

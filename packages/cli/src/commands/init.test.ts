@@ -115,6 +115,10 @@ describe('tfs init', () => {
 			types: './generated/runtime/styles/typography.module.css.d.ts',
 			default: './generated/runtime/styles/typography.module.css',
 		});
+		expect(manifest.exports['./shadows.module.css']).toEqual({
+			types: './generated/runtime/styles/shadows.module.css.d.ts',
+			default: './generated/runtime/styles/shadows.module.css',
+		});
 		expect(manifest.files).toEqual(['generated/runtime', 'generated/assets', 'README.md']);
 		expect(manifest.sideEffects).toEqual(['./generated/runtime/styles/*.css']);
 		const stdout = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
@@ -135,6 +139,9 @@ describe('tfs init', () => {
 		expect(
 			dryRun.result.plan.artifacts.map((artifact: { path: string }) => artifact.path)
 		).toContain('runtime/styles/typography.module.css.d.ts');
+		expect(
+			dryRun.result.plan.artifacts.map((artifact: { path: string }) => artifact.path)
+		).toContain('review/shadows.html');
 		expect(await fs.pathExists(path.join(projectRoot, 'generated'))).toBe(false);
 
 		execFileSync(

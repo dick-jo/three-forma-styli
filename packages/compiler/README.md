@@ -87,18 +87,23 @@ export default defineTfsProject({
 			runtime: {
 				css: {
 					fontUrls: { mode: 'relative' },
+					shadows: true,
+					shadowModule: true,
 				},
 				contracts: {},
 			},
-			review: { specimen: { title: 'Design system review' } },
+			review: {
+				specimen: { title: 'Typography review' },
+				shadowSpecimen: { title: 'Shadow review' },
+			},
 			design: { dtcg: true, figmaVariables: true },
 		},
 	},
 });
 ```
 
-An enabled `css: {}` emits the entry, tokens, available semantic typography,
-and CSS Module targets. An enabled `contracts: {}` emits the system, available
+An enabled `css: {}` emits the entry, tokens, available semantic typography and
+shadow global/CSS Module targets. An enabled `contracts: {}` emits the system, available
 typography, and available native-color-mode contracts. Set individual fields to
 `false` for explicit opt-outs; `runtime: true`, `review: true`, and
 `design: true` are complete shorthands.
@@ -108,7 +113,7 @@ The generated tree is stable and target-oriented:
 ```text
 generated/
   runtime/                 dependency-free ESM, declarations, and styles
-  review/typography.html   local authoring evidence, not a package export
+  review/                  typography/shadow evidence, not package exports
   design/                  DTCG and Figma interchange, not a package export
   assets/fonts/            one prepared font asset set shared by runtime/review
   build.manifest.json      deterministic schema-v2 artifact graph

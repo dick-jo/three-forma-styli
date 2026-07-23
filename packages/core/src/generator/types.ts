@@ -11,7 +11,15 @@
 export interface TokenValue {
 	/** Token family (color, spacing, gap, etc.) */
 	family:
-		'color' | 'spacing' | 'gap' | 'typography' | 'borderRadius' | 'borderWidth' | 'time' | 'motion';
+		| 'color'
+		| 'spacing'
+		| 'gap'
+		| 'typography'
+		| 'borderRadius'
+		| 'borderWidth'
+		| 'time'
+		| 'motion'
+		| 'shadow';
 
 	/** Full token name without -- prefix (e.g., 'clr-bg', 'sp-1', 'gap-s') */
 	name: string;
@@ -53,6 +61,11 @@ export interface TokenMetadata {
 
 	/** For motion tokens: base or an authored variant name. */
 	motionVariant?: string;
+
+	/** For shadow tokens: grammar, author recipe, and base/variant identity. */
+	shadowKind?: 'box' | 'text';
+	shadowRecipe?: string;
+	shadowVariant?: string;
 }
 
 /**
@@ -168,6 +181,39 @@ export interface MotionContract {
 	>;
 }
 
+export interface ShadowContractLayer {
+	x: number;
+	y: number;
+	blur: number;
+	spread?: number;
+	inset?: boolean;
+	color: {
+		name: string;
+		alpha?: string;
+		token: string;
+		css: string;
+	};
+}
+
+export interface ShadowContractValue {
+	token: string;
+	css: string;
+	layers: ShadowContractLayer[];
+}
+
+export interface ShadowContractRecipe {
+	base: ShadowContractValue;
+	variants: Record<string, ShadowContractValue>;
+	displayOrder: string[];
+}
+
+export interface ShadowContract {
+	namespace: string;
+	unit: string;
+	box: Record<string, ShadowContractRecipe>;
+	text: Record<string, ShadowContractRecipe>;
+}
+
 /**
  * The complete Intermediate Representation
  */
@@ -194,6 +240,9 @@ export interface IR {
 
 	/** Structured semantic motion decisions for CSS and JavaScript consumers. */
 	motion?: MotionContract;
+
+	/** Structured, mode-aware box/text shadow recipes. */
+	shadows?: ShadowContract;
 }
 
 /**
@@ -212,6 +261,7 @@ export interface GeneratorConfig {
 		borderWidth: string;
 		time: string;
 		motion: string;
+		shadow: string;
 	};
 
 	/** Color output format */
@@ -242,6 +292,7 @@ export const defaultGeneratorConfig: GeneratorConfig = {
 		borderWidth: 'bdw',
 		time: 't',
 		motion: 'motion',
+		shadow: 'shadow',
 	},
 	colorFormat: {
 		base: 'oklch',
@@ -274,4 +325,10 @@ export interface TimeGeneratorResult {
 export interface MotionGeneratorResult {
 	defaultTokens: TokenValue[];
 	contract: MotionContract;
+}
+
+/** Shadow recipes are root composites whose color references follow color modes. */
+export interface ShadowGeneratorResult {
+	defaultTokens: TokenValue[];
+	contract: ShadowContract;
 }

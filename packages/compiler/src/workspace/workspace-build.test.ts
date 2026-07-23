@@ -234,6 +234,75 @@ describe('workspace-package build', () => {
 		expect(manifest.targets.runtime.entrypoints).not.toHaveProperty('./design/dtcg');
 	});
 
+	it('emits global and module shadow helpers as explicit package surfaces', async () => {
+		const manifest = hostManifest({
+			exports: {
+				'./styles.css': './generated/runtime/styles/index.css',
+				'./tokens.css': './generated/runtime/styles/tokens.css',
+				'./shadows.css': './generated/runtime/styles/shadows.css',
+				'./shadows.module.css': {
+					types: './generated/runtime/styles/shadows.module.css.d.ts',
+					default: './generated/runtime/styles/shadows.module.css',
+				},
+				'./package.json': './package.json',
+				'./unrelated': './src/human.js',
+			},
+		});
+		const { directory, configPath } = await fixture(manifest);
+		const project = defineTfsProject({
+			system: {
+				colors: colors(),
+				shadows: {
+					unit: 'px',
+					box: {
+						elevation: {
+							base: [{ x: 0, y: 4, blur: 16, color: { color: 'ink', alpha: 'min' } }],
+						},
+					},
+					text: {
+						glow: {
+							base: [{ x: 0, y: 0, blur: 8, color: { color: 'pri', alpha: 'min' } }],
+						},
+					},
+				},
+			},
+			output: {
+				layout: 'workspace-package',
+				directory: './generated',
+				targets: {
+					runtime: {
+						css: {
+							entry: true,
+							tokens: true,
+							shadows: true,
+							shadowModule: true,
+						},
+					},
+					review: { shadowSpecimen: true },
+				},
+			},
+		});
+		const result = await buildProject(project, configPath);
+
+		expect(result.files).toEqual(
+			expect.arrayContaining([
+				'runtime/styles/shadows.css',
+				'runtime/styles/shadows.module.css',
+				'runtime/styles/shadows.module.css.d.ts',
+				'review/shadows.html',
+			])
+		);
+		expect(
+			await fs.readFile(path.join(directory, 'generated/runtime/styles/shadows.css'), 'utf8')
+		).toContain('.shadow--box-elevation {');
+		expect(
+			await fs.readFile(path.join(directory, 'generated/runtime/styles/shadows.module.css'), 'utf8')
+		).toContain('.text-glow {');
+		expect(
+			await fs.readFile(path.join(directory, 'generated/review/shadows.html'), 'utf8')
+		).toContain('class="box-stage clipped"');
+	});
+
 	it('checks a package-shaped tree without replacing or repairing it', async () => {
 		const { directory, configPath, packagePath } = await fixture();
 		const project = fullProject();

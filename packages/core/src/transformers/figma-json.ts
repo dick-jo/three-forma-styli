@@ -1,7 +1,7 @@
 /**
  * JSON transformers for standards-based design-token interchange and Figma's
- * Variables REST API. Figma variables are currently limited to color tokens;
- * other token families remain available through the CSS transformer.
+ * Variables REST API. Figma variables are currently limited to colors; DTCG
+ * additionally carries standards-compliant box/text shadow composites.
  */
 
 import type { IR, TokenValue } from '../generator/types.js';
@@ -102,16 +102,14 @@ function toDtcgColor(hex: string, colorSpace: 'srgb' | 'display-p3'): DtcgColor 
 }
 
 function getColorTokens(tokens: Record<string, TokenValue>): Record<string, TokenValue> {
-	return Object.fromEntries(
-		Object.entries(tokens).filter(([, token]) => token.family === 'color')
-	);
+	return Object.fromEntries(Object.entries(tokens).filter(([, token]) => token.family === 'color'));
 }
 
 function getColorModes(ir: IR): { defaultMode: string; allModes: string[] } {
 	const defaultMode = ir.modes.color.default;
 	if (!defaultMode) {
 		throw new Error(
-			'DTCG/Figma Variables JSON is currently color-only and requires a color token family'
+			'Design JSON requires a color token family (Figma Variables are color-only; DTCG shadows reference color tokens)'
 		);
 	}
 
@@ -152,6 +150,9 @@ function generateDtcg(
 	const tokens = getColorTokens(ir.tokens);
 	const { defaultMode, allModes } = getColorModes(ir);
 	const colorGroup: Record<string, unknown> = { $type: 'color' };
+	const shadowGroup: Record<string, unknown> | undefined = ir.shadows
+		? { $type: 'shadow' }
+		: undefined;
 
 	for (const [name, token] of Object.entries(tokens)) {
 		const entry: Record<string, unknown> = {
@@ -178,11 +179,43 @@ function generateDtcg(
 
 		colorGroup[name] = entry;
 	}
+	if (shadowGroup && ir.shadows) {
+		const dimension = (value: number) => ({ value, unit: ir.shadows!.unit });
+		for (const [kind, recipes] of [
+			['box', ir.shadows.box] as const,
+			['text', ir.shadows.text] as const,
+		]) {
+			for (const [recipeName, recipe] of Object.entries(recipes)) {
+				for (const [variantName, value] of [
+					['base', recipe.base] as const,
+					...Object.entries(recipe.variants),
+				]) {
+					const name =
+						variantName === 'base'
+							? `${kind}-${recipeName}`
+							: `${kind}-${recipeName}-${variantName}`;
+					const layers = value.layers.map((layer) => ({
+						color: `{color.${layer.color.token}}`,
+						offsetX: dimension(layer.x),
+						offsetY: dimension(layer.y),
+						blur: dimension(layer.blur),
+						spread: dimension(layer.spread ?? 0),
+						...(layer.inset ? { inset: true } : {}),
+					}));
+					shadowGroup[name] = {
+						$value: layers.length === 1 ? layers[0] : layers,
+						$extensions: { [EXTENSION_KEY]: { kind } },
+					};
+				}
+			}
+		}
+	}
 
 	return {
 		$schema: DTCG_SCHEMA,
 		...(metadata ? { $extensions: { [EXTENSION_KEY]: metadata } } : {}),
 		color: colorGroup,
+		...(shadowGroup ? { shadow: shadowGroup } : {}),
 	};
 }
 
@@ -230,9 +263,10 @@ export function toFigmaJson(
 ): string {
 	const config = mergeConfig(userConfig);
 	const metadata = buildMetadata(userConfig?.fileHeader);
-	const output = format === 'figma-variables'
-		? generateFigmaVariables(ir, config, metadata)
-		: generateDtcg(ir, config, metadata);
+	const output =
+		format === 'figma-variables'
+			? generateFigmaVariables(ir, config, metadata)
+			: generateDtcg(ir, config, metadata);
 
 	return JSON.stringify(output, null, 2);
 }

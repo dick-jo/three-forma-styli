@@ -19,6 +19,7 @@ export interface WorkspaceArtifact {
 export interface WorkspacePlanContext {
 	hasColors: boolean;
 	hasTypography: boolean;
+	hasShadows: boolean;
 	hasFonts: boolean;
 }
 
@@ -34,10 +35,21 @@ export interface WorkspacePlan {
 		typographyClassPrefix?: string;
 		typographySpecificity: 'class' | 'zero';
 		module: boolean;
+		shadows: boolean;
+		shadowClassPrefix?: string;
+		shadowSpecificity: 'class' | 'zero';
+		shadowModule: boolean;
 		separateFonts: boolean;
 	};
 	contracts: { system: boolean; typography: boolean; nativeColorModes: boolean };
-	review: { specimen: boolean; title?: string; interactive?: boolean };
+	review: {
+		specimen: boolean;
+		title?: string;
+		interactive?: boolean;
+		shadowSpecimen: boolean;
+		shadowTitle?: string;
+		shadowInteractive?: boolean;
+	};
 	design: {
 		dtcg?: Required<Pick<ProjectJsonOutput, 'colorSpace' | 'collectionName'>>;
 		figmaVariables?: Required<Pick<ProjectJsonOutput, 'colorSpace' | 'collectionName'>>;
@@ -121,16 +133,29 @@ export function planWorkspacePackage(
 	const moduleRequested = Boolean(
 		css && css.module !== undefined ? css.module : allCss && context.hasTypography
 	);
+	const shadowsRequested = Boolean(
+		css && css.shadows !== undefined ? css.shadows : allCss && context.hasShadows
+	);
+	const shadowModuleRequested = Boolean(
+		css && css.shadowModule !== undefined ? css.shadowModule : allCss && context.hasShadows
+	);
 	if (css && css.typography && !context.hasTypography) {
 		throw new Error('runtime.css.typography requires semantic typography roles.');
 	}
 	if (css && css.module && !context.hasTypography) {
 		throw new Error('runtime.css.module requires semantic typography roles.');
 	}
+	if (css && css.shadows && !context.hasShadows) {
+		throw new Error('runtime.css.shadows requires shadow recipes.');
+	}
+	if (css && css.shadowModule && !context.hasShadows) {
+		throw new Error('runtime.css.shadowModule requires shadow recipes.');
+	}
 	const tokensRequested = Boolean(css && css.tokens !== undefined ? css.tokens : allCss);
 	const entryRequested = Boolean(css && css.entry !== undefined ? css.entry : allCss);
 	const tokenConfig = css?.tokens && css.tokens !== true ? css.tokens : {};
 	const typographyConfig = css?.typography && css.typography !== true ? css.typography : {};
+	const shadowConfig = css?.shadows && css.shadows !== true ? css.shadows : {};
 	const runtimeFontUrls = css?.fontUrls ?? ({ mode: 'relative' } as const);
 	const separateFonts = context.hasFonts && moduleRequested && !typographyRequested;
 
@@ -155,13 +180,23 @@ export function planWorkspacePackage(
 	}
 
 	const reviewTarget = output.targets.review;
-	const review = reviewTarget === true ? { specimen: true } : reviewTarget || {};
+	const review =
+		reviewTarget === true
+			? { specimen: context.hasTypography, shadowSpecimen: context.hasShadows }
+			: reviewTarget || {};
 	const specimenOption = review.specimen;
 	const specimen = Boolean(specimenOption);
 	if (specimen && !context.hasTypography) {
 		throw new Error('review.specimen requires semantic typography roles.');
 	}
 	const specimenConfig = specimenOption && specimenOption !== true ? specimenOption : {};
+	const shadowSpecimenOption = review.shadowSpecimen;
+	const shadowSpecimen = Boolean(shadowSpecimenOption);
+	if (shadowSpecimen && !context.hasShadows) {
+		throw new Error('review.shadowSpecimen requires shadow recipes.');
+	}
+	const shadowSpecimenConfig =
+		shadowSpecimenOption && shadowSpecimenOption !== true ? shadowSpecimenOption : {};
 
 	const designTarget = output.targets.design;
 	const design = designTarget === true ? { dtcg: true, figmaVariables: true } : designTarget || {};
@@ -207,11 +242,34 @@ export function planWorkspacePackage(
 			dependencies: ['runtime/styles/typography.module.css'],
 		});
 	}
+	if (shadowsRequested) {
+		add(artifacts, {
+			path: 'runtime/styles/shadows.css',
+			kind: 'runtime-css',
+			target: 'runtime',
+			dependencies: tokensRequested ? ['runtime/styles/tokens.css'] : [],
+		});
+	}
+	if (shadowModuleRequested) {
+		add(artifacts, {
+			path: 'runtime/styles/shadows.module.css',
+			kind: 'runtime-css',
+			target: 'runtime',
+			dependencies: tokensRequested ? ['runtime/styles/tokens.css'] : [],
+		});
+		add(artifacts, {
+			path: 'runtime/styles/shadows.module.css.d.ts',
+			kind: 'runtime-types',
+			target: 'runtime',
+			dependencies: ['runtime/styles/shadows.module.css'],
+		});
+	}
 	if (entryRequested) {
 		const dependencies = [
 			...(separateFonts ? ['runtime/styles/fonts.css'] : []),
 			...(tokensRequested ? ['runtime/styles/tokens.css'] : []),
 			...(typographyRequested ? ['runtime/styles/typography.css'] : []),
+			...(shadowsRequested ? ['runtime/styles/shadows.css'] : []),
 		];
 		if (dependencies.length === 0) {
 			throw new Error('runtime.css.entry requires at least one emitted stylesheet.');
@@ -265,6 +323,13 @@ export function planWorkspacePackage(
 			dependencies: context.hasFonts ? [`${fontDirectory}/*`] : [],
 		});
 	}
+	if (shadowSpecimen) {
+		add(artifacts, {
+			path: 'review/shadows.html',
+			kind: 'review',
+			target: 'review',
+		});
+	}
 	if (dtcg) add(artifacts, { path: 'design/tokens.dtcg.json', kind: 'design', target: 'design' });
 	if (figmaVariables) {
 		add(artifacts, { path: 'design/figma.variables.json', kind: 'design', target: 'design' });
@@ -313,6 +378,10 @@ export function planWorkspacePackage(
 			typographyClassPrefix: typographyConfig.classPrefix,
 			typographySpecificity: typographyConfig.specificity ?? 'class',
 			module: moduleRequested,
+			shadows: shadowsRequested,
+			shadowClassPrefix: shadowConfig.classPrefix,
+			shadowSpecificity: shadowConfig.specificity ?? 'class',
+			shadowModule: shadowModuleRequested,
 			separateFonts,
 		},
 		contracts: { system: systemContract, typography: typographyContract, nativeColorModes },
@@ -320,6 +389,9 @@ export function planWorkspacePackage(
 			specimen,
 			title: specimenConfig.title,
 			interactive: specimenConfig.interactive,
+			shadowSpecimen,
+			shadowTitle: shadowSpecimenConfig.title,
+			shadowInteractive: shadowSpecimenConfig.interactive,
 		},
 		design: { dtcg, figmaVariables },
 		host: {
@@ -380,6 +452,21 @@ export function requiredPackageExports(
 			target: {
 				types: packageTarget(generatedFromHost, 'runtime/styles/typography.module.css.d.ts'),
 				default: packageTarget(generatedFromHost, 'runtime/styles/typography.module.css'),
+			},
+		});
+	}
+	if (plan.css.shadows) {
+		required.push({
+			subpath: './shadows.css',
+			target: packageTarget(generatedFromHost, 'runtime/styles/shadows.css'),
+		});
+	}
+	if (plan.css.shadowModule) {
+		required.push({
+			subpath: './shadows.module.css',
+			target: {
+				types: packageTarget(generatedFromHost, 'runtime/styles/shadows.module.css.d.ts'),
+				default: packageTarget(generatedFromHost, 'runtime/styles/shadows.module.css'),
 			},
 		});
 	}

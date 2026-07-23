@@ -55,6 +55,13 @@ export interface ProjectTypographyCssOutput extends ProjectOutputFormat {
 	fontFaces?: 'include' | 'separate' | 'none';
 }
 
+export interface ProjectShadowCssOutput extends ProjectOutputFormat {
+	/** Global helper namespace without punctuation. Defaults to `shadow`; TFS adds `--`. */
+	classPrefix?: string;
+	/** Defaults to ordinary class specificity. `zero` wraps global helpers in :where(). */
+	specificity?: 'class' | 'zero';
+}
+
 export type ProjectFontAssetUrlPolicy =
 	{ mode: 'relative' } | { mode: 'public'; prefix: string } | { mode: 'absolute'; prefix: string };
 
@@ -112,6 +119,10 @@ export interface WorkspaceRuntimeCssOutput {
 	typography?: boolean | Omit<ProjectTypographyCssOutput, 'file' | 'fontFaces'>;
 	/** Emit the CSS Module and declaration. Defaults to true when roles exist. */
 	module?: boolean;
+	/** Emit global box/text shadow helper classes when shadow recipes exist. */
+	shadows?: boolean | Omit<ProjectShadowCssOutput, 'file'>;
+	/** Emit kebab-case shadow CSS Module helpers and their declaration. */
+	shadowModule?: boolean;
 	/** URL policy for runtime font-face sources. Review always uses relative prepared assets. */
 	fontUrls?: ProjectFontAssetUrlPolicy;
 }
@@ -139,6 +150,8 @@ export interface WorkspaceSpecimenOutput {
 
 export interface WorkspaceReviewOutput {
 	specimen?: boolean | WorkspaceSpecimenOutput;
+	/** Layering, clipping, banding and color-mode review for shadow recipes. */
+	shadowSpecimen?: boolean | Omit<WorkspaceSpecimenOutput, 'fonts'>;
 }
 
 export interface WorkspaceDesignOutput {

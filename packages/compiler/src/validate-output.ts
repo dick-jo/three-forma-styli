@@ -183,6 +183,7 @@ export async function validateProjectOutput(
 		const plan = planWorkspacePackage(project.output as WorkspacePackageOutput, {
 			hasColors: Boolean(project.system.colors),
 			hasTypography: Boolean(typography?.roles && Object.keys(typography.roles).length > 0),
+			hasShadows: Boolean(project.system.shadows),
 			hasFonts: Object.keys(project.fonts ?? {}).length > 0,
 		});
 		const host = await validateHostPackage(configDirectory, outputDirectory, plan);

@@ -383,6 +383,55 @@ not emit motion helper classes.
 
 ---
 
+### Shadows
+
+**Philosophy:** Ordered, multi-layer semantic effects with explicit author
+intent. Box and text families are separate because `text-shadow` has neither
+spread nor inset.
+
+```typescript
+shadows: {
+  unit: "px",
+  box: {
+    elevation: {
+      base: [
+        { x: 0, y: 1, blur: 2, color: { color: "shadow", alpha: "lo" } },
+        {
+          x: 0,
+          y: 8,
+          blur: 24,
+          spread: -4,
+          color: { color: "shadow", alpha: "min" },
+        },
+      ],
+      variants: {
+        max: [/* complete ordered layers */],
+      },
+    },
+  },
+  text: {
+    glow: {
+      base: [
+        { x: 0, y: 0, blur: 10, color: { color: "pri", alpha: "lo" } },
+      ],
+    },
+  },
+}
+```
+
+The resulting variables are `--shadow-box-elevation`,
+`--shadow-box-elevation-max`, and `--shadow-text-glow`. Semantic color
+references point at the generated color/alpha variables and therefore follow
+color modes. Core assigns no meaning to `elevation`, `glow`, or variant names.
+
+`deriveShadowRange()` only interpolates compatible geometry. Anchors must have
+the same ordered layer count, paired layers must agree on inset state, and
+different semantic colors require an explicit choice. Workspace projects may
+emit global helpers, kebab-case CSS Modules, a typed contract, DTCG 2025.10
+shadow composites, and `review/shadows.html`.
+
+---
+
 ## Generator Layer
 
 ### Generator Config
@@ -400,6 +449,7 @@ interface GeneratorConfig {
 		borderWidth: string; // default: 'bdw'
 		time: string; // default: 't'
 		motion: string; // default: 'motion'
+		shadow: string; // default: 'shadow'
 	};
 }
 ```

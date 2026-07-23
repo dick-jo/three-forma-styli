@@ -1,7 +1,7 @@
 import type { IR, PartialDesignSystem, TokenValue } from '@three-forma-styli/core';
 
 type ModeCategory = keyof IR['modes'];
-type TokenCategory = ModeCategory | 'time' | 'motion';
+type TokenCategory = ModeCategory | 'time' | 'motion' | 'shadow';
 type SourceMode = { name: string; isDefault?: boolean; tokens: unknown; metadata?: unknown };
 type ProjectModeEntry = {
 	isDefault: boolean;
@@ -33,6 +33,7 @@ type ProjectSystemContract = {
 		};
 	};
 	motion?: IR['motion'];
+	shadows?: IR['shadows'];
 };
 
 const FAMILY_CATEGORIES: Record<TokenValue['family'], TokenCategory> = {
@@ -44,6 +45,7 @@ const FAMILY_CATEGORIES: Record<TokenValue['family'], TokenCategory> = {
 	borderWidth: 'size',
 	time: 'time',
 	motion: 'motion',
+	shadow: 'shadow',
 };
 
 function tokenValues(
@@ -162,6 +164,7 @@ export function projectSystemContract(system: PartialDesignSystem, ir: IR): Proj
 		modes: modes as ProjectSystemContract['modes'],
 		scales,
 		...(ir.motion ? { motion: ir.motion } : {}),
+		...(ir.shadows ? { shadows: ir.shadows } : {}),
 	} as const;
 }
 

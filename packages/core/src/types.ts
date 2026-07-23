@@ -387,6 +387,47 @@ export interface MotionSystem {
 	recipes: Record<string, MotionRecipe>;
 }
 
+// SHADOWS ---------------------------------------------- //
+
+/** Reference a semantic color token and, optionally, one alpha-ramp member. */
+export interface ShadowColorReference {
+	color: string;
+	alpha?: string;
+}
+
+interface ShadowLayerBase {
+	x: number;
+	y: number;
+	blur: number;
+	color: ShadowColorReference;
+}
+
+export interface BoxShadowLayer extends ShadowLayerBase {
+	spread?: number;
+	inset?: boolean;
+}
+
+export interface TextShadowLayer extends ShadowLayerBase {}
+
+export interface ShadowRecipe<Layer extends ShadowLayerBase> {
+	/** Ordered layers; earlier layers are painted on top, matching CSS. */
+	base: readonly Layer[];
+	/** Arbitrarily named complete alternatives such as min, lo, hi and max. */
+	variants?: Record<string, readonly Layer[]>;
+	/** Optional review order containing base and every variant exactly once. */
+	displayOrder?: string[];
+}
+
+/**
+ * Box and text shadows are separate because their CSS grammars differ:
+ * text-shadow has neither spread nor inset.
+ */
+export interface ShadowSystem {
+	unit: string;
+	box?: Record<string, ShadowRecipe<BoxShadowLayer>>;
+	text?: Record<string, ShadowRecipe<TextShadowLayer>>;
+}
+
 // MAIN CONFIG ------------------------------------------ //
 
 /**
@@ -408,6 +449,7 @@ export interface DesignSystem {
 	border: BorderSystem;
 	time: TimeSystem;
 	motion?: MotionSystem;
+	shadows?: ShadowSystem;
 }
 
 /**
@@ -444,4 +486,5 @@ export interface PartialDesignSystem {
 	border?: BorderSystem;
 	time?: TimeSystem;
 	motion?: MotionSystem;
+	shadows?: ShadowSystem;
 }

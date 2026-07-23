@@ -22,6 +22,7 @@ export const COLOR_MODES: Record<string, ColorMode> = {
 			pri: oklch(0.7969, 0.1178, 296.37), // Purple/pink brand color
 			neu: oklch(0.9302, 0.0371, 299.19), // Light desaturated purple
 			ink: oklch(0.9333, 0.0371, 299.2), // Text/icons
+			shadow: oklch(0, 0, 0), // Mode-calibrated shadow ink
 			pos: oklch(0.7625, 0.203, 150.49), // Green
 			neg: oklch(0.6875, 0.2113, 7.38), // Red
 		},

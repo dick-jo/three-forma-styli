@@ -294,6 +294,44 @@ does not attach CSS property names to recipes.
 Border radius derives semantic choices from spacing; border width remains a
 small explicit system.
 
+### Shadows
+
+Box and text shadows are separate author-owned recipe families because their CSS
+grammars differ. Values are ordered layer arrays, so a tight contact shadow plus
+a broad ambient shadow is a normal value:
+
+```typescript
+shadows: {
+  unit: 'px',
+  box: {
+    elevation: {
+      base: [
+        { x: 0, y: 1, blur: 2, color: { color: 'shadow', alpha: 'lo' } },
+        { x: 0, y: 8, blur: 24, spread: -4, color: { color: 'shadow', alpha: 'min' } },
+      ],
+      variants: {
+        max: [/* another complete ordered layer stack */],
+      },
+    },
+  },
+  text: {
+    glow: {
+      base: [
+        { x: 0, y: 0, blur: 3, color: { color: 'pri', alpha: 'lo' } },
+        { x: 0, y: 0, blur: 16, color: { color: 'pri', alpha: 'min' } },
+      ],
+    },
+  },
+}
+```
+
+Semantic color references resolve to existing `--clr-*` alpha tokens, so the
+shadow follows color modes without copying colors into the effect. Generated
+outputs include CSS custom properties, optional global helpers, kebab-case CSS
+Modules, a typed contract, DTCG shadow composites, and an interactive specimen.
+`deriveShadowRange()` may interpolate matching geometry, but refuses to invent
+layer pairing, inset state, or color identity.
+
 ## Luminance Constraints
 
 Validate intentional perceptual separation between palette groups:

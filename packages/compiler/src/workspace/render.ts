@@ -8,6 +8,9 @@ import {
 	generateTypographySpecimen,
 	toTypographyCss,
 	toTypographyCssModuleTypes,
+	toShadowCss,
+	toShadowCssModuleTypes,
+	toShadowSpecimen,
 	type IR,
 	type PartialDesignSystem,
 	type TypographySystem,
@@ -219,11 +222,30 @@ export async function renderWorkspacePackage(
 			toTypographyCssModuleTypes(ir)
 		);
 	}
+	if (plan.css.shadows) {
+		await writeText(
+			staging,
+			'runtime/styles/shadows.css',
+			toShadowCss(ir, {
+				classPrefix: plan.css.shadowClassPrefix,
+				specificity: plan.css.shadowSpecificity,
+			})
+		);
+	}
+	if (plan.css.shadowModule) {
+		await writeText(
+			staging,
+			'runtime/styles/shadows.module.css',
+			toShadowCss(ir, { scope: 'module' })
+		);
+		await writeText(staging, 'runtime/styles/shadows.module.css.d.ts', toShadowCssModuleTypes(ir));
+	}
 	if (plan.css.entry) {
 		const imports = [
 			...(plan.css.separateFonts ? ['runtime/styles/fonts.css'] : []),
 			...(plan.css.tokens ? ['runtime/styles/tokens.css'] : []),
 			...(plan.css.typography ? ['runtime/styles/typography.css'] : []),
+			...(plan.css.shadows ? ['runtime/styles/shadows.css'] : []),
 		];
 		await writeText(
 			staging,
@@ -286,6 +308,16 @@ export async function renderWorkspacePackage(
 							)
 						: undefined,
 				},
+			})
+		);
+	}
+	if (plan.review.shadowSpecimen) {
+		await writeText(
+			staging,
+			'review/shadows.html',
+			toShadowSpecimen(ir, {
+				title: plan.review.shadowTitle,
+				interactive: plan.review.shadowInteractive,
 			})
 		);
 	}

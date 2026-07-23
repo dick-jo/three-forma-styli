@@ -6,6 +6,7 @@ describe('project system TypeScript contract', () => {
 	it('preserves authored modes and simultaneous time scales as separate contracts', () => {
 		const system = {
 			colors: {
+				alphaSchedule: { min: 0.08 },
 				modes: [
 					{
 						name: 'default',
@@ -43,6 +44,14 @@ describe('project system TypeScript contract', () => {
 					},
 				},
 			},
+			shadows: {
+				unit: 'px',
+				box: {
+					elevation: {
+						base: [{ x: 0, y: 4, blur: 12, color: { color: 'bg', alpha: 'min' } }],
+					},
+				},
+			},
 		} satisfies PartialDesignSystem;
 		const contract = projectSystemContract(system, generate(system));
 
@@ -77,6 +86,10 @@ describe('project system TypeScript contract', () => {
 			token: 't-ambient-2',
 			milliseconds: 2000,
 			seconds: 2,
+		});
+		expect(contract.shadows?.box.elevation?.base).toMatchObject({
+			token: 'shadow-box-elevation',
+			layers: [{ y: 4, blur: 12, color: { token: 'clr-bg-a-min' } }],
 		});
 		expect(generateProjectSystemTypescript(system, generate(system))).toContain(
 			'export type TfsColorMode'

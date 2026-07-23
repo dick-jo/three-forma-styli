@@ -75,6 +75,7 @@ export async function buildWorkspacePackageProject(
 		hasTypography: Boolean(
 			sourceTypography?.roles && Object.keys(sourceTypography.roles).length > 0
 		),
+		hasShadows: Boolean(project.system.shadows),
 		hasFonts: Object.keys(project.fonts ?? {}).length > 0,
 	};
 	const plan = planWorkspacePackage(workspaceProject.output, context);

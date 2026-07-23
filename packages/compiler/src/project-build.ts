@@ -848,6 +848,7 @@ export async function planProject(
 			hasTypography: Boolean(
 				sourceTypography?.roles && Object.keys(sourceTypography.roles).length > 0
 			),
+			hasShadows: Boolean(project.system.shadows),
 			hasFonts: fontPlan.fonts.sources.length > 0,
 		});
 		const host = await validateHostPackage(configDirectory, outputDirectory, workspacePlan);

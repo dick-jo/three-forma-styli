@@ -117,14 +117,14 @@ reference evidence, not hardcoded policy.
 - [x] Add typography-role text-transform decisions, resolved into every complete
       recipe and available to generated CSS/TypeScript consumers. Preserve source
       text and keep role names and transform values author-defined.
-- [ ] Add first-class composite shadow tokens with ordered multi-layer values,
+- [x] Add first-class composite shadow tokens with ordered multi-layer values,
       explicit semantic colour references, safe interpolation rules, and review
       specimens for elevation, glow, clipping, banding, and light/dark surfaces.
 - [ ] Deferred: recalibrate Scatter's shimmer palette per native colour mode as
       an authored colour/theme concern. Do not couple it to the motion system.
 - [x] Correct the under-specified time model: simultaneously emitted duration
       namespaces are now authored and exported as `time.scales`, not switchable
-      modes. Easing and semantic motion recipes remain pending.
+      modes.
 - [x] Preserve atomic duration primitives, add arbitrary author-named cubic-bezier
       easing primitives, and add arbitrary author-named semantic motion recipes.
       Each recipe has an unsuffixed base plus any author-named variants and resolves
@@ -135,7 +135,7 @@ reference evidence, not hardcoded policy.
 - [ ] Make reduced-motion behavior explicit per semantic recipe and generate a
       `prefers-reduced-motion` contract. Do not globally erase essential feedback
       or assume every motion should degrade in the same way.
-- [ ] Keep component state/selectors and arbitrary keyframes outside the initial
+- [x] Keep component state/selectors and arbitrary keyframes outside the initial
       core motion model. Investigate optional higher-level interaction recipes
       only after the transition contract works across real consumers.
 
