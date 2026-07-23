@@ -1,6 +1,6 @@
 {
 	"name": "@three-forma-styli/core",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"type": "module",
 	"sideEffects": false,
 	"description": "Core design token generation library - framework-agnostic, browser and Node.js compatible",

@@ -33,9 +33,9 @@ describe('tfs init', () => {
 		const manifest = await fs.readJson(path.join(projectRoot, 'package.json'));
 
 		expect(manifest.version).toBeUndefined();
-		expect(manifest.dependencies['@three-forma-styli/core']).toBe('0.2.0');
-		expect(manifest.devDependencies['@three-forma-styli/cli']).toBe('0.2.0');
-		expect(manifest.devDependencies['@three-forma-styli/compiler']).toBe('0.2.0');
+		expect(manifest.dependencies['@three-forma-styli/core']).toBe('0.3.0');
+		expect(manifest.devDependencies['@three-forma-styli/cli']).toBe('0.3.0');
+		expect(manifest.devDependencies['@three-forma-styli/compiler']).toBe('0.3.0');
 		expect(manifest.devDependencies.typescript).toBe('5.9.3');
 		expect(await fs.readFile(path.join(projectRoot, 'tfs.config.ts'), 'utf8')).toContain(
 			'from "@three-forma-styli/compiler"'
@@ -60,7 +60,7 @@ describe('tfs init', () => {
 
 		await buildCommand(projectRoot, {});
 		const buildManifest = await fs.readJson(path.join(projectRoot, 'dist/build.manifest.json'));
-		expect(buildManifest.tool.version).toBe('0.2.0');
+		expect(buildManifest.tool.version).toBe('0.3.0');
 		expect(buildManifest.artifacts['tokens.css']).toBeDefined();
 		expect(buildManifest.artifacts['typography.specimen.html']).toBeDefined();
 		await expect(checkCommand(projectRoot)).resolves.toBeUndefined();
@@ -99,7 +99,7 @@ describe('tfs init', () => {
 		expect(config).toContain('layout: "workspace-package"');
 		expect(config).toContain('directory: "./generated"');
 		expect(manifest.dependencies).toBeUndefined();
-		expect(manifest.devDependencies['@three-forma-styli/core']).toBe('0.2.0');
+		expect(manifest.devDependencies['@three-forma-styli/core']).toBe('0.3.0');
 		expect(manifest.devDependencies.typescript).toBe('5.9.3');
 		expect(manifest.scripts).toEqual({
 			generate: 'tfs build .',

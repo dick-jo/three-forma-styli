@@ -153,7 +153,7 @@ describe('portable project build', () => {
 			)
 		);
 		expect(legacyFixture).toEqual({
-			'build.manifest.json': '56f1120317e4f047dda90af6afd7d3a0b412546b8152e3ebe165b8afe1b27d1b',
+			'build.manifest.json': '821b01fc2dca02ea278f7c49fb3562f0b14e7cb6a2c80ce8ac2702bd1dc0bb5e',
 			'index.css': '4cb2f483ae8a8ccca27250d862e726233646c40571ecfbb5e9a32e66ad79436a',
 			'system.generated.ts': 'ff16abd9f1075dae372cc332fe9b39818cb55482a429b0eb79f93f1f5cdcee0e',
 			'tokens.css': '580d6d89ce37cfc05e13e2e8e96742732f659570b760567c4fa3e5e24182a220',
