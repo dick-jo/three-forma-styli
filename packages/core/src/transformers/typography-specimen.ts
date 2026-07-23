@@ -45,7 +45,76 @@ function typographyTokenCss(ir: IR): string {
 	const declarations = Object.values(ir.tokens)
 		.filter((token) => token.family === 'typography')
 		.map((token) => `  --${token.name}: ${token.value};`);
-	return `:root {\n${declarations.join('\n')}\n}`;
+	const overrides = ir.modes.size.overrides
+		.map((modeName) => {
+			const modeDeclarations = Object.values(ir.overrideTokens[modeName] ?? {})
+				.filter((token) => token.family === 'typography')
+				.map((token) => `  --${token.name}: ${token.value};`);
+			return modeDeclarations.length > 0
+				? `body[data-size-mode=${JSON.stringify(modeName)}] {\n${modeDeclarations.join('\n')}\n}`
+				: '';
+		})
+		.filter(Boolean);
+	return [`:root {\n${declarations.join('\n')}\n}`, ...overrides].join('\n\n');
+}
+
+interface SpecimenRecipeBaseline {
+	fontSize: string | number;
+	weight: string;
+	lineHeight: number;
+	letterSpacing: number;
+}
+
+function modeRecipeBaselines(
+	ir: IR,
+	contract: TypographyContract
+): Record<string, Record<string, Record<string, SpecimenRecipeBaseline>>> {
+	const modes = [ir.modes.size.default, ...ir.modes.size.overrides];
+	return Object.fromEntries(
+		modes.map((modeName) => [
+			modeName,
+			Object.fromEntries(
+				Object.entries(contract.roles).map(([roleName, role]) => {
+					const recipes = [['base', role.base] as const, ...Object.entries(role.variants)];
+					return [
+						roleName,
+						Object.fromEntries(
+							recipes.map(([variantName, recipe]) => {
+								const modeTokens =
+									modeName === ir.modes.size.default
+										? ir.tokens
+										: (ir.overrideTokens[modeName] ?? {});
+								const fontSizeToken = modeTokens[recipe.fontSizeToken];
+								const atomicPrefix = atomicFontSizePrefix(
+									recipe.fontSizeReference,
+									recipe.atomicFontSizeToken
+								);
+								const reference = fontSizeToken?.reference;
+								const fontSizeSuffix = reference?.startsWith(`${atomicPrefix}-`)
+									? reference.slice(atomicPrefix.length + 1)
+									: String(recipe.fontSizeReference);
+								const weightToken = modeTokens[recipe.fontWeightToken];
+								const weight =
+									Object.entries(role.weightTokens).find(
+										([, token]) => token === weightToken?.reference
+									)?.[0] ?? recipe.weight;
+								return [
+									variantName,
+									{
+										fontSize: fontSizeSuffix === 'min' ? 'min' : Number(fontSizeSuffix),
+										weight,
+										lineHeight: modeTokens[recipe.lineHeightToken]?.rawValue ?? recipe.lineHeight,
+										letterSpacing:
+											modeTokens[recipe.letterSpacingToken]?.rawValue ?? recipe.letterSpacingEm,
+									},
+								];
+							})
+						),
+					];
+				})
+			),
+		])
+	);
 }
 
 function recipeDeclarations(
@@ -134,14 +203,21 @@ function atomicFontSizePrefix(selected: string | number, atomicToken: string): s
 
 function fontSizeOptions(ir: IR, selected: string | number, atomicToken: string): string {
 	const prefix = atomicFontSizePrefix(selected, atomicToken);
-	const names = Object.values(ir.tokens)
+	const names = [
+		...Object.values(ir.tokens),
+		...Object.values(ir.overrideTokens).flatMap((tokens) => Object.values(tokens)),
+	]
 		.filter(
 			(token) =>
 				token.family === 'typography' &&
 				token.name.startsWith(`${prefix}-`) &&
 				/^(?:min|\d+)$/.test(token.name.slice(prefix.length + 1))
 		)
-		.map((token) => token.name.slice(prefix.length + 1));
+		.map((token) => token.name.slice(prefix.length + 1))
+		.filter((name, index, all) => all.indexOf(name) === index)
+		.sort((left, right) =>
+			left === 'min' ? -1 : right === 'min' ? 1 : Number(left) - Number(right)
+		);
 	return names
 		.map(
 			(name) =>
@@ -164,7 +240,7 @@ function calibrationControls(
 			`<option value="${escapeHtml(alias)}"${recipe.weight === alias ? ' selected' : ''}>${escapeHtml(alias)} · ${role.weights[alias]}</option>`
 	).join('');
 	const weightPrefix = role.weightTokens[recipe.weight].slice(0, -recipe.weight.length);
-	return `<div class="calibration" data-role="${escapeHtml(roleName)}" data-variant="${escapeHtml(variantName ?? '')}" data-atomic-prefix="${escapeHtml(atomicFontSizePrefix(recipe.fontSizeReference, recipe.atomicFontSizeToken))}" data-weight-prefix="${escapeHtml(weightPrefix)}" data-baseline='${escapeHtml(JSON.stringify({ fontSize: recipe.fontSizeReference, weight: recipe.weight, lineHeight: recipe.lineHeight, letterSpacing: recipe.letterSpacingEm }))}'>
+	return `<div class="calibration" data-role="${escapeHtml(roleName)}" data-variant="${escapeHtml(variantName ?? '')}" data-atomic-prefix="${escapeHtml(atomicFontSizePrefix(recipe.fontSizeReference, recipe.atomicFontSizeToken))}" data-weight-prefix="${escapeHtml(weightPrefix)}">
   <label>size<select data-control="fontSize">${fontSizeOptions(ir, recipe.fontSizeReference, recipe.atomicFontSizeToken)}</select></label>
   <label>weight<select data-control="weight">${weightOptions}</select></label>
   <label>line height<input data-control="lineHeight" type="range" min="0.7" max="2" step="0.01" value="${recipe.lineHeight}"><output>${recipe.lineHeight}</output></label>
@@ -192,10 +268,10 @@ function roleCards(
 					return `<article class="sample-row">
   <div class="sample-meta">
     <strong>${escapeHtml(label)}</strong>
-    <code>--${escapeHtml(recipe.atomicFontSizeToken)}</code>
-	<code>weight ${escapeHtml(recipe.weight)} · ${role.weights[recipe.weight]}</code>
-    <code>lh ${recipe.lineHeight}</code>
-    <code>ls ${recipe.letterSpacingEm}em</code>
+    <code data-meta="font-size">--${escapeHtml(recipe.atomicFontSizeToken)}</code>
+	<code data-meta="weight">weight ${escapeHtml(recipe.weight)} · ${role.weights[recipe.weight]}</code>
+    <code data-meta="line-height">lh ${recipe.lineHeight}</code>
+    <code data-meta="letter-spacing">ls ${recipe.letterSpacingEm}em</code>
 	${fallbackRoles.has(roleName) ? fallbackDiagnostic(fallbackKey, 'fallback delta') : ''}
   </div>
   <div class="sample-preview" data-type-role="${escapeHtml(roleName)}"${variantName ? ` data-type-variant="${escapeHtml(variantName)}"` : ''}>
@@ -288,6 +364,12 @@ export function toTypographySpecimen(ir: IR, config: TypographySpecimenConfig = 
 	);
 	const fallbackStacks = fallbackComparisonStacks(ir.typography, config.adjustedFallbackFamilies);
 	const fallbackRoles = new Set(Object.keys(fallbackStacks.adjusted));
+	const sizeModes = [ir.modes.size.default, ...ir.modes.size.overrides];
+	const recipeBaselines = modeRecipeBaselines(ir, ir.typography);
+	const sizeModeControl =
+		sizeModes.length > 1
+			? `<label>size mode<select id="size-mode">${sizeModes.map((mode) => `<option value="${escapeHtml(mode)}">${escapeHtml(mode)}</option>`).join('')}</select></label>`
+			: '';
 	const fallbackNotice = fallbackRoles.size
 		? '<div class="notice fallback-notice"><strong>Measured fallback comparison</strong><span>Primary → adjusted fallback deltas below are browser measurements at this viewport. Non-zero values are residual reflow—not a pass/fail score or approval state.</span></div>'
 		: '';
@@ -312,7 +394,7 @@ ${adjustedFallbackCss(ir.typography, config.adjustedFallbackFamilies)}
 <body>
 <main>
   <header class="page-header"><span class="eyebrow">three-forma-styli</span><h1>${escapeHtml(title)}</h1><p>Inspect every configured role, base recipe, variant, style and weight. Calibration controls create an in-memory draft only; project configuration remains the source of truth.</p><div class="notice">${escapeHtml(fontNotice)}</div>${warningPanel}</header>
-  <div class="tools"><label><input id="toggle-lines" type="checkbox">metric diagnostics</label><label><input id="toggle-theme" type="checkbox">light surface</label><label><input id="toggle-wcag" type="checkbox">WCAG spacing stress</label>${fallbackRoles.size ? '<label><input id="toggle-fallback" type="checkbox">force adjusted fallback</label>' : ''}${config.fontFaceHref ? '<label><input id="toggle-fonts" type="checkbox">disable all generated font faces</label>' : ''}<span id="font-status">checking fonts</span><span class="metric-legend"><i class="cap">CSS 1cap</i><i class="ex">CSS 1ex</i><i class="baseline">rendered baseline</i><span>grey = line box</span></span></div>
+  <div class="tools">${sizeModeControl}<label><input id="toggle-lines" type="checkbox">metric diagnostics</label><label><input id="toggle-theme" type="checkbox">light surface</label><label><input id="toggle-wcag" type="checkbox">WCAG spacing stress</label>${fallbackRoles.size ? '<label><input id="toggle-fallback" type="checkbox">force adjusted fallback</label>' : ''}${config.fontFaceHref ? '<label><input id="toggle-fonts" type="checkbox">disable all generated font faces</label>' : ''}<span id="font-status">checking fonts</span><span class="metric-legend"><i class="cap">CSS 1cap</i><i class="ex">CSS 1ex</i><i class="baseline">rendered baseline</i><span>grey = line box</span></span></div>
   <h2 class="section-title">Role recipes</h2>${roleCards(ir, ir.typography, interactive, fallbackRoles)}
   <h2 class="section-title">Style and weight combinations</h2>${weightCards(ir.typography)}
   <h2 class="section-title">Wrapping and glyph stress</h2>${fallbackNotice}<div class="stress-grid">${stressCards(ir.typography, fallbackRoles)}</div>
@@ -322,6 +404,8 @@ ${adjustedFallbackCss(ir.typography, config.adjustedFallbackFamilies)}
 const families=${serializeScriptData(fontFamilies)};
 const primaryFamilyStacks=${serializeScriptData(fallbackStacks.primary)};
 const adjustedFamilyStacks=${serializeScriptData(fallbackStacks.adjusted)};
+const defaultSizeMode=${serializeScriptData(ir.modes.size.default)};
+const recipeBaselines=${serializeScriptData(recipeBaselines)};
 const drafts={};
 function appendMetricGuide(overlay,name,top,label){if(!Number.isFinite(top))return;const guide=document.createElement('span');guide.className='metric-guide metric-'+name;guide.style.top=top+'px';const text=document.createElement('i');text.textContent=label;guide.append(text);overlay.append(guide)}
 function refreshMetrics(){document.querySelectorAll('.sample-preview').forEach(sample=>{const overlay=sample.querySelector('.metric-overlay');const probe=sample.querySelector('.metric-probe');const baselineProbe=sample.querySelector('.baseline-probe');if(!overlay||!probe||!baselineProbe)return;overlay.replaceChildren();const probeRect=probe.getBoundingClientRect();const baseline=baselineProbe.getBoundingClientRect().top-probeRect.top;appendMetricGuide(overlay,'line',0,'line top');appendMetricGuide(overlay,'line',probeRect.height,'line bottom');if(CSS.supports('height','1cap')){const cap=sample.querySelector('.cap-probe')?.getBoundingClientRect().height;appendMetricGuide(overlay,'cap',baseline-cap,'1cap')}if(CSS.supports('height','1ex')){const ex=sample.querySelector('.ex-probe')?.getBoundingClientRect().height;appendMetricGuide(overlay,'ex',baseline-ex,'1ex')}appendMetricGuide(overlay,'baseline',baseline,'baseline')})}
@@ -342,9 +426,19 @@ async function refreshFallbackDiagnostics(){const run=++fallbackMeasurementRun;c
 function scheduleFallbackDiagnostics(){clearTimeout(fallbackMeasurementTimer);fallbackMeasurementTimer=setTimeout(()=>void refreshFallbackDiagnostics(),80)}
 document.querySelectorAll('[data-fallback-measure]').forEach(element=>element.addEventListener('input',scheduleFallbackDiagnostics));
 document.fonts.ready.then(()=>{refreshFontStatus();refreshMetrics();scheduleFallbackDiagnostics()});
-function draftPatch(){const roles={};for(const [key,value] of Object.entries(drafts)){const [role,variant]=key.split('::');roles[role]??={};if(variant==='base')roles[role].base=value;else{roles[role].variants??={};roles[role].variants[variant]=value}}return Object.keys(roles).length?JSON.stringify({roles},null,2):'No calibration changes.'}
+const sizeModeSelect=document.querySelector('#size-mode');
+function currentSizeMode(){return sizeModeSelect?.value||defaultSizeMode}
+function panelVariant(panel){return panel.dataset.variant||'base'}
+function panelBaseline(panel,mode=currentSizeMode()){return recipeBaselines[mode][panel.dataset.role][panelVariant(panel)]}
+function panelDraftKey(panel,mode=currentSizeMode()){return mode+'::'+panel.dataset.role+'::'+panelVariant(panel)}
+function controlValue(controls){return {fontSize:controls.fontSize.value==='min'?'min':Number(controls.fontSize.value),weight:controls.weight.value,lineHeight:Number(controls.lineHeight.value),letterSpacing:Number(controls.letterSpacing.value)}}
+function refreshPanelMeta(panel,value){const meta=panel.parentElement?.querySelector('.sample-meta');if(!meta)return;meta.querySelector('[data-meta=font-size]').textContent='--'+panel.dataset.atomicPrefix+'-'+value.fontSize;meta.querySelector('[data-meta=weight]').textContent='weight '+value.weight+' · '+panel.querySelector('[data-control=weight] option:checked')?.textContent.split(' · ')[1];meta.querySelector('[data-meta=line-height]').textContent='lh '+value.lineHeight;meta.querySelector('[data-meta=letter-spacing]').textContent='ls '+value.letterSpacing+'em'}
+function applyPanelValue(panel,value,changed){const samples=panel.parentElement?.querySelectorAll('.sample-preview,.sample-copy')??[];const controls=Object.fromEntries(Array.from(panel.querySelectorAll('[data-control]')).map(control=>[control.dataset.control,control]));for(const [name,control] of Object.entries(controls))control.value=String(value[name]);for(const sample of samples){if(changed){sample.style.setProperty('font-size','var(--'+panel.dataset.atomicPrefix+'-'+value.fontSize+')');sample.style.setProperty('font-weight','var(--'+panel.dataset.weightPrefix+value.weight+')');sample.style.setProperty('line-height',String(value.lineHeight));sample.style.setProperty('letter-spacing',value.letterSpacing===0?'0':value.letterSpacing+'em')}else{sample.style.removeProperty('font-size');sample.style.removeProperty('font-weight');sample.style.removeProperty('line-height');sample.style.removeProperty('letter-spacing')}}controls.lineHeight.nextElementSibling.value=String(value.lineHeight);controls.letterSpacing.nextElementSibling.value=value.letterSpacing+'em';panel.classList.toggle('changed',changed);refreshPanelMeta(panel,value)}
+function draftPatch(){const roles={};for(const [key,value] of Object.entries(drafts)){const [mode,role,variant]=key.split('::');roles[role]??={};if(mode===defaultSizeMode){if(variant==='base')roles[role].base=value;else{roles[role].variants??={};roles[role].variants[variant]=value}}else{roles[role].modeOverrides??={};roles[role].modeOverrides[mode]??={};const target=roles[role].modeOverrides[mode];if(variant==='base')target.base=value;else{target.variants??={};target.variants[variant]=value}}}return Object.keys(roles).length?JSON.stringify({roles},null,2):'No calibration changes.'}
 function refreshPatch(){const target=document.querySelector('#draft-patch');if(target)target.textContent=draftPatch()}
-document.querySelectorAll('.calibration').forEach(panel=>{const sample=panel.parentElement?.querySelector('.sample-preview');const baseline=JSON.parse(panel.dataset.baseline);const controls=Object.fromEntries(Array.from(panel.querySelectorAll('[data-control]')).map(control=>[control.dataset.control,control]));const update=()=>{const value={fontSize:controls.fontSize.value==='min'?'min':Number(controls.fontSize.value),weight:controls.weight.value,lineHeight:Number(controls.lineHeight.value),letterSpacing:Number(controls.letterSpacing.value)};const unchanged=JSON.stringify(value)===JSON.stringify(baseline);if(unchanged){sample?.style.removeProperty('font-size');sample?.style.removeProperty('font-weight');sample?.style.removeProperty('line-height');sample?.style.removeProperty('letter-spacing')}else{sample?.style.setProperty('font-size','var(--'+panel.dataset.atomicPrefix+'-'+value.fontSize+')');sample?.style.setProperty('font-weight','var(--'+panel.dataset.weightPrefix+value.weight+')');sample?.style.setProperty('line-height',String(value.lineHeight));sample?.style.setProperty('letter-spacing',value.letterSpacing===0?'0':value.letterSpacing+'em')}controls.lineHeight.nextElementSibling.value=String(value.lineHeight);controls.letterSpacing.nextElementSibling.value=value.letterSpacing+'em';const key=panel.dataset.role+'::'+(panel.dataset.variant||'base');if(unchanged){delete drafts[key];panel.classList.remove('changed')}else{drafts[key]=value;panel.classList.add('changed')}refreshPatch();refreshMetrics();scheduleFallbackDiagnostics()};Object.entries(controls).forEach(([name,control])=>{control.addEventListener('input',update);if(control.matches('input[type=range]')){control.title='Double-click to reset';control.addEventListener('dblclick',event=>{event.preventDefault();control.value=String(baseline[name]);update()})}});panel.querySelector('.reset-recipe')?.addEventListener('click',()=>{for(const [name,control] of Object.entries(controls))control.value=String(baseline[name]);update()})});
+function activateSizeMode(){const mode=currentSizeMode();document.body.dataset.sizeMode=mode;for(const panel of document.querySelectorAll('.calibration')){const key=panelDraftKey(panel,mode);applyPanelValue(panel,drafts[key]??panelBaseline(panel,mode),Boolean(drafts[key]))}refreshMetrics();scheduleFallbackDiagnostics()}
+document.querySelectorAll('.calibration').forEach(panel=>{const controls=Object.fromEntries(Array.from(panel.querySelectorAll('[data-control]')).map(control=>[control.dataset.control,control]));const update=()=>{const baseline=panelBaseline(panel);const value=controlValue(controls);const unchanged=JSON.stringify(value)===JSON.stringify(baseline);const key=panelDraftKey(panel);if(unchanged)delete drafts[key];else drafts[key]=value;applyPanelValue(panel,value,!unchanged);refreshPatch();refreshMetrics();scheduleFallbackDiagnostics()};Object.entries(controls).forEach(([name,control])=>{control.addEventListener('input',update);if(control.matches('input[type=range]')){control.title='Double-click to reset';control.addEventListener('dblclick',event=>{event.preventDefault();control.value=String(panelBaseline(panel)[name]);update()})}});panel.querySelector('.reset-recipe')?.addEventListener('click',()=>{const baseline=panelBaseline(panel);for(const [name,control] of Object.entries(controls))control.value=String(baseline[name]);update()})});
+sizeModeSelect?.addEventListener('change',activateSizeMode);activateSizeMode();
 new ResizeObserver(()=>{refreshMetrics();scheduleFallbackDiagnostics()}).observe(document.querySelector('main'));window.addEventListener('resize',()=>{refreshMetrics();scheduleFallbackDiagnostics()});
 document.querySelector('#copy-patch')?.addEventListener('click',async()=>{await navigator.clipboard.writeText(draftPatch());const button=document.querySelector('#copy-patch');if(button){button.textContent='Copied';setTimeout(()=>button.textContent='Copy patch',1200)}});
 </script>
