@@ -1,7 +1,8 @@
 import fs from 'fs-extra';
 import path from 'node:path';
 import chalk from 'chalk';
-import { input, select } from '@inquirer/prompts';
+import input from '@inquirer/input';
+import select from '@inquirer/select';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { CLI_VERSION } from '../version.js';

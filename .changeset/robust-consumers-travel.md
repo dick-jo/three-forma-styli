@@ -25,6 +25,10 @@ selection, and produce a packable private workspace package. The release gate
 installs actual tarballs, exercises both scaffold shapes, packs the generated
 package, and type-checks and bundles a production browser consumer.
 
+The CLI depends directly on the two prompt controls it uses rather than the
+umbrella Inquirer prompt suite, reducing every authoring install's dependency
+surface without changing commands.
+
 The compiler now exposes a read-only, validated project plan. The CLI presents
 it through `build --dry-run`, and build/check/validate expose versioned JSON
 success and failure envelopes with documented exit semantics.

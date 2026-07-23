@@ -95,6 +95,22 @@ Long term there are still four public responsibilities, even if `themes` becomes
 Applications consume generated design-system packages, not the TFS preview app and
 not necessarily the CLI at runtime.
 
+## Measured package surface
+
+The 2026-07-23 packed artifacts are small: core is roughly 70 KB compressed,
+themes 9 KB, compiler 84 KB, and CLI 25 KB. The compiler's production graph is
+24 packages including font parsing. The CLI graph is larger because it also
+loads TypeScript configs and provides interactive initialization, but it is an
+authoring-only dependency and no longer installs the unused umbrella Inquirer
+prompt suite.
+
+These measurements do not justify another public package today. A separate
+non-interactive command package would add release/version resolution complexity
+while every production consumer already imports only generated output or the
+dependency-light runtime subpath. Reconsider the split if a real host requires a
+CLI-free install graph for generation itself; keep measuring packed artifacts
+and resolved dependency trees in that decision.
+
 See [monorepo integration](monorepo-integration.md) for the concrete package,
 task, cache, dependency, and staged-adoption contract.
 
