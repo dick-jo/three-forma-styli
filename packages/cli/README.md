@@ -46,7 +46,7 @@ design-tool JSON remain local review artifacts. Its scripts deliberately keep
 routine `build`/`check` independent of FontTools:
 
 ```bash
-npm run check             # fast TypeScript check
+npm run check             # fast types + committed package validation
 npm run generate          # explicit authoring operation
 npm run check:generated   # dedicated CI drift proof
 ```
@@ -87,6 +87,20 @@ measurement—in a locked sibling stage. It compares every byte and reports
 missing, changed, and unexpected files. The staged candidate is then removed;
 TFS never repairs drift during a check. Run `tfs build .` deliberately to accept
 and review regenerated output.
+
+### `tfs validate`
+
+Validate the already-committed output without rebuilding it:
+
+```bash
+tfs validate .
+```
+
+This is the fast routine build/check path for a co-located package. TFS verifies
+the owning manifest and compiler version, exact artifact inventory, byte counts
+and hashes, plus workspace exports, CSS side-effects coverage, published-file
+coverage, and the recorded host-package hash. It does not run FontTools, prepare
+fonts, or write files.
 
 The legacy single-file workflow remains available:
 

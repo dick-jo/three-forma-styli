@@ -8,6 +8,7 @@ import { initCommand } from './init.js';
 import { buildCommand } from './build.js';
 import { figmaSyncCommand } from './figma-sync.js';
 import { checkCommand } from './check.js';
+import { validateCommand } from './validate.js';
 
 const originalCwd = process.cwd();
 const require = createRequire(import.meta.url);
@@ -60,9 +61,11 @@ describe('tfs init', () => {
 		expect(buildManifest.artifacts['tokens.css']).toBeDefined();
 		expect(buildManifest.artifacts['typography.specimen.html']).toBeDefined();
 		await expect(checkCommand(projectRoot)).resolves.toBeUndefined();
+		await expect(validateCommand(projectRoot)).resolves.toBeUndefined();
 		const tokensPath = path.join(projectRoot, 'dist/tokens.css');
 		await fs.writeFile(tokensPath, 'drift\n');
 		await expect(checkCommand(projectRoot)).rejects.toThrow(/changed tokens\.css/);
+		await expect(validateCommand(projectRoot)).rejects.toThrow(/does not match its manifest/);
 		expect(await fs.readFile(tokensPath, 'utf8')).toBe('drift\n');
 		await buildCommand(projectRoot, {});
 
@@ -93,8 +96,8 @@ describe('tfs init', () => {
 		expect(manifest.devDependencies['@three-forma-styli/core']).toBe('^0.2.0');
 		expect(manifest.scripts).toEqual({
 			generate: 'tfs build .',
-			build: 'tsc --noEmit',
-			check: 'tsc --noEmit',
+			build: 'tfs validate .',
+			check: 'tsc --noEmit && tfs validate .',
 			'check:generated': 'tfs check .',
 			specimen: 'tfs specimen serve .',
 		});
@@ -112,6 +115,7 @@ describe('tfs init', () => {
 			{ cwd: projectRoot, stdio: 'inherit' }
 		);
 		await buildCommand(projectRoot, {});
+		await expect(validateCommand(projectRoot)).resolves.toBeUndefined();
 		await expect(checkCommand(projectRoot)).resolves.toBeUndefined();
 		expect(await fs.pathExists(path.join(projectRoot, 'dist'))).toBe(false);
 		expect(await fs.pathExists(path.join(projectRoot, 'generated/runtime/index.js'))).toBe(true);

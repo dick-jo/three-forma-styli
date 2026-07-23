@@ -53,6 +53,8 @@ remaining work so decisions do not depend on one chat transcript.
 - [x] Promote drift verification to the generic compiler/CLI contract and add a
       monorepo-ready scaffold whose routine checks remain independent of font
       tooling.
+- [x] Add lightweight committed-output/package validation so ordinary monorepo
+      build and check paths prove generated contracts without regeneration.
 - [x] Run the complete release gate, packed-package consumer fixture, security
       audit, and deterministic legacy-output checks.
 - [x] Run the final P3, prepared-font, specimen-server, and real-browser
@@ -145,3 +147,5 @@ remaining work so decisions do not depend on one chat transcript.
   It fully renders to a locked sibling stage and reports byte-level drift rather
   than silently repairing it. The opt-in workspace-package scaffold separates
   fast routine checks, explicit generation, and dedicated CI regeneration.
+  Routine builds use a separate manifest/hash/package validator and therefore
+  remain independent of FontTools.

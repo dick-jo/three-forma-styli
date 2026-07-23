@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildProject, checkProject } from './project-build.js';
 import { defineTfsProject } from './project.js';
+import { validateProjectOutput } from './validate-output.js';
 import { typography as defaultTypography } from '@three-forma-styli/themes/default';
 
 const temporaryDirectories: string[] = [];
@@ -129,11 +130,15 @@ describe('portable project build', () => {
 		const configPath = path.join(directory, 'tfs.config.ts');
 		const built = await buildProject(project, configPath);
 		await expect(checkProject(project, configPath)).resolves.toEqual(built);
+		await expect(validateProjectOutput(project, configPath)).resolves.toEqual(built);
 
 		const tokensPath = path.join(built.outputDirectory, 'tokens.css');
 		await fs.writeFile(tokensPath, 'human drift\n');
 		await expect(checkProject(project, configPath)).rejects.toThrow(
 			/Generated output is out of date[\s\S]*changed tokens\.css[\s\S]*tfs build/
+		);
+		await expect(validateProjectOutput(project, configPath)).rejects.toThrow(
+			/Generated artifact does not match its manifest: tokens\.css/
 		);
 		expect(await fs.readFile(tokensPath, 'utf8')).toBe('human drift\n');
 	});

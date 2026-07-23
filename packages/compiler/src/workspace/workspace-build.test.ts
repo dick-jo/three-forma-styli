@@ -8,6 +8,7 @@ import { typography as defaultTypography } from '@three-forma-styli/themes/defau
 import { defineTfsProject } from '../project.js';
 import { buildProject, checkProject } from '../project-build.js';
 import { buildWorkspacePackageProject } from './build.js';
+import { validateProjectOutput } from '../validate-output.js';
 
 const execFileAsync = promisify(execFile);
 const temporaryDirectories: string[] = [];
@@ -213,6 +214,20 @@ describe('workspace-package build', () => {
 			'leave me alone\n'
 		);
 		expect(await fs.readFile(packagePath)).toEqual(packageBefore);
+	});
+
+	it('validates committed package artifacts and host wiring without regenerating', async () => {
+		const { configPath, packagePath } = await fixture();
+		const project = fullProject();
+		const built = await buildProject(project, configPath);
+		await expect(validateProjectOutput(project, configPath)).resolves.toEqual(built);
+
+		const manifest = await fs.readJson(packagePath);
+		await fs.writeJson(packagePath, { ...manifest, description: 'host changed' }, { spaces: 2 });
+		await expect(validateProjectOutput(project, configPath)).rejects.toThrow(
+			/records a stale host package manifest/
+		);
+		expect(await fs.pathExists(path.join(built.outputDirectory, 'runtime/index.js'))).toBe(true);
 	});
 
 	it('accepts explicit target subsets and requires only their exact exports', async () => {

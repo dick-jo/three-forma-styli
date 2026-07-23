@@ -35,6 +35,18 @@ The checker runs the same complete compiler in a locked sibling stage and
 rejects missing, changed, or unexpected files byte-for-byte. It does not repair
 the output directory.
 
+Routine monorepo checks can validate the committed package without regeneration
+or font tooling:
+
+```ts
+import { validateProjectOutput } from '@three-forma-styli/compiler/build';
+
+await validateProjectOutput(project, '/absolute/path/to/tfs.config.ts');
+```
+
+This verifies manifest ownership/version, exact file inventory and hashes, and
+the workspace host-package contract.
+
 Font preparation and inspection APIs live at
 `@three-forma-styli/compiler/fonts`. Use `@three-forma-styli/cli` when you want
 the `tfs` executable, config loading, scaffolding, browser specimen server, or

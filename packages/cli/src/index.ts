@@ -8,6 +8,7 @@ import { figmaSyncCommand } from './commands/figma-sync.js';
 import { inspectFontsCommand, prepareFontsCommand } from './commands/fonts.js';
 import { serveSpecimenCommand } from './commands/specimen.js';
 import { checkCommand } from './commands/check.js';
+import { validateCommand } from './commands/validate.js';
 import { CLI_VERSION } from './version.js';
 
 const program = new Command();
@@ -55,6 +56,13 @@ program
 	.description('Regenerate privately and fail when committed project output has drifted')
 	.action(async (filePath) => {
 		await checkCommand(filePath);
+	});
+
+program
+	.command('validate <path>')
+	.description('Validate committed artifacts and package wiring without regeneration')
+	.action(async (filePath) => {
+		await validateCommand(filePath);
 	});
 
 // Figma sync command

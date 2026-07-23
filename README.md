@@ -32,7 +32,7 @@ For a co-located monorepo package instead of a standalone handoff:
 npx @three-forma-styli/cli init design-system --workspace-package
 cd design-system
 npm run generate          # explicit authoring operation
-npm run check             # fast routine check
+npm run check             # fast types + committed package validation
 npm run check:generated   # dedicated byte-for-byte CI proof
 ```
 
@@ -224,7 +224,9 @@ Run `tfs check .` in dedicated CI to perform that same complete build in a
 private sibling stage and reject missing, changed, or unexpected committed
 artifacts without modifying them. `tfs init --workspace-package` scaffolds the
 package exports and separates this heavier regeneration proof from routine
-monorepo checks.
+monorepo checks. `tfs validate .` is the lightweight routine path: it verifies
+the committed manifest, artifact bytes, and package wiring without FontTools or
+regeneration.
 
 Review that generated specimen over localhost with `tfs specimen serve .`.
 Pass `--open` only when the CLI should launch the browser; use `--port 4400`
