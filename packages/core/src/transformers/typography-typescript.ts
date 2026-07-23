@@ -71,12 +71,15 @@ function selectionTypes(contract: TypographyContract): string {
 	const roles = Object.entries(contract.roles)
 		.map(([roleName, contractRole]) => {
 			const role = JSON.stringify(roleName);
+			const defaultStyle = JSON.stringify(contractRole.defaultStyle);
 			const branches = [
-				`    | { role: ${role}; variant?: TypographyVariant<${role}>; fontStyle?: undefined; weight?: TypographyWeightForStyle<${role}, ${JSON.stringify(contractRole.defaultStyle)}> }`,
-				...Object.keys(contractRole.styles).map(
-					(style) =>
-						`    | { role: ${role}; variant?: TypographyVariant<${role}>; fontStyle: ${JSON.stringify(style)}; weight: TypographyWeightForStyle<${role}, ${JSON.stringify(style)}> }`
-				),
+				`    | { role: ${role}; variant?: TypographyVariant<${role}>; fontStyle?: ${defaultStyle}; weight?: TypographyWeightForStyle<${role}, ${defaultStyle}> }`,
+				...Object.keys(contractRole.styles)
+					.filter((style) => style !== contractRole.defaultStyle)
+					.map(
+						(style) =>
+							`    | { role: ${role}; variant?: TypographyVariant<${role}>; fontStyle: ${JSON.stringify(style)}; weight: TypographyWeightForStyle<${role}, ${JSON.stringify(style)}> }`
+					),
 			];
 			return `  ${role}:\n${branches.join('\n')};`;
 		})

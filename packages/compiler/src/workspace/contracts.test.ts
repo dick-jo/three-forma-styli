@@ -73,6 +73,7 @@ describe('workspace runtime contracts', () => {
 		const rendered = renderTypographyContract(generate(system));
 		const declaration = rendered.declaration;
 		expect(declaration).toContain('export type TypographySelection =');
+		expect(declaration).toContain('fontStyle?: "normal"; weight?: TypographyWeightForStyle');
 		expect(declaration).toContain('fontStyle: "italic"; weight: TypographyWeightForStyle');
 		expect(declaration).toContain('TypographySelectionByRole[R]');
 		expect(declaration).toContain('export type TypographyClassKey =');

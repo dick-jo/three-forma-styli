@@ -108,6 +108,7 @@ describe('toTypographyTypescript', () => {
 			typecheck(
 				`${output}
 const base: TypographySelection = { role: 'interface' };
+const explicitDefaultStyle: TypographySelection = { role: 'interface', fontStyle: 'normal' };
 const compact: TypographySelection = { role: 'interface', variant: 'compact' };
 const italic: TypographySelection = { role: 'interface', fontStyle: 'italic', weight: 'regular' };
 const classes: TypographyClassMap = {
@@ -118,7 +119,7 @@ const classes: TypographyClassMap = {
   'interface-style-italic-weight-regular': 'italic-regular',
 };
 const className: string = typographyClassName(compact, classes);
-void base; void compact; void italic; void className;
+void base; void explicitDefaultStyle; void compact; void italic; void className;
 // @ts-expect-error unknown variant
 const badVariant: TypographySelection = { role: 'interface', variant: 'display' };
 // @ts-expect-error italic does not expose strong
