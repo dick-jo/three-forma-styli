@@ -91,6 +91,11 @@ remaining work so decisions do not depend on one chat transcript.
       dependencies. A fifth published package would add release and migration
       surface for install-tree neatness rather than browser correctness. Revisit
       only if a real consumer policy or vulnerability requires it.
+- [x] Commission an independent hostile due-diligence audit and close its P0
+      findings: mode-scoped Workbench patches, immutable defaults, complete
+      FontTools planning/provenance, inspectable recoverable build locks, and a
+      mandatory Browser/Next/Turborepo release matrix. See
+      `docs/audit-2026-07-23-independent.md`.
 
 ## Active Scatter design-system work
 

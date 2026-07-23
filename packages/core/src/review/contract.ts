@@ -1,5 +1,10 @@
 import type { IR, ShadowContractRecipe, TypographyContractRecipe } from '../generator/types.js';
-import type { PartialDesignSystem, TypographyRole } from '../types.js';
+import type {
+	FontSizeReference,
+	PartialDesignSystem,
+	TypographyMode,
+	TypographyRole,
+} from '../types.js';
 import type {
 	ReviewCapturePolicy,
 	ColorReviewCase,
@@ -159,26 +164,20 @@ function modeGroups(ir: IR): ReviewModeGroup[] {
 	);
 }
 
-function typographySizeOptions(system: PartialDesignSystem): TypographySizeOption[] {
-	const defaultMode = system.typography?.modes.find((mode) => mode.isDefault);
-	if (!defaultMode) return [];
+function typographySizeOptions(mode: TypographyMode & { name: string }): TypographySizeOption[] {
 	const options: TypographySizeOption[] = [{ label: 'min', value: 'min' }];
-	for (let step = 1; step <= defaultMode.tokens.range; step += 1) {
+	for (let step = 1; step <= mode.tokens.range; step += 1) {
 		options.push({ label: String(step), value: step });
 	}
 	return options;
 }
 
 function recipeControls(
-	roleName: string,
-	variantName: string | null,
+	sourcePath: string,
 	role: TypographyRole,
 	recipe: TypographyContractRecipe,
 	sizeOptions: TypographySizeOption[]
 ): ReviewControl[] {
-	const sourcePath = `/typography/roles/${pointerSegment(roleName)}/${
-		variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`
-	}`;
 	const weightAlias = recipe.weight;
 	const currentSuffix =
 		recipe.fontSizeReference === 'min' ? 'min' : String(recipe.fontSizeReference);
@@ -230,6 +229,67 @@ function recipeControls(
 	];
 }
 
+function atomicFontSizePrefix(recipe: TypographyContractRecipe): string {
+	const suffix = recipe.fontSizeReference === 'min' ? 'min' : String(recipe.fontSizeReference);
+	return recipe.atomicFontSizeToken.slice(0, -(suffix.length + 1));
+}
+
+function fontSizeReference(
+	reference: string | undefined,
+	fallback: FontSizeReference,
+	atomicPrefix: string
+): FontSizeReference {
+	if (!reference?.startsWith(`${atomicPrefix}-`)) return fallback;
+	const suffix = reference.slice(atomicPrefix.length + 1);
+	if (suffix === 'min') return 'min';
+	const numeric = Number(suffix);
+	return Number.isInteger(numeric) && numeric > 0 ? numeric : fallback;
+}
+
+/**
+ * Resolve the exact recipe visible in one typography mode from the generated IR.
+ *
+ * Non-default mode token sets intentionally contain only declarations that must
+ * be rebound inside that selector. Missing declarations therefore inherit the
+ * default contract rather than becoming empty values.
+ */
+function modeRecipe(
+	ir: IR,
+	modeName: string,
+	defaultModeName: string,
+	role: TypographyContractRecipe,
+	weightTokens: Record<string, string>
+): TypographyContractRecipe {
+	const tokens = modeName === defaultModeName ? ir.tokens : (ir.overrideTokens[modeName] ?? {});
+	const atomicPrefix = atomicFontSizePrefix(role);
+	const resolvedFontSize = fontSizeReference(
+		tokens[role.fontSizeToken]?.reference,
+		role.fontSizeReference,
+		atomicPrefix
+	);
+	const weightReference = tokens[role.fontWeightToken]?.reference;
+	const resolvedWeight =
+		Object.entries(weightTokens).find(([, token]) => token === weightReference)?.[0] ?? role.weight;
+	const recipePrefix = role.fontSizeToken.slice(0, -'-font-size'.length);
+	const textTransformTokenName = `${recipePrefix}-text-transform`;
+	const textTransformValue = tokens[textTransformTokenName]?.value;
+
+	return {
+		...role,
+		fontSizeReference: resolvedFontSize,
+		atomicFontSizeToken: `${atomicPrefix}-${resolvedFontSize}`,
+		weight: resolvedWeight,
+		lineHeight: tokens[role.lineHeightToken]?.rawValue ?? role.lineHeight,
+		letterSpacingEm: tokens[role.letterSpacingToken]?.rawValue ?? role.letterSpacingEm,
+		...(textTransformValue
+			? {
+					textTransformToken: textTransformTokenName,
+					textTransform: textTransformValue as TypographyContractRecipe['textTransform'],
+				}
+			: {}),
+	};
+}
+
 function typographyCases(
 	system: PartialDesignSystem,
 	ir: IR,
@@ -239,59 +299,92 @@ function typographyCases(
 	const contractTypography = ir.typography;
 	const sourceRoles = sourceTypography?.roles;
 	if (!sourceTypography || !sourceRoles || !contractTypography) return [];
-	const sizes = typographySizeOptions(system);
+	const defaultMode =
+		sourceTypography.modes.find((mode) => mode.isDefault) ?? sourceTypography.modes[0];
+	if (!defaultMode) return [];
+	const orderedModes = [
+		defaultMode,
+		...sourceTypography.modes.filter((mode) => mode !== defaultMode),
+	];
 	return Object.entries(contractTypography.roles).flatMap(([roleName, contractRole]) => {
 		const sourceRole = sourceRoles[roleName];
 		if (!sourceRole) return [];
 		const font = contractTypography.fonts[contractRole.font];
 		if (!font) return [];
-		const recipes = [
-			[null, contractRole.base] as const,
-			...contractRole.displayOrder
-				.filter((name) => name !== 'base')
-				.map((name) => [name, contractRole.variants[name]] as const),
-		].filter((entry): entry is readonly [string | null, TypographyContractRecipe] =>
-			Boolean(entry[1])
-		);
-		return recipes.map(([variantName, recipe]) => {
-			const sourcePath = `/typography/roles/${pointerSegment(roleName)}/${
-				variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`
-			}`;
-			const weightAlias = recipe.weight;
-			const adjustedFallback = adjustedFallbackFamilies[roleName];
-			return {
-				kind: 'typography',
-				id: `typography--${caseIdSegment(roleName)}--${caseIdSegment(variantName ?? 'base')}`,
-				label: `${roleName} / ${variantName ?? 'base'}`,
-				sourcePath,
-				role: roleName,
-				variant: variantName,
-				font: {
-					id: contractRole.font,
-					family: font.family,
-					fallbacks: font.fallbacks.filter((family) => family !== adjustedFallback),
-					...(adjustedFallback ? { adjustedFallback } : {}),
-				},
-				style: contractRole.defaultStyle,
-				weight: { alias: weightAlias, value: sourceRole.weights[weightAlias]! },
-				availableStyles: Object.keys(contractRole.styles),
-				availableWeights: Object.entries(sourceRole.weights).map(([alias, value]) => ({
-					alias,
-					value,
-				})),
-				styleWeights: Object.fromEntries(
-					Object.entries(contractRole.styles).map(([style, entry]) => [
-						style,
-						(entry?.weights ?? []).map((alias) => ({
-							alias,
-							value: sourceRole.weights[alias]!,
-						})),
-					])
-				),
-				recipe,
-				controls: recipeControls(roleName, variantName, sourceRole, recipe, sizes),
-				capture: defaultCapture,
-			};
+		const adjustedFallback = adjustedFallbackFamilies[roleName];
+		return orderedModes.flatMap((mode) => {
+			const recipes = [
+				[null, contractRole.base] as const,
+				...contractRole.displayOrder
+					.filter((name) => name !== 'base')
+					.map((name) => [name, contractRole.variants[name]] as const),
+			].filter((entry): entry is readonly [string | null, TypographyContractRecipe] =>
+				Boolean(entry[1])
+			);
+			const sizes = typographySizeOptions(mode);
+			return recipes.map(([variantName, defaultRecipe]) => {
+				const recipe = modeRecipe(
+					ir,
+					mode.name,
+					defaultMode.name,
+					defaultRecipe,
+					contractRole.weightTokens
+				);
+				const recipePath =
+					variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`;
+				const sourcePath =
+					mode.name === defaultMode.name
+						? `/typography/roles/${pointerSegment(roleName)}/${recipePath}`
+						: `/typography/roles/${pointerSegment(roleName)}/modeOverrides/${pointerSegment(
+								mode.name
+							)}/${recipePath}`;
+				const weightAlias = recipe.weight;
+				const defaultId = `typography--${caseIdSegment(roleName)}--${caseIdSegment(
+					variantName ?? 'base'
+				)}`;
+				return {
+					kind: 'typography',
+					id:
+						mode.name === defaultMode.name
+							? defaultId
+							: `typography--${caseIdSegment(mode.name)}--${caseIdSegment(
+									roleName
+								)}--${caseIdSegment(variantName ?? 'base')}`,
+					label: `${roleName} / ${variantName ?? 'base'}`,
+					sourcePath,
+					mode: mode.name,
+					role: roleName,
+					variant: variantName,
+					font: {
+						id: contractRole.font,
+						family: font.family,
+						fallbacks: font.fallbacks.filter((family) => family !== adjustedFallback),
+						...(adjustedFallback ? { adjustedFallback } : {}),
+					},
+					style: contractRole.defaultStyle,
+					weight: { alias: weightAlias, value: sourceRole.weights[weightAlias]! },
+					availableStyles: Object.keys(contractRole.styles),
+					availableWeights: Object.entries(sourceRole.weights).map(([alias, value]) => ({
+						alias,
+						value,
+					})),
+					styleWeights: Object.fromEntries(
+						Object.entries(contractRole.styles).map(([style, entry]) => [
+							style,
+							(entry?.weights ?? []).map((alias) => ({
+								alias,
+								value: sourceRole.weights[alias]!,
+							})),
+						])
+					),
+					recipe,
+					controls: recipeControls(sourcePath, sourceRole, recipe, sizes),
+					capture: {
+						...defaultCapture,
+						sizeModes: [mode.name],
+					},
+				};
+			});
 		});
 	});
 }

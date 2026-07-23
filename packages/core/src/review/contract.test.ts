@@ -38,6 +38,10 @@ const system: PartialDesignSystem = {
 				isDefault: true,
 				tokens: { unit: 'rem', base: 1, min: 0.75, increment: 0.125, range: 4 },
 			},
+			{
+				name: 'compact',
+				tokens: { unit: 'rem', base: 0.875, min: 0.6875, increment: 0.125, range: 4 },
+			},
 		],
 		fonts: {
 			sans: {
@@ -54,6 +58,16 @@ const system: PartialDesignSystem = {
 				base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0, weight: 'min' },
 				variants: {
 					max: { fontSize: 4, lineHeight: 1.1, letterSpacing: -0.01, weight: 'max' },
+				},
+				modeOverrides: {
+					compact: {
+						base: {
+							fontSize: 1,
+							lineHeight: 1.2,
+							letterSpacing: 0.005,
+							weight: 'max',
+						},
+					},
 				},
 				displayOrder: ['base', 'max'],
 			},
@@ -98,6 +112,8 @@ describe('workbench review contract', () => {
 		expect(typography?.cases.map((reviewCase) => reviewCase.id)).toEqual([
 			'typography--prose--base',
 			'typography--prose--max',
+			'typography--compact--prose--base',
+			'typography--compact--prose--max',
 		]);
 		expect(typography?.cases[0]?.controls.map((control) => control.id)).toEqual([
 			'fontSize',
@@ -106,6 +122,24 @@ describe('workbench review contract', () => {
 			'weight',
 		]);
 		expect(typography?.cases[0]?.sourcePath).toBe('/typography/roles/prose/base');
+		expect(typography?.cases[2]).toMatchObject({
+			mode: 'compact',
+			sourcePath: '/typography/roles/prose/modeOverrides/compact/base',
+			weight: { alias: 'max', value: 700 },
+			recipe: {
+				fontSizeReference: 1,
+				atomicFontSizeToken: 'fs-1',
+				lineHeight: 1.2,
+				letterSpacingEm: 0.005,
+				weight: 'max',
+			},
+		});
+		expect(typography?.cases[2]?.controls.map((control) => control.path)).toEqual([
+			'/typography/roles/prose/modeOverrides/compact/base/fontSize',
+			'/typography/roles/prose/modeOverrides/compact/base/lineHeight',
+			'/typography/roles/prose/modeOverrides/compact/base/letterSpacing',
+			'/typography/roles/prose/modeOverrides/compact/base/weight',
+		]);
 
 		const shadows = contract.labs.find((lab) => lab.kind === 'shadows');
 		expect(shadows?.cases[0]).toMatchObject({
@@ -132,7 +166,10 @@ describe('workbench review contract', () => {
 		});
 
 		expect(contract.globals.modes.map((group) => group.category)).toEqual(['size']);
-		expect(contract.globals.modes[0]?.modes.map((mode) => mode.name)).toEqual(['default']);
+		expect(contract.globals.modes[0]?.modes.map((mode) => mode.name)).toEqual([
+			'default',
+			'compact',
+		]);
 		expect(contract.agent.verification).toEqual({
 			generate: 'tfs build .',
 			check: 'tfs check .',

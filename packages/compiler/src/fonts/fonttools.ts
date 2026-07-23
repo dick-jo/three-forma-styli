@@ -19,6 +19,7 @@ export interface FontToolsConversionProvenance {
 export interface FontToolsConverter {
 	provenance: FontToolsConversionProvenance;
 	convert(source: string, destination: string): Promise<void>;
+	decompress(source: string, destination: string): Promise<void>;
 }
 
 function pathCandidates(command: string): string[] {
@@ -176,6 +177,22 @@ export async function createFontToolsConverter(command = 'fonttools'): Promise<F
 				const detail = error instanceof Error ? error.message : String(error);
 				throw new Error(
 					`FontTools ${fontToolsVersion} WOFF2 conversion failed under ${provenance.python.implementation} ${provenance.python.version}. Verify Brotli support and the source font, then retry. ${detail}`
+				);
+			}
+		},
+		async decompress(source, destination) {
+			try {
+				await execFileAsync(executablePath, [
+					'ttLib.woff2',
+					'decompress',
+					source,
+					'-o',
+					destination,
+				]);
+			} catch (error) {
+				const detail = error instanceof Error ? error.message : String(error);
+				throw new Error(
+					`FontTools ${fontToolsVersion} WOFF2 decompression failed under ${provenance.python.implementation} ${provenance.python.version}. Verify Brotli support and the source font, then retry. ${detail}`
 				);
 			}
 		},

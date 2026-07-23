@@ -74,6 +74,8 @@ export interface ReviewCaseBase {
 
 export interface TypographyReviewCase extends ReviewCaseBase {
 	kind: 'typography';
+	/** Typography mode whose resolved recipe and authoring path this case represents. */
+	mode: string;
 	role: string;
 	variant: string | null;
 	font: {

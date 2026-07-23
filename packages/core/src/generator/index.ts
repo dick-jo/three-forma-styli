@@ -83,18 +83,14 @@ function validateConfig(config: GeneratorConfig): void {
 
 /** Resolve partial author options into the exact generator configuration used by every target. */
 export function resolveGeneratorConfig(userConfig?: GeneratorOptions): GeneratorConfig {
-	if (!userConfig) {
-		return defaultGeneratorConfig;
-	}
-
 	return {
 		prefixes: {
 			...defaultGeneratorConfig.prefixes,
-			...userConfig.prefixes,
+			...userConfig?.prefixes,
 		},
 		colorFormat: {
 			...defaultGeneratorConfig.colorFormat,
-			...userConfig.colorFormat,
+			...userConfig?.colorFormat,
 		},
 	};
 }

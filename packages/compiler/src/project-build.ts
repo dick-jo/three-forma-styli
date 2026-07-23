@@ -1,5 +1,4 @@
 import { createHash } from 'node:crypto';
-import { open, type FileHandle } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'fs-extra';
@@ -43,6 +42,8 @@ import { workspacePlanContext } from './workspace/context.js';
 import { assertGeneratedOutputCurrent } from './generated-check.js';
 import { fontAssetUrl, relativeUrl, validateFontAssetUrlPolicy } from './font-url.js';
 import { assertPortableConfiguredPath } from './portable-path.js';
+import { inspectFontFiles } from './fonts/inspect.js';
+import { acquireBuildLock } from './build-lock.js';
 
 interface OutputPlan {
 	css?: string;
@@ -423,14 +424,8 @@ async function buildLegacyProject(
 		hasEmbeddedTypographyFonts,
 	} = await legacyProjectContext(project, configPath);
 
-	const lockPath = `${outputDirectory}.tfs-lock`;
 	await fs.ensureDir(path.dirname(outputDirectory));
-	let lock: FileHandle | undefined;
-	try {
-		lock = await open(lockPath, 'wx');
-	} catch {
-		throw new Error(`Another TFS build appears to be using ${outputDirectory}.`);
-	}
+	const lock = await acquireBuildLock(outputDirectory, 'legacy');
 	const staging = await fs.mkdtemp(path.join(path.dirname(outputDirectory), '.tfs-build-stage-'));
 	try {
 		let preparedFonts: Awaited<ReturnType<typeof prepareFonts>> | undefined;
@@ -696,8 +691,7 @@ async function buildLegacyProject(
 		else await commitOutput(staging, outputDirectory);
 		return { outputDirectory, files: [...files, 'build.manifest.json'].sort() };
 	} finally {
-		await lock?.close();
-		await fs.remove(lockPath);
+		await lock.release();
 		await fs.remove(staging);
 	}
 }
@@ -748,6 +742,22 @@ async function plannedFontInputs(
 ): Promise<Pick<ProjectBuildPlan, 'fonts' | 'prerequisites'>> {
 	const sources: ProjectPlanFontSource[] = [];
 	const licenses: Array<{ font: string; source: string; exists: boolean }> = [];
+	const fontToolsRequiredBy = new Set<string>();
+	const typography = project.system.typography;
+	const adjustedFallbackFonts = new Set(
+		typography && 'roles' in typography && typography.roles
+			? Object.values(typography.roles)
+					.map((role) => role.font)
+					.filter((fontId) => {
+						const font = project.fonts?.[fontId];
+						return (
+							Boolean(font) &&
+							(font!.category === 'sans' || font!.category === 'mono') &&
+							!font!.fallbacks?.length
+						);
+					})
+			: []
+	);
 	for (const [font, family] of Object.entries(project.fonts ?? {})) {
 		const licensePath = path.resolve(configDirectory, family.license.file);
 		licenses.push({ font, source: licensePath, exists: await fs.pathExists(licensePath) });
@@ -762,20 +772,26 @@ async function plannedFontInputs(
 				(strategy === 'woff2'
 					? `${path.basename(original, path.extname(original))}.woff2`
 					: original);
+			const exists = await fs.pathExists(sourcePath);
 			sources.push({
 				font,
 				source: sourcePath,
 				output,
 				strategy,
-				exists: await fs.pathExists(sourcePath),
+				exists,
 			});
+			if (strategy === 'woff2') {
+				fontToolsRequiredBy.add(`${font}/${output}`);
+			} else if (adjustedFallbackFonts.has(font) && extension === '.woff2' && exists) {
+				const [inspection] = inspectFontFiles([sourcePath], configDirectory);
+				if (inspection?.axes.wght) fontToolsRequiredBy.add(`${font}/${output}`);
+			}
 		}
 	}
 	sources.sort((left, right) =>
 		`${left.font}/${left.output}`.localeCompare(`${right.font}/${right.output}`)
 	);
 	licenses.sort((left, right) => left.font.localeCompare(right.font));
-	const conversions = sources.filter((source) => source.strategy === 'woff2');
 	return {
 		fonts: {
 			sources,
@@ -790,13 +806,13 @@ async function plannedFontInputs(
 		},
 		prerequisites: {
 			externalTools:
-				conversions.length > 0
+				fontToolsRequiredBy.size > 0
 					? [
 							{
 								id: 'fonttools',
 								reason:
-									'Convert configured TTF/OTF sources to WOFF2 without changing font semantics.',
-								requiredBy: conversions.map((source) => `${source.font}/${source.output}`),
+									'Convert configured sources or decompress variable WOFF2 faces for exact adjusted-fallback sampling.',
+								requiredBy: [...fontToolsRequiredBy].sort(),
 							},
 						]
 					: [],

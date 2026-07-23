@@ -558,7 +558,7 @@ describe('portable project build', () => {
 		expect(specimen).toContain(
 			'body[data-fallback=true] [data-type-role="text"] { font-family: "__tfs-example-adjusted-fallback"'
 		);
-		expect(fallbackManifest.schemaVersion).toBe(2);
+		expect(fallbackManifest.schemaVersion).toBe(3);
 		expect(fallbackManifest).not.toHaveProperty('status');
 		expect(fallbackManifest.roles.text.instances[0].primary.source.sha256).toMatch(/^[a-f\d]{64}$/);
 		expect(fallbackManifest.roles.text.instances[0].provenance).not.toHaveProperty('verification');

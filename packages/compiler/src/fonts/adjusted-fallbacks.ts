@@ -1,7 +1,5 @@
-import { execFile } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { promisify } from 'node:util';
 import type {
 	TypographyFontStyle,
 	TypographyRole,
@@ -17,15 +15,22 @@ import {
 	type BuiltInFallbackProfileId,
 } from './fallback-metrics.js';
 import type { PreparedFontFace, PreparedFontsManifest } from './prepare.js';
-
-const execFileAsync = promisify(execFile);
+import {
+	createFontToolsConverter,
+	type FontToolsConversionProvenance,
+	type FontToolsConverter,
+} from './fonttools.js';
 
 export interface AdjustedFallbackManifest {
-	schemaVersion: 2;
+	schemaVersion: 3;
 	calibration: {
 		id: 'tfs-project-adjusted-fallbacks-v1';
 		profileSelection: 'fontpie style match; regular through 500; bold above 500';
 		supportedStyles: readonly ['normal', 'italic'];
+	};
+	tools?: {
+		/** Present when a variable WOFF2 had to be decompressed for exact sampling. */
+		fontTools: FontToolsConversionProvenance;
 	};
 	roles: Record<
 		string,
@@ -51,6 +56,12 @@ export interface BuildAdjustedFallbacksOptions {
 	preparedDirectory: string;
 	/** Test seam for font parsing only; project builds use fontkit.openSync. */
 	openFont?: (file: string) => Font;
+	/** Internal seam; production builds resolve and record the exact executable. */
+	fontToolsConverter?: FontToolsConverter;
+}
+
+interface AdjustedFallbackToolchain {
+	fontToolsConverter?: FontToolsConverter;
 }
 
 function stylesForRole(
@@ -123,7 +134,8 @@ async function openExactFont(
 	file: string,
 	face: PreparedFontFace,
 	options: BuildAdjustedFallbacksOptions,
-	temporaryDirectories: string[]
+	temporaryDirectories: string[],
+	toolchain: AdjustedFallbackToolchain
 ): Promise<Font> {
 	const openFont =
 		options.openFont ??
@@ -137,7 +149,7 @@ async function openExactFont(
 			return value as Font;
 		});
 	const opened = openFont(file);
-	if (!face.axes.wght || opened.type !== 'WOFF2' || options.openFont) return opened;
+	if (!face.axes.wght || opened.type !== 'WOFF2') return opened;
 
 	// Fontkit 2 cannot instantiate WOFF2 variable fonts correctly. Decompress to
 	// an sfnt wrapper, then perform all variation sampling with fontkit.
@@ -145,12 +157,12 @@ async function openExactFont(
 	temporaryDirectories.push(temporaryDirectory);
 	const decompressed = path.join(temporaryDirectory, 'font.ttf');
 	try {
-		await execFileAsync('fonttools', ['ttLib.woff2', 'decompress', file, '-o', decompressed]);
+		toolchain.fontToolsConverter ??=
+			options.fontToolsConverter ?? (await createFontToolsConverter());
+		await toolchain.fontToolsConverter.decompress(file, decompressed);
 	} catch (error) {
 		const detail = error instanceof Error ? error.message : String(error);
-		throw new Error(
-			`Cannot instantiate prepared variable WOFF2 face "${face.file}". Install FontTools with Brotli support. ${detail}`
-		);
+		throw new Error(`Cannot instantiate prepared variable WOFF2 face "${face.file}". ${detail}`);
 	}
 	return openFont(decompressed);
 }
@@ -190,6 +202,7 @@ export async function buildAdjustedFallbacks(
 
 	const temporaryDirectories: string[] = [];
 	const parsedFaces = new Map<string, Font>();
+	const toolchain: AdjustedFallbackToolchain = {};
 	const cssFaces = new Map<string, { family: string; measurement: AdjustedFallbackMeasurement }>();
 	const manifestRoles: AdjustedFallbackManifest['roles'] = {};
 	const usedFonts = new Set<string>();
@@ -217,7 +230,7 @@ export async function buildAdjustedFallbacks(
 					const facePath = path.join(options.preparedDirectory, face.file);
 					let font = parsedFaces.get(facePath);
 					if (!font) {
-						font = await openExactFont(facePath, face, options, temporaryDirectories);
+						font = await openExactFont(facePath, face, options, temporaryDirectories, toolchain);
 						parsedFaces.set(facePath, font);
 					}
 					const measurement = calculateAdjustedFallback({
@@ -274,12 +287,19 @@ export async function buildAdjustedFallbacks(
 			typography: { ...typography, fonts, roles },
 			css: `${css}\n`,
 			manifest: {
-				schemaVersion: 2,
+				schemaVersion: 3,
 				calibration: {
 					id: 'tfs-project-adjusted-fallbacks-v1',
 					profileSelection: 'fontpie style match; regular through 500; bold above 500',
 					supportedStyles: ['normal', 'italic'],
 				},
+				...(toolchain.fontToolsConverter
+					? {
+							tools: {
+								fontTools: toolchain.fontToolsConverter.provenance,
+							},
+						}
+					: {}),
 				roles: manifestRoles,
 			},
 			measurementCount: Object.values(manifestRoles).reduce(

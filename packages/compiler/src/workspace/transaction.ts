@@ -1,6 +1,6 @@
-import { open, type FileHandle } from 'node:fs/promises';
 import path from 'node:path';
 import fs from 'fs-extra';
+import { acquireBuildLock } from '../build-lock.js';
 
 async function assertOwnedWorkspaceOutput(outputDirectory: string): Promise<void> {
 	if (!(await fs.pathExists(outputDirectory))) return;
@@ -112,13 +112,7 @@ export async function withWorkspaceTransaction<T>(
 ): Promise<T> {
 	await assertOwnedWorkspaceOutput(outputDirectory);
 	await fs.ensureDir(path.dirname(outputDirectory));
-	const lockPath = `${outputDirectory}.tfs-lock`;
-	let lock: FileHandle | undefined;
-	try {
-		lock = await open(lockPath, 'wx');
-	} catch {
-		throw new Error(`Another TFS build appears to be using ${outputDirectory}.`);
-	}
+	const lock = await acquireBuildLock(outputDirectory, 'workspace-package');
 	const staging = await fs.mkdtemp(
 		path.join(path.dirname(outputDirectory), '.tfs-workspace-stage-')
 	);
@@ -142,8 +136,7 @@ export async function withWorkspaceTransaction<T>(
 		}
 		return result;
 	} finally {
-		await lock?.close();
-		await fs.remove(lockPath);
+		await lock.release();
 		if (!committed) await fs.remove(staging);
 	}
 }

@@ -47,19 +47,19 @@ export interface CssTransformerConfig {
 /**
  * Default CSS transformer configuration (internal, with all values)
  */
-const defaultSelectors: ResolvedCssConfig['selectors'] = {
+const defaultSelectors = Object.freeze({
 	root: ':root',
 	colorMode: '[data-color-mode="{mode}"]',
 	sizeMode: '[data-size-mode="{mode}"]',
-};
+}) satisfies ResolvedCssConfig['selectors'];
 
 /**
  * Default CSS transformer configuration (exported for reference)
  */
-export const defaultCssConfig: CssTransformerConfig = {
+export const defaultCssConfig = Object.freeze({
 	selectors: defaultSelectors,
 	// fileHeader is undefined by default (no header unless caller provides config)
-};
+}) satisfies CssTransformerConfig;
 
 /**
  * Internal resolved config with all values present

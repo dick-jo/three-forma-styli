@@ -26,6 +26,13 @@ describe('toCss', () => {
 		overrideTokens: {},
 	};
 
+	it('publishes deeply immutable defaults', () => {
+		expect(Object.isFrozen(defaultCssConfig)).toBe(true);
+		expect(Object.isFrozen(defaultCssConfig.selectors)).toBe(true);
+		expect(Reflect.set(defaultCssConfig.selectors!, 'root', '.mutated-default')).toBe(false);
+		expect(toCss(minimalIR)).toContain(':root {');
+	});
+
 	it('generates :root block with tokens', () => {
 		const css = toCss(minimalIR);
 

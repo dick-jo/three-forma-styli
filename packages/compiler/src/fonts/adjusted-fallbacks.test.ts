@@ -157,6 +157,45 @@ describe('buildAdjustedFallbacks', () => {
 		);
 	});
 
+	it('uses the identified FontTools boundary for variable WOFF2 sampling and records it', async () => {
+		const variable = createFont({
+			axes: { wght: { name: 'Weight', min: 100, default: 400, max: 800 } },
+			getVariation: ({ wght }: { wght: number }) =>
+				createFont({ weight: wght, averageAdvance: wght }),
+		});
+		const compressed = { ...variable, type: 'WOFF2' } as Font;
+		const provenance = {
+			executable: 'fonttools',
+			fontToolsVersion: '4.60.1',
+			python: { implementation: 'CPython', version: '3.14.0' },
+		};
+		const decompress = vi.fn(async () => undefined);
+		const result = await buildAdjustedFallbacks(
+			typography(),
+			manifest(),
+			{ example: projectFont() },
+			{
+				preparedDirectory: '/prepared',
+				openFont: (file) => (file.endsWith('.woff2') ? compressed : variable),
+				fontToolsConverter: {
+					provenance,
+					convert: vi.fn(async () => undefined),
+					decompress,
+				},
+			}
+		);
+
+		expect(decompress).toHaveBeenCalledTimes(1);
+		expect(decompress).toHaveBeenCalledWith(
+			'/prepared/example.woff2',
+			expect.stringMatching(/font\.ttf$/)
+		);
+		expect(result!.manifest).toMatchObject({
+			schemaVersion: 3,
+			tools: { fontTools: provenance },
+		});
+	});
+
 	it('deduplicates CSS faces while retaining each role measurement', async () => {
 		const font = createFont({
 			axes: { wght: { name: 'Weight', min: 100, default: 400, max: 800 } },

@@ -98,12 +98,24 @@
 			: []
 	);
 	let activeCase = $derived(cases.find((reviewCase) => reviewCase.id === activeCaseId) ?? cases[0]);
+	let visibleTypographyMode = $derived(
+		activeLab?.kind === 'typography'
+			? (activeLab.cases.find((reviewCase) => reviewCase.mode === sizeMode)?.mode ??
+					activeLab.cases[0]?.mode)
+			: undefined
+	);
 	let visibleCases = $derived(
 		cases.filter((reviewCase) => {
 			if (
 				activeLab?.kind === 'color' &&
 				reviewCase.kind === 'color' &&
 				reviewCase.mode !== colorMode
+			)
+				return false;
+			if (
+				activeLab?.kind === 'typography' &&
+				reviewCase.kind === 'typography' &&
+				reviewCase.mode !== visibleTypographyMode
 			)
 				return false;
 			return reviewCase.label.toLowerCase().includes(caseQuery.trim().toLowerCase());
@@ -172,6 +184,19 @@
 		if (replacement) activeCaseId = replacement.id;
 	});
 
+	$effect(() => {
+		if (activeLab?.kind !== 'typography' || activeCase?.kind !== 'typography') return;
+		if (activeCase.mode === visibleTypographyMode) return;
+		const replacement =
+			activeLab.cases.find(
+				(reviewCase) =>
+					reviewCase.mode === visibleTypographyMode &&
+					reviewCase.role === activeCase.role &&
+					reviewCase.variant === activeCase.variant
+			) ?? activeLab.cases.find((reviewCase) => reviewCase.mode === visibleTypographyMode);
+		if (replacement) activeCaseId = replacement.id;
+	});
+
 	function selectLab(lab: ReviewLab): void {
 		activeLabId = lab.id;
 		caseQuery = '';
@@ -192,6 +217,7 @@
 		viewMode = 'case';
 		const selected = cases.find((reviewCase) => reviewCase.id === id);
 		if (selected?.kind === 'color') colorMode = selected.mode;
+		if (selected?.kind === 'typography') sizeMode = selected.mode;
 	}
 
 	function selectCaseFromLab(lab: ReviewLab, id: string): void {
@@ -202,12 +228,18 @@
 		viewMode = 'case';
 		const selected = lab.cases.find((reviewCase) => reviewCase.id === id);
 		if (selected?.kind === 'color') colorMode = selected.mode;
+		if (selected?.kind === 'typography') sizeMode = selected.mode;
 	}
 
 	function visibleLabCases(lab: ReviewLab) {
 		if (lab.kind === 'overview') return [];
 		if (lab.kind === 'color')
 			return lab.cases.filter((reviewCase) => reviewCase.mode === colorMode);
+		if (lab.kind === 'typography') {
+			const mode =
+				lab.cases.find((reviewCase) => reviewCase.mode === sizeMode)?.mode ?? lab.cases[0]?.mode;
+			return lab.cases.filter((reviewCase) => reviewCase.mode === mode);
+		}
 		return lab.cases;
 	}
 

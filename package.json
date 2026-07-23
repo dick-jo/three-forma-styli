@@ -20,7 +20,7 @@
 		"workbench:sync": "pnpm --filter @three-forma-styli/workbench-source sync:compiler",
 		"check:workbench": "pnpm --filter @three-forma-styli/workbench-source check && pnpm --filter @three-forma-styli/workbench-source check:compiler",
 		"check": "pnpm check:format && pnpm check:versions && pnpm build:all && pnpm check:split && pnpm test && pnpm check:workbench",
-		"check:release": "pnpm check && pnpm check:packages && node scripts/verify-packed-release.mjs && pnpm check:ecosystem",
+		"check:release": "pnpm check && pnpm check:packages && node scripts/verify-packed-release.mjs && pnpm check:integration",
 		"changeset": "changeset",
 		"release:version": "changeset version",
 		"release:publish": "changeset publish",

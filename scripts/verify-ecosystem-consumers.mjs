@@ -440,7 +440,19 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 		await page.getByText('0 edits', { exact: true }).waitFor();
 		await page.getByRole('button', { name: 'Undo draft' }).click();
 		await page.getByText('1 edits', { exact: true }).waitFor();
+		await page.getByRole('button', { name: 'discard all edits' }).click();
 		await page.getByLabel('size mode', { exact: true }).selectOption('large');
+		await page.getByRole('spinbutton', { name: 'line height value' }).fill('1.31');
+		await page.getByText('1 edits', { exact: true }).waitFor();
+		const downloadPromise = page.waitForEvent('download');
+		await page.getByRole('button', { name: 'export', exact: true }).click();
+		const download = await downloadPromise;
+		const patch = JSON.parse(await readFile(await download.path(), 'utf8'));
+		assert.equal(patch.operations.length, 1);
+		assert.equal(
+			patch.operations[0].path,
+			'/typography/roles/prose/modeOverrides/large/base/lineHeight'
+		);
 
 		await labNavigation.getByRole('button', { name: /motion/i }).click();
 		const motionMatrix = page.locator('.case-matrix[data-lab="motion"]');
@@ -485,7 +497,7 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 		assert.deepEqual(failures, []);
 		assert.equal(evidence.title, 'TFS workbench');
 		assert.equal(evidence.lab, 'typography');
-		assert.equal(evidence.caseId, 'typography--prose--base');
+		assert.equal(evidence.caseId, 'typography--large--prose--base');
 		assert.equal(evidence.sizeMode, 'large');
 		assert.ok(Number.parseFloat(evidence.lineHeight) > 0);
 		assert.ok(evidence.fontSizeToken.length > 0);

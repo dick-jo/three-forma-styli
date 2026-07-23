@@ -281,8 +281,8 @@ export interface GeneratorOptions {
 /**
  * Default generator configuration
  */
-export const defaultGeneratorConfig: GeneratorConfig = {
-	prefixes: {
+export const defaultGeneratorConfig = Object.freeze({
+	prefixes: Object.freeze({
 		color: 'clr',
 		spacing: 'sp',
 		gap: 'gap',
@@ -293,13 +293,13 @@ export const defaultGeneratorConfig: GeneratorConfig = {
 		time: 't',
 		motion: 'motion',
 		shadow: 'shadow',
-	},
-	colorFormat: {
+	}),
+	colorFormat: Object.freeze({
 		base: 'oklch',
 		alpha: 'oklch',
 		alphaModifier: 'a',
-	},
-};
+	}),
+}) satisfies GeneratorConfig;
 
 /**
  * Result from individual token family generators
