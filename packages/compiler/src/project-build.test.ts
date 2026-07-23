@@ -105,7 +105,7 @@ describe('portable project build', () => {
 			)
 		);
 		expect(legacyFixture).toEqual({
-			'build.manifest.json': '7f347cbb7feadb78daa01eda061fe142609fb5b23348b0c20f97c42c27bf0dab',
+			'build.manifest.json': '01f5bd35190ab596a5da78cc109500b70ed6004743f2c17a548fafb9001de6e8',
 			'index.css': '4cb2f483ae8a8ccca27250d862e726233646c40571ecfbb5e9a32e66ad79436a',
 			'system.generated.ts': '18a655155852930d0d54a783507b36c35b09cf62cf76d6b62a57db634bfef716',
 			'tokens.css': 'f2fb21be48defa144feed8d91243839e135b3d5332fc5366f17ebd86c89d623a',
@@ -116,7 +116,7 @@ describe('portable project build', () => {
 				'c0d5b47824c3b1196fa61c19bbb9960fca2ef26165a59f07d8894b622c973fce',
 			'typography.generated.ts': '51e96732b2b5b735a0cd583f24800ab8633e5cc5aaa820478612ae6de4f8736c',
 			'typography.specimen.html':
-				'e21aa0c0f1a29620479a619d1a5f6be37c7d7412c28cffe6cf4e1d2212da62df',
+				'e0e56eea4b320c9a1b26e5318e6849fcab68ec17af3cbae889b21f86c44f0317',
 		});
 	});
 

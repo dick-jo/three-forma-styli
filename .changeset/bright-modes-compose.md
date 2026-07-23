@@ -11,3 +11,5 @@ Make the interactive typography specimen genuinely mode-aware: alternate modes
 now load their generated tokens, controls and labels show resolved tuples, and
 copied drafts preserve default recipes versus mode overrides. Calibration edits
 also apply to the editable glyph sample and its metric context together.
+Slider controls no longer quantize precise authored line-height or tracking
+values when another field is edited.

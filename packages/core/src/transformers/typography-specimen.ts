@@ -243,8 +243,8 @@ function calibrationControls(
 	return `<div class="calibration" data-role="${escapeHtml(roleName)}" data-variant="${escapeHtml(variantName ?? '')}" data-atomic-prefix="${escapeHtml(atomicFontSizePrefix(recipe.fontSizeReference, recipe.atomicFontSizeToken))}" data-weight-prefix="${escapeHtml(weightPrefix)}">
   <label>size<select data-control="fontSize">${fontSizeOptions(ir, recipe.fontSizeReference, recipe.atomicFontSizeToken)}</select></label>
   <label>weight<select data-control="weight">${weightOptions}</select></label>
-  <label>line height<input data-control="lineHeight" type="range" min="0.7" max="2" step="0.01" value="${recipe.lineHeight}"><output>${recipe.lineHeight}</output></label>
-  <label>letter spacing<input data-control="letterSpacing" type="range" min="-0.1" max="0.2" step="0.001" value="${recipe.letterSpacingEm}"><output>${recipe.letterSpacingEm}em</output></label>
+  <label>line height<input data-control="lineHeight" type="range" min="0.7" max="2" step="any" value="${recipe.lineHeight}"><output>${recipe.lineHeight}</output></label>
+  <label>letter spacing<input data-control="letterSpacing" type="range" min="-0.1" max="0.2" step="any" value="${recipe.letterSpacingEm}"><output>${recipe.letterSpacingEm}em</output></label>
   <button class="reset-recipe" type="button">Reset recipe</button>
 </div>`;
 }

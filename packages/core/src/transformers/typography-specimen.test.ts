@@ -51,6 +51,7 @@ describe('toTypographySpecimen', () => {
 		expect(html).toContain('font-size: var(--text-reading-legal-font-size)');
 		expect(html).toContain('Draft configuration patch');
 		expect(html).toContain('data-control="lineHeight"');
+		expect(html.match(/step="any"/g)).toHaveLength(4);
 		expect(html).toContain('data-control="weight"');
 		expect(html).toContain('<select id="size-mode">');
 		expect(html).toContain('<option value="display">display</option>');
