@@ -161,6 +161,11 @@ export interface MotionContractValue {
 	};
 }
 
+export interface ReducedMotionContractValue extends MotionContractValue {
+	/** Whether this value is deliberately preserved or replaced under reduce. */
+	behavior: 'preserve' | 'override';
+}
+
 export interface MotionContract {
 	namespace: string;
 	easings: Record<
@@ -177,6 +182,10 @@ export interface MotionContract {
 			base: MotionContractValue;
 			variants: Record<string, MotionContractValue>;
 			displayOrder: string[];
+			reducedMotion: {
+				base: ReducedMotionContractValue;
+				variants: Record<string, ReducedMotionContractValue>;
+			};
 		}
 	>;
 }
@@ -234,6 +243,9 @@ export interface IR {
 
 	/** Override tokens by mode name, only contains tokens that differ from default */
 	overrideTokens: Record<string, Record<string, TokenValue>>;
+
+	/** Conditional token overrides keyed by their complete CSS media condition. */
+	mediaOverrides: Record<string, Record<string, TokenValue>>;
 
 	/** Structured typography decisions for typed and non-CSS transformers. */
 	typography?: TypographyContract;
@@ -324,6 +336,7 @@ export interface TimeGeneratorResult {
 /** Motion recipes are root fragments and do not participate in CSS modes. */
 export interface MotionGeneratorResult {
 	defaultTokens: TokenValue[];
+	reducedMotionTokens: TokenValue[];
 	contract: MotionContract;
 }
 

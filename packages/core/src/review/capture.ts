@@ -21,7 +21,8 @@ function reviewUrl(
 	lab: ReviewLabId,
 	caseId?: string,
 	colorMode?: string,
-	sizeMode?: string
+	sizeMode?: string,
+	motionPreference?: 'no-preference' | 'reduce'
 ): string {
 	const entries = [
 		['lab', lab],
@@ -29,6 +30,7 @@ function reviewUrl(
 		['view', 'case'],
 		...(colorMode ? [['color', colorMode]] : []),
 		...(sizeMode ? [['size', sizeMode]] : []),
+		...(motionPreference ? [['motion', motionPreference]] : []),
 	];
 	return `./index.html?${entries
 		.map(([name, value]) => `${encodeURIComponent(name)}=${encodeURIComponent(value)}`)
@@ -63,6 +65,10 @@ function caseStates(
 	const sizeGroup = contract.globals.modes.find((group) => group.category === 'size');
 	const colorModes = modesFor(colorGroup, reviewCase.capture.colorModes, reviewCase.id);
 	const sizeModes = modesFor(sizeGroup, reviewCase.capture.sizeModes, reviewCase.id);
+	const motionPreferences: Array<'no-preference' | 'reduce' | undefined> =
+		reviewCase.capture.motionPreferences.length > 0
+			? reviewCase.capture.motionPreferences
+			: [undefined];
 
 	return reviewCase.capture.viewports.flatMap((viewportId) => {
 		const viewport = contract.globals.viewports.find((entry) => entry.id === viewportId);
@@ -70,31 +76,35 @@ function caseStates(
 			throw new Error(`Review case "${reviewCase.id}" requests unknown viewport "${viewportId}"`);
 		}
 		return colorModes.flatMap((colorMode) =>
-			sizeModes.map((sizeMode) => {
-				const modeIdentity = [
-					colorMode ? `color-${idSegment(colorMode)}` : undefined,
-					sizeMode ? `size-${idSegment(sizeMode)}` : undefined,
-				]
-					.filter(Boolean)
-					.join('--');
-				return {
-					id: [
-						reviewCase.id,
-						`viewport-${idSegment(viewport.id)}`,
-						...(modeIdentity ? [modeIdentity] : []),
-					].join('--'),
-					lab,
-					caseId: reviewCase.id,
-					viewport: {
-						id: viewport.id,
-						width: viewport.width,
-						height: viewport.height,
-					},
-					...(colorMode ? { colorMode } : {}),
-					...(sizeMode ? { sizeMode } : {}),
-					url: reviewUrl(lab, reviewCase.id, colorMode, sizeMode),
-				};
-			})
+			sizeModes.flatMap((sizeMode) =>
+				motionPreferences.map((motionPreference) => {
+					const modeIdentity = [
+						colorMode ? `color-${idSegment(colorMode)}` : undefined,
+						sizeMode ? `size-${idSegment(sizeMode)}` : undefined,
+						motionPreference ? `motion-${idSegment(motionPreference)}` : undefined,
+					]
+						.filter(Boolean)
+						.join('--');
+					return {
+						id: [
+							reviewCase.id,
+							`viewport-${idSegment(viewport.id)}`,
+							...(modeIdentity ? [modeIdentity] : []),
+						].join('--'),
+						lab,
+						caseId: reviewCase.id,
+						viewport: {
+							id: viewport.id,
+							width: viewport.width,
+							height: viewport.height,
+						},
+						...(colorMode ? { colorMode } : {}),
+						...(sizeMode ? { sizeMode } : {}),
+						...(motionPreference ? { motionPreference } : {}),
+						url: reviewUrl(lab, reviewCase.id, colorMode, sizeMode, motionPreference),
+					};
+				})
+			)
 		);
 	});
 }
@@ -140,7 +150,7 @@ export function createReviewCapturePlan(contract: TfsWorkbenchContract): TfsRevi
 	if (duplicate) throw new Error(`Review capture state ID "${duplicate.id}" is not unique`);
 	return {
 		kind: 'three-forma-styli/review-captures',
-		schemaVersion: 1,
+		schemaVersion: 2,
 		systemFingerprint: contract.systemFingerprint,
 		entrypoint: './index.html',
 		states,

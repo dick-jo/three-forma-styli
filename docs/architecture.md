@@ -348,6 +348,12 @@ motion: {
         max: { duration: 4 },
       },
       displayOrder: ["min", "lo", "base", "hi", "max"],
+      reducedMotion: {
+        base: { duration: 0, delay: 0 },
+        variants: {
+          max: "preserve",
+        },
+      },
     },
   },
 }
@@ -356,7 +362,14 @@ motion: {
 Recipe, variant, and easing names are entirely author-defined. Duration numbers
 reference the default time scale; `{ scale: "ambient", step: 2 }` explicitly
 references another scale. Variants inherit omitted easing and delay decisions
-from their base.
+from their base. `reducedMotion` is mandatory: `"preserve"` records essential
+motion explicitly, while an object supplies a reduced base inherited by every
+variant. A variant-level `"preserve"` opts that one variant back into its
+original tuple.
+
+This follows the platform definition: `prefers-reduced-motion` asks authors to
+remove or replace non-essential motion, not to erase every transition
+indiscriminately. See [Media Queries Level 5](https://www.w3.org/TR/mediaqueries-5/#prefers-reduced-motion).
 
 **Output:**
 
@@ -366,6 +379,13 @@ from their base.
 --motion-hover-easing: var(--motion-ease-standard);
 --motion-hover-delay: 0ms;
 --motion-hover: var(--motion-hover-duration) var(--motion-hover-easing) var(--motion-hover-delay);
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--motion-hover-duration: 0ms;
+		--motion-hover-delay: 0ms;
+	}
+}
 ```
 
 ```css
@@ -378,8 +398,10 @@ from their base.
 
 The generated system TypeScript contract also exposes the resolved cubic Bézier
 tuple plus duration/delay in milliseconds and seconds for Motion, Framer Motion,
-or another JavaScript engine. TFS does not encode CSS property names and does
-not emit motion helper classes.
+or another JavaScript engine, including the fully resolved reduced alternative
+and whether it preserves or overrides the standard value. The DTCG transition
+extension and Workbench carry the same decision. TFS does not encode CSS
+property names and does not emit motion helper classes.
 
 ---
 

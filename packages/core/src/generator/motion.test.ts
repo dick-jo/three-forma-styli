@@ -34,6 +34,12 @@ function system(): PartialDesignSystem {
 						},
 					},
 					displayOrder: ['min', 'base', 'max'],
+					reducedMotion: {
+						base: { duration: 0, delay: 0 },
+						variants: {
+							max: 'preserve',
+						},
+					},
 				},
 			},
 		},
@@ -64,6 +70,25 @@ describe('motion generation', () => {
 			seconds: 2,
 		});
 		expect(ir.motion?.recipes.hover?.displayOrder).toEqual(['min', 'base', 'max']);
+		expect(ir.motion?.recipes.hover?.reducedMotion.base).toMatchObject({
+			behavior: 'override',
+			duration: { token: null, milliseconds: 0 },
+		});
+		expect(ir.motion?.recipes.hover?.reducedMotion.variants.min).toMatchObject({
+			behavior: 'override',
+			duration: { token: null, milliseconds: 0 },
+		});
+		expect(ir.motion?.recipes.hover?.reducedMotion.variants.max).toMatchObject({
+			behavior: 'preserve',
+			duration: { token: 't-ambient-2', milliseconds: 2000 },
+		});
+		expect(ir.mediaOverrides['(prefers-reduced-motion: reduce)']).toMatchObject({
+			'motion-hover-duration': { value: '0ms' },
+			'motion-hover-min-duration': { value: '0ms' },
+		});
+		expect(ir.mediaOverrides['(prefers-reduced-motion: reduce)']).not.toHaveProperty(
+			'motion-hover-max-duration'
+		);
 	});
 
 	it('allows arbitrary author recipe and variant names', () => {
@@ -72,6 +97,7 @@ describe('motion generation', () => {
 			linger: {
 				base: { duration: 2, easing: 'standard' },
 				variants: { whisper: { duration: 'min' } },
+				reducedMotion: 'preserve',
 			},
 		};
 		const ir = generate(input, { prefixes: { motion: 'move' } });
@@ -104,5 +130,32 @@ describe('motion generation', () => {
 		const invalidOrder = system();
 		invalidOrder.motion!.recipes.hover!.displayOrder = ['base'];
 		expect(() => generate(invalidOrder)).toThrow(/displayOrder must contain base/);
+	});
+
+	it('requires an explicit reduced-motion policy and validates overrides', () => {
+		const missing = system();
+		delete (missing.motion!.recipes.hover as Partial<(typeof missing.motion.recipes)['hover']>)
+			.reducedMotion;
+		expect(() => generate(missing)).toThrow(/reducedMotion is required/);
+
+		const unknownVariant = system();
+		if (unknownVariant.motion!.recipes.hover!.reducedMotion !== 'preserve') {
+			unknownVariant.motion!.recipes.hover!.reducedMotion.variants = {
+				unknown: { duration: 0 },
+			};
+		}
+		expect(() => generate(unknownVariant)).toThrow(/references unknown variant "unknown"/);
+
+		const empty = system();
+		if (empty.motion!.recipes.hover!.reducedMotion !== 'preserve') {
+			empty.motion!.recipes.hover!.reducedMotion.base = {};
+		}
+		expect(() => generate(empty)).toThrow(/must override duration, easing, or delay/);
+
+		const invalidVariants = system();
+		if (invalidVariants.motion!.recipes.hover!.reducedMotion !== 'preserve') {
+			invalidVariants.motion!.recipes.hover!.reducedMotion.variants = [] as never;
+		}
+		expect(() => generate(invalidVariants)).toThrow(/reducedMotion\.variants must be an object/);
 	});
 });

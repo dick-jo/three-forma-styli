@@ -64,6 +64,8 @@ export interface ReviewCapturePolicy {
 	colorModes: string[];
 	/** Authored mode names, `*` for every mode, or `$default` for the category default. */
 	sizeModes: string[];
+	/** User motion preferences to exercise for this case. */
+	motionPreferences: Array<'no-preference' | 'reduce'>;
 }
 
 export interface ReviewCaptureState {
@@ -78,13 +80,14 @@ export interface ReviewCaptureState {
 	};
 	colorMode?: string;
 	sizeMode?: string;
+	motionPreference?: 'no-preference' | 'reduce';
 	/** URL relative to the generated review directory. */
 	url: string;
 }
 
 export interface TfsReviewCapturePlan {
 	kind: 'three-forma-styli/review-captures';
-	schemaVersion: 1;
+	schemaVersion: 2;
 	systemFingerprint: string;
 	entrypoint: './index.html';
 	states: ReviewCaptureState[];
@@ -192,6 +195,17 @@ export interface MotionReviewCase extends ReviewCaseBase {
 		css: string;
 		value: readonly [number, number, number, number];
 	};
+	reducedMotion: {
+		behavior: 'preserve' | 'override';
+		duration: { token: string | null; milliseconds: number };
+		delay: { token: string | null; milliseconds: number };
+		easing: {
+			name: string;
+			token: string;
+			css: string;
+			value: readonly [number, number, number, number];
+		};
+	};
 }
 
 export interface MotionReviewLab {
@@ -238,7 +252,7 @@ export interface ReviewDiagnostic {
 
 export interface TfsWorkbenchContract {
 	kind: 'three-forma-styli/workbench';
-	schemaVersion: 1;
+	schemaVersion: 2;
 	systemFingerprint: string;
 	toolVersion: string;
 	title: string;

@@ -41,6 +41,7 @@ describe('project system TypeScript contract', () => {
 					hover: {
 						base: { duration: 1, easing: 'standard' },
 						variants: { max: { duration: { scale: 'ambient', step: 2 } } },
+						reducedMotion: { base: { duration: 0, delay: 0 } },
 					},
 				},
 			},

@@ -183,5 +183,16 @@ export function toCss(ir: IR, userConfig?: Partial<CssTransformerConfig>): strin
 		}
 	}
 
+	for (const [condition, tokens] of Object.entries(ir.mediaOverrides)) {
+		const mediaVars = formatTokensAsCss(tokens);
+		if (mediaVars.length > 0) {
+			blocks.push(
+				`@media ${condition} {\n  ${config.selectors.root} {\n${mediaVars
+					.map((line) => `  ${line}`)
+					.join('\n')}\n  }\n}`
+			);
+		}
+	}
+
 	return blocks.join('\n\n');
 }

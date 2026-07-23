@@ -259,6 +259,7 @@ describe('toFigmaJson', () => {
 					hover: {
 						base: { duration: 2, easing: 'standard' },
 						variants: { max: { duration: 3, delay: 1 } },
+						reducedMotion: { base: { duration: 0, delay: 0 } },
 					},
 				},
 			},
@@ -271,6 +272,16 @@ describe('toFigmaJson', () => {
 			duration: { value: 300, unit: 'ms' },
 			delay: { value: 100, unit: 'ms' },
 			timingFunction: [0.2, 0, 0.38, 0.9],
+		});
+		expect(
+			output.transition['hover-max'].$extensions['com.three-forma-styli'].reducedMotion
+		).toEqual({
+			behavior: 'override',
+			value: {
+				duration: { value: 0, unit: 'ms' },
+				delay: { value: 0, unit: 'ms' },
+				timingFunction: [0.2, 0, 0.38, 0.9],
+			},
 		});
 		expect(output.typography.prose.$value).toEqual({
 			fontFamily: ['Proof Sans', 'Arial', 'sans-serif'],
@@ -360,6 +371,7 @@ describe('toFigmaJson', () => {
 						hover: {
 							base: { duration: 2, easing: 'standard' },
 							variants: { max: { duration: 3, delay: 1 } },
+							reducedMotion: { base: { duration: 0, delay: 0 } },
 						},
 					},
 				},

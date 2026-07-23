@@ -298,5 +298,14 @@ export function generate(
 			time: timeResult.scaleInfo,
 		},
 		overrideTokens,
+		mediaOverrides:
+			motionResult && motionResult.reducedMotionTokens.length > 0
+				? {
+						'(prefers-reduced-motion: reduce)': tokensToRecord(
+							motionResult.reducedMotionTokens,
+							'the reduced-motion media override'
+						),
+					}
+				: {},
 	};
 }

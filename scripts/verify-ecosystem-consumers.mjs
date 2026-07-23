@@ -171,7 +171,7 @@ async function exerciseScaffolds() {
 		await readFile(path.join(workspaceRoot, 'generated/review/workbench.json'), 'utf8')
 	);
 	assert.equal(workbench.kind, 'three-forma-styli/workbench');
-	assert.equal(workbench.schemaVersion, 1);
+	assert.equal(workbench.schemaVersion, 2);
 	assert.ok(workbench.labs.some((lab) => lab.kind === 'color' && lab.cases.length > 0));
 	assert.ok(workbench.labs.some((lab) => lab.kind === 'typography' && lab.cases.length > 0));
 	assert.ok(workbench.labs.some((lab) => lab.kind === 'shadows' && lab.cases.length > 0));
@@ -486,7 +486,9 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 	const typographyCase = typographyLab?.cases.find(
 		(reviewCase) => reviewCase.role === 'prose' && reviewCase.variant === null
 	);
+	const motionCase = workbench.labs.find((lab) => lab.kind === 'motion')?.cases[0];
 	assert.ok(typographyCase, 'Generated Workbench omitted the prose base typography case');
+	assert.ok(motionCase, 'Generated Workbench omitted a motion case');
 	typographyCase.font.family = '__tfs-missing-primary';
 	typographyCase.font.adjustedFallback = '__tfs-missing-adjusted';
 	await writeJson(workbenchPath, workbench);
@@ -495,6 +497,11 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 	const capturePlan = JSON.parse(
 		await readFile(path.join(workspaceRoot, 'generated/review/captures.json'), 'utf8')
 	);
+	const motionCapturePreferences = capturePlan.states
+		.filter((state) => state.lab === 'motion')
+		.map((state) => state.motionPreference);
+	assert.ok(motionCapturePreferences.includes('no-preference'));
+	assert.ok(motionCapturePreferences.includes('reduce'));
 	const browser = await chromium.launch({ headless: true });
 	try {
 		const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
@@ -597,6 +604,23 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 		await motionMatrix.waitFor();
 		assert.ok((await motionMatrix.locator('.matrix-card').count()) > 1);
 		await motionMatrix.locator('.matrix-card').first().click();
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+		assert.equal(
+			await page.evaluate(
+				(token) => getComputedStyle(document.documentElement).getPropertyValue(token).trim(),
+				`--${motionCase.token}-duration`
+			),
+			`${motionCase.duration.milliseconds}ms`
+		);
+		await page.emulateMedia({ reducedMotion: 'reduce' });
+		assert.equal(
+			await page.evaluate(
+				(token) => getComputedStyle(document.documentElement).getPropertyValue(token).trim(),
+				`--${motionCase.token}-duration`
+			),
+			`${motionCase.reducedMotion.duration.milliseconds}ms`
+		);
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
 		const motionObject = page.locator('.motion-object');
 		assert.equal(
 			await motionObject.evaluate((element) => getComputedStyle(element).transform),
@@ -609,6 +633,16 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 				.locator('.motion-object')
 				.evaluate((element) => getComputedStyle(element).transform),
 			'none'
+		);
+		await page.getByRole('button', { name: 'reduced', exact: true }).click();
+		assert.equal(new URL(page.url()).searchParams.get('motion'), 'reduce');
+		assert.equal(
+			await page.locator('.motion-preference span').textContent(),
+			motionCase.reducedMotion.behavior
+		);
+		assert.equal(
+			await page.locator('.motion-meta strong').first().textContent(),
+			`${motionCase.reducedMotion.duration.milliseconds}ms`
 		);
 		await labNavigation.getByRole('button', { name: /typography/i }).click();
 		await page

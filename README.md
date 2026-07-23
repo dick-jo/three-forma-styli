@@ -289,6 +289,9 @@ motion: {
         hi: { duration: 3 },
         max: { duration: 4 },
       },
+      reducedMotion: {
+        base: { duration: 0, delay: 0 },
+      },
     },
   },
 }
@@ -305,6 +308,13 @@ motion: {
 The generated TypeScript contract exposes the same easing tuple and resolved
 millisecond/second values for JavaScript animation libraries. TFS deliberately
 does not attach CSS property names to recipes.
+
+Every recipe must make one explicit reduced-motion decision. Use
+`reducedMotion: "preserve"` only when the motion itself is essential, or author
+a base reduced override inherited by its variants. Any variant can override
+that reduced value or use `"preserve"` independently. TFS emits the resolved
+semantic variables under `@media (prefers-reduced-motion: reduce)` and exposes
+the same standard/reduced values to JavaScript consumers.
 
 ### Border
 

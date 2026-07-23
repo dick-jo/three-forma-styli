@@ -375,6 +375,29 @@ export interface MotionRecipeBase {
  */
 export type MotionRecipeVariant = Partial<MotionRecipeBase>;
 
+/**
+ * A reduced-motion override may resolve duration or delay to literal zero.
+ * Omitted fields preserve the corresponding authored recipe decision.
+ */
+export interface ReducedMotionRecipeVariant {
+	duration?: 0 | TimeReference;
+	easing?: string;
+	delay?: 0 | TimeReference;
+}
+
+/**
+ * Reduced-motion is an explicit semantic decision, not a global duration
+ * multiplier. A recipe can preserve its motion when it is essential, or
+ * provide a base override inherited by every variant. Individual variants may
+ * override that reduced value or opt back into their original motion.
+ */
+export type ReducedMotionRecipe =
+	| 'preserve'
+	| {
+			base: ReducedMotionRecipeVariant;
+			variants?: Record<string, ReducedMotionRecipeVariant | 'preserve'>;
+	  };
+
 export interface MotionRecipe {
 	/** Unsuffixed/default fragment, emitted as --motion-{recipe}. */
 	base: MotionRecipeBase;
@@ -382,6 +405,8 @@ export interface MotionRecipe {
 	variants?: Record<string, MotionRecipeVariant>;
 	/** Optional review order containing base and every variant exactly once. */
 	displayOrder?: string[];
+	/** Required behavior for the user's reduced-motion preference. */
+	reducedMotion: ReducedMotionRecipe;
 }
 
 /**

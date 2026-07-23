@@ -2,6 +2,7 @@ import type {
 	MotionEasing,
 	MotionRecipeBase,
 	MotionRecipeVariant,
+	ReducedMotionRecipeVariant,
 	MotionSystem,
 	TimeReference,
 	TimeSystem,
@@ -15,6 +16,12 @@ import type {
 	TokenValue,
 } from './types.js';
 import { getDefaultEntry } from './utils.js';
+
+type ResolvedMotionValue = {
+	duration: 0 | TimeReference;
+	easing: string;
+	delay: 0 | TimeReference;
+};
 
 function number(value: number): string {
 	return Object.is(value, -0) ? '0' : String(value);
@@ -56,27 +63,50 @@ function zeroTimeValue(): MotionContractTimeValue {
 	};
 }
 
+function resolvedValue(
+	base: MotionRecipeBase,
+	...overrides: Array<MotionRecipeVariant | ReducedMotionRecipeVariant | undefined>
+): ResolvedMotionValue {
+	let value: ResolvedMotionValue = {
+		duration: base.duration,
+		easing: base.easing,
+		delay: base.delay ?? 0,
+	};
+	for (const override of overrides) {
+		if (!override) continue;
+		value = {
+			duration: override.duration ?? value.duration,
+			easing: override.easing ?? value.easing,
+			delay: override.delay ?? value.delay,
+		};
+	}
+	return value;
+}
+
 function resolveValue(
 	recipeName: string,
 	variantName: string,
-	base: MotionRecipeBase,
-	override: MotionRecipeVariant | undefined,
+	value: ResolvedMotionValue,
 	system: MotionSystem,
 	time: TimeSystem,
-	config: GeneratorConfig
+	config: GeneratorConfig,
+	preference: 'default' | 'reduced-motion' = 'default'
 ): { tokens: TokenValue[]; contract: MotionContractValue } {
 	const namespace = config.prefixes.motion;
 	const prefix =
 		variantName === 'base'
 			? `${namespace}-${recipeName}`
 			: `${namespace}-${recipeName}-${variantName}`;
-	const duration = timeValue(override?.duration ?? base.duration, time, config);
-	const delayReference = override?.delay ?? base.delay ?? 0;
-	const delay = delayReference === 0 ? zeroTimeValue() : timeValue(delayReference, time, config);
-	const easingName = override?.easing ?? base.easing;
+	const duration = value.duration === 0 ? zeroTimeValue() : timeValue(value.duration, time, config);
+	const delay = value.delay === 0 ? zeroTimeValue() : timeValue(value.delay, time, config);
+	const easingName = value.easing;
 	const easing = system.easings[easingName]!;
 	const easingToken = `${namespace}-ease-${easingName}`;
-	const metadata = { motionRecipe: recipeName, motionVariant: variantName };
+	const metadata = {
+		motionRecipe: recipeName,
+		motionVariant: variantName,
+		motionPreference: preference,
+	};
 	const tokens: TokenValue[] = [
 		{
 			family: 'motion',
@@ -135,6 +165,7 @@ export function generateMotionTokens(
 ): MotionGeneratorResult {
 	const namespace = config.prefixes.motion;
 	const defaultTokens: TokenValue[] = [];
+	const reducedMotionTokens: TokenValue[] = [];
 	const easings: MotionContract['easings'] = {};
 	const recipes: MotionContract['recipes'] = {};
 
@@ -150,33 +181,79 @@ export function generateMotionTokens(
 	}
 
 	for (const [recipeName, recipe] of Object.entries(system.recipes)) {
-		const base = resolveValue(recipeName, 'base', recipe.base, undefined, system, time, config);
+		const normalBaseValue = resolvedValue(recipe.base);
+		const base = resolveValue(recipeName, 'base', normalBaseValue, system, time, config);
 		defaultTokens.push(...base.tokens);
 
 		const variants: Record<string, MotionContractValue> = {};
+		const normalVariantValues: Record<string, ResolvedMotionValue> = {};
 		for (const [variantName, variant] of Object.entries(recipe.variants ?? {})) {
+			const normalValue = resolvedValue(recipe.base, variant);
+			const resolved = resolveValue(recipeName, variantName, normalValue, system, time, config);
+			defaultTokens.push(...resolved.tokens);
+			variants[variantName] = resolved.contract;
+			normalVariantValues[variantName] = normalValue;
+		}
+
+		const reducedBaseBehavior = recipe.reducedMotion === 'preserve' ? 'preserve' : 'override';
+		const reducedBaseValue =
+			recipe.reducedMotion === 'preserve'
+				? normalBaseValue
+				: resolvedValue(recipe.base, recipe.reducedMotion.base);
+		const reducedBase = resolveValue(
+			recipeName,
+			'base',
+			reducedBaseValue,
+			system,
+			time,
+			config,
+			'reduced-motion'
+		);
+		if (reducedBaseBehavior === 'override') reducedMotionTokens.push(...reducedBase.tokens);
+
+		const reducedVariants: MotionContract['recipes'][string]['reducedMotion']['variants'] = {};
+		for (const [variantName, normalValue] of Object.entries(normalVariantValues)) {
+			const authored =
+				recipe.reducedMotion === 'preserve'
+					? 'preserve'
+					: recipe.reducedMotion.variants?.[variantName];
+			const behavior = authored === 'preserve' ? 'preserve' : 'override';
+			const reducedValue =
+				authored === 'preserve'
+					? normalValue
+					: resolvedValue(
+							recipe.base,
+							recipe.variants?.[variantName],
+							recipe.reducedMotion === 'preserve' ? undefined : recipe.reducedMotion.base,
+							authored
+						);
 			const resolved = resolveValue(
 				recipeName,
 				variantName,
-				recipe.base,
-				variant,
+				reducedValue,
 				system,
 				time,
-				config
+				config,
+				'reduced-motion'
 			);
-			defaultTokens.push(...resolved.tokens);
-			variants[variantName] = resolved.contract;
+			if (behavior === 'override') reducedMotionTokens.push(...resolved.tokens);
+			reducedVariants[variantName] = { ...resolved.contract, behavior };
 		}
 
 		recipes[recipeName] = {
 			base: base.contract,
 			variants,
 			displayOrder: recipe.displayOrder ?? ['base', ...Object.keys(variants)],
+			reducedMotion: {
+				base: { ...reducedBase.contract, behavior: reducedBaseBehavior },
+				variants: reducedVariants,
+			},
 		};
 	}
 
 	return {
 		defaultTokens,
+		reducedMotionTokens,
 		contract: { namespace, easings, recipes },
 	};
 }

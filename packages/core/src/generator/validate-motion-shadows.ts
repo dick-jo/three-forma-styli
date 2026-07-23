@@ -69,6 +69,45 @@ function validateTimeReference(
 	}
 }
 
+function validateMotionValue(
+	value: unknown,
+	path: string,
+	fallback: {
+		duration?: TimeReference;
+		easing?: string;
+		delay?: 0 | TimeReference;
+	},
+	motion: NonNullable<PartialDesignSystem['motion']>,
+	time: NonNullable<PartialDesignSystem['time']>,
+	options: { allowZeroDuration: boolean; requireField: boolean }
+): void {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) {
+		throw new ValidationError(`${path} must be an object`);
+	}
+	const authored = value as Record<string, unknown>;
+	const allowed = new Set(['duration', 'easing', 'delay']);
+	for (const key of Object.keys(authored)) {
+		if (!allowed.has(key)) throw new ValidationError(`${path} contains unknown field "${key}"`);
+	}
+	if (options.requireField && Object.keys(authored).length === 0) {
+		throw new ValidationError(`${path} must override duration, easing, or delay`);
+	}
+	const duration = authored.duration ?? fallback.duration;
+	const easing = authored.easing ?? fallback.easing;
+	const delay = authored.delay ?? fallback.delay ?? 0;
+	if (duration === undefined) throw new ValidationError(`${path}.duration is required`);
+	if (typeof easing !== 'string' || !motion.easings[easing]) {
+		throw new ValidationError(`${path}.easing references unknown easing "${String(easing)}"`);
+	}
+	validateTimeReference(
+		duration as TimeReference,
+		time,
+		`${path}.duration`,
+		options.allowZeroDuration
+	);
+	validateTimeReference(delay as TimeReference, time, `${path}.delay`, true);
+}
+
 export function validateMotionPartial(
 	motion: NonNullable<PartialDesignSystem['motion']>,
 	time: NonNullable<PartialDesignSystem['time']>
@@ -106,6 +145,11 @@ export function validateMotionPartial(
 		if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe) || !recipe.base) {
 			throw new ValidationError(`motion.recipes.${recipeName}.base is required`);
 		}
+		if (recipe.reducedMotion === undefined) {
+			throw new ValidationError(
+				`motion.recipes.${recipeName}.reducedMotion is required; use "preserve" for essential motion or author a reduced override`
+			);
+		}
 		if ('base' in (recipe.variants ?? {})) {
 			throw new ValidationError(
 				`motion.recipes.${recipeName}.variants must not contain reserved name "base"`
@@ -136,22 +180,64 @@ export function validateMotionPartial(
 			...Object.entries(recipe.variants ?? {}),
 		]) {
 			const path = `motion.recipes.${recipeName}.${variantName}`;
-			if (!variant || typeof variant !== 'object' || Array.isArray(variant)) {
-				throw new ValidationError(`${path} must be an object`);
+			validateMotionValue(variant, path, recipe.base, motion, time, {
+				allowZeroDuration: false,
+				requireField: false,
+			});
+		}
+
+		if (recipe.reducedMotion !== 'preserve') {
+			if (
+				!recipe.reducedMotion ||
+				typeof recipe.reducedMotion !== 'object' ||
+				Array.isArray(recipe.reducedMotion)
+			) {
+				throw new ValidationError(
+					`motion.recipes.${recipeName}.reducedMotion must be "preserve" or an object`
+				);
 			}
-			const allowed = new Set(['duration', 'easing', 'delay']);
-			for (const key of Object.keys(variant)) {
-				if (!allowed.has(key)) throw new ValidationError(`${path} contains unknown field "${key}"`);
+			const reducedAllowed = new Set(['base', 'variants']);
+			for (const key of Object.keys(recipe.reducedMotion)) {
+				if (!reducedAllowed.has(key)) {
+					throw new ValidationError(
+						`motion.recipes.${recipeName}.reducedMotion contains unknown field "${key}"`
+					);
+				}
 			}
-			const duration = variant.duration ?? recipe.base.duration;
-			const easing = variant.easing ?? recipe.base.easing;
-			const delay = variant.delay ?? recipe.base.delay ?? 0;
-			if (duration === undefined) throw new ValidationError(`${path}.duration is required`);
-			if (typeof easing !== 'string' || !motion.easings[easing]) {
-				throw new ValidationError(`${path}.easing references unknown easing "${String(easing)}"`);
+			validateMotionValue(
+				recipe.reducedMotion.base,
+				`motion.recipes.${recipeName}.reducedMotion.base`,
+				recipe.base,
+				motion,
+				time,
+				{ allowZeroDuration: true, requireField: true }
+			);
+			if (
+				recipe.reducedMotion.variants !== undefined &&
+				(!recipe.reducedMotion.variants ||
+					typeof recipe.reducedMotion.variants !== 'object' ||
+					Array.isArray(recipe.reducedMotion.variants))
+			) {
+				throw new ValidationError(
+					`motion.recipes.${recipeName}.reducedMotion.variants must be an object`
+				);
 			}
-			validateTimeReference(duration, time, `${path}.duration`, false);
-			validateTimeReference(delay, time, `${path}.delay`, true);
+			for (const [variantName, override] of Object.entries(recipe.reducedMotion.variants ?? {})) {
+				if (!recipe.variants?.[variantName]) {
+					throw new ValidationError(
+						`motion.recipes.${recipeName}.reducedMotion.variants references unknown variant "${variantName}"`
+					);
+				}
+				if (override === 'preserve') continue;
+				validateMotionValue(
+					override,
+					`motion.recipes.${recipeName}.reducedMotion.variants.${variantName}`,
+					recipe.base,
+					motion,
+					time,
+					{ allowZeroDuration: true, requireField: true }
+				);
+			}
 		}
 	}
 }

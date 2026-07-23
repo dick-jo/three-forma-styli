@@ -150,7 +150,7 @@ reference evidence, not hardcoded policy.
 - [x] Generate equivalent CSS and typed JavaScript motion contracts so CSS
       transitions and application animation libraries do not maintain separate
       timing values.
-- [ ] Make reduced-motion behavior explicit per semantic recipe and generate a
+- [x] Make reduced-motion behavior explicit per semantic recipe and generate a
       `prefers-reduced-motion` contract. Do not globally erase essential feedback
       or assume every motion should degrade in the same way.
 - [x] Keep component state/selectors and arbitrary keyframes outside the initial
@@ -256,6 +256,11 @@ reference evidence, not hardcoded policy.
   browser-safe; `compiler` owns Node project/font compilation; `cli` owns config
   loading and interactive commands. Compatibility CLI exports remain during the
   transition, but new authored projects import compiler APIs directly.
+- **2026-07-23 — reduced motion is semantic.** Every motion recipe explicitly
+  preserves essential motion or resolves an authored reduced alternative. TFS
+  rebinds the same semantic variables under the platform preference and exposes
+  both tuples to JavaScript, DTCG and Workbench consumers; it never applies a
+  global duration multiplier or blanket animation kill switch.
 - **2026-07-23 — concurrent visual calibration.** Marketing typography tuning is
   isolated in `/Users/dickjones/project-local/tfs-scatter-mktgfx-tuning` from the
   committed `tfs-scatter` main line and its vendored TFS build. The canonical

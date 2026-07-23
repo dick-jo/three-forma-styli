@@ -416,6 +416,10 @@ function generateDtcg(
 				...Object.entries(recipe.variants),
 			]) {
 				const name = variantName === 'base' ? recipeName : `${recipeName}-${variantName}`;
+				const reduced =
+					variantName === 'base'
+						? recipe.reducedMotion.base
+						: recipe.reducedMotion.variants[variantName];
 				transitionGroup[name] = {
 					$value: {
 						duration: { value: value.duration.milliseconds, unit: 'ms' },
@@ -423,7 +427,18 @@ function generateDtcg(
 						timingFunction: [...value.easing.value],
 					},
 					$extensions: {
-						[EXTENSION_KEY]: { recipe: recipeName, variant: variantName },
+						[EXTENSION_KEY]: {
+							recipe: recipeName,
+							variant: variantName,
+							reducedMotion: {
+								behavior: reduced.behavior,
+								value: {
+									duration: { value: reduced.duration.milliseconds, unit: 'ms' },
+									delay: { value: reduced.delay.milliseconds, unit: 'ms' },
+									timingFunction: [...reduced.easing.value],
+								},
+							},
+						},
 					},
 				};
 			}

@@ -1009,6 +1009,37 @@ button:disabled {
 	margin: auto;
 }
 
+.motion-preference {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.motion-preference button {
+	padding: 6px 9px;
+	border-color: var(--clr-neu-a-lo-x, #444);
+	background: transparent;
+	color: var(--clr-ink, #fff);
+	font-size: 9px;
+	text-transform: uppercase;
+}
+
+.motion-preference button.active {
+	border-color: var(--clr-pri, var(--wb-accent));
+	color: var(--clr-pri, var(--wb-accent));
+}
+
+.motion-preference span {
+	margin-left: auto;
+	color: var(--clr-neu, #aaa);
+	font-size: 9px;
+	text-transform: uppercase;
+}
+
+.motion-preference span[data-behavior='override'] {
+	color: var(--clr-pri, var(--wb-accent));
+}
+
 .motion-meta {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -50,27 +50,31 @@ runtime output:
 ```ts
 interface TfsWorkbenchContract {
 	kind: 'three-forma-styli/workbench';
-	schemaVersion: 1;
+	schemaVersion: 2;
 	systemFingerprint: string;
 	toolVersion: string;
-	assets: {
-		runtimeCss: string;
-		fontCss?: string;
-	};
+	title: string;
+	assets: { stylesheets: string[] };
 	globals: {
-		colorModes: ReviewGlobal[];
-		sizeModes: ReviewGlobal[];
+		modes: ReviewModeGroup[];
 		viewports: ReviewViewport[];
-		media: ReviewMediaState[];
 	};
 	labs: ReviewLab[];
 	diagnostics: ReviewDiagnostic[];
+	agent: {
+		verification: { generate: string; check: string };
+	};
+	motion?: MotionContract;
 }
 ```
 
 Every lab owns stable, CSS-safe IDs, its cases, typed controls, source/resolved
 values, diagnostics, and capture policy. Case IDs must survive ordering changes
 and become permalink and screenshot-baseline keys.
+
+Schema v2 adds explicit normal/reduced motion values and motion-preference
+capture states. Review patches remain schema v1 because their operation format
+did not change.
 
 The review contract is deliberately distinct from:
 
@@ -359,7 +363,7 @@ foundation does not prevent a carefully scoped authoring server later.
 
 ### Extensions
 
-- motion and reduced-motion lab;
+- editable structured motion/time-reference authoring;
 - optional host-component fixtures or Storybook adapter;
 - explicitly designed CLI promotion for machine-editable authored sources.
 

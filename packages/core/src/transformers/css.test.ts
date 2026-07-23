@@ -24,6 +24,7 @@ describe('toCss', () => {
 		},
 		scales: { time: { default: '', names: [] } },
 		overrideTokens: {},
+		mediaOverrides: {},
 	};
 
 	it('publishes deeply immutable defaults', () => {
@@ -73,6 +74,7 @@ describe('toCss', () => {
 					'sp-1': { family: 'spacing', name: 'sp-1', value: '16px' },
 				},
 			},
+			mediaOverrides: {},
 		};
 
 		it('generates color mode overrides with data-color-mode selector', () => {
@@ -128,6 +130,7 @@ describe('toCss', () => {
 						'sp-1': { family: 'spacing', name: 'sp-1', value: '4px' },
 					},
 				},
+				mediaOverrides: {},
 			};
 
 			const css = toCss(irWithOverride);
@@ -219,6 +222,7 @@ describe('toCss', () => {
 				overrideTokens: {
 					small: {}, // Empty override
 				},
+				mediaOverrides: {},
 			};
 
 			const css = toCss(irWithEmptyOverride);
@@ -240,11 +244,34 @@ describe('toCss', () => {
 						'sp-1': { family: 'spacing', name: 'sp-1', value: '4px' },
 					},
 				},
+				mediaOverrides: {},
 			};
 
 			// Should not throw, just skip the unknown mode
 			const css = toCss(irWithUnknownMode);
 			expect(css).not.toContain('mystery-mode');
+		});
+
+		it('emits conditional token overrides under their media query and root selector', () => {
+			const css = toCss(
+				{
+					...minimalIR,
+					mediaOverrides: {
+						'(prefers-reduced-motion: reduce)': {
+							'motion-hover-duration': {
+								family: 'motion',
+								name: 'motion-hover-duration',
+								value: '0ms',
+							},
+						},
+					},
+				},
+				{ selectors: { root: 'html' } }
+			);
+
+			expect(css).toContain(
+				'@media (prefers-reduced-motion: reduce) {\n  html {\n    --motion-hover-duration: 0ms;\n  }\n}'
+			);
 		});
 	});
 });

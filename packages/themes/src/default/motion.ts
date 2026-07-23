@@ -9,6 +9,9 @@ const interactionRange = (easing: string): MotionRecipe => ({
 		max: { duration: 4 },
 	},
 	displayOrder: ['min', 'lo', 'base', 'hi', 'max'],
+	reducedMotion: {
+		base: { duration: 0, delay: 0 },
+	},
 });
 
 /**

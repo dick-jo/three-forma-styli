@@ -13,7 +13,7 @@ async function loadContract(): Promise<TfsWorkbenchContract> {
 		!value ||
 		typeof value !== 'object' ||
 		(value as { kind?: unknown }).kind !== 'three-forma-styli/workbench' ||
-		(value as { schemaVersion?: unknown }).schemaVersion !== 1
+		(value as { schemaVersion?: unknown }).schemaVersion !== 2
 	) {
 		throw new Error('Unsupported TFS workbench contract');
 	}

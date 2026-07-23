@@ -66,7 +66,7 @@ describe('createReviewCapturePlan', () => {
 
 		expect(plan).toMatchObject({
 			kind: 'three-forma-styli/review-captures',
-			schemaVersion: 1,
+			schemaVersion: 2,
 			systemFingerprint: 'abc123',
 			entrypoint: './index.html',
 		});
@@ -106,5 +106,42 @@ describe('createReviewCapturePlan', () => {
 		color.cases[0]!.capture.colorModes = ['$default'];
 		color.cases[0]!.capture.viewports = ['missing'];
 		expect(() => createReviewCapturePlan(contract)).toThrow('requests unknown viewport "missing"');
+	});
+
+	it('enumerates standard and reduced preference states for every motion case', () => {
+		const withMotion: PartialDesignSystem = {
+			...system,
+			time: {
+				scales: [
+					{
+						name: 'default',
+						isDefault: true,
+						tokens: { unit: 'ms', base: 100, min: 50, range: 2 },
+					},
+				],
+			},
+			motion: {
+				easings: { standard: [0.2, 0, 0.38, 0.9] },
+				recipes: {
+					hover: {
+						base: { duration: 1, easing: 'standard' },
+						reducedMotion: { base: { duration: 0, delay: 0 } },
+					},
+				},
+			},
+		};
+		const contract = createWorkbenchContract(withMotion, generate(withMotion), {
+			systemFingerprint: 'motion',
+			toolVersion: '0.2.0',
+			stylesheets: [],
+		});
+		const states = createReviewCapturePlan(contract).states.filter(
+			(state) => state.lab === 'motion'
+		);
+
+		expect(states).toHaveLength(2);
+		expect(states.map((state) => state.motionPreference)).toEqual(['no-preference', 'reduce']);
+		expect(states[1]?.url).toContain('motion=reduce');
+		expect(states[1]?.id).toContain('motion-reduce');
 	});
 });

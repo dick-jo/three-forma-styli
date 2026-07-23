@@ -21,13 +21,16 @@ import type {
 } from './types.js';
 
 function capturePolicy(
-	overrides: Partial<Pick<ReviewCapturePolicy, 'colorModes' | 'sizeModes' | 'viewports'>> = {}
+	overrides: Partial<
+		Pick<ReviewCapturePolicy, 'colorModes' | 'sizeModes' | 'viewports' | 'motionPreferences'>
+	> = {}
 ): ReviewCapturePolicy {
 	return {
 		enabled: true,
 		viewports: [...(overrides.viewports ?? ['desktop'])],
 		colorModes: [...(overrides.colorModes ?? ['$default'])],
 		sizeModes: [...(overrides.sizeModes ?? ['$default'])],
+		motionPreferences: [...(overrides.motionPreferences ?? [])],
 	};
 }
 
@@ -508,28 +511,46 @@ function motionCases(ir: IR): MotionReviewCase[] {
 		].filter((entry): entry is readonly [string | null, NonNullable<(typeof entry)[1]>] =>
 			Boolean(entry[1])
 		);
-		return values.map(([variantName, value]) => ({
-			kind: 'motion',
-			id: `motion--${caseIdSegment(recipeName)}--${caseIdSegment(variantName ?? 'base')}`,
-			label: `${recipeName} / ${variantName ?? 'base'}`,
-			sourcePath: `/motion/recipes/${pointerSegment(recipeName)}/${
-				variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`
-			}`,
-			recipe: recipeName,
-			variant: variantName,
-			token: value.token,
-			duration: {
-				token: value.duration.token,
-				milliseconds: value.duration.milliseconds,
-			},
-			delay: {
-				token: value.delay.token,
-				milliseconds: value.delay.milliseconds,
-			},
-			easing: value.easing,
-			controls: [],
-			capture: capturePolicy(),
-		}));
+		return values.map(([variantName, value]) => {
+			const reduced =
+				variantName === null
+					? recipe.reducedMotion.base
+					: recipe.reducedMotion.variants[variantName];
+			return {
+				kind: 'motion',
+				id: `motion--${caseIdSegment(recipeName)}--${caseIdSegment(variantName ?? 'base')}`,
+				label: `${recipeName} / ${variantName ?? 'base'}`,
+				sourcePath: `/motion/recipes/${pointerSegment(recipeName)}/${
+					variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`
+				}`,
+				recipe: recipeName,
+				variant: variantName,
+				token: value.token,
+				duration: {
+					token: value.duration.token,
+					milliseconds: value.duration.milliseconds,
+				},
+				delay: {
+					token: value.delay.token,
+					milliseconds: value.delay.milliseconds,
+				},
+				easing: value.easing,
+				reducedMotion: {
+					behavior: reduced.behavior,
+					duration: {
+						token: reduced.duration.token,
+						milliseconds: reduced.duration.milliseconds,
+					},
+					delay: {
+						token: reduced.delay.token,
+						milliseconds: reduced.delay.milliseconds,
+					},
+					easing: reduced.easing,
+				},
+				controls: [],
+				capture: capturePolicy({ motionPreferences: ['no-preference', 'reduce'] }),
+			};
+		});
 	});
 }
 
@@ -606,7 +627,7 @@ export function createWorkbenchContract(
 	const modes = modeGroups(ir);
 	return {
 		kind: 'three-forma-styli/workbench',
-		schemaVersion: 1,
+		schemaVersion: 2,
 		systemFingerprint: options.systemFingerprint,
 		toolVersion: options.toolVersion,
 		title: options.title ?? 'TFS workbench',

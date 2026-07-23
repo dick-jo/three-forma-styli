@@ -64,11 +64,13 @@ source model.
 
 Still planned:
 
-- baseline/draft split comparison;
 - project-owned pinned screenshot baselines;
 - structured motion/time-reference editing;
-- color relationship, gamut and luminance-constraint diagnostics;
-- a reduced-motion review context.
+- color relationship, gamut and luminance-constraint diagnostics.
+
+Reduced-motion review is implemented. Motion cases switch between standard and
+reduced resolved tuples, show whether reduced behavior is preserved or
+overridden, and generate stable capture-plan URLs for both user preferences.
 
 Strict fingerprint- and contract-bound patch import is implemented. Typography
 fallback evidence now refuses to report a comparison when the intended primary

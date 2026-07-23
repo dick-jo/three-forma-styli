@@ -152,6 +152,9 @@ export default defineTfsProject({
 						emphatic: { duration: 3, easing: 'reveal' },
 					},
 					displayOrder: ['base', 'emphatic'],
+					reducedMotion: {
+						base: { duration: 0, delay: 0 },
+					},
 				},
 			},
 		},
