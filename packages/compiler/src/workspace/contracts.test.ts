@@ -35,7 +35,7 @@ describe('workspace runtime contracts', () => {
 		expect(rendered.declaration).toContain('export type TfsTimeScale = keyof');
 	});
 
-	it('shares the complete discriminated typography selection surface', () => {
+	it('shares the complete discriminated typography selection surface', async () => {
 		const system: PartialDesignSystem = {
 			typography: {
 				modes: [
@@ -70,10 +70,42 @@ describe('workspace runtime contracts', () => {
 				},
 			},
 		};
-		const declaration = renderTypographyContract(generate(system)).declaration;
+		const rendered = renderTypographyContract(generate(system));
+		const declaration = rendered.declaration;
 		expect(declaration).toContain('export type TypographySelection =');
 		expect(declaration).toContain('fontStyle: "italic"; weight: TypographyWeightForStyle');
 		expect(declaration).toContain('TypographySelectionByRole[R]');
+		expect(declaration).toContain('export type TypographyClassKey =');
+		expect(declaration).toContain('export declare function typographyClassName');
+
+		const encoded = Buffer.from(rendered.javascript).toString('base64');
+		const runtime = (await import(`data:text/javascript;base64,${encoded}`)) as {
+			typographyClassName: (
+				selection: Record<string, string>,
+				classes: Readonly<Record<string, string>>
+			) => string;
+		};
+		const classes = {
+			prose: 'recipe_base',
+			'prose-style-normal-weight-regular': 'normal_regular',
+			'prose-style-normal-weight-strong': 'normal_strong',
+			'prose-style-italic-weight-regular': 'italic_regular',
+		};
+		expect(runtime.typographyClassName({ role: 'prose' }, classes)).toBe(
+			'recipe_base normal_regular'
+		);
+		expect(
+			runtime.typographyClassName(
+				{ role: 'prose', fontStyle: 'italic', weight: 'regular' },
+				classes
+			)
+		).toBe('recipe_base italic_regular');
+		expect(() => runtime.typographyClassName({ role: 'missing' }, classes)).toThrow(
+			'Unknown typography role "missing"'
+		);
+		expect(() =>
+			runtime.typographyClassName({ role: 'prose', fontStyle: 'italic', weight: 'strong' }, classes)
+		).toThrow('does not expose style "italic" at weight "strong"');
 	});
 
 	it('keeps default colors complete, override colors authored, and inheritance explicit', () => {

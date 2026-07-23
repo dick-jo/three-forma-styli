@@ -322,6 +322,51 @@ button:disabled {
 	padding: clamp(16px, 2vw, 32px);
 }
 
+.canvas.compare-view {
+	padding: clamp(16px, 2vw, 32px);
+}
+
+.comparison {
+	display: grid;
+	gap: 20px;
+	max-width: 1440px;
+	margin: auto;
+}
+
+.comparison-frame {
+	display: grid;
+	border: 1px solid var(--clr-neu-a-lo-x, #444);
+	background: var(--clr-bg, #181916);
+}
+
+.comparison-frame > header {
+	display: flex;
+	align-items: end;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 10px 12px;
+	border-bottom: 1px solid var(--clr-neu-a-lo-x, #444);
+}
+
+.comparison-frame > header span {
+	color: var(--clr-neu, #aaa);
+	font-size: 9px;
+	text-transform: uppercase;
+}
+
+.comparison-frame > header strong {
+	font-size: 11px;
+	text-transform: uppercase;
+}
+
+.comparison-frame[data-state='draft'] {
+	border-color: var(--clr-pri, var(--wb-accent));
+}
+
+.comparison-body {
+	padding: clamp(20px, 4vw, 64px);
+}
+
 .case-matrix {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

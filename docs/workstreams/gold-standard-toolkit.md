@@ -169,7 +169,9 @@ reference evidence, not hardcoded policy.
 - [x] Add non-destructive typed draft overlays, transaction-safe undo/redo,
       scoped resets, patch export, and a source-aware agent handoff. Automatic
       TypeScript source mutation remains deliberately outside the browser.
-- [ ] Add baseline/draft comparison on top of the immutable draft foundation.
+- [x] Add exact-case baseline/draft comparison on top of the immutable draft
+      foundation. The comparison is stacked at the same available width so
+      typography wrapping is not distorted by a narrower side-by-side canvas.
       Strict contract-bound patch import is complete.
 - [x] Migrate color, typography and shadow interactions into domain labs without
       iframe-composing the current generated HTML documents.
@@ -194,9 +196,9 @@ reference evidence, not hardcoded policy.
 - [x] Split the Workbench shell from domain rendering, typography measurement
       and calibration controls so application orchestration does not become a
       domain-logic monolith.
-- [ ] Add maintained minimal, editorial, display, Vite, Next.js, workspace and
+- [x] Add maintained minimal, editorial, display, Vite, Next.js, workspace and
       runtime-theme fixtures to the release matrix. Scatter may exercise them,
-      but must not be their only implementation.
+      but is not their only implementation.
 - [x] Add explicit framework-neutral review-runner output so pinned screenshot
       projects can enumerate the same versioned cases without importing the
       Workbench source application.
@@ -358,3 +360,11 @@ reference evidence, not hardcoded policy.
   are separate named APIs; constraint failure is not confused with malformed
   input. The public field is `minimumLuminanceDelta`; diagnostics remain
   explicitly `oklch-l`.
+- **2026-07-23 — typography component boundary.** TFS emits one exact,
+  framework-neutral CSS Module class resolver alongside the literal typography
+  contract. React/Next and Svelte components remain host-owned because element
+  semantics, refs, class merging and client boundaries are application
+  decisions. A future `tfs add text` command may copy editable framework starter
+  source only after real React and Svelte consumers prove a common contract; it
+  will not become continuously regenerated output. See
+  `docs/typography-component-boundary.md`.

@@ -15,18 +15,16 @@
 		patchFromDraft,
 		type DraftValues,
 	} from './lib/draft';
-	import FoundationCase from './lib/FoundationCase.svelte';
+	import CaseView from './lib/CaseView.svelte';
 	import Inspector from './lib/Inspector.svelte';
-	import MotionCase from './lib/MotionCase.svelte';
 	import { canvasVariables } from './lib/review';
-	import ShadowCase from './lib/ShadowCase.svelte';
-	import TypographyCase from './lib/TypographyCase.svelte';
 
 	interface Props {
 		contract: TfsWorkbenchContract;
 	}
 
 	type DraftValue = DraftValues[string];
+	type ViewMode = 'case' | 'compare' | 'matrix';
 	interface DraftChange {
 		path: string;
 		previous: DraftValue;
@@ -73,14 +71,19 @@
 	const initialContract = untrack(() => contract);
 	const params = new URLSearchParams(location.search);
 	const initialCaseId = params.get('case') ?? '';
-	const initialView = params.get('view') === 'matrix' ? 'matrix' : 'case';
+	const initialView: ViewMode =
+		params.get('view') === 'matrix'
+			? 'matrix'
+			: params.get('view') === 'compare'
+				? 'compare'
+				: 'case';
 	let draft = $state<DraftValues>(storedDraft(initialContract));
 	let undo = $state<DraftTransaction[]>([]);
 	let redo = $state<typeof undo>([]);
 	let activeLabId = $state(params.get('lab') ?? 'overview');
 	let activeCaseId = $state(initialCaseId);
 	let caseQuery = $state('');
-	let viewMode = $state<'case' | 'matrix'>(initialView);
+	let viewMode = $state<ViewMode>(initialView);
 	let colorMode = $state(
 		params.get('color') ??
 			initialContract.globals.modes.find((group) => group.category === 'color')?.default ??
@@ -165,6 +168,9 @@
 	let colorGroup = $derived(modeGroups.find((entry) => entry.category === 'color'));
 	let sizeGroup = $derived(modeGroups.find((entry) => entry.category === 'size'));
 	let canvasStyle = $derived(canvasVariables(modeGroups, colorMode, sizeMode));
+	let activeCaseChanged = $derived(
+		Boolean(activeCase?.controls.some((control) => draft[control.path] !== undefined))
+	);
 
 	$effect(() => {
 		localStorage.setItem(`tfs-workbench:${contract.systemFingerprint}`, JSON.stringify(draft));
@@ -179,6 +185,10 @@
 		if (sizeMode) next.searchParams.set('size', sizeMode);
 		next.searchParams.set('view', viewMode);
 		history.replaceState(null, '', next);
+	});
+
+	$effect(() => {
+		if (viewMode === 'compare' && !activeCaseChanged) viewMode = 'case';
 	});
 
 	$effect(() => {
@@ -488,7 +498,7 @@
 				{/if}
 				{#each visibleCases as reviewCase}
 					<button
-						class:active={viewMode === 'case' && reviewCase.id === activeCase?.id}
+						class:active={viewMode !== 'matrix' && reviewCase.id === activeCase?.id}
 						onclick={() => selectCase(reviewCase.id)}
 						title={reviewCase.label}
 					>
@@ -520,9 +530,16 @@
 					<button class:active={viewMode === 'case'} onclick={() => (viewMode = 'case')}>
 						case
 					</button>
+					<button
+						class:active={viewMode === 'compare'}
+						disabled={!activeCaseChanged}
+						onclick={() => (viewMode = 'compare')}
+					>
+						compare
+					</button>
 				</div>
 			{/if}
-			{#if activeCase && viewMode === 'case'}
+			{#if activeCase && viewMode !== 'matrix'}
 				<code>{activeCase.sourcePath}</code>
 			{/if}
 		</div>
@@ -531,11 +548,33 @@
 			class="canvas"
 			class:matrix-view={viewMode === 'matrix' && activeLab?.kind !== 'overview'}
 			class:overview-view={activeLab?.kind === 'overview'}
+			class:compare-view={viewMode === 'compare'}
 			style={canvasStyle}
 			data-testid="review-canvas"
 		>
 			{#if viewMode === 'matrix' && activeLab?.kind !== 'overview'}
 				<CaseMatrix cases={visibleCases} {draft} onselect={selectCase} />
+			{:else if viewMode === 'compare' && activeCase}
+				<div class="comparison" data-testid="baseline-draft-comparison">
+					<section class="comparison-frame" data-state="baseline">
+						<header>
+							<span>immutable source</span>
+							<strong>baseline</strong>
+						</header>
+						<div class="comparison-body">
+							<CaseView reviewCase={activeCase} draft={{}} />
+						</div>
+					</section>
+					<section class="comparison-frame" data-state="draft">
+						<header>
+							<span>review overlay</span>
+							<strong>draft</strong>
+						</header>
+						<div class="comparison-body">
+							<CaseView reviewCase={activeCase} {draft} />
+						</div>
+					</section>
+				</div>
 			{:else if activeLab?.kind === 'overview'}
 				<div class="system-overview">
 					<div class="overview-grid">
@@ -585,18 +624,8 @@
 						</section>
 					{/each}
 				</div>
-			{:else if activeCase?.kind === 'color'}
-				<ColorCase reviewCase={activeCase} {draft} />
-			{:else if activeCase?.kind === 'typography'}
-				<TypographyCase reviewCase={activeCase} {draft} />
-			{:else if activeCase?.kind === 'shadow'}
-				<ShadowCase reviewCase={activeCase} {draft} />
-			{:else if activeCase?.kind === 'motion'}
-				{#key activeCase.id}
-					<MotionCase reviewCase={activeCase} />
-				{/key}
-			{:else if activeCase?.kind === 'foundation'}
-				<FoundationCase reviewCase={activeCase} />
+			{:else}
+				<CaseView reviewCase={activeCase} {draft} />
 			{/if}
 		</section>
 	</main>

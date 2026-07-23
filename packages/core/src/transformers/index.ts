@@ -16,6 +16,8 @@ export type {
 
 export {
 	toTypographyTypescript,
+	typographyClassResolverDeclaration,
+	typographyClassResolverJavascript,
 	typographyContractData,
 	typographyContractTypes,
 } from './typography-typescript.js';

@@ -1,5 +1,10 @@
 import type { GeneratorConfig, IR, PartialDesignSystem } from '@three-forma-styli/core';
-import { typographyContractData, typographyContractTypes } from '@three-forma-styli/core';
+import {
+	typographyClassResolverDeclaration,
+	typographyClassResolverJavascript,
+	typographyContractData,
+	typographyContractTypes,
+} from '@three-forma-styli/core';
 import { projectSystemContract } from '../system-typescript.js';
 
 type JsonPrimitive = string | number | boolean | null;
@@ -107,9 +112,14 @@ export function renderTypographyContract(ir: IR) {
 	if (!ir.typography || Object.keys(ir.typography.roles).length === 0) {
 		throw new Error('A typography system with semantic roles is required.');
 	}
-	return renderLiteralModule('typography', typographyContractData(ir.typography), [
+	const rendered = renderLiteralModule('typography', typographyContractData(ir.typography), [
 		typographyContractTypes(ir.typography).trimEnd(),
+		typographyClassResolverDeclaration(),
 	]);
+	return {
+		javascript: `${rendered.javascript}\n${typographyClassResolverJavascript()}`,
+		declaration: rendered.declaration,
+	};
 }
 
 function normalizedColor(color: unknown): { l: number; c: number; h: number } {

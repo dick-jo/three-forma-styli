@@ -986,12 +986,14 @@ describe('workspace-package build', () => {
 		await fs.writeFile(
 			path.join(consumer, 'index.ts'),
 			[
-				"import { nativeColorModes, typography } from '@fixture/design-system';",
+				"import { nativeColorModes, typography, typographyClassName, type TypographyClassMap } from '@fixture/design-system';",
 				"import { tfsSystem } from '@fixture/design-system/system';",
 				"const mode: typeof nativeColorModes.defaultMode = 'night';",
 				"const role: keyof typeof typography.roles = 'prose';",
 				"const colorMode: keyof typeof tfsSystem.modes.color.entries = 'paper';",
-				'void [mode, role, colorMode];',
+				'const classes = {} as TypographyClassMap;',
+				"const className: string = typographyClassName({ role: 'prose' }, classes);",
+				'void [mode, role, colorMode, className];',
 				'// @ts-expect-error exact native mode names stay literal',
 				"const invalid: typeof nativeColorModes.defaultMode = 'missing';",
 				'void invalid;',

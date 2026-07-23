@@ -149,6 +149,13 @@ Every visual domain has two complementary canvas modes:
 - **Case** expands one specimen into its full diagnostic and calibration surface.
   Selecting any matrix tile drills into the same stable case permalink.
 
+An edited case also exposes **Compare**. It renders the immutable baseline and
+the current draft as two stacked instances at the same available width. Stacking
+is deliberate: a side-by-side typography comparison changes line wrapping and
+can manufacture a geometry difference unrelated to the draft. Resetting the
+last active-case edit returns to Case because there is no longer a meaningful
+comparison.
+
 Search and global modes scope the matrix without creating a separate source of
 truth. The inspector describes the matrix while it is visible; it must not show
 controls for a hidden, coincidentally active case.
@@ -339,7 +346,7 @@ foundation does not prevent a carefully scoped authoring server later.
 ### Calibration
 
 - color and foundation labs;
-- before/draft comparison;
+- before/draft exact-case comparison; **implemented**
 - patch export/import and copyable authored values; **implemented**
 - domain diagnostics and source hints.
 

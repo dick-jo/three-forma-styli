@@ -23,6 +23,8 @@ export type { CssTransformerConfig, FileHeaderConfig } from './transformers/inde
 export { toFigmaJson } from './transformers/index.js';
 export {
 	toTypographyTypescript,
+	typographyClassResolverDeclaration,
+	typographyClassResolverJavascript,
 	typographyContractData,
 	typographyContractTypes,
 } from './transformers/index.js';

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -199,6 +199,50 @@ async function exerciseScaffolds() {
 	return workspaceRoot;
 }
 
+async function exerciseAuthoredShapeFixtures() {
+	const sourceRoot = path.join(repositoryRoot, 'scripts/ecosystem/fixtures');
+	const entries = await readdir(sourceRoot, { withFileTypes: true });
+	const names = entries
+		.filter((entry) => entry.isDirectory())
+		.map((entry) => entry.name)
+		.sort();
+	assert.deepEqual(names, ['display', 'editorial', 'minimal']);
+
+	for (const name of names) {
+		const projectRoot = path.join(projectsDirectory, `authored-${name}`);
+		await cp(path.join(sourceRoot, name), projectRoot, { recursive: true });
+		tfs(projectRoot, ['build', '.']);
+		tfs(projectRoot, ['validate', '.']);
+		tfs(projectRoot, ['check', '.']);
+	}
+
+	assert.match(
+		await readFile(path.join(projectsDirectory, 'authored-minimal/generated/tokens.css'), 'utf8'),
+		/--clr-canvas/
+	);
+	assert.match(
+		await readFile(
+			path.join(projectsDirectory, 'authored-editorial/generated/typography.css'),
+			'utf8'
+		),
+		/\.text--article/
+	);
+	assert.match(
+		await readFile(
+			path.join(projectsDirectory, 'authored-editorial/generated/typography.generated.ts'),
+			'utf8'
+		),
+		/"article"/
+	);
+	const displayCss = await readFile(
+		path.join(projectsDirectory, 'authored-display/generated/tokens.css'),
+		'utf8'
+	);
+	assert.match(displayCss, /\[data-size-mode="stage"\]/);
+	assert.match(displayCss, /--shadow-box-float/);
+	assert.match(displayCss, /--motion-respond/);
+}
+
 async function packGeneratedDesignSystem(workspaceRoot) {
 	const output = run('npm', ['pack', '--pack-destination', tarballDirectory], {
 		cwd: workspaceRoot,
@@ -244,6 +288,7 @@ async function buildBrowserConsumer(designSystemTarball, coreTarball) {
 		path.join(browserRoot, 'src/main.ts'),
 		`import 'workspace-system/styles.css';
 import typographyClasses from 'workspace-system/typography.module.css';
+import { typographyClassName } from 'workspace-system/typography';
 import { nativeColorModes } from 'workspace-system/native-color-modes';
 import { runtimeColorThemeConfig } from 'workspace-system/runtime-color-theme';
 import {
@@ -288,7 +333,7 @@ root.dataset.luminanceConstraintRejected = String(luminanceConstraintRejected);
 root.dataset.measuredInvalidLuminance = String(measuredInvalid.luminance.deltaValid);
 const app = document.querySelector<HTMLElement>('#app');
 if (!app) throw new Error('Missing app root');
-app.className = typographyClasses.prose;
+app.className = typographyClassName({ role: 'prose' }, typographyClasses);
 app.textContent = 'TFS browser consumer ready';
 `
 	);
@@ -402,6 +447,8 @@ async function runBrowserProof(browserRoot) {
 				text: app.textContent,
 				fontSize: style.fontSize,
 				fontFamily: style.fontFamily,
+				fontWeight: style.fontWeight,
+				typographyClassCount: app.classList.length,
 				runtimeValid: document.documentElement.dataset.runtimeValid,
 				nativeModeCount: document.documentElement.dataset.nativeModeCount,
 				hostilePayloadRejected: document.documentElement.dataset.hostilePayloadRejected,
@@ -423,6 +470,8 @@ async function runBrowserProof(browserRoot) {
 		assert.equal(evidence.oklchSupported, true);
 		assert.notEqual(evidence.fontSize, '16px');
 		assert.ok(evidence.fontFamily.length > 0);
+		assert.equal(evidence.fontWeight, '400');
+		assert.equal(evidence.typographyClassCount, 2);
 	} finally {
 		await browser.close();
 		await server.close();
@@ -489,7 +538,19 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 		const lineHeight = page.getByRole('spinbutton').first();
 		await lineHeight.fill('1.3');
 		await page.getByText('1 edits', { exact: true }).waitFor();
+		await page.getByRole('button', { name: 'compare', exact: true }).click();
+		const comparison = page.getByTestId('baseline-draft-comparison');
+		await comparison.waitFor();
+		assert.equal(await comparison.locator('.comparison-frame').count(), 2);
+		const comparisonSamples = comparison.locator('.type-short');
+		assert.equal(await comparisonSamples.count(), 2);
+		assert.notEqual(
+			await comparisonSamples.nth(0).evaluate((element) => getComputedStyle(element).lineHeight),
+			await comparisonSamples.nth(1).evaluate((element) => getComputedStyle(element).lineHeight)
+		);
+		assert.equal(new URL(page.url()).searchParams.get('view'), 'compare');
 		await page.getByRole('button', { name: 'reset case' }).click();
+		await page.getByRole('button', { name: 'case', exact: true }).waitFor();
 		await page.getByText('0 edits', { exact: true }).waitFor();
 		await page.getByRole('button', { name: 'Undo draft' }).click();
 		await page.getByText('1 edits', { exact: true }).waitFor();
@@ -607,6 +668,7 @@ try {
 	const tarballs = await packTfsPackages();
 	await installPackedToolchain(tarballs);
 	const workspaceRoot = await exerciseScaffolds();
+	await exerciseAuthoredShapeFixtures();
 	await exerciseMachineCli(workspaceRoot);
 	const designSystemTarball = await packGeneratedDesignSystem(workspaceRoot);
 	await buildBrowserConsumer(designSystemTarball, tarballs.core);

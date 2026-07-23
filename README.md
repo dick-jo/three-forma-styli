@@ -229,6 +229,13 @@ CSS, typed system/mode and typography contracts, helper classes, a Workbench,
 JSON interchange, and a hashed ownership manifest before replacing the output directory once. See
 `examples/project/tfs.config.ts`.
 
+The typography contract includes a framework-neutral `typographyClassName()`
+resolver whose exact class map is the generated CSS Module. A local React,
+Next.js, or Svelte `Text` component can consume that pair without duplicating
+valid role/variant/style/weight combinations. TFS does not overwrite
+framework-component source; see the
+[typography component boundary](docs/typography-component-boundary.md).
+
 Run `tfs check .` in dedicated CI to perform that same complete build in a
 private sibling stage and reject missing, changed, or unexpected committed
 artifacts without modifying them. `tfs init --workspace-package` scaffolds the
