@@ -3,7 +3,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import fs from 'fs-extra';
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildProject, checkProject } from './project-build.js';
+import { buildProject, checkProject, planProject } from './project-build.js';
 import { defineTfsProject } from './project.js';
 import { validateProjectOutput } from './validate-output.js';
 import { typography as defaultTypography } from '@three-forma-styli/themes/default';
@@ -49,6 +49,53 @@ afterEach(async () => {
 });
 
 describe('portable project build', () => {
+	it('plans exact authored outputs and external font prerequisites without writing', async () => {
+		const directory = await fixtureDirectory();
+		await fs.writeFile(path.join(directory, 'proof.ttf'), 'not inspected during planning');
+		await fs.writeFile(path.join(directory, 'LICENSE.txt'), 'test');
+		const project = defineTfsProject({
+			fonts: {
+				proof: {
+					family: 'Proof',
+					sources: ['./proof.ttf'],
+					license: {
+						id: 'test',
+						file: './LICENSE.txt',
+						allowWebEmbedding: true,
+						allowTransformations: true,
+						webEmbeddingBasis: 'test fixture',
+					},
+				},
+			},
+			system: {},
+			output: { directory: './dist', css: true },
+		});
+		const plan = await planProject(project, path.join(directory, 'tfs.config.ts'));
+
+		expect(plan.output).toEqual({
+			layout: 'flat',
+			directory: path.join(directory, 'dist'),
+			ownership: 'atomic-directory',
+		});
+		expect(plan.artifacts.map((artifact) => artifact.path)).toEqual(
+			expect.arrayContaining([
+				'build.manifest.json',
+				'fonts/proof.woff2',
+				'fonts/fonts.css',
+				'fonts/fonts.manifest.json',
+				'fonts/licenses/proof-LICENSE.txt',
+				'tokens.css',
+			])
+		);
+		expect(plan.fonts.sources).toMatchObject([
+			{ font: 'proof', output: 'proof.woff2', strategy: 'woff2', exists: true },
+		]);
+		expect(plan.prerequisites.externalTools).toMatchObject([
+			{ id: 'fonttools', requiredBy: ['proof/proof.woff2'] },
+		]);
+		expect(await fs.pathExists(path.join(directory, 'dist'))).toBe(false);
+	});
+
 	it('builds and replaces one deterministic owned output tree', async () => {
 		const directory = await fixtureDirectory();
 		const project = defineTfsProject({

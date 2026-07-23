@@ -1,5 +1,10 @@
 # @three-forma-styli/cli
 
+## Unreleased
+
+- Added a non-writing project-plan dry run and versioned JSON success/error
+  envelopes with stable operation and usage exit codes.
+
 ## 0.2.0 — 2026-07-22
 
 ### Minor changes

@@ -1,13 +1,14 @@
-import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { promisify } from 'node:util';
 import fs from 'fs-extra';
 import { classifyFontStyle, inspectFontFiles, type FontInspection } from './inspect.js';
+import {
+	createFontToolsConverter,
+	type FontToolsConversionProvenance,
+	type FontToolsConverter,
+} from './fonttools.js';
 import { joinUrlPath } from '../font-url.js';
 import { assertPortablePathSegment } from '../portable-path.js';
-
-const execFileAsync = promisify(execFile);
 
 export type FontPreparationStrategy = 'copy' | 'woff2';
 export type FontDisplay = 'auto' | 'block' | 'swap' | 'fallback' | 'optional';
@@ -99,6 +100,10 @@ export interface PreparedFontFamily {
 
 export interface PreparedFontsManifest {
 	schemaVersion: 2;
+	/** Present only when TFS transformed TTF/OTF bytes into WOFF2. */
+	conversion?: {
+		woff2: FontToolsConversionProvenance;
+	};
 	families: Record<string, PreparedFontFamily>;
 }
 
@@ -308,24 +313,22 @@ export function renderFontFaceCss(
 	return `${blocks.join('\n\n')}\n`;
 }
 
-async function convertToWoff2(source: string, destination: string): Promise<void> {
+async function convertToWoff2(
+	converter: FontToolsConverter,
+	source: string,
+	destination: string
+): Promise<void> {
 	if (!['.ttf', '.otf'].includes(path.extname(source).toLowerCase())) {
 		throw new Error('The woff2 strategy accepts TTF or OTF sources only.');
 	}
-	try {
-		await execFileAsync('fonttools', ['ttLib.woff2', 'compress', source, '-o', destination]);
-	} catch (error) {
-		const detail = error instanceof Error ? error.message : String(error);
-		throw new Error(
-			`FontTools WOFF2 conversion failed. Install FontTools with Brotli support, then retry. ${detail}`
-		);
-	}
+	await converter.convert(source, destination);
 }
 
 async function prepareFile(
 	source: string,
 	destination: string,
-	strategy: FontPreparationStrategy
+	strategy: FontPreparationStrategy,
+	fontToolsConverter?: FontToolsConverter
 ): Promise<void> {
 	const temporaryDirectory = await fs.mkdtemp(path.join(path.dirname(destination), '.tfs-font-'));
 	const temporaryOutput = path.join(temporaryDirectory, path.basename(destination));
@@ -333,7 +336,10 @@ async function prepareFile(
 		if (strategy === 'copy') {
 			await fs.copy(source, temporaryOutput);
 		} else {
-			await convertToWoff2(source, temporaryOutput);
+			if (!fontToolsConverter) {
+				throw new Error('Internal error: WOFF2 conversion started without a FontTools converter.');
+			}
+			await convertToWoff2(fontToolsConverter, source, temporaryOutput);
 		}
 		await fs.move(temporaryOutput, destination, { overwrite: true });
 	} finally {
@@ -580,6 +586,7 @@ export async function prepareFonts(
 	await fs.ensureDir(licensesDirectory);
 
 	const manifest: PreparedFontsManifest = { schemaVersion: 2, families: {} };
+	let fontToolsConverter: FontToolsConverter | undefined;
 	const claimedOutputs = new Set<string>([
 		path.basename(cssPath).toLowerCase(),
 		path.basename(manifestPath).toLowerCase(),
@@ -651,7 +658,13 @@ export async function prepareFonts(
 				claimedOutputs.add(outputName.toLowerCase());
 				const outputPath = path.join(stagingDirectory, outputName);
 
-				await prepareFile(sourcePath, outputPath, strategy);
+				if (strategy === 'woff2') {
+					fontToolsConverter ??= await createFontToolsConverter();
+				}
+				await prepareFile(sourcePath, outputPath, strategy, fontToolsConverter);
+				if (strategy === 'woff2') {
+					manifest.conversion ??= { woff2: fontToolsConverter!.provenance };
+				}
 
 				const [preparedInspection] = inspectFontFiles([outputPath], outputDirectory);
 				if (strategy === 'woff2') {

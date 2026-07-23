@@ -23,6 +23,19 @@ import { buildProject } from '@three-forma-styli/compiler/build';
 await buildProject(project, '/absolute/path/to/tfs.config.ts');
 ```
 
+Resolve the same validated graph without writing or invoking FontTools:
+
+```ts
+import { planProject } from '@three-forma-styli/compiler/build';
+
+const plan = await planProject(project, '/absolute/path/to/tfs.config.ts');
+```
+
+The versioned plan reports ownership/layout, artifacts and dependencies, exact
+workspace package exports, physical font inputs, conversion strategies, missing
+input status, and external-tool prerequisites. Facts that require inspecting
+font bytes remain explicitly listed as build-time discoveries.
+
 Dedicated CI can prove committed output without mutating it:
 
 ```ts
@@ -51,6 +64,12 @@ Font preparation and inspection APIs live at
 `@three-forma-styli/compiler/fonts`. Use `@three-forma-styli/cli` when you want
 the `tfs` executable, config loading, scaffolding, browser specimen server, or
 Figma network sync.
+
+Prepared-font manifests remain dependency-free facts. Copying existing
+WOFF/WOFF2 assets neither requires nor claims FontTools. When TFS converts
+TTF/OTF bytes, the manifest adds a `conversion.woff2` record containing the
+exact FontTools and Python versions plus the executable command. No timestamps
+or absolute machine paths enter generated output.
 
 ## Workspace-package output
 

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -78,14 +78,54 @@ async function installPackedToolchain(tarballs) {
 	}
 }
 
+function cliEntry() {
+	return path.join(toolchainDirectory, 'node_modules/@three-forma-styli/cli/dist/index.js');
+}
+
 function tfs(projectDirectory, args) {
-	const cliEntry = path.join(
-		toolchainDirectory,
-		'node_modules/@three-forma-styli/cli/dist/index.js'
-	);
-	return run(process.execPath, [cliEntry, ...args], {
+	return run(process.execPath, [cliEntry(), ...args], {
 		cwd: projectDirectory,
 	});
+}
+
+async function exerciseMachineCli(workspaceRoot) {
+	const manifestPath = path.join(workspaceRoot, 'generated/build.manifest.json');
+	const manifestBefore = await readFile(manifestPath);
+	const dryRun = JSON.parse(tfs(workspaceRoot, ['build', '.', '--dry-run', '--json']));
+	assert.deepEqual(
+		{
+			command: dryRun.command,
+			status: dryRun.status,
+			mode: dryRun.result?.mode,
+			layout: dryRun.result?.plan?.output?.layout,
+		},
+		{ command: 'build', status: 'ok', mode: 'dry-run', layout: 'workspace-package' }
+	);
+	assert.ok(
+		dryRun.result.plan.artifacts.some(
+			(artifact) => artifact.path === 'runtime/styles/typography.module.css.d.ts'
+		)
+	);
+	assert.deepEqual(
+		await readFile(manifestPath),
+		manifestBefore,
+		'dry-run changed generated output'
+	);
+
+	for (const [args, expected] of [
+		[['build', '.', '--unknown', '--json'], { exitCode: 2, id: 'TFS_CLI_USAGE' }],
+		[['validate', './missing-project', '--json'], { exitCode: 1, id: 'TFS_VALIDATE_FAILED' }],
+	]) {
+		const result = spawnSync(process.execPath, [cliEntry(), ...args], {
+			cwd: workspaceRoot,
+			encoding: 'utf8',
+		});
+		assert.equal(result.status, expected.exitCode);
+		assert.equal(result.stderr, '');
+		const envelope = JSON.parse(result.stdout);
+		assert.equal(envelope.exitCode, expected.exitCode);
+		assert.equal(envelope.diagnostic.id, expected.id);
+	}
 }
 
 async function exerciseScaffolds() {
@@ -237,6 +277,7 @@ try {
 	const tarballs = await packTfsPackages();
 	await installPackedToolchain(tarballs);
 	const workspaceRoot = await exerciseScaffolds();
+	await exerciseMachineCli(workspaceRoot);
 	const designSystemTarball = await packGeneratedDesignSystem(workspaceRoot);
 	await buildBrowserConsumer(designSystemTarball, tarballs.core);
 

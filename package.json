@@ -10,6 +10,7 @@
 		"check:packages": "publint packages/core && publint packages/themes && publint packages/compiler && publint packages/cli",
 		"check:split": "node scripts/verify-compiler-split.mjs",
 		"check:ecosystem": "node scripts/verify-ecosystem-consumers.mjs",
+		"check:fonttools": "pnpm --filter @three-forma-styli/compiler build && node scripts/verify-fonttools-provenance.mjs",
 		"check": "pnpm check:versions && pnpm build:all && pnpm check:split && pnpm test && pnpm --filter @three-forma-styli/preview check",
 		"check:release": "pnpm check && pnpm check:packages && node scripts/verify-packed-release.mjs && pnpm check:ecosystem",
 		"changeset": "changeset",

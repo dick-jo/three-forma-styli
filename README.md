@@ -66,6 +66,7 @@ does not install or bundle Svelte.
 The public packages share a coordinated release version and are verified as
 packed artifacts—including an external TypeScript consumer—before publishing.
 See [the package architecture](docs/package-architecture.md),
+[monorepo integration](docs/monorepo-integration.md),
 [validation policy](docs/validation.md), and [release procedure](docs/releasing.md).
 
 ## Architecture

@@ -12,8 +12,9 @@ import {
 } from '@three-forma-styli/core';
 import { CLI_VERSION } from '../version.js';
 import { loadConfigModule, resolveDesignSystemExport } from '../config/load-module.js';
-import { buildProject } from '@three-forma-styli/compiler/build';
+import { buildProject, planProject } from '@three-forma-styli/compiler/build';
 import type { TfsProject } from '@three-forma-styli/compiler/project';
+import { writeMachineResult } from '../output.js';
 
 export type OutputFormat = 'css' | 'dtcg' | 'figma-variables' | 'typescript' | 'specimen';
 
@@ -73,6 +74,8 @@ export interface BuildOptions {
 	collection?: string;
 	colorSpace?: 'srgb' | 'display-p3';
 	fontCss?: string;
+	dryRun?: boolean;
+	json?: boolean;
 }
 
 function isProject(value: unknown): value is TfsProject {
@@ -90,13 +93,46 @@ export async function buildCommand(filePath: string, options: BuildOptions): Pro
 				'Project builds own their output plan; omit --format, --output, and --font-css.'
 			);
 		}
+		if (options.dryRun) {
+			const plan = await planProject(module.default, loaded.inputPath);
+			if (options.json) {
+				writeMachineResult('build', { mode: 'dry-run', plan });
+			} else {
+				console.error(
+					chalk.cyan(
+						`Plan: ${plan.output.layout}, ${plan.artifacts.length} artifacts, ${plan.fonts.sources.length} font sources`
+					)
+				);
+				console.error(`Output: ${path.relative(process.cwd(), plan.output.directory) || '.'}`);
+				for (const artifact of plan.artifacts)
+					console.error(`  ${artifact.kind.padEnd(8)} ${artifact.path}`);
+				for (const tool of plan.prerequisites.externalTools) {
+					console.error(`Requires ${tool.id}: ${tool.reason}`);
+				}
+			}
+			return;
+		}
 		const result = await buildProject(module.default, loaded.inputPath);
-		console.error(
-			chalk.green(
-				`✓ Built ${result.files.length} files in ${path.relative(process.cwd(), result.outputDirectory)}`
-			)
-		);
+		if (options.json) {
+			writeMachineResult('build', {
+				mode: 'write',
+				outputDirectory: result.outputDirectory,
+				files: result.files,
+			});
+		} else {
+			console.error(
+				chalk.green(
+					`✓ Built ${result.files.length} files in ${path.relative(process.cwd(), result.outputDirectory)}`
+				)
+			);
+		}
 		return;
+	}
+	if (options.dryRun) {
+		throw new Error('--dry-run requires a defineTfsProject() project.');
+	}
+	if (options.json && !options.output) {
+		throw new Error('--json requires --output for targeted single-format generation.');
 	}
 	const designSystem: PartialDesignSystem = resolveDesignSystemExport(module);
 	const defaultExport =
@@ -160,7 +196,16 @@ export async function buildCommand(filePath: string, options: BuildOptions): Pro
 		const outputPath = path.resolve(process.cwd(), options.output);
 		await fs.ensureDir(path.dirname(outputPath));
 		await fs.writeFile(outputPath, output);
-		console.error(chalk.green(`✓ Generated ${path.relative(process.cwd(), outputPath)}`));
+		if (options.json) {
+			writeMachineResult('build', {
+				mode: 'write-single',
+				format,
+				output: outputPath,
+				bytes: Buffer.byteLength(output),
+			});
+		} else {
+			console.error(chalk.green(`✓ Generated ${path.relative(process.cwd(), outputPath)}`));
+		}
 	} else {
 		process.stdout.write(output);
 	}

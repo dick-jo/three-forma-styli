@@ -91,3 +91,6 @@ Long term there are still four public responsibilities, even if `themes` becomes
 
 Applications consume generated design-system packages, not the TFS preview app and
 not necessarily the CLI at runtime.
+
+See [monorepo integration](monorepo-integration.md) for the concrete package,
+task, cache, dependency, and staged-adoption contract.

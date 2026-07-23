@@ -220,7 +220,15 @@ coverage, embedding metadata, and warnings.
 - verifies that conversion preserved style, ranges, axes, features, coverage,
   metrics, and embedding flags;
 - emits correct `@font-face` longhands, copied license text, and manifest schema 2;
+- records the exact FontTools version, Python implementation/version, and
+  executable command only when it actually converts TTF/OTF bytes;
 - stages and commits its managed output atomically.
+
+Copy-only WOFF/WOFF2 preparation does not resolve, execute, or mention
+FontTools. This keeps normal builds and committed-output validation independent
+of Python. Conversion provenance deliberately excludes absolute executable
+paths and timestamps, so otherwise identical output does not depend on a
+checkout or virtual-environment location.
 
 `fontFromManifest()` checks the schema and manifest consistency before converting
 raw face facts into the core validation shape. It does not derive semantic weight

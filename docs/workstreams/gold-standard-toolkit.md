@@ -76,10 +76,12 @@ remaining work so decisions do not depend on one chat transcript.
       results, and add hostile persisted-JSON regressions.
 - [x] Add Windows Node 22 CI for build, package validation, packed installs and
       ecosystem consumers. The first remote run remains release evidence.
-- [ ] Add a stable machine-readable CLI contract (`--json`, diagnostic IDs,
+- [x] Add a stable machine-readable CLI contract (`--json`, diagnostic IDs,
       documented exit codes and `build --dry-run`) before declaring the CLI 1.0.
-- [ ] Record exact FontTools/Python provenance whenever byte conversion occurs;
+- [x] Record exact FontTools/Python provenance whenever byte conversion occurs;
       keep the external tool pinned in dedicated regeneration CI.
+- [x] Publish a framework-neutral monorepo package/task/security contract without
+      mutating host workspace or cache configuration.
 - [ ] Decide whether install-graph minimalism justifies a future dedicated
       `@three-forma-styli/runtime` package. The current runtime subpath is
       browser-bundle clean but installing `core` still installs Culori.
@@ -201,3 +203,18 @@ remaining work so decisions do not depend on one chat transcript.
   unresolved CSS Module declarations, stale exports after target removal, and
   broken font URLs for reserved URL characters. Those are now permanent
   regressions rather than one-off manual observations.
+- **2026-07-23 — inspectable CLI contract.** Project planning is now a public,
+  read-only compiler operation shared with `tfs build --dry-run`. Build, check,
+  and validate emit versioned JSON envelopes on request; operation and usage
+  failures have stable diagnostic IDs and exit codes. The packed ecosystem gate
+  verifies stdout purity and the no-write guarantee through the real executable.
+- **2026-07-23 — external font compiler provenance.** Copy-only font projects do
+  not resolve or mention FontTools. Actual TTF/OTF conversion records the exact
+  FontTools version and Python implementation/version without leaking machine
+  paths or timestamps. A dedicated pinned CI job performs a real conversion and
+  proves inspected semantics survive.
+- **2026-07-23 — monorepo integration boundary.** TFS recommends one private
+  generated design-system package with many package consumers, not multiple copy
+  destinations. Ordinary build/check only validate committed output; explicit
+  generation and discarded drift checks remain separate. TFS documents task
+  inputs/outputs but does not edit a host's workspace or cache policy.

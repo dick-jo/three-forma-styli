@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import { afterEach, describe, expect, it } from 'vitest';
 import { typography as defaultTypography } from '@three-forma-styli/themes/default';
 import { defineTfsProject } from '../project.js';
-import { buildProject, checkProject } from '../project-build.js';
+import { buildProject, checkProject, planProject } from '../project-build.js';
 import { buildWorkspacePackageProject } from './build.js';
 import { validateProjectOutput } from '../validate-output.js';
 
@@ -133,6 +133,41 @@ afterEach(async () => {
 });
 
 describe('workspace-package build', () => {
+	it('reports the validated package graph and exact exports without writing', async () => {
+		const { directory, configPath, packagePath } = await fixture();
+		const before = await fs.readFile(packagePath);
+		const plan = await planProject(fullProject(), configPath);
+
+		expect(plan.output).toEqual({
+			layout: 'workspace-package',
+			directory: path.join(directory, 'generated'),
+			ownership: 'atomic-directory',
+		});
+		expect(plan.hostPackage).toMatchObject({
+			manifest: packagePath,
+			generatedFromHost: 'generated',
+			requiredExports: expect.arrayContaining([
+				{
+					subpath: './typography.module.css',
+					target: {
+						types: './generated/runtime/styles/typography.module.css.d.ts',
+						default: './generated/runtime/styles/typography.module.css',
+					},
+				},
+			]),
+		});
+		expect(plan.artifacts.map((artifact) => artifact.path)).toEqual(
+			expect.arrayContaining([
+				'build.manifest.json',
+				'runtime/styles/index.css',
+				'review/typography.html',
+				'design/tokens.dtcg.json',
+			])
+		);
+		expect(await fs.pathExists(path.join(directory, 'generated'))).toBe(false);
+		expect(await fs.readFile(packagePath)).toEqual(before);
+	});
+
 	it('emits the canonical target tree deterministically without touching package.json', async () => {
 		const { directory, configPath, packagePath } = await fixture();
 		const before = await fs.readFile(packagePath);

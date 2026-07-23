@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import { checkProject } from '@three-forma-styli/compiler/build';
 import type { TfsProject } from '@three-forma-styli/compiler/project';
 import { loadConfigModule } from '../config/load-module.js';
+import { writeMachineResult } from '../output.js';
 
 function isProject(value: unknown): value is TfsProject {
 	return Boolean(
@@ -11,15 +12,26 @@ function isProject(value: unknown): value is TfsProject {
 }
 
 /** Rebuild to a private sibling stage and prove committed output is byte-current. */
-export async function checkCommand(filePath: string): Promise<void> {
+export async function checkCommand(
+	filePath: string,
+	options: { json?: boolean } = {}
+): Promise<void> {
 	const loaded = await loadConfigModule(filePath);
 	if (!isProject(loaded.module.default)) {
 		throw new Error('tfs check requires a defineTfsProject() project.');
 	}
 	const result = await checkProject(loaded.module.default, loaded.inputPath);
-	console.error(
-		chalk.green(
-			`✓ Generated output is current (${result.files.length} files in ${path.relative(process.cwd(), result.outputDirectory)})`
-		)
-	);
+	if (options.json) {
+		writeMachineResult('check', {
+			outputDirectory: result.outputDirectory,
+			files: result.files,
+			current: true,
+		});
+	} else {
+		console.error(
+			chalk.green(
+				`✓ Generated output is current (${result.files.length} files in ${path.relative(process.cwd(), result.outputDirectory)})`
+			)
+		);
+	}
 }

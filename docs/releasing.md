@@ -12,6 +12,9 @@ not consume the CLI or themes package at runtime.
 ## TODO: circle back before the next npm release
 
 - [ ] Review this procedure with fresh eyes and confirm npm scope/account access.
+- [ ] Confirm the dedicated `font-conversion` CI job passed with the pinned
+      Python and FontTools requirements; compare its recorded provenance with
+      any project whose generated font bytes are release evidence.
 - [ ] Add the appropriate Changeset for the post-`0.2.0` hardening, scoped
       typography-mode fix, and any other unreleased public changes.
 - [ ] Publish an exact `next` canary, install it in Splinter, and run the full

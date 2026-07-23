@@ -117,6 +117,25 @@ describe('tfs init', () => {
 		});
 		expect(manifest.files).toEqual(['generated/runtime', 'generated/assets', 'README.md']);
 		expect(manifest.sideEffects).toEqual(['./generated/runtime/styles/*.css']);
+		const stdout = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+		await buildCommand(projectRoot, { dryRun: true, json: true });
+		const dryRun = JSON.parse(String(stdout.mock.calls.at(-1)?.[0]));
+		expect(dryRun).toMatchObject({
+			schemaVersion: 1,
+			command: 'build',
+			status: 'ok',
+			result: {
+				mode: 'dry-run',
+				plan: {
+					output: { layout: 'workspace-package', ownership: 'atomic-directory' },
+					hostPackage: { generatedFromHost: 'generated' },
+				},
+			},
+		});
+		expect(
+			dryRun.result.plan.artifacts.map((artifact: { path: string }) => artifact.path)
+		).toContain('runtime/styles/typography.module.css.d.ts');
+		expect(await fs.pathExists(path.join(projectRoot, 'generated'))).toBe(false);
 
 		execFileSync(
 			process.execPath,
@@ -124,6 +143,13 @@ describe('tfs init', () => {
 			{ cwd: projectRoot, stdio: 'inherit' }
 		);
 		await buildCommand(projectRoot, {});
+		stdout.mockClear();
+		await validateCommand(projectRoot, { json: true });
+		expect(JSON.parse(String(stdout.mock.calls.at(-1)?.[0]))).toMatchObject({
+			command: 'validate',
+			status: 'ok',
+			result: { valid: true },
+		});
 		await expect(validateCommand(projectRoot)).resolves.toBeUndefined();
 		await expect(checkCommand(projectRoot)).resolves.toBeUndefined();
 		expect(await fs.pathExists(path.join(projectRoot, 'dist'))).toBe(false);

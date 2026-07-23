@@ -15,9 +15,16 @@ Workspace packages now expose CSS Module declarations through an explicit
 `types` condition and reject stale exports into removed TFS-owned artifacts.
 Generated font, CSS import and specimen URLs encode filesystem path segments;
 ambiguous prefixes and cross-platform-reserved output names fail early.
+WOFF2 conversion manifests now identify the FontTools executable, exact
+FontTools release, and Python runtime; copy-only font preparation neither
+requires nor claims that external toolchain.
 
 Scaffolds pin one exact TFS release, use non-mutating build/check scripts, support
 scoped package names and deterministic package-manager selection, and produce a
 packable private workspace package. The release gate installs actual tarballs,
 exercises both scaffold shapes, packs the generated package, and type-checks and
 bundles a production browser consumer.
+
+The compiler now exposes a read-only, validated project plan. The CLI presents
+it through `build --dry-run`, and build/check/validate expose versioned JSON
+success and failure envelopes with documented exit semantics.
