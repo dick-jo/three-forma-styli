@@ -82,6 +82,10 @@ remaining work so decisions do not depend on one chat transcript.
 - [ ] Re-home application-owned logo URLs outside generated token CSS.
 - [ ] Upgrade the runtime custom-theme path, including strict persisted-data
       validation and native OKLCH/P3 output.
+- [ ] Decide whether fixed per-polarity runtime overlays become a generic,
+      explicitly authored TFS project policy or a generated Scatter-local
+      manifest. Do not leave the existing duplicated application constants by
+      accident.
 - [ ] Represent built-in themes by generated keys/metadata and static selectors;
       preserve runtime collection-owner themes.
 - [ ] Test real-page cold-cache font loading, fallback reflow, CLS, P3 colour,
@@ -155,3 +159,9 @@ remaining work so decisions do not depend on one chat transcript.
   validates all 24 committed files, exact package wiring, production parity,
   and P3 without font preparation; the heavy path still proves regeneration,
   conversion, packing, and an isolated Next.js consumer.
+- **2026-07-23 — runtime theme boundary mapped.** Built-in modes use generated
+  static selectors; only genuinely user-authored themes use the strict browser
+  runtime API. Scatter's positive-polarity sentiment/network overlay remains an
+  explicit ownership decision because core must not guess editable colours or
+  polarity transforms. The alternatives are recorded in `tfs-scatter`'s
+  `SCATTER-INTEGRATION.md`.
