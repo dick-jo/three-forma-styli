@@ -3,28 +3,27 @@
  *
  * Generates time tokens using multiplicative formula: t-{n} = base * n
  *
- * The default mode gets unprefixed tokens (--t-1, --t-2, etc.)
- * Other modes get their name as prefix (--t-anim-1, --t-anim-2, etc.)
+ * The default scale gets unprefixed tokens (--t-1, --t-2, etc.)
+ * Other scales get their name as prefix (--t-anim-1, --t-anim-2, etc.)
  */
 
-import type { DesignSystem, TimeMode } from '../types.js';
-import type { TokenValue, GeneratorResult, GeneratorConfig } from './types.js';
-import { getDefaultMode } from './utils.js';
+import type { DesignSystem, TimeScale } from '../types.js';
+import type { TokenValue, GeneratorConfig, TimeGeneratorResult } from './types.js';
+import { getDefaultEntry } from './utils.js';
 
 /**
- * Generate tokens for a single time mode
+ * Generate tokens for a single time scale.
  */
 function generateTokensForMode(
-	mode: TimeMode & { name: string },
-	isDefaultMode: boolean,
+	scale: TimeScale & { name: string },
+	isDefaultScale: boolean,
 	config: GeneratorConfig
 ): TokenValue[] {
 	const basePrefix = config.prefixes.time;
-	const { unit, base, min, range } = mode.tokens;
+	const { unit, base, min, range } = scale.tokens;
 	const tokens: TokenValue[] = [];
 
-	// Default mode gets unprefixed tokens, others get their name as prefix
-	const prefix = isDefaultMode ? basePrefix : `${basePrefix}-${mode.name}`;
+	const prefix = isDefaultScale ? basePrefix : `${basePrefix}-${scale.name}`;
 
 	// min token
 	tokens.push({
@@ -34,7 +33,7 @@ function generateTokensForMode(
 		rawValue: min,
 		unit,
 		metadata: {
-			timeCategory: mode.name,
+			timeScale: scale.name,
 		},
 	});
 
@@ -48,7 +47,7 @@ function generateTokensForMode(
 			rawValue: value,
 			unit,
 			metadata: {
-				timeCategory: mode.name,
+				timeScale: scale.name,
 			},
 		});
 	}
@@ -59,28 +58,24 @@ function generateTokensForMode(
 /**
  * Generate all time tokens from a DesignSystem
  *
- * Unlike other generators, time modes all output to :root together.
- * The default mode gets unprefixed tokens, other modes get prefixed tokens.
+ * Unlike mode generators, every time scale outputs to :root.
  */
 export function generateTimeTokens(
 	time: DesignSystem['time'],
 	config: GeneratorConfig
-): GeneratorResult {
-	const defaultMode = getDefaultMode(time.modes);
+): TimeGeneratorResult {
+	const defaultScale = getDefaultEntry(time.scales);
 	const allTokens: TokenValue[] = [];
 
-	// Generate tokens for all modes - they all go to :root
-	for (const mode of time.modes) {
-		const isDefault = mode === defaultMode;
-		allTokens.push(...generateTokensForMode(mode, isDefault, config));
+	for (const scale of time.scales) {
+		allTokens.push(...generateTokensForMode(scale, scale === defaultScale, config));
 	}
 
 	return {
 		defaultTokens: allTokens,
-		overrideTokens: {}, // Time modes don't create CSS override blocks
-		modeInfo: {
-			default: defaultMode.name,
-			overrides: [], // No overrides - all modes output together
+		scaleInfo: {
+			default: defaultScale.name,
+			names: time.scales.map((scale) => scale.name),
 		},
 	};
 }

@@ -50,9 +50,16 @@ const typography: DesignSystem['typography'] = {
 	roles: {
 		interface: {
 			font: 'ui',
+			textTransform: 'uppercase',
 			base: { fontSize: 2, weight: 'regular', lineHeight: 1.2, letterSpacing: 0 },
 			variants: {
-				compact: { fontSize: 1, weight: 'strong', lineHeight: 1.1, letterSpacing: 0.01 },
+				compact: {
+					fontSize: 1,
+					weight: 'strong',
+					lineHeight: 1.1,
+					letterSpacing: 0.01,
+					textTransform: 'lowercase',
+				},
 			},
 			weights: { regular: 400, strong: 700 },
 			styles: {
@@ -73,6 +80,9 @@ describe('toTypographyTypescript', () => {
 		expect(output).toContain('"fontSize": "var(--text-interface-compact-font-size)"');
 		expect(output).toContain('"fontWeight": "var(--text-interface-compact-font-weight)"');
 		expect(output).toContain('"weight": "strong"');
+		expect(output).toContain('"textTransform": "var(--text-interface-text-transform)"');
+		expect(output).toContain('"textTransformValue": "uppercase"');
+		expect(output).toContain('"textTransformValue": "lowercase"');
 		expect(output).not.toContain('"defaultWeight"');
 		expect(output).not.toContain('"fonts":');
 		expect(output).toContain('export type TypographyVariant<R extends TypographyRole>');

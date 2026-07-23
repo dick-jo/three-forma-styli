@@ -26,6 +26,7 @@ describe('workspace runtime contracts', () => {
 		expect(rendered.javascript).not.toContain('"": {');
 		expect(rendered.declaration).toContain('readonly default: null;');
 		expect(rendered.declaration).toContain('export type TfsSizeMode = keyof');
+		expect(rendered.declaration).toContain('export type TfsTimeScale = keyof');
 	});
 
 	it('shares the complete discriminated typography selection surface', () => {

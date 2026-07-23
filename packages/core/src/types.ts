@@ -158,6 +158,8 @@ export type TypographyFont = TypographyFontIdentity &
 	);
 
 export type TypographyFeatureValue = boolean | number;
+export type TypographyTextTransform =
+	'none' | 'capitalize' | 'uppercase' | 'lowercase' | 'full-width' | 'full-size-kana' | 'math-auto';
 
 export interface TypographySettings {
 	/** Prefer normal CSS properties where they exist; this is the OpenType escape hatch. */
@@ -166,6 +168,8 @@ export interface TypographySettings {
 	variations?: Record<string, number>;
 	fontKerning?: 'auto' | 'normal' | 'none';
 	fontOpticalSizing?: 'auto' | 'none';
+	/** Presentational casing/glyph transform; source text remains unchanged. */
+	textTransform?: TypographyTextTransform;
 }
 
 /** A complete role-local size recipe. Letter spacing is expressed in em. */
@@ -182,7 +186,7 @@ export interface TypographyRecipe extends TypographySettings {
  * mode. Core derives nothing here: omitted fields retain the authored recipe.
  */
 export type TypographyModeRecipeOverride = Partial<
-	Pick<TypographyRecipe, 'fontSize' | 'weight' | 'lineHeight' | 'letterSpacing'>
+	Pick<TypographyRecipe, 'fontSize' | 'weight' | 'lineHeight' | 'letterSpacing' | 'textTransform'>
 >;
 
 export interface TypographyRoleModeOverride {
@@ -310,30 +314,29 @@ export interface BorderSystem {
 // TIME ------------------------------------------------- //
 
 /**
- * Time system tokens.
- * Generates tokens using multiplicative formula: t-{n} = base * n
- *
- * The default mode gets unprefixed tokens (--t-1, --t-2, etc.)
- * Other modes get their name as prefix (--t-anim-1, --t-anim-2, etc.)
- *
- * Example:
- *   TIME_MODES = {
- *     default: { isDefault: true, tokens: { unit: 'ms', base: 100, min: 50, range: 10 } },
- *     anim: { tokens: { unit: 'ms', base: 1000, min: 500, range: 10 } }
- *   }
- *   // Generates: --t-1, --t-2, ..., --t-anim-1, --t-anim-2, ...
+ * One atomic time scale. Values use the multiplicative formula `base * step`.
  */
-export interface TimeSystem {
+export interface TimeScaleTokens {
 	unit: string; // e.g., 'ms'
 	base: number; // base increment (e.g., 100)
 	min: number; // minimum time value
 	range: number; // number of steps
 }
 
-export interface TimeMode {
+/**
+ * A named time scale. Every scale is emitted into the same root token set:
+ * the default scale is `--t-*`; additional scales are `--t-{name}-*`.
+ *
+ * Scales are namespaces, not switchable CSS modes.
+ */
+export interface TimeScale {
 	isDefault?: boolean;
 	metadata?: ModeMetadata;
-	tokens: TimeSystem;
+	tokens: TimeScaleTokens;
+}
+
+export interface TimeSystem {
+	scales: Array<TimeScale & { name: string }>;
 }
 
 // MAIN CONFIG ------------------------------------------ //
@@ -355,9 +358,7 @@ export interface DesignSystem {
 	};
 	typography: TypographySystem;
 	border: BorderSystem;
-	time: {
-		modes: Array<TimeMode & { name: string }>;
-	};
+	time: TimeSystem;
 }
 
 /**
@@ -392,7 +393,5 @@ export interface PartialDesignSystem {
 	};
 	typography?: TypographySystem;
 	border?: BorderSystem;
-	time?: {
-		modes: Array<TimeMode & { name: string }>;
-	};
+	time?: TimeSystem;
 }

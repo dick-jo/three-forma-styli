@@ -408,10 +408,20 @@ function resolvedRecipeSettings(role: TypographyRole, recipe: TypographyRecipe) 
 		fontOpticalSizing:
 			recipe.fontOpticalSizing ?? role.base.fontOpticalSizing ?? role.fontOpticalSizing,
 		fontKerning: recipe.fontKerning ?? role.base.fontKerning ?? role.fontKerning,
+		textTransform: recipe.textTransform ?? role.base.textTransform ?? role.textTransform,
 	};
 }
 
 const managedVariationAxes = new Set(['wght', 'wdth', 'ital', 'slnt', 'opsz']);
+const typographyTextTransforms = new Set([
+	'none',
+	'capitalize',
+	'uppercase',
+	'lowercase',
+	'full-width',
+	'full-size-kana',
+	'math-auto',
+]);
 
 function validateTypographySemanticLayer(
 	typography: NonNullable<PartialDesignSystem['typography']>
@@ -717,6 +727,14 @@ function validateTypographySemanticLayer(
 					`Typography role "${roleName}" ${variantName} fontOpticalSizing must be "auto" or "none"`
 				);
 			}
+			if (
+				settings.textTransform !== undefined &&
+				!typographyTextTransforms.has(settings.textTransform)
+			) {
+				throw new ValidationError(
+					`Typography role "${roleName}" ${variantName} textTransform is unsupported`
+				);
+			}
 			for (const [tag, value] of Object.entries(settings.features)) {
 				if (
 					!openTypeTagPattern.test(tag) ||
@@ -785,6 +803,7 @@ function validateTypographySemanticLayer(
 			'weight',
 			'lineHeight',
 			'letterSpacing',
+			'textTransform',
 		]);
 		for (const [modeName, modeOverride] of Object.entries(role.modeOverrides ?? {})) {
 			const mode = typography.modes.find((candidate) => candidate.name === modeName);
@@ -871,6 +890,12 @@ function validateTypographySemanticLayer(
 				if (!Number.isFinite(resolved.letterSpacing)) {
 					throw new ValidationError(`${path} letterSpacing must be finite`);
 				}
+				if (
+					resolved.textTransform !== undefined &&
+					!typographyTextTransforms.has(resolved.textTransform)
+				) {
+					throw new ValidationError(`${path} textTransform is unsupported`);
+				}
 			}
 		}
 	}
@@ -936,21 +961,21 @@ function validateBorderPartial(
 }
 
 function validateTimePartial(time: NonNullable<PartialDesignSystem['time']>): void {
-	if (!time.modes || !Array.isArray(time.modes)) {
-		throw new ValidationError('time.modes must be an array');
+	if (!time.scales || !Array.isArray(time.scales)) {
+		throw new ValidationError('time.scales must be an array');
 	}
 
-	if (time.modes.length === 0) {
-		throw new ValidationError('time.modes must have at least one mode');
+	if (time.scales.length === 0) {
+		throw new ValidationError('time.scales must have at least one scale');
 	}
-	validateNamedModes(time.modes, 'time.modes', 'Time');
+	validateNamedModes(time.scales, 'time.scales', 'Time scale');
 
-	time.modes.forEach((mode) => {
-		if (!mode.tokens) {
-			throw new ValidationError(`Time mode "${mode.name}" must have tokens`);
+	time.scales.forEach((scale) => {
+		if (!scale.tokens) {
+			throw new ValidationError(`Time scale "${scale.name}" must have tokens`);
 		}
 
-		validateTimeTokens(mode.tokens, `time.modes["${mode.name}"].tokens`);
+		validateTimeTokens(scale.tokens, `time.scales["${scale.name}"].tokens`);
 	});
 }
 

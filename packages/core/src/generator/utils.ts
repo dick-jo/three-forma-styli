@@ -3,11 +3,11 @@
  */
 
 /**
- * Get the default mode from an array of modes
+ * Get the default named entry from an ordered collection.
  *
- * Returns the mode with isDefault: true, or the first mode if none is marked as default.
+ * Returns the entry with isDefault: true, or the first entry when none is marked.
  */
-export function getDefaultMode<T extends { isDefault?: boolean; name: string }>(modes: T[]): T {
-	const defaultMode = modes.find((m) => m.isDefault);
-	return defaultMode || modes[0];
+export function getDefaultEntry<T extends { isDefault?: boolean; name: string }>(entries: T[]): T {
+	const explicitDefault = entries.find((entry) => entry.isDefault);
+	return explicitDefault || entries[0];
 }

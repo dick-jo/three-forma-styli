@@ -42,7 +42,7 @@ export interface ProjectOutputFormat {
 }
 
 export interface ProjectCssOutput extends ProjectOutputFormat {
-	/** Selectors used for root tokens and independent color, size, and time modes. */
+	/** Selectors used for root tokens and independent color and size modes. */
 	selectors?: CssTransformerConfig['selectors'];
 }
 

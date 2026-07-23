@@ -17,7 +17,7 @@ import type {
 	TypographyContract,
 	TypographyContractRecipe,
 } from './types.js';
-import { getDefaultMode } from './utils.js';
+import { getDefaultEntry } from './utils.js';
 
 function formatNumber(value: number): string {
 	return value.toFixed(4).replace(/\.?0+$/, '');
@@ -107,6 +107,7 @@ function resolvedSettings(
 		variations: Object.keys(variations).length > 0 ? variations : undefined,
 		fontKerning: recipe.fontKerning ?? base.fontKerning ?? role.fontKerning,
 		fontOpticalSizing: recipe.fontOpticalSizing ?? base.fontOpticalSizing ?? role.fontOpticalSizing,
+		textTransform: recipe.textTransform ?? base.textTransform ?? role.textTransform,
 	};
 }
 
@@ -161,6 +162,15 @@ function recipeTokens(
 			family: 'typography',
 			name: contract.fontKerningToken,
 			value: settings.fontKerning,
+		});
+	}
+	if (settings.textTransform) {
+		contract.textTransformToken = `${recipePrefix}-text-transform`;
+		contract.textTransform = settings.textTransform;
+		tokens.push({
+			family: 'typography',
+			name: contract.textTransformToken,
+			value: settings.textTransform,
 		});
 	}
 	if (settings.fontOpticalSizing) {
@@ -387,7 +397,7 @@ export function generateTypographyTokens(
 	typography: DesignSystem['typography'],
 	config: GeneratorConfig
 ): GeneratorResult {
-	const defaultMode = getDefaultMode(typography.modes);
+	const defaultMode = getDefaultEntry(typography.modes);
 	const overrideModes = typography.modes.filter((mode) => mode !== defaultMode);
 	const defaultTokens = [
 		...generateTokensForMode(defaultMode, config),

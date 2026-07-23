@@ -101,6 +101,7 @@ function recipeSettings(recipe: TypographyRecipe): TypographySettings {
 		...(recipe.variations ? { variations: { ...recipe.variations } } : {}),
 		...(recipe.fontKerning ? { fontKerning: recipe.fontKerning } : {}),
 		...(recipe.fontOpticalSizing ? { fontOpticalSizing: recipe.fontOpticalSizing } : {}),
+		...(recipe.textTransform ? { textTransform: recipe.textTransform } : {}),
 	};
 }
 
@@ -114,6 +115,7 @@ function settingsSignature(settings: TypographySettings): string {
 		),
 		fontKerning: settings.fontKerning ?? null,
 		fontOpticalSizing: settings.fontOpticalSizing ?? null,
+		textTransform: settings.textTransform ?? null,
 	});
 }
 

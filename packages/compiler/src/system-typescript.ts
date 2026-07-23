@@ -1,9 +1,10 @@
 import type { IR, PartialDesignSystem, TokenValue } from '@three-forma-styli/core';
 
 type ModeCategory = keyof IR['modes'];
+type TokenCategory = ModeCategory | 'time';
 type SourceMode = { name: string; isDefault?: boolean; tokens: unknown; metadata?: unknown };
 
-const FAMILY_CATEGORIES: Record<TokenValue['family'], ModeCategory> = {
+const FAMILY_CATEGORIES: Record<TokenValue['family'], TokenCategory> = {
 	color: 'color',
 	spacing: 'size',
 	gap: 'size',
@@ -15,7 +16,7 @@ const FAMILY_CATEGORIES: Record<TokenValue['family'], ModeCategory> = {
 
 function tokenValues(
 	tokens: Record<string, TokenValue>,
-	category: ModeCategory
+	category: TokenCategory
 ): Record<string, string> {
 	return Object.fromEntries(
 		Object.values(tokens)
@@ -32,9 +33,6 @@ function sourceModes(
 	if (category === 'color') {
 		return system.colors ? [{ system: 'colors', modes: system.colors.modes }] : [];
 	}
-	if (category === 'time') {
-		return system.time ? [{ system: 'time', modes: system.time.modes }] : [];
-	}
 	const sources: Array<{ system: string; modes: SourceMode[] }> = [];
 	if (system.spacing) sources.push({ system: 'spacing', modes: system.spacing.modes });
 	if (system.gap) sources.push({ system: 'gap', modes: system.gap.modes });
@@ -46,6 +44,18 @@ function sourceModes(
 		sources.push({ system: 'borderWidth', modes: system.border.width.modes });
 	}
 	return sources;
+}
+
+function timeScaleTokenValues(
+	tokens: Record<string, TokenValue>,
+	scaleName: string
+): Record<string, string> {
+	return Object.fromEntries(
+		Object.values(tokens)
+			.filter((token) => token.family === 'time' && token.metadata?.timeScale === scaleName)
+			.sort((left, right) => left.name.localeCompare(right.name))
+			.map((token) => [token.name, token.value])
+	);
 }
 
 function entrySource(
@@ -74,7 +84,7 @@ function entrySource(
 /** Build a standalone, serializable contract for generated consumers. */
 export function projectSystemContract(system: PartialDesignSystem, ir: IR) {
 	const modes = Object.fromEntries(
-		(['color', 'size', 'time'] as const).map((category) => {
+		(['color', 'size'] as const).map((category) => {
 			const info = ir.modes[category];
 			const names = [info.default, ...info.overrides];
 			return [
@@ -98,8 +108,24 @@ export function projectSystemContract(system: PartialDesignSystem, ir: IR) {
 			];
 		})
 	);
+	const scales = {
+		time: {
+			default: ir.scales.time.default,
+			entries: Object.fromEntries(
+				(system.time?.scales ?? []).map((scale) => [
+					scale.name,
+					{
+						isDefault: scale.name === ir.scales.time.default,
+						...(scale.metadata === undefined ? {} : { metadata: scale.metadata }),
+						source: scale.tokens,
+						resolvedTokens: timeScaleTokenValues(ir.tokens, scale.name),
+					},
+				])
+			),
+		},
+	};
 
-	return { schemaVersion: 1, modes } as const;
+	return { schemaVersion: 2, modes, scales } as const;
 }
 
 export function generateProjectSystemTypescript(system: PartialDesignSystem, ir: IR): string {
@@ -111,7 +137,7 @@ export function generateProjectSystemTypescript(system: PartialDesignSystem, ir:
 		'export type TfsSystem = typeof tfsSystem;',
 		'export type TfsColorMode = keyof typeof tfsSystem.modes.color.entries;',
 		'export type TfsSizeMode = keyof typeof tfsSystem.modes.size.entries;',
-		'export type TfsTimeMode = keyof typeof tfsSystem.modes.time.entries;',
+		'export type TfsTimeScale = keyof typeof tfsSystem.scales.time.entries;',
 		'',
 	].join('\n');
 }

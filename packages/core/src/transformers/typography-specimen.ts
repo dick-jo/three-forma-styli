@@ -129,6 +129,9 @@ function recipeDeclarations(
 		`  font-synthesis: none;`,
 		`  line-height: ${variable(recipe.lineHeightToken)};`,
 		`  letter-spacing: ${variable(recipe.letterSpacingToken)};`,
+		...(recipe.textTransformToken
+			? [`  text-transform: ${variable(recipe.textTransformToken)};`]
+			: []),
 		...(recipe.fontKerningToken ? [`  font-kerning: ${variable(recipe.fontKerningToken)};`] : []),
 		...(recipe.fontOpticalSizingToken
 			? [`  font-optical-sizing: ${variable(recipe.fontOpticalSizingToken)};`]
@@ -271,7 +274,7 @@ function roleCards(
     <code data-meta="font-size">--${escapeHtml(recipe.atomicFontSizeToken)}</code>
 	<code data-meta="weight">weight ${escapeHtml(recipe.weight)} · ${role.weights[recipe.weight]}</code>
     <code data-meta="line-height">lh ${recipe.lineHeight}</code>
-    <code data-meta="letter-spacing">ls ${recipe.letterSpacingEm}em</code>
+    <code data-meta="letter-spacing">ls ${recipe.letterSpacingEm}em</code>${recipe.textTransform ? `\n    <code>transform ${escapeHtml(recipe.textTransform)}</code>` : ''}
 	${fallbackRoles.has(roleName) ? fallbackDiagnostic(fallbackKey, 'fallback delta') : ''}
   </div>
   <div class="sample-preview" data-type-role="${escapeHtml(roleName)}"${variantName ? ` data-type-variant="${escapeHtml(variantName)}"` : ''}>

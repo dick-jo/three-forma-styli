@@ -153,18 +153,18 @@ describe('portable project build', () => {
 			)
 		);
 		expect(legacyFixture).toEqual({
-			'build.manifest.json': '01f5bd35190ab596a5da78cc109500b70ed6004743f2c17a548fafb9001de6e8',
+			'build.manifest.json': '55f3615d55dba4a3a9fc137a69507150472b6636cbd6c496af42b4a85a511737',
 			'index.css': '4cb2f483ae8a8ccca27250d862e726233646c40571ecfbb5e9a32e66ad79436a',
-			'system.generated.ts': '18a655155852930d0d54a783507b36c35b09cf62cf76d6b62a57db634bfef716',
-			'tokens.css': 'f2fb21be48defa144feed8d91243839e135b3d5332fc5366f17ebd86c89d623a',
-			'typography.css': '6af6c4d0b10c01e4288a761b0fb122a0c6d0673370f33f11b7853a3511d108ba',
+			'system.generated.ts': 'ff16abd9f1075dae372cc332fe9b39818cb55482a429b0eb79f93f1f5cdcee0e',
+			'tokens.css': '580d6d89ce37cfc05e13e2e8e96742732f659570b760567c4fa3e5e24182a220',
+			'typography.css': '7acb1ed4300ee678f8a80b1e346331ff414d9eb81e9aa0ef0b64fd916c8e4924',
 			'typography.generated.module.css':
-				'05bb1d5e817cd42847141f5446f16f33a32b5b0a87be7365b9cb4acf63cc726b',
+				'd6fd0ee579f4028e9e067bef8e03d86c67292059c11827b702f1621c16753f22',
 			'typography.generated.module.css.d.ts':
 				'c0d5b47824c3b1196fa61c19bbb9960fca2ef26165a59f07d8894b622c973fce',
-			'typography.generated.ts': '51e96732b2b5b735a0cd583f24800ab8633e5cc5aaa820478612ae6de4f8736c',
+			'typography.generated.ts': '498590d92ba88966a20b41c2796e78392a3cce759850c52cce0d210c0d413517',
 			'typography.specimen.html':
-				'e0e56eea4b320c9a1b26e5318e6849fcab68ec17af3cbae889b21f86c44f0317',
+				'aac66436a9adc6d88431420d859aa81931fbd930a1dce12c46e47bdeb2b28f2e',
 		});
 	});
 

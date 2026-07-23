@@ -21,8 +21,8 @@ describe('toCss', () => {
 		modes: {
 			color: { default: 'light', overrides: [] },
 			size: { default: 'default', overrides: [] },
-			time: { default: 'default', overrides: [] },
 		},
+		scales: { time: { default: '', names: [] } },
 		overrideTokens: {},
 	};
 
@@ -53,8 +53,8 @@ describe('toCss', () => {
 			modes: {
 				color: { default: 'light', overrides: ['dark'] },
 				size: { default: 'default', overrides: ['small', 'large'] },
-				time: { default: 'default', overrides: ['reduced-motion'] },
 			},
+			scales: { time: { default: 'default', names: ['default'] } },
 			overrideTokens: {
 				dark: {
 					'clr-bg': { family: 'color', name: 'clr-bg', value: 'oklch(0.15 0 180)' },
@@ -64,9 +64,6 @@ describe('toCss', () => {
 				},
 				large: {
 					'sp-1': { family: 'spacing', name: 'sp-1', value: '16px' },
-				},
-				'reduced-motion': {
-					't-1': { family: 'time', name: 't-1', value: '0ms' },
 				},
 			},
 		};
@@ -85,24 +82,16 @@ describe('toCss', () => {
 			expect(css).toContain('[data-size-mode="large"]');
 		});
 
-		it('generates time mode overrides with data-time-mode selector', () => {
-			const css = toCss(irWithModes);
-
-			expect(css).toContain('[data-time-mode="reduced-motion"]');
-		});
-
 		it('allows custom mode selectors', () => {
 			const css = toCss(irWithModes, {
 				selectors: {
 					colorMode: '.theme-{mode}',
 					sizeMode: '.size-{mode}',
-					timeMode: '.motion-{mode}',
 				},
 			});
 
 			expect(css).toContain('.theme-dark');
 			expect(css).toContain('.size-small');
-			expect(css).toContain('.motion-reduced-motion');
 		});
 	});
 
@@ -125,8 +114,8 @@ describe('toCss', () => {
 				modes: {
 					color: { default: 'default', overrides: [] },
 					size: { default: 'default', overrides: ['small'] },
-					time: { default: 'default', overrides: [] },
 				},
+				scales: { time: { default: '', names: [] } },
 				overrideTokens: {
 					small: {
 						'sp-1': { family: 'spacing', name: 'sp-1', value: '4px' },
@@ -218,8 +207,8 @@ describe('toCss', () => {
 				modes: {
 					color: { default: 'default', overrides: [] },
 					size: { default: 'default', overrides: ['small'] },
-					time: { default: 'default', overrides: [] },
 				},
+				scales: { time: { default: '', names: [] } },
 				overrideTokens: {
 					small: {}, // Empty override
 				},
@@ -237,8 +226,8 @@ describe('toCss', () => {
 				modes: {
 					color: { default: 'default', overrides: [] },
 					size: { default: 'default', overrides: [] },
-					time: { default: 'default', overrides: [] },
 				},
+				scales: { time: { default: '', names: [] } },
 				overrideTokens: {
 					'mystery-mode': {
 						'sp-1': { family: 'spacing', name: 'sp-1', value: '4px' },

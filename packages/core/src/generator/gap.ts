@@ -6,7 +6,7 @@
 
 import type { DesignSystem, GapMode, SpacingMode } from '../types.js';
 import type { TokenValue, GeneratorResult, GeneratorConfig } from './types.js';
-import { getDefaultMode } from './utils.js';
+import { getDefaultEntry } from './utils.js';
 
 /**
  * Properties that are metadata, not actual gap values
@@ -78,7 +78,7 @@ function findSpacingModeForGap(
 	if (sameNameMode) return sameNameMode;
 
 	// Fall back to default spacing mode
-	return getDefaultMode(spacingModes);
+	return getDefaultEntry(spacingModes);
 }
 
 /**
@@ -89,7 +89,7 @@ export function generateGapTokens(
 	spacing: DesignSystem['spacing'],
 	config: GeneratorConfig
 ): GeneratorResult {
-	const defaultGapMode = getDefaultMode(gap.modes);
+	const defaultGapMode = getDefaultEntry(gap.modes);
 	const overrideGapModes = gap.modes.filter((m) => m !== defaultGapMode);
 
 	const defaultSpacingMode = findSpacingModeForGap(defaultGapMode, spacing.modes);

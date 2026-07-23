@@ -4,7 +4,7 @@
 
 import type { DesignSystem, BorderRadiusMode, BorderWidthMode, SpacingMode } from '../types.js';
 import type { TokenValue, GeneratorResult, GeneratorConfig, ModeInfo } from './types.js';
-import { getDefaultMode } from './utils.js';
+import { getDefaultEntry } from './utils.js';
 
 // ============================================
 // BORDER RADIUS
@@ -80,7 +80,7 @@ function findSpacingModeForRadius(
 	if (sameNameMode) return sameNameMode;
 
 	// Fall back to default spacing mode
-	return getDefaultMode(spacingModes);
+	return getDefaultEntry(spacingModes);
 }
 
 /**
@@ -91,7 +91,7 @@ export function generateBorderRadiusTokens(
 	spacing: DesignSystem['spacing'],
 	config: GeneratorConfig
 ): GeneratorResult {
-	const defaultRadiusMode = getDefaultMode(borderRadius.modes);
+	const defaultRadiusMode = getDefaultEntry(borderRadius.modes);
 	const overrideRadiusModes = borderRadius.modes.filter((m) => m !== defaultRadiusMode);
 
 	const defaultSpacingMode = findSpacingModeForRadius(defaultRadiusMode, spacing.modes);
@@ -145,7 +145,7 @@ export function generateBorderWidthTokens(
 	borderWidth: DesignSystem['border']['width'],
 	config: GeneratorConfig
 ): GeneratorResult {
-	const defaultMode = getDefaultMode(borderWidth.modes);
+	const defaultMode = getDefaultEntry(borderWidth.modes);
 	const overrideModes = borderWidth.modes.filter((m) => m !== defaultMode);
 
 	const defaultTokens = generateWidthTokensForMode(defaultMode, config);

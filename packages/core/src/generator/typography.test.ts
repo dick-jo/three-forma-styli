@@ -37,6 +37,7 @@ const semanticTypography: DesignSystem['typography'] = {
 	roles: {
 		copy: {
 			font: 'editorial',
+			textTransform: 'uppercase',
 			base: {
 				fontSize: 2,
 				weight: 'min',
@@ -45,7 +46,13 @@ const semanticTypography: DesignSystem['typography'] = {
 				features: { liga: true },
 			},
 			variants: {
-				compact: { fontSize: 1, weight: 'min', lineHeight: 1.2, letterSpacing: 0.01 },
+				compact: {
+					fontSize: 1,
+					weight: 'min',
+					lineHeight: 1.2,
+					letterSpacing: 0.01,
+					textTransform: 'lowercase',
+				},
 				display: { fontSize: 7, weight: 'max', lineHeight: 1, letterSpacing: -0.02 },
 			},
 			weights: { min: 400, max: 700 },
@@ -96,7 +103,9 @@ describe('generateTypographyTokens', () => {
 		expect(tokens['text-copy-font-weight']).toBe('var(--text-copy-font-weight-min)');
 		expect(tokens['text-copy-line-height']).toBe('1.3');
 		expect(tokens['text-copy-letter-spacing']).toBe('0');
+		expect(tokens['text-copy-text-transform']).toBe('uppercase');
 		expect(tokens['text-copy-compact-font-size']).toBe('var(--fs-1)');
+		expect(tokens['text-copy-compact-text-transform']).toBe('lowercase');
 		expect(tokens['text-copy-display-letter-spacing']).toBe('-0.02em');
 		expect(tokens['text-copy-m-font-size']).toBeUndefined();
 		expect(tokens['ff-editorial']).toBeUndefined();
@@ -139,7 +148,13 @@ describe('generateTypographyTokens', () => {
 		});
 		typography.roles!.copy.modeOverrides = {
 			display: {
-				base: { fontSize: 4, weight: 'max', lineHeight: 0.85, letterSpacing: -0.015 },
+				base: {
+					fontSize: 4,
+					weight: 'max',
+					lineHeight: 0.85,
+					letterSpacing: -0.015,
+					textTransform: 'capitalize',
+				},
 				variants: {
 					display: { fontSize: 10, lineHeight: 0.8, letterSpacing: -0.03 },
 				},
@@ -155,6 +170,7 @@ describe('generateTypographyTokens', () => {
 			'text-copy-font-weight': 'var(--text-copy-font-weight-max)',
 			'text-copy-line-height': '0.85',
 			'text-copy-letter-spacing': '-0.015em',
+			'text-copy-text-transform': 'capitalize',
 			'text-copy-compact-font-size': 'var(--fs-1)',
 			'text-copy-display-font-size': 'var(--fs-10)',
 			'text-copy-display-font-weight': 'var(--text-copy-font-weight-max)',
@@ -207,6 +223,18 @@ describe('generateTypographyTokens', () => {
 		};
 		expect(() => generate({ typography: beyondMode })).toThrow(
 			'mode "display" only generates through fs-12'
+		);
+
+		const invalidTransform = withMode();
+		invalidTransform.roles!.copy.modeOverrides = {
+			display: {
+				base: {
+					textTransform: 'sideways' as never,
+				},
+			},
+		};
+		expect(() => generate({ typography: invalidTransform })).toThrow(
+			'textTransform is unsupported'
 		);
 	});
 

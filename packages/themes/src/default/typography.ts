@@ -106,16 +106,19 @@ const labelRange = deriveTypographyRange({
 export const TYPOGRAPHY_ROLES: Record<string, TypographyRole> = {
 	prose: {
 		font: 'sans',
+		textTransform: 'none',
 		...proseRange,
 		weights: { min: 400, max: 700 },
 	},
 	heading: {
 		font: 'sans',
+		textTransform: 'none',
 		...headingRange,
 		weights: { min: 700, max: 800 },
 	},
 	label: {
 		font: 'mono',
+		textTransform: 'uppercase',
 		...labelRange,
 		weights: { min: 400, max: 700 },
 	},

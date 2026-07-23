@@ -90,12 +90,16 @@ export function renderSystemContract(system: PartialDesignSystem, ir: IR) {
 				mode.default === '' ? { default: null, entries: {} } : mode,
 			])
 		),
+		scales: {
+			...legacy.scales,
+			time: legacy.scales.time.default === '' ? { default: null, entries: {} } : legacy.scales.time,
+		},
 	};
 	return renderLiteralModule('tfsSystem', contract, [
 		'export type TfsSystem = typeof tfsSystem;',
 		'export type TfsColorMode = keyof typeof tfsSystem.modes.color.entries;',
 		'export type TfsSizeMode = keyof typeof tfsSystem.modes.size.entries;',
-		'export type TfsTimeMode = keyof typeof tfsSystem.modes.time.entries;',
+		'export type TfsTimeScale = keyof typeof tfsSystem.scales.time.entries;',
 	]);
 }
 

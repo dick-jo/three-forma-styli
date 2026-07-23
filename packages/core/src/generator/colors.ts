@@ -7,7 +7,7 @@
 import type { DesignSystem, ColorMode, AlphaSchedule } from '../types.js';
 import type { TokenValue, GeneratorResult, GeneratorConfig } from './types.js';
 import { formatColor, formatColorWithAlpha } from '../utils.js';
-import { getDefaultMode } from './utils.js';
+import { getDefaultEntry } from './utils.js';
 
 /**
  * Generate tokens for a single color mode
@@ -76,7 +76,7 @@ export function generateColorTokens(
 	colors: DesignSystem['colors'],
 	config: GeneratorConfig
 ): GeneratorResult {
-	const defaultMode = getDefaultMode(colors.modes);
+	const defaultMode = getDefaultEntry(colors.modes);
 	const overrideModes = colors.modes.filter((m) => m !== defaultMode);
 
 	const defaultAlphaSchedule = getAlphaSchedule(defaultMode, colors.alphaSchedule);

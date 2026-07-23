@@ -44,8 +44,8 @@ export interface TokenMetadata {
 	/** For time tokens: is this a shorthand? */
 	isShorthand?: boolean;
 
-	/** For time tokens: which time category (standard, animation, etc.) */
-	timeCategory?: string;
+	/** For time tokens: which simultaneously emitted scale owns this token. */
+	timeScale?: string;
 }
 
 /**
@@ -59,6 +59,13 @@ export interface ModeInfo {
 	overrides: string[];
 }
 
+export interface ScaleInfo {
+	/** Name of the scale that receives the unqualified token namespace. */
+	default: string;
+	/** Every emitted scale name, in authored order. */
+	names: string[];
+}
+
 export interface TypographyContractRecipe {
 	fontSizeToken: string;
 	fontWeightToken: string;
@@ -69,6 +76,8 @@ export interface TypographyContractRecipe {
 	fontSizeReference: import('../types.js').FontSizeReference;
 	lineHeight: number;
 	letterSpacingEm: number;
+	textTransformToken?: string;
+	textTransform?: import('../types.js').TypographyTextTransform;
 	fontKerningToken?: string;
 	fontOpticalSizingToken?: string;
 	fontFeatureSettingsToken?: string;
@@ -119,11 +128,15 @@ export interface IR {
 	/** All default mode tokens, keyed by token name */
 	tokens: Record<string, TokenValue>;
 
-	/** Mode metadata by category */
+	/** Switchable mode metadata by selector category. */
 	modes: {
 		color: ModeInfo;
 		size: ModeInfo;
-		time: ModeInfo;
+	};
+
+	/** Simultaneously emitted atomic scales. */
+	scales: {
+		time: ScaleInfo;
 	};
 
 	/** Override tokens by mode name, only contains tokens that differ from default */
@@ -197,4 +210,10 @@ export interface GeneratorResult {
 
 	/** Mode information */
 	modeInfo: ModeInfo;
+}
+
+/** Time scales are all root tokens and therefore have no override-mode surface. */
+export interface TimeGeneratorResult {
+	defaultTokens: TokenValue[];
+	scaleInfo: ScaleInfo;
 }

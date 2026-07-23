@@ -282,7 +282,6 @@ output: {
 			root: ':root',
 			colorMode: '[data-color-mode="{mode}"]',
 			sizeMode: '[data-size-mode="{mode}"]',
-			timeMode: '[data-time-mode="{mode}"]',
 		},
 	},
 	typographyCss: {

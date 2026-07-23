@@ -13,6 +13,8 @@ import type {
 	GeneratorOptions,
 	GeneratorResult,
 	ModeInfo,
+	ScaleInfo,
+	TimeGeneratorResult,
 } from './types.js';
 import { defaultGeneratorConfig } from './types.js';
 import { validatePartialDesignSystem, ValidationError } from './validate.js';
@@ -31,6 +33,8 @@ export type {
 	GeneratorOptions,
 	GeneratorResult,
 	ModeInfo,
+	ScaleInfo,
+	TimeGeneratorResult,
 	TypographyContract,
 } from './types.js';
 
@@ -41,6 +45,11 @@ const emptyResult: GeneratorResult = {
 	defaultTokens: [],
 	overrideTokens: {},
 	modeInfo: { default: '', overrides: [] },
+};
+
+const emptyTimeResult: TimeGeneratorResult = {
+	defaultTokens: [],
+	scaleInfo: { default: '', names: [] },
 };
 
 const cssNamespacePattern = /^[a-z][a-z0-9-]*$/i;
@@ -187,7 +196,7 @@ export function generate(
 
 	const timeResult = designSystem.time
 		? generateTimeTokens(designSystem.time, config)
-		: emptyResult;
+		: emptyTimeResult;
 
 	const results = {
 		colors: colorResult,
@@ -196,7 +205,6 @@ export function generate(
 		typography: typographyResult,
 		borderRadius: borderRadiusResult,
 		borderWidth: borderWidthResult,
-		time: timeResult,
 	};
 
 	// Combine all default tokens
@@ -241,10 +249,6 @@ export function generate(
 		if (borderWidthResult.overrideTokens[modeName]) {
 			modeTokens.push(...borderWidthResult.overrideTokens[modeName]);
 		}
-		if (timeResult.overrideTokens[modeName]) {
-			modeTokens.push(...timeResult.overrideTokens[modeName]);
-		}
-
 		if (modeTokens.length > 0) {
 			overrideTokens[modeName] = tokensToRecord(modeTokens, `mode "${modeName}"`);
 		}
@@ -252,8 +256,6 @@ export function generate(
 
 	// Build mode info
 	const colorOverrides = colorResult.modeInfo.overrides;
-	const timeOverrides = timeResult.modeInfo.overrides;
-
 	// Size overrides: union of all size family overrides
 	const sizeOverridesSet = new Set<string>();
 	[spacingResult, gapResult, typographyResult, borderRadiusResult, borderWidthResult].forEach(
@@ -282,10 +284,9 @@ export function generate(
 				default: sizeDefault,
 				overrides: sizeOverrides,
 			},
-			time: {
-				default: timeResult.modeInfo.default,
-				overrides: timeOverrides,
-			},
+		},
+		scales: {
+			time: timeResult.scaleInfo,
 		},
 		overrideTokens,
 	};

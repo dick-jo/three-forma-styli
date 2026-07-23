@@ -11,6 +11,12 @@ function recipeManifest(recipe: TypographyContract['roles'][string]['base']) {
 		weight: recipe.weight,
 		lineHeight: variable(recipe.lineHeightToken),
 		letterSpacing: variable(recipe.letterSpacingToken),
+		...(recipe.textTransformToken
+			? {
+					textTransform: variable(recipe.textTransformToken),
+					textTransformValue: recipe.textTransform,
+				}
+			: {}),
 		...(recipe.fontKerningToken ? { fontKerning: variable(recipe.fontKerningToken) } : {}),
 		...(recipe.fontOpticalSizingToken
 			? { fontOpticalSizing: variable(recipe.fontOpticalSizingToken) }

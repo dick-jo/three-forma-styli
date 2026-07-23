@@ -114,21 +114,21 @@ These are active design investigations, not approved core contracts. Resolve the
 author-facing vocabulary and derivation rules before implementation; Scatter is
 reference evidence, not hardcoded policy.
 
-- [ ] Add typography-role text-transform decisions, resolved into every complete
+- [x] Add typography-role text-transform decisions, resolved into every complete
       recipe and available to generated CSS/TypeScript consumers. Preserve source
       text and keep role names and transform values author-defined.
 - [ ] Add first-class composite shadow tokens with ordered multi-layer values,
       explicit semantic colour references, safe interpolation rules, and review
       specimens for elevation, glow, clipping, banding, and light/dark surfaces.
-- [ ] Recalibrate Scatter's shimmer palette per native colour mode. Separate the
-      effect's authored colour contract from its animation/motion contract, and
-      include the chosen fixed-colour policy in custom runtime themes.
-- [ ] Replace the under-specified time model with a coherent duration/easing/motion
-      architecture. Current `time.modes` are actually simultaneously emitted
-      duration namespaces, not switchable modes.
+- [ ] Deferred: recalibrate Scatter's shimmer palette per native colour mode as
+      an authored colour/theme concern. Do not couple it to the motion system.
+- [x] Correct the under-specified time model: simultaneously emitted duration
+      namespaces are now authored and exported as `time.scales`, not switchable
+      modes. Easing and semantic motion recipes remain pending.
 - [ ] Preserve atomic duration primitives, add arbitrary author-named cubic-bezier
-      easing primitives, and add a deliberately small set of semantic transition
-      recipes containing property, duration, easing, and delay.
+      easing primitives, and add arbitrary author-named semantic motion recipes.
+      Each recipe has an unsuffixed base plus any author-named variants and resolves
+      only duration, easing, and delay—never a list of CSS properties.
 - [ ] Generate equivalent CSS and typed JavaScript motion contracts so CSS
       transitions and application animation libraries do not maintain separate
       timing values.

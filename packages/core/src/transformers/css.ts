@@ -34,7 +34,6 @@ export interface CssTransformerConfig {
 		root?: string;
 		colorMode?: string;
 		sizeMode?: string;
-		timeMode?: string;
 	};
 
 	/**
@@ -52,7 +51,6 @@ const defaultSelectors: ResolvedCssConfig['selectors'] = {
 	root: ':root',
 	colorMode: '[data-color-mode="{mode}"]',
 	sizeMode: '[data-size-mode="{mode}"]',
-	timeMode: '[data-time-mode="{mode}"]',
 };
 
 /**
@@ -71,7 +69,6 @@ interface ResolvedCssConfig {
 		root: string;
 		colorMode: string;
 		sizeMode: string;
-		timeMode: string;
 	};
 }
 
@@ -90,10 +87,7 @@ function mergeConfig(userConfig?: CssTransformerConfig): ResolvedCssConfig {
 /**
  * Determine which category a mode belongs to based on which tokens it contains
  */
-function getModeCategory(
-	modeName: string,
-	ir: IR
-): 'color' | 'size' | 'time' | null {
+function getModeCategory(modeName: string, ir: IR): 'color' | 'size' | null {
 	// Check color modes
 	if (ir.modes.color.overrides.includes(modeName)) {
 		return 'color';
@@ -104,11 +98,6 @@ function getModeCategory(
 		return 'size';
 	}
 
-	// Check time modes
-	if (ir.modes.time.overrides.includes(modeName)) {
-		return 'time';
-	}
-
 	return null;
 }
 
@@ -117,7 +106,7 @@ function getModeCategory(
  */
 function getSelectorForMode(
 	modeName: string,
-	category: 'color' | 'size' | 'time',
+	category: 'color' | 'size',
 	config: ResolvedCssConfig
 ): string {
 	switch (category) {
@@ -125,8 +114,6 @@ function getSelectorForMode(
 			return config.selectors.colorMode.replace('{mode}', modeName);
 		case 'size':
 			return config.selectors.sizeMode.replace('{mode}', modeName);
-		case 'time':
-			return config.selectors.timeMode.replace('{mode}', modeName);
 	}
 }
 

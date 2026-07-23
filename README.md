@@ -282,7 +282,6 @@ Modes are grouped into categories with separate CSS selectors:
 | -------- | -------------------------------- | ------------------------- |
 | `color`  | colors                           | `[data-color-mode="..."]` |
 | `size`   | spacing, gap, typography, border | `[data-size-mode="..."]`  |
-| `time`   | time                             | `[data-time-mode="..."]`  |
 
 Typography may define multiple atomic size modes just like spacing. Semantic roles
 continue to reference the stable `--fs-*` names, so a compact mode can alter the
@@ -305,6 +304,11 @@ tuple: omitted fields retain the role recipe, while authored `fontSize`,
 `weight`, `lineHeight`, or `letterSpacing` values are emitted only inside that
 mode selector. Mode and variant names are validated; TFS never guesses which
 roles should tighten, grow, or become heavier.
+
+Time values are scales, not modes. Every authored scale is emitted into `:root`
+at once: the default scale produces `--t-*`, while an additional `ambient`
+scale produces `--t-ambient-*`. They never create a selector or compete for one
+active state.
 
 ## Programmatic Usage
 

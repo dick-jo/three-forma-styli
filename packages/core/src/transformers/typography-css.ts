@@ -86,6 +86,9 @@ export function toTypographyCss(ir: IR, options: TypographyCssConfig = {}): stri
 			`font-synthesis: none;`,
 			`line-height: ${variable(recipe.lineHeightToken)};`,
 			`letter-spacing: ${variable(recipe.letterSpacingToken)};`,
+			...(recipe.textTransformToken
+				? [`text-transform: ${variable(recipe.textTransformToken)};`]
+				: []),
 			...(recipe.fontKerningToken ? [`font-kerning: ${variable(recipe.fontKerningToken)};`] : []),
 			...(recipe.fontOpticalSizingToken
 				? [`font-optical-sizing: ${variable(recipe.fontOpticalSizingToken)};`]
