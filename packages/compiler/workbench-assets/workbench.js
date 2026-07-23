@@ -1,14 +1,6190 @@
-var vs=Object.defineProperty;var Pa=e=>{throw TypeError(e)};var hs=(e,t,n)=>t in e?vs(e,t,{enumerable:!0,configurable:!0,writable:!0,value:n}):e[t]=n;var qe=(e,t,n)=>hs(e,typeof t!="symbol"?t+"":t,n),qr=(e,t,n)=>t.has(e)||Pa("Cannot "+n);var d=(e,t,n)=>(qr(e,t,"read from private field"),n?n.call(e):t.get(e)),B=(e,t,n)=>t.has(e)?Pa("Cannot add the same private member more than once"):t instanceof WeakSet?t.add(e):t.set(e,n),z=(e,t,n,r)=>(qr(e,t,"write to private field"),r?r.call(e,n):t.set(e,n),n),Z=(e,t,n)=>(qr(e,t,"access private method"),n);(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const a of document.querySelectorAll('link[rel="modulepreload"]'))r(a);new MutationObserver(a=>{for(const s of a)if(s.type==="childList")for(const l of s.addedNodes)l.tagName==="LINK"&&l.rel==="modulepreload"&&r(l)}).observe(document,{childList:!0,subtree:!0});function n(a){const s={};return a.integrity&&(s.integrity=a.integrity),a.referrerPolicy&&(s.referrerPolicy=a.referrerPolicy),a.crossOrigin==="use-credentials"?s.credentials="include":a.crossOrigin==="anonymous"?s.credentials="omit":s.credentials="same-origin",s}function r(a){if(a.ep)return;a.ep=!0;const s=n(a);fetch(a.href,s)}})();const ri=!1;var da=Array.isArray,ps=Array.prototype.indexOf,xr=Array.prototype.includes,jr=Array.from,_s=Object.defineProperty,Hn=Object.getOwnPropertyDescriptor,gs=Object.getOwnPropertyDescriptors,ms=Object.prototype,ws=Array.prototype,ai=Object.getPrototypeOf,Da=Object.isExtensible;const bs=()=>{};function ys(e){for(var t=0;t<e.length;t++)e[t]()}function ii(){var e,t,n=new Promise((r,a)=>{e=r,t=a});return{promise:n,resolve:e,reject:t}}function si(e,t){if(Array.isArray(e))return e;if(!(Symbol.iterator in e))return Array.from(e);const n=[];for(const r of e)if(n.push(r),n.length===t)break;return n}const be=2,Tn=4,Lr=8,oi=1<<24,ut=16,tt=32,Ft=64,Jr=128,$e=512,we=1024,_e=2048,vt=4096,Ae=8192,et=16384,On=32768,Zr=1<<25,An=65536,Er=1<<17,ks=1<<18,jn=1<<19,xs=1<<20,gt=1<<25,ln=65536,Sr=1<<21,mn=1<<22,Bt=1<<23,wn=Symbol("$state"),Es=Symbol(""),pr=Symbol("attributes"),Qr=Symbol("class"),Xr=Symbol("style"),zn=Symbol("text"),_r=Symbol("form reset"),nr=new class extends Error{constructor(){super(...arguments);qe(this,"name","StaleReactionError");qe(this,"message","The reaction that called `getAbortSignal()` was re-run or destroyed")}};var ei;const Ss=!!((ei=globalThis.document)!=null&&ei.contentType)&&globalThis.document.contentType.includes("xml");function Cs(){throw new Error("https://svelte.dev/e/async_derived_orphan")}function Ts(e,t,n){throw new Error("https://svelte.dev/e/each_key_duplicate")}function As(e){throw new Error("https://svelte.dev/e/effect_in_teardown")}function Fs(){throw new Error("https://svelte.dev/e/effect_in_unowned_derived")}function Rs(e){throw new Error("https://svelte.dev/e/effect_orphan")}function Ms(){throw new Error("https://svelte.dev/e/effect_update_depth_exceeded")}function Os(){throw new Error("https://svelte.dev/e/state_descriptors_fixed")}function js(){throw new Error("https://svelte.dev/e/state_prototype_fixed")}function Ls(){throw new Error("https://svelte.dev/e/state_unsafe_mutation")}function Ns(){throw new Error("https://svelte.dev/e/svelte_boundary_reset_onerror")}const Ps=1,Ds=2,li=4,Is=8,zs=16,Bs=1,qs=2,me=Symbol("uninitialized"),Us="http://www.w3.org/1999/xhtml";function Vs(){console.warn("https://svelte.dev/e/derived_inert")}function Hs(){console.warn("https://svelte.dev/e/select_multiple_invalid_value")}function Ws(){console.warn("https://svelte.dev/e/svelte_boundary_reset_noop")}function ci(e){return e===this.v}function Gs(e,t){return e!=e?t==t:e!==t||e!==null&&typeof e=="object"||typeof e=="function"}function fi(e){return!Gs(e,this.v)}let Ks=!1,Fe=null;function Fn(e){Fe=e}function bt(e,t=!1,n){Fe={p:Fe,i:!1,c:null,e:null,s:e,x:null,r:Y,l:null}}function yt(e){var t=Fe,n=t.e;if(n!==null){t.e=null;for(var r of n)Ri(r)}return t.i=!0,Fe=t.p,{}}function ui(){return!0}let Jt=[];function di(){var e=Jt;Jt=[],ys(e)}function qt(e){if(Jt.length===0&&!Gn){var t=Jt;queueMicrotask(()=>{t===Jt&&di()})}Jt.push(e)}function Ys(){for(;Jt.length>0;)di()}function vi(e){var t=Y;if(t===null)return V.f|=Bt,e;if((t.f&On)===0&&(t.f&Tn)===0)throw e;zt(e,t)}function zt(e,t){if(!(t!==null&&(t.f&et)!==0)){for(;t!==null;){if((t.f&Jr)!==0){if((t.f&On)===0)throw e;try{t.b.error(e);return}catch(n){e=n}}t=t.parent}throw e}}const Js=-7169;function fe(e,t){e.f=e.f&Js|t}function va(e){(e.f&$e)!==0||e.deps===null?fe(e,we):fe(e,vt)}function hi(e){if(e!==null)for(const t of e)(t.f&be)===0||(t.f&ln)===0||(t.f^=ln,hi(t.deps))}function pi(e,t,n){(e.f&_e)!==0?t.add(e):(e.f&vt)!==0&&n.add(e),hi(e.deps),fe(e,we)}let Ia=!1;function Zs(){Ia||(Ia=!0,document.addEventListener("reset",e=>{Promise.resolve().then(()=>{var t;if(!e.defaultPrevented)for(const n of e.target.elements)(t=n[_r])==null||t.call(n)})},{capture:!0}))}function Ln(e){var t=V,n=Y;nt(null),wt(null);try{return e()}finally{nt(t),wt(n)}}function ha(e,t,n,r=n){e.addEventListener(t,()=>Ln(n));const a=e[_r];a?e[_r]=()=>{a(),r(!0)}:e[_r]=()=>r(!0),Zs()}function Qs(e){let t=0,n=fn(0),r;return()=>{wa()&&(i(n),Nr(()=>(t===0&&(r=ir(()=>e(()=>Kn(n)))),t+=1,()=>{qt(()=>{t-=1,t===0&&(r==null||r(),r=void 0,Kn(n))})})))}}var Xs=An|jn;function $s(e,t,n,r){new eo(e,t,n,r)}var Je,ua,Ze,$t,Me,Qe,Ce,Ve,St,en,Dt,bn,Qn,Xn,Ct,Rr,ue,to,no,ro,$r,gr,mr,ea,ta;class eo{constructor(t,n,r,a){B(this,ue);qe(this,"parent");qe(this,"is_pending",!1);qe(this,"transform_error");B(this,Je);B(this,ua,null);B(this,Ze);B(this,$t);B(this,Me);B(this,Qe,null);B(this,Ce,null);B(this,Ve,null);B(this,St,null);B(this,en,0);B(this,Dt,0);B(this,bn,!1);B(this,Qn,new Set);B(this,Xn,new Set);B(this,Ct,null);B(this,Rr,Qs(()=>(z(this,Ct,fn(d(this,en))),()=>{z(this,Ct,null)})));var s;z(this,Je,t),z(this,Ze,n),z(this,$t,l=>{var c=Y;c.b=this,c.f|=Jr,r(l)}),this.parent=Y.b,this.transform_error=a??((s=this.parent)==null?void 0:s.transform_error)??(l=>l),z(this,Me,Pr(()=>{Z(this,ue,$r).call(this)},Xs))}defer_effect(t){pi(t,d(this,Qn),d(this,Xn))}is_rendered(){return!this.is_pending&&(!this.parent||this.parent.is_rendered())}has_pending_snippet(){return!!d(this,Ze).pending}update_pending_count(t,n){Z(this,ue,ea).call(this,t,n),z(this,en,d(this,en)+t),!(!d(this,Ct)||d(this,bn))&&(z(this,bn,!0),qt(()=>{z(this,bn,!1),d(this,Ct)&&Rn(d(this,Ct),d(this,en))}))}get_effect_pending(){return d(this,Rr).call(this),i(d(this,Ct))}error(t){if(!d(this,Ze).onerror&&!d(this,Ze).failed)throw t;O!=null&&O.is_fork?(d(this,Qe)&&O.skip_effect(d(this,Qe)),d(this,Ce)&&O.skip_effect(d(this,Ce)),d(this,Ve)&&O.skip_effect(d(this,Ve)),O.oncommit(()=>{Z(this,ue,ta).call(this,t)})):Z(this,ue,ta).call(this,t)}}Je=new WeakMap,ua=new WeakMap,Ze=new WeakMap,$t=new WeakMap,Me=new WeakMap,Qe=new WeakMap,Ce=new WeakMap,Ve=new WeakMap,St=new WeakMap,en=new WeakMap,Dt=new WeakMap,bn=new WeakMap,Qn=new WeakMap,Xn=new WeakMap,Ct=new WeakMap,Rr=new WeakMap,ue=new WeakSet,to=function(){try{z(this,Qe,Xe(()=>d(this,$t).call(this,d(this,Je))))}catch(t){this.error(t)}},no=function(t){const n=d(this,Ze).failed;n&&z(this,Ve,Xe(()=>{n(d(this,Je),()=>t,()=>()=>{})}))},ro=function(){const t=d(this,Ze).pending;t&&(this.is_pending=!0,z(this,Ce,Xe(()=>t(d(this,Je)))),qt(()=>{var n=z(this,St,document.createDocumentFragment()),r=Ut();n.append(r),z(this,Qe,Z(this,ue,mr).call(this,()=>Xe(()=>d(this,$t).call(this,r)))),d(this,Dt)===0&&(d(this,Je).before(n),z(this,St,null),sn(d(this,Ce),()=>{z(this,Ce,null)}),Z(this,ue,gr).call(this,O))}))},$r=function(){try{if(this.is_pending=this.has_pending_snippet(),z(this,Dt,0),z(this,en,0),z(this,Qe,Xe(()=>{d(this,$t).call(this,d(this,Je))})),d(this,Dt)>0){var t=z(this,St,document.createDocumentFragment());ka(d(this,Qe),t);const n=d(this,Ze).pending;z(this,Ce,Xe(()=>n(d(this,Je))))}else Z(this,ue,gr).call(this,O)}catch(n){this.error(n)}},gr=function(t){this.is_pending=!1,t.transfer_effects(d(this,Qn),d(this,Xn))},mr=function(t){var n=Y,r=V,a=Fe;wt(d(this,Me)),nt(d(this,Me)),Fn(d(this,Me).ctx);try{return cn.ensure(),t()}catch(s){return vi(s),null}finally{wt(n),nt(r),Fn(a)}},ea=function(t,n){var r;if(!this.has_pending_snippet()){this.parent&&Z(r=this.parent,ue,ea).call(r,t,n);return}z(this,Dt,d(this,Dt)+t),d(this,Dt)===0&&(Z(this,ue,gr).call(this,n),d(this,Ce)&&sn(d(this,Ce),()=>{z(this,Ce,null)}),d(this,St)&&(d(this,Je).before(d(this,St)),z(this,St,null)))},ta=function(t){d(this,Qe)&&(Ie(d(this,Qe)),z(this,Qe,null)),d(this,Ce)&&(Ie(d(this,Ce)),z(this,Ce,null)),d(this,Ve)&&(Ie(d(this,Ve)),z(this,Ve,null));var n=d(this,Ze).onerror;let r=d(this,Ze).failed;var a=!1,s=!1;const l=()=>{if(a){Ws();return}a=!0,s&&Ns(),d(this,Ve)!==null&&sn(d(this,Ve),()=>{z(this,Ve,null)}),Z(this,ue,mr).call(this,()=>{Z(this,ue,$r).call(this)})},c=o=>{try{s=!0,n==null||n(o,l),s=!1}catch(f){zt(f,d(this,Me)&&d(this,Me).parent)}r&&z(this,Ve,Z(this,ue,mr).call(this,()=>{try{return Xe(()=>{var f=Y;f.b=this,f.f|=Jr,r(d(this,Je),()=>o,()=>l)})}catch(f){return zt(f,d(this,Me).parent),null}}))};qt(()=>{var o;try{o=this.transform_error(t)}catch(f){zt(f,d(this,Me)&&d(this,Me).parent);return}o!==null&&typeof o=="object"&&typeof o.then=="function"?o.then(c,f=>zt(f,d(this,Me)&&d(this,Me).parent)):c(o)})};function ao(e,t,n,r){const a=pa;var s=e.filter(g=>!g.settled),l=t.map(a);if(n.length===0&&s.length===0){r(l);return}var c=Y,o=io(),f=s.length===1?s[0].promise:s.length>1?Promise.all(s.map(g=>g.promise)):null;function v(g){if((c.f&et)===0){o();try{r([...l,...g])}catch(m){zt(m,c)}Cr()}}var k=_i();if(n.length===0){f.then(()=>v([])).finally(k);return}function h(){Promise.all(n.map(g=>so(g))).then(v).catch(g=>zt(g,c)).finally(k)}f?f.then(()=>{o(),h(),Cr()}):h()}function io(){var e=Y,t=V,n=Fe,r=O;return function(s=!0){wt(e),nt(t),Fn(n),s&&(e.f&et)===0&&(r==null||r.activate(),r==null||r.apply())}}function Cr(e=!0){wt(null),nt(null),Fn(null),e&&(O==null||O.deactivate())}function _i(){var e=Y,t=e.b,n=O,r=!!(t!=null&&t.is_rendered());return t==null||t.update_pending_count(1,n),n.increment(r,e),()=>{t==null||t.update_pending_count(-1,n),n.decrement(r,e)}}function pa(e){var t=be|_e;return Y!==null&&(Y.f|=jn),{ctx:Fe,deps:null,effects:null,equals:ci,f:t,fn:e,reactions:null,rv:0,v:me,wv:0,parent:Y,ac:null}}const Bn=Symbol("obsolete");function so(e,t,n){let r=Y;r===null&&Cs();var a=void 0,s=fn(me),l=!V,c=new Set;return Eo(()=>{var g,m;var o=Y,f=ii();a=f.promise;try{Promise.resolve(e()).then(f.resolve,x=>{x!==nr&&f.reject(x)}).finally(Cr)}catch(x){f.reject(x),Cr()}var v=O;if(l){if((o.f&On)!==0)var k=_i();if((g=r.b)!=null&&g.is_rendered())(m=v.async_deriveds.get(o))==null||m.reject(Bn);else for(const x of c.values())x.reject(Bn);c.add(f),v.async_deriveds.set(o,f)}const h=(x,y=void 0)=>{k==null||k(),c.delete(f),y!==Bn&&(v.activate(),y?(s.f|=Bt,Rn(s,y)):((s.f&Bt)!==0&&(s.f^=Bt),Rn(s,x)),v.deactivate())};f.promise.then(h,x=>h(null,x||"unknown"))}),ba(()=>{for(const o of c)o.reject(Bn)}),new Promise(o=>{function f(v){function k(){v===a?o(s):f(a)}v.then(k,k)}f(a)})}function ge(e){const t=pa(e);return Pi(t),t}function oo(e){const t=pa(e);return t.equals=fi,t}function lo(e){var t=e.effects;if(t!==null){e.effects=null;for(var n=0;n<t.length;n+=1)Ie(t[n])}}function _a(e){var t,n=Y,r=e.parent;if(!Vt&&r!==null&&e.v!==me&&(r.f&(et|Ae))!==0)return Vs(),e.v;wt(r);try{e.f&=~ln,lo(e),t=Bi(e)}finally{wt(n)}return t}function gi(e){var t=_a(e);if(!e.equals(t)&&(e.wv=Ii(),(!(O!=null&&O.is_fork)||e.deps===null)&&(O!==null?(O.capture(e,t,!0),Wn==null||Wn.capture(e,t,!0)):e.v=t,e.deps===null))){fe(e,we);return}Vt||(ye!==null?(wa()||O!=null&&O.is_fork)&&ye.set(e,t):va(e))}function co(e){var t;if(e.effects!==null)for(const n of e.effects)(n.teardown||n.ac)&&((t=n.teardown)==null||t.call(n),n.ac!==null&&Ln(()=>{n.ac.abort(nr),n.ac=null}),n.fn!==null&&(n.teardown=bs),Zn(n,0),ya(n))}function mi(e){if(e.effects!==null)for(const t of e.effects)t.teardown&&t.fn!==null&&Mn(t)}let Ur=null,hn=null,O=null,Wn=null,ye=null,na=null,Gn=!1,Vr=!1,gn=null,wr=null;var za=0;let fo=1;var yn,It,tn,kn,xn,En,Tt,Sn,Oe,$n,At,lt,pt,Cn,nn,$,ra,qn,aa,wi,bi,pn,uo,Un;const Mr=class Mr{constructor(){B(this,$);qe(this,"id",fo++);B(this,yn,!1);qe(this,"linked",!0);B(this,It,null);B(this,tn,null);qe(this,"async_deriveds",new Map);qe(this,"current",new Map);qe(this,"previous",new Map);B(this,kn,new Set);B(this,xn,new Set);B(this,En,0);B(this,Tt,new Map);B(this,Sn,null);B(this,Oe,[]);B(this,$n,[]);B(this,At,new Set);B(this,lt,new Set);B(this,pt,new Map);B(this,Cn,new Set);qe(this,"is_fork",!1);B(this,nn,!1);hn===null?Ur=hn=this:(z(hn,tn,this),z(this,It,hn)),hn=this}skip_effect(t){d(this,pt).has(t)||d(this,pt).set(t,{d:[],m:[]}),d(this,Cn).delete(t)}unskip_effect(t,n=r=>this.schedule(r)){var r=d(this,pt).get(t);if(r){d(this,pt).delete(t);for(var a of r.d)fe(a,_e),n(a);for(a of r.m)fe(a,vt),n(a)}d(this,Cn).add(t)}capture(t,n,r=!1){t.v!==me&&!this.previous.has(t)&&this.previous.set(t,t.v),(t.f&Bt)===0&&(this.current.set(t,[n,r]),ye==null||ye.set(t,n)),this.is_fork||(t.v=n)}activate(){O=this}deactivate(){O=null,ye=null}flush(){try{Vr=!0,O=this,Z(this,$,qn).call(this)}finally{za=0,na=null,gn=null,wr=null,Vr=!1,O=null,ye=null,an.clear()}}discard(){var t;for(const n of d(this,xn))n(this);d(this,xn).clear();for(const n of this.async_deriveds.values())n.reject(Bn);Z(this,$,Un).call(this),(t=d(this,Sn))==null||t.resolve()}register_created_effect(t){d(this,$n).push(t)}increment(t,n){if(z(this,En,d(this,En)+1),t){let r=d(this,Tt).get(n)??0;d(this,Tt).set(n,r+1)}}decrement(t,n){if(z(this,En,d(this,En)-1),t){let r=d(this,Tt).get(n)??0;r===1?d(this,Tt).delete(n):d(this,Tt).set(n,r-1)}d(this,nn)||(z(this,nn,!0),qt(()=>{z(this,nn,!1),this.linked&&this.flush()}))}transfer_effects(t,n){for(const r of t)d(this,At).add(r);for(const r of n)d(this,lt).add(r);t.clear(),n.clear()}oncommit(t){d(this,kn).add(t)}ondiscard(t){d(this,xn).add(t)}settled(){return(d(this,Sn)??z(this,Sn,ii())).promise}static ensure(){if(O===null){const t=O=new Mr;!Vr&&!Gn&&qt(()=>{d(t,yn)||t.flush()})}return O}apply(){{ye=null;return}}schedule(t){var a;if(na=t,(a=t.b)!=null&&a.is_pending&&(t.f&(Tn|Lr|oi))!==0&&(t.f&On)===0){t.b.defer_effect(t);return}for(var n=t;n.parent!==null;){n=n.parent;var r=n.f;if(gn!==null&&n===Y&&(V===null||(V.f&be)===0))return;if((r&(Ft|tt))!==0){if((r&we)===0)return;n.f^=we}}d(this,Oe).push(n)}};yn=new WeakMap,It=new WeakMap,tn=new WeakMap,kn=new WeakMap,xn=new WeakMap,En=new WeakMap,Tt=new WeakMap,Sn=new WeakMap,Oe=new WeakMap,$n=new WeakMap,At=new WeakMap,lt=new WeakMap,pt=new WeakMap,Cn=new WeakMap,nn=new WeakMap,$=new WeakSet,ra=function(){if(this.is_fork)return!0;for(const r of d(this,Tt).keys()){for(var t=r,n=!1;t.parent!==null;){if(d(this,pt).has(t)){n=!0;break}t=t.parent}if(!n)return!0}return!1},qn=function(){var o,f,v,k;z(this,yn,!0),za++>1e3&&(Z(this,$,Un).call(this),ho());for(const h of d(this,At))d(this,lt).delete(h),fe(h,_e),this.schedule(h);for(const h of d(this,lt))fe(h,vt),this.schedule(h);const t=d(this,Oe);z(this,Oe,[]),this.apply();var n=gn=[],r=[],a=wr=[];for(const h of t)try{Z(this,$,aa).call(this,h,n,r)}catch(g){throw xi(h),Z(this,$,ra).call(this)||this.discard(),g}if(O=null,a.length>0){var s=Mr.ensure();for(const h of a)s.schedule(h)}if(gn=null,wr=null,Z(this,$,ra).call(this)){Z(this,$,pn).call(this,r),Z(this,$,pn).call(this,n);for(const[h,g]of d(this,pt))ki(h,g);a.length>0&&Z(o=O,$,qn).call(o);return}const l=Z(this,$,wi).call(this);if(l){Z(this,$,pn).call(this,r),Z(this,$,pn).call(this,n),Z(f=l,$,bi).call(f,this);return}d(this,At).clear(),d(this,lt).clear();for(const h of d(this,kn))h(this);d(this,kn).clear(),Wn=this,Ba(r),Ba(n),Wn=null,(v=d(this,Sn))==null||v.resolve();var c=O;if(d(this,En)===0&&(d(this,Oe).length===0||c!==null)&&Z(this,$,Un).call(this),d(this,Oe).length>0)if(c!==null){const h=c;d(h,Oe).push(...d(this,Oe).filter(g=>!d(h,Oe).includes(g)))}else c=this;c!==null&&Z(k=c,$,qn).call(k)},aa=function(t,n,r){t.f^=we;for(var a=t.first;a!==null;){var s=a.f,l=(s&(tt|Ft))!==0,c=l&&(s&we)!==0,o=c||(s&Ae)!==0||d(this,pt).has(a);if(!o&&a.fn!==null){l?a.f^=we:(s&Tn)!==0?n.push(a):ar(a)&&((s&ut)!==0&&d(this,lt).add(a),Mn(a));var f=a.first;if(f!==null){a=f;continue}}for(;a!==null;){var v=a.next;if(v!==null){a=v;break}a=a.parent}}},wi=function(){for(var t=d(this,It);t!==null;){if(!t.is_fork){for(const[n,[,r]]of this.current)if(t.current.has(n)&&!r)return t}t=d(t,It)}return null},bi=function(t){var r;for(const[a,s]of t.current)!this.previous.has(a)&&t.previous.has(a)&&this.previous.set(a,t.previous.get(a)),this.current.set(a,s);for(const[a,s]of t.async_deriveds){const l=this.async_deriveds.get(a);l&&s.promise.then(l.resolve).catch(l.reject)}t.async_deriveds.clear(),this.transfer_effects(d(t,At),d(t,lt));const n=a=>{var s=a.reactions;if(s!==null&&!((a.f&be)!==0&&(a.f&(_e|vt))===0))for(const o of s){var l=o.f;if((l&be)!==0)n(o);else{var c=o;l&(mn|ut)&&!this.async_deriveds.has(c)&&(d(this,lt).delete(c),fe(c,_e),this.schedule(c))}}};for(const a of this.current.keys())n(a);this.oncommit(()=>t.discard()),Z(r=t,$,Un).call(r),O=this,Z(this,$,qn).call(this)},pn=function(t){for(var n=0;n<t.length;n+=1)pi(t[n],d(this,At),d(this,lt))},uo=function(){var k;for(let h=Ur;h!==null;h=d(h,tn)){var t=h.id<this.id,n=[];for(const[g,[m,x]]of this.current){if(h.current.has(g)){var r=h.current.get(g)[0];if(t&&m!==r)h.current.set(g,[m,x]);else continue}n.push(g)}if(t)for(const[g,m]of this.async_deriveds){const x=h.async_deriveds.get(g);x&&m.promise.then(x.resolve).catch(x.reject)}var a=[...h.current.keys()].filter(g=>!h.current.get(g)[1]);if(!(!d(h,yn)||a.length===0)){var s=a.filter(g=>!this.current.has(g));if(s.length===0)t&&h.discard();else if(n.length>0){if(t)for(const g of d(this,Cn))h.unskip_effect(g,m=>{var x;(m.f&(ut|mn))!==0?h.schedule(m):Z(x=h,$,pn).call(x,[m])});h.activate();var l=new Set,c=new Map;for(var o of n)yi(o,s,l,c);c=new Map;var f=[...h.current].filter(([g,m])=>{const x=this.current.get(g);return x?x[0]!==m[0]||x[1]!==m[1]:!0}).map(([g])=>g);if(f.length>0)for(const g of d(this,$n))(g.f&(et|Ae|Er))===0&&ga(g,f,c)&&((g.f&(mn|ut))!==0?(fe(g,_e),h.schedule(g)):d(h,At).add(g));if(d(h,Oe).length>0&&!d(h,nn)){h.apply();for(var v of d(h,Oe))Z(k=h,$,aa).call(k,v,[],[]);z(h,Oe,[])}h.deactivate()}}}},Un=function(){if(this.linked){var t=d(this,It),n=d(this,tn);t===null?Ur=n:z(t,tn,n),n===null?hn=t:z(n,It,t),this.linked=!1}};let cn=Mr;function vo(e){var t=Gn;Gn=!0;try{for(var n;;){if(Ys(),O===null)return n;O.flush()}}finally{Gn=t}}function ho(){try{Ms()}catch(e){zt(e,na)}}let ot=null;function Ba(e){var t=e.length;if(t!==0){for(var n=0;n<t;){var r=e[n++];if((r.f&(et|Ae))===0&&ar(r)&&(ot=new Set,Mn(r),r.deps===null&&r.first===null&&r.nodes===null&&r.teardown===null&&r.ac===null&&ji(r),(ot==null?void 0:ot.size)>0)){an.clear();for(const a of ot){if((a.f&(et|Ae))!==0)continue;const s=[a];let l=a.parent;for(;l!==null;)ot.has(l)&&(ot.delete(l),s.push(l)),l=l.parent;for(let c=s.length-1;c>=0;c--){const o=s[c];(o.f&(et|Ae))===0&&Mn(o)}}ot.clear()}}ot=null}}function yi(e,t,n,r){if(!n.has(e)&&(n.add(e),e.reactions!==null))for(const a of e.reactions){const s=a.f;(s&be)!==0?yi(a,t,n,r):(s&(mn|ut))!==0&&(s&_e)===0&&ga(a,t,r)&&(fe(a,_e),ma(a))}}function ga(e,t,n){const r=n.get(e);if(r!==void 0)return r;if(e.deps!==null)for(const a of e.deps){if(xr.call(t,a))return!0;if((a.f&be)!==0&&ga(a,t,n))return n.set(a,!0),!0}return n.set(e,!1),!1}function ma(e){O.schedule(e)}function ki(e,t){if(!((e.f&tt)!==0&&(e.f&we)!==0)){(e.f&_e)!==0?t.d.push(e):(e.f&vt)!==0&&t.m.push(e),fe(e,we);for(var n=e.first;n!==null;)ki(n,t),n=n.next}}function xi(e){fe(e,we);for(var t=e.first;t!==null;)xi(t),t=t.next}let Tr=new Set;const an=new Map;let Ei=!1;function fn(e,t){var n={f:0,v:e,reactions:null,equals:ci,rv:0,wv:0};return n}function J(e,t){const n=fn(e);return Pi(n),n}function po(e,t=!1,n=!0){const r=fn(e);return t||(r.equals=fi),r}function E(e,t,n=!1){V!==null&&(!dt||(V.f&Er)!==0)&&ui()&&(V.f&(be|ut|mn|Er))!==0&&(mt===null||!mt.has(e))&&Ls();let r=n?je(t):t;return Rn(e,r,wr)}function Rn(e,t,n=null){if(!e.equals(t)){an.set(e,Vt?t:e.v);var r=cn.ensure();if(r.capture(e,t),(e.f&be)!==0){const a=e;(e.f&_e)!==0&&_a(a),ye===null&&va(a)}e.wv=Ii(),Si(e,_e,n),Y!==null&&(Y.f&we)!==0&&(Y.f&(tt|Ft))===0&&(Ye===null?To([e]):Ye.push(e)),!r.is_fork&&Tr.size>0&&!Ei&&_o()}return t}function _o(){Ei=!1;for(const e of Tr){(e.f&we)!==0&&fe(e,vt);let t;try{t=ar(e)}catch{t=!0}t&&Mn(e)}Tr.clear()}function Kn(e){E(e,e.v+1)}function Si(e,t,n){var r=e.reactions;if(r!==null)for(var a=r.length,s=0;s<a;s++){var l=r[s],c=l.f,o=(c&_e)===0;if(o&&fe(l,t),(c&Er)!==0)Tr.add(l);else if((c&be)!==0){var f=l;ye==null||ye.delete(f),(c&ln)===0&&(c&$e&&(Y===null||(Y.f&Sr)===0)&&(l.f|=ln),Si(f,vt,n))}else if(o){var v=l;(c&ut)!==0&&ot!==null&&ot.add(v),n!==null?n.push(v):ma(v)}}}function je(e){if(typeof e!="object"||e===null||wn in e)return e;const t=ai(e);if(t!==ms&&t!==ws)return e;var n=new Map,r=da(e),a=J(0),s=on,l=c=>{if(on===s)return c();var o=V,f=on;nt(null),Va(s);var v=c();return nt(o),Va(f),v};return r&&n.set("length",J(e.length)),new Proxy(e,{defineProperty(c,o,f){(!("value"in f)||f.configurable===!1||f.enumerable===!1||f.writable===!1)&&Os();var v=n.get(o);return v===void 0?l(()=>{var k=J(f.value);return n.set(o,k),k}):E(v,f.value,!0),!0},deleteProperty(c,o){var f=n.get(o);if(f===void 0){if(o in c){const v=l(()=>J(me));n.set(o,v),Kn(a)}}else E(f,me),Kn(a);return!0},get(c,o,f){var g;if(o===wn)return e;var v=n.get(o),k=o in c;if(v===void 0&&(!k||(g=Hn(c,o))!=null&&g.writable)&&(v=l(()=>{var m=je(k?c[o]:me),x=J(m);return x}),n.set(o,v)),v!==void 0){var h=i(v);return h===me?void 0:h}return Reflect.get(c,o,f)},getOwnPropertyDescriptor(c,o){var f=Reflect.getOwnPropertyDescriptor(c,o);if(f&&"value"in f){var v=n.get(o);v&&(f.value=i(v))}else if(f===void 0){var k=n.get(o),h=k==null?void 0:k.v;if(k!==void 0&&h!==me)return{enumerable:!0,configurable:!0,value:h,writable:!0}}return f},has(c,o){var h;if(o===wn)return!0;var f=n.get(o),v=f!==void 0&&f.v!==me||Reflect.has(c,o);if(f!==void 0||Y!==null&&(!v||(h=Hn(c,o))!=null&&h.writable)){f===void 0&&(f=l(()=>{var g=v?je(c[o]):me,m=J(g);return m}),n.set(o,f));var k=i(f);if(k===me)return!1}return v},set(c,o,f,v){var S;var k=n.get(o),h=o in c;if(r&&o==="length")for(var g=f;g<k.v;g+=1){var m=n.get(g+"");m!==void 0?E(m,me):g in c&&(m=l(()=>J(me)),n.set(g+"",m))}if(k===void 0)(!h||(S=Hn(c,o))!=null&&S.writable)&&(k=l(()=>J(void 0)),E(k,je(f)),n.set(o,k));else{h=k.v!==me;var x=l(()=>je(f));E(k,x)}var y=Reflect.getOwnPropertyDescriptor(c,o);if(y!=null&&y.set&&y.set.call(v,f),!h){if(r&&typeof o=="string"){var C=n.get("length"),G=Number(o);Number.isInteger(G)&&G>=C.v&&E(C,G+1)}Kn(a)}return!0},ownKeys(c){i(a);var o=Reflect.ownKeys(c).filter(k=>{var h=n.get(k);return h===void 0||h.v!==me});for(var[f,v]of n)v.v!==me&&!(f in c)&&o.push(f);return o},setPrototypeOf(){js()}})}function qa(e){try{if(e!==null&&typeof e=="object"&&wn in e)return e[wn]}catch{}return e}function go(e,t){return Object.is(qa(e),qa(t))}var ia,Ci,Ti,Ai;function mo(){if(ia===void 0){ia=window,Ci=/Firefox/.test(navigator.userAgent);var e=Element.prototype,t=Node.prototype,n=Text.prototype;Ti=Hn(t,"firstChild").get,Ai=Hn(t,"nextSibling").get,Da(e)&&(e[Qr]=void 0,e[pr]=null,e[Xr]=void 0,e.__e=void 0),Da(n)&&(n[zn]=void 0)}}function Ut(e=""){return document.createTextNode(e)}function Ar(e){return Ti.call(e)}function rr(e){return Ai.call(e)}function p(e,t){return Ar(e)}function ft(e,t=!1){{var n=Ar(e);return n instanceof Comment&&n.data===""?rr(n):n}}function b(e,t=1,n=!1){let r=e;for(;t--;)r=rr(r);return r}function wo(e){e.textContent=""}function Fi(){return!1}function bo(e,t,n){return n?document.createElement(e,{is:n}):document.createElement(e)}function yo(e){Y===null&&(V===null&&Rs(),Fs()),Vt&&As()}function ko(e,t){var n=t.last;n===null?t.last=t.first=e:(n.next=e,e.prev=n,t.last=e)}function Rt(e,t){var n=Y;n!==null&&(n.f&Ae)!==0&&(e|=Ae);var r={ctx:Fe,deps:null,nodes:null,f:e|_e|$e,first:null,fn:t,last:null,next:null,parent:n,b:n&&n.b,prev:null,teardown:null,wv:0,ac:null};O==null||O.register_created_effect(r);var a=r;if((e&Tn)!==0)gn!==null?gn.push(r):cn.ensure().schedule(r);else if(t!==null){try{Mn(r)}catch(l){throw Ie(r),l}a.deps===null&&a.teardown===null&&a.nodes===null&&a.first===a.last&&(a.f&jn)===0&&(a=a.first,(e&ut)!==0&&(e&An)!==0&&a!==null&&(a.f|=An))}if(a!==null&&(a.parent=n,n!==null&&ko(a,n),V!==null&&(V.f&be)!==0&&(e&Ft)===0)){var s=V;(s.effects??(s.effects=[])).push(a)}return r}function wa(){return V!==null&&!dt}function ba(e){const t=Rt(Lr,null);return fe(t,we),t.teardown=e,t}function _n(e){yo();var t=Y.f,n=!V&&(t&tt)!==0&&Fe!==null&&!Fe.i;if(n){var r=Fe;(r.e??(r.e=[])).push(e)}else return Ri(e)}function Ri(e){return Rt(Tn|xs,e)}function xo(e){cn.ensure();const t=Rt(Ft|jn,e);return(n={})=>new Promise(r=>{n.outro?sn(t,()=>{Ie(t),r(void 0)}):(Ie(t),r(void 0))})}function Mi(e){return Rt(Tn,e)}function Eo(e){return Rt(mn|jn,e)}function Nr(e,t=0){return Rt(Lr|t,e)}function q(e,t=[],n=[],r=[]){ao(r,t,n,a=>{Rt(Lr,()=>{e(...a.map(i))})})}function Pr(e,t=0){var n=Rt(ut|t,e);return n}function Xe(e){return Rt(tt|jn,e)}function Oi(e){var t=e.teardown;if(t!==null){const n=Vt,r=V;Ua(!0),nt(null);try{t.call(null)}finally{Ua(n),nt(r)}}}function ya(e,t=!1){var n=e.first;for(e.first=e.last=null;n!==null;){const a=n.ac;a!==null&&Ln(()=>{a.abort(nr)});var r=n.next;(n.f&Ft)!==0?n.parent=null:Ie(n,t),n=r}}function So(e){for(var t=e.first;t!==null;){var n=t.next;(t.f&tt)===0&&Ie(t),t=n}}function Ie(e,t=!0){var n=!1;(t||(e.f&ks)!==0)&&e.nodes!==null&&e.nodes.end!==null&&(Co(e.nodes.start,e.nodes.end),n=!0),e.f|=Zr,ya(e,t&&!n),Zn(e,0);var r=e.nodes&&e.nodes.t;if(r!==null)for(const s of r)s.stop();Oi(e),e.f^=Zr,e.f|=et;var a=e.parent;a!==null&&a.first!==null&&ji(e),e.next=e.prev=e.teardown=e.ctx=e.deps=e.fn=e.nodes=e.ac=e.b=null}function Co(e,t){for(;e!==null;){var n=e===t?null:rr(e);e.remove(),e=n}}function ji(e){var t=e.parent,n=e.prev,r=e.next;n!==null&&(n.next=r),r!==null&&(r.prev=n),t!==null&&(t.first===e&&(t.first=r),t.last===e&&(t.last=n))}function sn(e,t,n=!0){var r=[];Li(e,r,!0);var a=()=>{n&&Ie(e),t&&t()},s=r.length;if(s>0){var l=()=>--s||a();for(var c of r)c.out(l)}else a()}function Li(e,t,n){if((e.f&Ae)===0){e.f^=Ae;var r=e.nodes&&e.nodes.t;if(r!==null)for(const c of r)(c.is_global||n)&&t.push(c);for(var a=e.first;a!==null;){var s=a.next;if((a.f&Ft)===0){var l=(a.f&An)!==0||(a.f&tt)!==0&&(e.f&ut)!==0;Li(a,t,l?n:!1)}a=s}}}function Fr(e){Ni(e,!0)}function Ni(e,t){if((e.f&Ae)!==0){e.f^=Ae,(e.f&we)===0&&(fe(e,_e),cn.ensure().schedule(e));for(var n=e.first;n!==null;){var r=n.next,a=(n.f&An)!==0||(n.f&tt)!==0;Ni(n,a?t:!1),n=r}var s=e.nodes&&e.nodes.t;if(s!==null)for(const l of s)(l.is_global||t)&&l.in()}}function ka(e,t){if(e.nodes)for(var n=e.nodes.start,r=e.nodes.end;n!==null;){var a=n===r?null:rr(n);t.append(n),n=a}}let br=!1,Vt=!1;function Ua(e){Vt=e}let V=null,dt=!1;function nt(e){V=e}let Y=null;function wt(e){Y=e}let mt=null;function Pi(e){V!==null&&(mt??(mt=new Set)).add(e)}let Le=null,Ue=0,Ye=null;function To(e){Ye=e}let Di=1,Zt=0,on=Zt;function Va(e){on=e}function Ii(){return++Di}function ar(e){var t=e.f;if((t&_e)!==0)return!0;if(t&be&&(e.f&=~ln),(t&vt)!==0){for(var n=e.deps,r=n.length,a=0;a<r;a++){var s=n[a];if(ar(s)&&gi(s),s.wv>e.wv)return!0}(t&$e)!==0&&ye===null&&fe(e,we)}return!1}function zi(e,t,n=!0){var r=e.reactions;if(r!==null&&!(mt!==null&&mt.has(e)))for(var a=0;a<r.length;a++){var s=r[a];(s.f&be)!==0?zi(s,t,!1):t===s&&(n?fe(s,_e):(s.f&we)!==0&&fe(s,vt),ma(s))}}function Bi(e){var x;var t=Le,n=Ue,r=Ye,a=V,s=mt,l=Fe,c=dt,o=on,f=e.f;Le=null,Ue=0,Ye=null,V=(f&(tt|Ft))===0?e:null,mt=null,Fn(e.ctx),dt=!1,on=++Zt,e.ac!==null&&(Ln(()=>{e.ac.abort(nr)}),e.ac=null);try{e.f|=Sr;var v=e.fn,k=v();e.f|=On;var h=e.deps,g=O==null?void 0:O.is_fork;if(Le!==null){var m;if(g||Zn(e,Ue),h!==null&&Ue>0)for(h.length=Ue+Le.length,m=0;m<Le.length;m++)h[Ue+m]=Le[m];else e.deps=h=Le;if(wa()&&(e.f&$e)!==0)for(m=Ue;m<h.length;m++)((x=h[m]).reactions??(x.reactions=[])).push(e)}else!g&&h!==null&&Ue<h.length&&(Zn(e,Ue),h.length=Ue);if(ui()&&Ye!==null&&!dt&&h!==null&&(e.f&(be|vt|_e))===0)for(m=0;m<Ye.length;m++)zi(Ye[m],e);if(a!==null&&a!==e){if(Zt++,a.deps!==null)for(let y=0;y<n;y+=1)a.deps[y].rv=Zt;if(t!==null)for(const y of t)y.rv=Zt;Ye!==null&&(r===null?r=Ye:r.push(...Ye))}return(e.f&Bt)!==0&&(e.f^=Bt),k}catch(y){return vi(y)}finally{e.f^=Sr,Le=t,Ue=n,Ye=r,V=a,mt=s,Fn(l),dt=c,on=o}}function Ao(e,t){let n=t.reactions;if(n!==null){var r=ps.call(n,e);if(r!==-1){var a=n.length-1;a===0?n=t.reactions=null:(n[r]=n[a],n.pop())}}if(n===null&&(t.f&be)!==0&&(Le===null||!xr.call(Le,t))){var s=t;(s.f&$e)!==0&&(s.f^=$e,s.f&=~ln),s.v!==me&&va(s),s.ac!==null&&Ln(()=>{s.ac.abort(nr),s.ac=null,fe(s,_e)}),co(s),Zn(s,0)}}function Zn(e,t){var n=e.deps;if(n!==null)for(var r=t;r<n.length;r++)Ao(e,n[r])}function Mn(e){var t=e.f;if((t&et)===0){fe(e,we);var n=Y,r=br;Y=e,br=(t&(tt|Ft))===0;try{(t&(ut|oi))!==0?So(e):ya(e),Oi(e);var a=Bi(e);e.teardown=typeof a=="function"?a:null,e.wv=Di;var s;ri&&Ks&&(e.f&_e)!==0&&e.deps}finally{br=r,Y=n}}}async function Fo(){await Promise.resolve(),vo()}function i(e){var t=e.f,n=(t&be)!==0;if(V!==null&&!dt){var r=Y!==null&&(Y.f&et)!==0;if(!r&&(mt===null||!mt.has(e))){var a=V.deps;if((V.f&Sr)!==0)e.rv<Zt&&(e.rv=Zt,Le===null&&a!==null&&a[Ue]===e?Ue++:Le===null?Le=[e]:Le.push(e));else{V.deps??(V.deps=[]),xr.call(V.deps,e)||V.deps.push(e);var s=e.reactions;s===null?e.reactions=[V]:xr.call(s,V)||s.push(V)}}}if(Vt&&an.has(e))return an.get(e);if(n){var l=e;if(Vt){var c=l.v;return((l.f&we)===0&&l.reactions!==null||Ui(l))&&(c=_a(l)),an.set(l,c),c}var o=(l.f&$e)===0&&!dt&&V!==null&&(br||(V.f&$e)!==0),f=(l.f&On)===0;ar(l)&&(o&&(l.f|=$e),gi(l)),o&&!f&&(mi(l),qi(l))}if(ye!=null&&ye.has(e))return ye.get(e);if((e.f&Bt)!==0)throw e.v;return e.v}function qi(e){if(e.f|=$e,e.deps!==null)for(const t of e.deps)(t.reactions??(t.reactions=[])).push(e),(t.f&be)!==0&&(t.f&$e)===0&&(mi(t),qi(t))}function Ui(e){if(e.v===me)return!0;if(e.deps===null)return!1;for(const t of e.deps)if(an.has(t)||(t.f&be)!==0&&Ui(t))return!0;return!1}function ir(e){var t=dt;try{return dt=!0,e()}finally{dt=t}}const Ro=["touchstart","touchmove"];function Mo(e){return Ro.includes(e)}const Qt=Symbol("events"),Vi=new Set,sa=new Set;function Oo(e,t,n,r={}){function a(s){if(r.capture||oa.call(t,s),!s.cancelBubble)return Ln(()=>n==null?void 0:n.call(this,s))}return e.startsWith("pointer")||e.startsWith("touch")||e==="wheel"?qt(()=>{t.addEventListener(e,a,r)}):t.addEventListener(e,a,r),a}function jo(e,t,n,r,a){var s={capture:r,passive:a},l=Oo(e,t,n,s);(t===document.body||t===window||t===document||t instanceof HTMLMediaElement)&&ba(()=>{t.removeEventListener(e,l,s)})}function le(e,t,n){(t[Qt]??(t[Qt]={}))[e]=n}function sr(e){for(var t=0;t<e.length;t++)Vi.add(e[t]);for(var n of sa)n(e)}let Ha=null;function oa(e){var x,y;var t=this,n=t.ownerDocument,r=e.type,a=((x=e.composedPath)==null?void 0:x.call(e))||[],s=a[0]||e.target;Ha=e;var l=0,c=Ha===e&&e[Qt];if(c){var o=a.indexOf(c);if(o!==-1&&(t===document||t===window)){e[Qt]=t;return}var f=a.indexOf(t);if(f===-1)return;o<=f&&(l=o)}if(s=a[l]||e.target,s!==t){_s(e,"currentTarget",{configurable:!0,get(){return s||n}});var v=V,k=Y;nt(null),wt(null);try{for(var h,g=[];s!==null&&s!==t;){try{var m=(y=s[Qt])==null?void 0:y[r];m!=null&&(!s.disabled||e.target===s)&&m.call(s,e)}catch(C){h?g.push(C):h=C}if(e.cancelBubble)break;l++,s=l<a.length?a[l]:null}if(h){for(let C of g)queueMicrotask(()=>{throw C});throw h}}finally{e[Qt]=t,delete e.currentTarget,nt(v),wt(k)}}}var ti;const Hr=((ti=globalThis==null?void 0:globalThis.window)==null?void 0:ti.trustedTypes)&&globalThis.window.trustedTypes.createPolicy("svelte-trusted-html",{createHTML:e=>e});function Lo(e){return(Hr==null?void 0:Hr.createHTML(e))??e}function No(e){var t=bo("template");return t.innerHTML=Lo(e.replaceAll("<!>","<!---->")),t.content}function la(e,t){var n=Y;n.nodes===null&&(n.nodes={start:e,end:t,a:null,t:null})}function N(e,t){var n=(t&Bs)!==0,r=(t&qs)!==0,a,s=!e.startsWith("<!>");return()=>{a===void 0&&(a=No(s?e:"<!>"+e),n||(a=Ar(a)));var l=r||Ci?document.importNode(a,!0):a.cloneNode(!0);if(n){var c=Ar(l),o=l.lastChild;la(c,o)}else la(l,l);return l}}function ca(){var e=document.createDocumentFragment(),t=document.createComment(""),n=Ut();return e.append(t,n),la(t,n),e}function M(e,t){e!==null&&e.before(t)}function F(e,t){var n=t==null?"":typeof t=="object"?`${t}`:t;n!==(e[zn]??(e[zn]=e.nodeValue))&&(e[zn]=n,e.nodeValue=`${n}`)}function Po(e,t){return Do(e,t)}const vr=new Map;function Do(e,{target:t,anchor:n,props:r={},events:a,context:s,intro:l=!0,transformError:c}){mo();var o=void 0,f=xo(()=>{var v=n??t.appendChild(Ut());$s(v,{pending:()=>{}},g=>{bt({});var m=Fe;s&&(m.c=s),a&&(r.$$events=a),o=e(g,r)||{},yt()},c);var k=new Set,h=g=>{for(var m=0;m<g.length;m++){var x=g[m];if(!k.has(x)){k.add(x);var y=Mo(x);for(const S of[t,document]){var C=vr.get(S);C===void 0&&(C=new Map,vr.set(S,C));var G=C.get(x);G===void 0?(S.addEventListener(x,oa,{passive:y}),C.set(x,1)):C.set(x,G+1)}}}};return h(jr(Vi)),sa.add(h),()=>{var y;for(var g of k)for(const C of[t,document]){var m=vr.get(C),x=m.get(g);--x==0?(C.removeEventListener(g,oa),m.delete(g),m.size===0&&vr.delete(C)):m.set(g,x)}sa.delete(h),v!==n&&((y=v.parentNode)==null||y.removeChild(v))}});return Io.set(o,f),o}let Io=new WeakMap;var ct,_t,He,rn,er,tr,Or;class Hi{constructor(t,n=!0){qe(this,"anchor");B(this,ct,new Map);B(this,_t,new Map);B(this,He,new Map);B(this,rn,new Set);B(this,er,!0);B(this,tr,t=>{if(d(this,ct).has(t)){var n=d(this,ct).get(t),r=d(this,_t).get(n);if(r)Fr(r),d(this,rn).delete(n);else{var a=d(this,He).get(n);a&&(Fr(a.effect),d(this,_t).set(n,a.effect),d(this,He).delete(n),a.fragment.lastChild.remove(),this.anchor.before(a.fragment),r=a.effect)}for(const[s,l]of d(this,ct)){if(d(this,ct).delete(s),s===t)break;const c=d(this,He).get(l);c&&(Ie(c.effect),d(this,He).delete(l))}for(const[s,l]of d(this,_t)){if(s===n||d(this,rn).has(s))continue;const c=()=>{if(Array.from(d(this,ct).values()).includes(s)){var f=document.createDocumentFragment();ka(l,f),f.append(Ut()),d(this,He).set(s,{effect:l,fragment:f})}else Ie(l);d(this,rn).delete(s),d(this,_t).delete(s)};d(this,er)||!r?(d(this,rn).add(s),sn(l,c,!1)):c()}}});B(this,Or,t=>{d(this,ct).delete(t);const n=Array.from(d(this,ct).values());for(const[r,a]of d(this,He))n.includes(r)||(Ie(a.effect),d(this,He).delete(r))});this.anchor=t,z(this,er,n)}ensure(t,n){var r=O,a=Fi();if(n&&!d(this,_t).has(t)&&!d(this,He).has(t))if(a){var s=document.createDocumentFragment(),l=Ut();s.append(l),d(this,He).set(t,{effect:Xe(()=>n(l)),fragment:s})}else d(this,_t).set(t,Xe(()=>n(this.anchor)));if(d(this,ct).set(r,t),a){for(const[c,o]of d(this,_t))c===t?r.unskip_effect(o):r.skip_effect(o);for(const[c,o]of d(this,He))c===t?r.unskip_effect(o.effect):r.skip_effect(o.effect);r.oncommit(d(this,tr)),r.ondiscard(d(this,Or))}else d(this,tr).call(this,r)}}ct=new WeakMap,_t=new WeakMap,He=new WeakMap,rn=new WeakMap,er=new WeakMap,tr=new WeakMap,Or=new WeakMap;function ve(e,t,n=!1){var r=new Hi(e),a=n?An:0;function s(l,c){r.ensure(l,c)}Pr(()=>{var l=!1;t((c,o=0)=>{l=!0,s(o,c)}),l||s(-1,null)},a)}const zo=Symbol("NaN");function Wi(e,t,n){var r=new Hi(e);Pr(()=>{var a=t();a!==a&&(a=zo),r.ensure(a,n)})}function Ne(e,t){return t}function Bo(e,t,n){for(var r=[],a=t.length,s,l=t.length,c=0;c<a;c++){let k=t[c];sn(k,()=>{if(s){if(s.pending.delete(k),s.done.add(k),s.pending.size===0){var h=e.outrogroups;fa(e,jr(s.done)),h.delete(s),h.size===0&&(e.outrogroups=null)}}else l-=1},!1)}if(l===0){var o=r.length===0&&n!==null;if(o){var f=n,v=f.parentNode;wo(v),v.append(f),e.items.clear()}fa(e,t,!o)}else s={pending:new Set(t),done:new Set},(e.outrogroups??(e.outrogroups=new Set)).add(s)}function fa(e,t,n=!0){var r;if(e.pending.size>0){r=new Set;for(const l of e.pending.values())for(const c of l)r.add(e.items.get(c).e)}for(var a=0;a<t.length;a++){var s=t[a];if(r!=null&&r.has(s)){s.f|=gt;const l=document.createDocumentFragment();ka(s,l)}else Ie(t[a],n)}}var Wa;function Pe(e,t,n,r,a,s=null){var l=e,c=new Map,o=(t&li)!==0;if(o){var f=e;l=f.appendChild(Ut())}var v=null,k=oo(()=>{var S=n();return da(S)?S:S==null?[]:jr(S)}),h,g=new Map,m=!0;function x(S){(G.effect.f&et)===0&&(G.pending.delete(S),G.fallback=v,qo(G,h,l,t,r),v!==null&&(h.length===0?(v.f&gt)===0?Fr(v):(v.f^=gt,Vn(v,null,l)):sn(v,()=>{v=null})))}function y(S){G.pending.delete(S)}var C=Pr(()=>{h=i(k);for(var S=h.length,j=new Set,R=O,I=Fi(),D=0;D<S;D+=1){var K=h[D],A=r(K,D),H=m?null:c.get(A);H?(H.v&&Rn(H.v,K),H.i&&Rn(H.i,D),I&&R.unskip_effect(H.e)):(H=Uo(c,m?l:Wa??(Wa=Ut()),K,A,D,a,t,n),m||(H.e.f|=gt),c.set(A,H)),j.add(A)}if(S===0&&s&&!v&&(m?v=Xe(()=>s(l)):(v=Xe(()=>s(Wa??(Wa=Ut()))),v.f|=gt)),S>j.size&&Ts(),!m)if(g.set(R,j),I){for(const[te,ce]of c)j.has(te)||R.skip_effect(ce.e);R.oncommit(x),R.ondiscard(y)}else x(R);i(k)}),G={effect:C,items:c,pending:g,outrogroups:null,fallback:v};m=!1}function In(e){for(;e!==null&&(e.f&tt)===0;)e=e.next;return e}function qo(e,t,n,r,a){var H,te,ce,ht,ze,rt,We,Ge,at;var s=(r&Is)!==0,l=t.length,c=e.items,o=In(e.effect.first),f,v=null,k,h=[],g=[],m,x,y,C;if(s)for(C=0;C<l;C+=1)m=t[C],x=a(m,C),y=c.get(x).e,(y.f&gt)===0&&((te=(H=y.nodes)==null?void 0:H.a)==null||te.measure(),(k??(k=new Set)).add(y));for(C=0;C<l;C+=1){if(m=t[C],x=a(m,C),y=c.get(x).e,e.outrogroups!==null)for(const ee of e.outrogroups)ee.pending.delete(y),ee.done.delete(y);if((y.f&Ae)!==0&&(Fr(y),s&&((ht=(ce=y.nodes)==null?void 0:ce.a)==null||ht.unfix(),(k??(k=new Set)).delete(y))),(y.f&gt)!==0)if(y.f^=gt,y===o)Vn(y,null,n);else{var G=v?v.next:o;y===e.effect.last&&(e.effect.last=y.prev),y.prev&&(y.prev.next=y.next),y.next&&(y.next.prev=y.prev),Nt(e,v,y),Nt(e,y,G),Vn(y,G,n),v=y,h=[],g=[],o=In(v.next);continue}if(y!==o){if(f!==void 0&&f.has(y)){if(h.length<g.length){var S=g[0],j;v=S.prev;var R=h[0],I=h[h.length-1];for(j=0;j<h.length;j+=1)Vn(h[j],S,n);for(j=0;j<g.length;j+=1)f.delete(g[j]);Nt(e,R.prev,I.next),Nt(e,v,R),Nt(e,I,S),o=S,v=I,C-=1,h=[],g=[]}else f.delete(y),Vn(y,o,n),Nt(e,y.prev,y.next),Nt(e,y,v===null?e.effect.first:v.next),Nt(e,v,y),v=y;continue}for(h=[],g=[];o!==null&&o!==y;)(f??(f=new Set)).add(o),g.push(o),o=In(o.next);if(o===null)continue}(y.f&gt)===0&&h.push(y),v=y,o=In(y.next)}if(e.outrogroups!==null){for(const ee of e.outrogroups)ee.pending.size===0&&(fa(e,jr(ee.done)),(ze=e.outrogroups)==null||ze.delete(ee));e.outrogroups.size===0&&(e.outrogroups=null)}if(o!==null||f!==void 0){var D=[];if(f!==void 0)for(y of f)(y.f&Ae)===0&&D.push(y);for(;o!==null;)(o.f&Ae)===0&&o!==e.fallback&&D.push(o),o=In(o.next);var K=D.length;if(K>0){var A=(r&li)!==0&&l===0?n:null;if(s){for(C=0;C<K;C+=1)(We=(rt=D[C].nodes)==null?void 0:rt.a)==null||We.measure();for(C=0;C<K;C+=1)(at=(Ge=D[C].nodes)==null?void 0:Ge.a)==null||at.fix()}Bo(e,D,A)}}s&&qt(()=>{var ee,ne;if(k!==void 0)for(y of k)(ne=(ee=y.nodes)==null?void 0:ee.a)==null||ne.apply()})}function Uo(e,t,n,r,a,s,l,c){var o=(l&Ps)!==0?(l&zs)===0?po(n,!1,!1):fn(n):null,f=(l&Ds)!==0?fn(a):null;return{v:o,i:f,e:Xe(()=>(s(t,o??n,f??a,c),()=>{e.delete(r)}))}}function Vn(e,t,n){if(e.nodes)for(var r=e.nodes.start,a=e.nodes.end,s=t&&(t.f&gt)===0?t.nodes.start:n;r!==null;){var l=rr(r);if(s.before(r),r===a)return;r=l}}function Nt(e,t,n){t===null?e.effect.first=n:t.next=n,n===null?e.effect.last=t:n.prev=t}const Ga=[...` 	
-\r\f \v\uFEFF`];function Vo(e,t,n){var r=e==null?"":""+e;if(n){for(var a of Object.keys(n))if(n[a])r=r?r+" "+a:a;else if(r.length)for(var s=a.length,l=0;(l=r.indexOf(a,l))>=0;){var c=l+s;(l===0||Ga.includes(r[l-1]))&&(c===r.length||Ga.includes(r[c]))?r=(l===0?"":r.substring(0,l))+r.substring(c+1):l=c}}return r===""?null:r}function Ho(e,t){return e==null?null:String(e)}function De(e,t,n,r,a,s){var l=e[Qr];if(l!==n||l===void 0){var c=Vo(n,r,s);c==null?e.removeAttribute("class"):e.className=c,e[Qr]=n}else if(s&&a!==s)for(var o in s){var f=!!s[o];(a==null||f!==!!a[o])&&e.classList.toggle(o,f)}return s}function pe(e,t,n,r){var a=e[Xr];if(a!==t){var s=Ho(t);s==null?e.removeAttribute("style"):e.style.cssText=s,e[Xr]=t}return r}function xa(e,t,n=!1){if(e.multiple){if(t==null)return;if(!da(t))return Hs();for(var r of e.options)r.selected=t.includes(Yn(r));return}for(r of e.options){var a=Yn(r);if(go(a,t)){r.selected=!0;return}}(!n||t!==void 0)&&(e.selectedIndex=-1)}function Gi(e){var t=new MutationObserver(()=>{xa(e,e.__value)});t.observe(e,{childList:!0,subtree:!0,attributes:!0,attributeFilter:["value"]}),ba(()=>{t.disconnect()})}function Ka(e,t,n=t){var r=new WeakSet,a=!0;ha(e,"change",s=>{var l=s?"[selected]":":checked",c;if(e.multiple)c=[].map.call(e.querySelectorAll(l),Yn);else{var o=e.querySelector(l)??e.querySelector("option:not([disabled])");c=o&&Yn(o)}n(c),e.__value=c,O!==null&&r.add(O)}),Mi(()=>{var s=t();if(e===document.activeElement){var l=O;if(r.has(l))return}if(xa(e,s,a),a&&s===void 0){var c=e.querySelector(":checked");c!==null&&(s=Yn(c),n(s))}e.__value=s,a=!1}),Gi(e)}function Yn(e){return"__value"in e?e.__value:e.value}const Wo=Symbol("is custom element"),Go=Symbol("is html"),Ko=Ss?"progress":"PROGRESS";function Ya(e,t){var n=Ki(e);n.value===(n.value=t??void 0)||e.value===t&&(t!==0||e.nodeName!==Ko)||(e.value=t??"")}function Yo(e,t){t?e.hasAttribute("selected")||e.setAttribute("selected",""):e.removeAttribute("selected")}function Te(e,t,n,r){var a=Ki(e);a[t]!==(a[t]=n)&&(t==="loading"&&(e[Es]=n),n==null?e.removeAttribute(t):typeof n!="string"&&Jo(e).includes(t)?e[t]=n:e.setAttribute(t,n))}function Ki(e){return e[pr]??(e[pr]={[Wo]:e.nodeName.includes("-"),[Go]:e.namespaceURI===Us})}var Ja=new Map;function Jo(e){var t=e.getAttribute("is")||e.nodeName,n=Ja.get(t);if(n)return n;Ja.set(t,n=[]);for(var r,a=e,s=Element.prototype;s!==a;){r=gs(a);for(var l in r)r[l].set&&l!=="innerHTML"&&l!=="textContent"&&l!=="innerText"&&n.push(l);a=ai(a)}return n}function Zo(e,t,n=t){var r=new WeakSet;ha(e,"input",async a=>{var s=a?e.defaultValue:e.value;if(s=Wr(e)?Gr(s):s,n(s),O!==null&&r.add(O),await Fo(),s!==(s=t())){var l=e.selectionStart,c=e.selectionEnd,o=e.value.length;if(e.value=s??"",c!==null){var f=e.value.length;l===c&&c===o&&f>o?(e.selectionStart=f,e.selectionEnd=f):(e.selectionStart=l,e.selectionEnd=Math.min(c,f))}}}),ir(t)==null&&e.value&&(n(Wr(e)?Gr(e.value):e.value),O!==null&&r.add(O)),Nr(()=>{var a=t();if(e===document.activeElement){var s=O;if(r.has(s))return}Wr(e)&&a===Gr(e.value)||e.type==="date"&&!a&&!e.value||a!==e.value&&(e.value=a??"")})}function hr(e,t,n=t){ha(e,"change",r=>{var a=r?e.defaultChecked:e.checked;n(a)}),ir(t)==null&&n(e.checked),Nr(()=>{var r=t();e.checked=!!r})}function Wr(e){var t=e.type;return t==="number"||t==="range"}function Gr(e){return e===""?null:+e}function Kr(e,t){return e===t||(e==null?void 0:e[wn])===t}function Pt(e={},t,n,r){var a=Fe.r,s=Y;return Mi(()=>{var l,c;return Nr(()=>{l=c,c=[],ir(()=>{Kr(n(...c),e)||(t(e,...c),l&&Kr(n(...l),e)&&t(null,...l))})}),()=>{let o=s;for(;o!==a&&o.parent!==null&&o.parent.f&Zr;)o=o.parent;const f=()=>{c&&Kr(n(...c),e)&&t(null,...c)},v=o.teardown;o.teardown=()=>{f(),v==null||v()}}}),e}function Qo(e,t,n,r){var a=r,s=!0,l=()=>(s&&(s=!1,a=r),a),c;c=e[t],c===void 0&&r!==void 0&&(c=l());var o;return o=()=>{var f=e[t];return f===void 0?l():(s=!0,f)},o}const Xo="5";var ni;typeof window<"u"&&((ni=window.__svelte??(window.__svelte={})).v??(ni.v=new Set)).add(Xo);const $o=new Set(["serif","sans-serif","monospace","cursive","fantasy","system-ui","ui-serif","ui-sans-serif","ui-monospace","ui-rounded","emoji","math","fangsong"]);function el(e){return $o.has(e.toLowerCase())?e:JSON.stringify(e)}function Xt(e,t){const n=t[e.path];return typeof n=="string"||typeof n=="number"?n:e.value}function Jn(e,t,n=1){const r=Object.fromEntries(e.controls.map(c=>[c.id,Number(Xt(c,t))])),a=r.l??e.value.l,s=r.c??e.value.c,l=r.h??e.value.h;return`oklch(${a} ${s} ${l}${n===1?"":` / ${n}`})`}function tl(e,t,n){var a,s;return[(a=e.find(l=>l.category==="color"))==null?void 0:a.modes.find(l=>l.name===t),(s=e.find(l=>l.category==="size"))==null?void 0:s.modes.find(l=>l.name===n)].flatMap(l=>Object.entries((l==null?void 0:l.tokens)??{})).map(([l,c])=>`${l}:${c}`).join(";")}function Yt(e,t,n={}){var f;const r=Object.fromEntries(e.controls.map(v=>[v.id,Xt(v,t)])),a=e.controls.find(v=>v.kind==="select"&&v.id==="fontSize"),s=(a==null?void 0:a.kind)==="select"?a.options.find(v=>v.value===r.fontSize):void 0,l=((f=e.availableWeights.find(v=>v.alias===r.weight))==null?void 0:f.value)??e.weight.value,c=[e.font.family,...e.font.adjustedFallback?[e.font.adjustedFallback]:[],...e.font.fallbacks],o=[...e.font.adjustedFallback?[e.font.adjustedFallback]:[],...e.font.fallbacks];return[`font-family:${(n.forceFallback?o:c).map(el).join(",")}`,`font-size:${(s==null?void 0:s.css)??`var(--${e.recipe.atomicFontSizeToken})`}`,`font-style:${e.style}`,`font-weight:${l}`,"font-synthesis:none",`line-height:${n.wcagSpacing?1.5:r.lineHeight}`,`letter-spacing:${n.wcagSpacing?"0.12em":r.letterSpacing===0?"0":`${r.letterSpacing}em`}`,...n.wcagSpacing?["word-spacing:0.16em"]:[],`text-transform:${e.recipe.textTransform??"none"}`,...e.recipe.fontKerningToken?[`font-kerning:var(--${e.recipe.fontKerningToken})`]:[],...e.recipe.fontOpticalSizingToken?[`font-optical-sizing:var(--${e.recipe.fontOpticalSizingToken})`]:[],...e.recipe.fontFeatureSettingsToken?[`font-feature-settings:var(--${e.recipe.fontFeatureSettingsToken})`]:[],...e.recipe.fontVariationSettingsToken?[`font-variation-settings:var(--${e.recipe.fontVariationSettingsToken})`]:[]].join(";")}function yr(e,t){const n=Object.fromEntries(e.controls.map(a=>[a.id,Number(Xt(a,t))])),r=e.layers.map((a,s)=>{const l=`layer-${s}`,c=n[`${l}-x`]??a.x,o=n[`${l}-y`]??a.y,f=n[`${l}-blur`]??a.blur,v=e.shadowKind==="box"?n[`${l}-spread`]??a.spread??0:void 0;return[a.inset?"inset":"",`${c}${e.unit}`,`${o}${e.unit}`,`${f}${e.unit}`,v===void 0?"":`${v}${e.unit}`,a.color.css].filter(Boolean).join(" ")}).join(", ");return`${e.shadowKind==="box"?"box-shadow":"text-shadow"}:${r}`}var nl=N('<div class="matrix-color"></div> <code> </code>',1),rl=N('<span class="matrix-type">Sphinx of black quartz, judge my vow.</span> <code> </code>',1),al=N('<div class="matrix-shadow"><span>Aa</span></div> <code> </code>',1),il=N('<div class="matrix-motion"><span></span></div> <code> </code>',1),sl=N('<div class="matrix-foundation"><strong> </strong> <span>generated tokens</span></div> <code> </code>',1),ol=N('<button class="matrix-card"><header><strong> </strong> <code> </code></header> <!></button>'),ll=N("<div></div>");function Za(e,t){bt(t,!0);let n=Qo(t,"compact",3,!1),r=ge(()=>{var l;return((l=t.cases[0])==null?void 0:l.kind)??"empty"});var a=ll();let s;Pe(a,21,()=>t.cases,Ne,(l,c)=>{var o=ol(),f=p(o),v=p(f),k=p(v),h=b(v,2),g=p(h),m=b(f,2);{var x=j=>{var R=nl(),I=ft(R),D=b(I,2),K=p(D);q((A,H)=>{pe(I,A),F(K,H)},[()=>`--review-color:${Jn(i(c),t.draft)}`,()=>Jn(i(c),t.draft)]),M(j,R)},y=j=>{var R=rl(),I=ft(R),D=b(I,2),K=p(D);q(A=>{pe(I,A),F(K,`--${i(c).recipe.atomicFontSizeToken??""} · ${i(c).weight.alias??""} ·
-					${i(c).recipe.lineHeight??""}`)},[()=>Yt(i(c),t.draft)]),M(j,R)},C=j=>{var R=al(),I=ft(R),D=p(I),K=b(I,2),A=p(K);q(H=>{pe(D,H),F(A,i(c).css)},[()=>yr(i(c),t.draft)]),M(j,R)},G=j=>{var R=il(),I=ft(R),D=p(I),K=b(I,2),A=p(K);q(H=>{pe(D,H),F(A,`${i(c).duration.milliseconds??""}ms · ${i(c).easing.name??""}`)},[()=>`width:${Math.max(8,Math.min(100,i(c).duration.milliseconds/4))}%`]),M(j,R)},S=j=>{var R=sl(),I=ft(R),D=p(I),K=p(D),A=b(I,2),H=p(A);q(te=>{var ce;F(K,i(c).tokens.length),F(H,`${((ce=i(c).tokens[0])==null?void 0:ce.value)??""} → ${te??""}`)},[()=>{var te;return(te=i(c).tokens.at(-1))==null?void 0:te.value}]),M(j,R)};ve(m,j=>{i(c).kind==="color"?j(x):i(c).kind==="typography"?j(y,1):i(c).kind==="shadow"?j(C,2):i(c).kind==="motion"?j(G,3):i(c).kind==="foundation"&&j(S,4)})}q(()=>{F(k,i(c).label),F(g,i(c).sourcePath)}),le("click",o,()=>t.onselect(i(c).id)),M(l,o)}),q(()=>{s=De(a,1,"case-matrix",null,s,{compact:n()}),Te(a,"data-lab",i(r))}),M(e,a),yt()}sr(["click"]);var cl=N('<article><div class="alpha-chip"></div> <strong> </strong> <small> </small> <code> </code></article>'),fl=N('<div class="color-stage"><div class="color-hero"><div class="color-chip"><strong> </strong> <span> </span> <code> </code></div></div> <div class="alpha-ramp"></div></div>');function ul(e,t){bt(t,!0);var n=fl(),r=p(n),a=p(r),s=p(a),l=p(s),c=b(s,2),o=p(c),f=b(c,2),v=p(f),k=b(r,2);Pe(k,21,()=>t.reviewCase.alphaVariants,Ne,(h,g)=>{var m=cl(),x=p(m),y=b(x,2),C=p(y),G=b(y,2),S=p(G),j=b(G,2),R=p(j);q((I,D)=>{pe(x,I),F(C,i(g).label),F(S,`${D??""}%`),F(R,`--${i(g).token??""}`)},[()=>`--review-color:${Jn(t.reviewCase,t.draft,i(g).alpha)}`,()=>Math.round(i(g).alpha*100)]),M(h,m)}),q((h,g)=>{pe(r,h),F(l,t.reviewCase.color),F(o,t.reviewCase.mode),F(v,g)},[()=>`--review-color:${Jn(t.reviewCase,t.draft)}`,()=>Jn(t.reviewCase,t.draft)]),M(e,n),yt()}function Qa(e){return!!e&&typeof e=="object"&&!Array.isArray(e)}function dl(e,t){if(e.kind==="select"){if(typeof t!="string"&&typeof t!="number"||!e.options.some(n=>n.value===t))throw new Error(`Patch value for ${e.path} is not an available option`);return t}if(typeof t!="number"||!Number.isFinite(t))throw new Error(`Patch value for ${e.path} must be a finite number`);if(t<e.min||t>e.max)throw new Error(`Patch value for ${e.path} must be between ${e.min} and ${e.max}`);return t}function vl(e,t,n,r){if(!Qa(e))throw new Error("Review patch must be a JSON object");if(e.kind!=="three-forma-styli/review-patch"||e.schemaVersion!==1)throw new Error("Unsupported review patch kind or schema version");if(e.systemFingerprint!==t)throw new Error("Review patch belongs to a different generated design system");if(!Array.isArray(e.operations)||!Array.isArray(e.selectedCases))throw new Error("Review patch operations and selectedCases must be arrays");const a=new Map(n.map(o=>[o.path,o])),s=[],l={};for(const o of e.operations){if(!Qa(o)||typeof o.path!="string")throw new Error("Every review patch operation must contain a path");if(o.path in l)throw new Error(`Review patch contains duplicate path ${o.path}`);const f=a.get(o.path);if(!f)throw new Error(`Review patch references unknown path ${o.path}`);if(o.previous!==f.value)throw new Error(`Review patch baseline is stale at ${o.path}`);const v=dl(f,o.value);l[o.path]=v,s.push({path:o.path,previous:f.value,value:v})}const c=e.selectedCases.map(o=>{if(typeof o!="string"||!r.has(o))throw new Error(`Review patch references unknown selected case ${String(o)}`);return o});return{patch:{kind:"three-forma-styli/review-patch",schemaVersion:1,systemFingerprint:t,operations:s,selectedCases:[...new Set(c)].sort(),...typeof e.note=="string"?{note:e.note}:{}},draft:l}}function hl(e,t,n,r){const a=Object.entries(n).filter(([s,l])=>t[s]!==l).map(([s,l])=>({path:s,previous:t[s]??null,value:l})).sort((s,l)=>s.path.localeCompare(l.path));return{kind:"three-forma-styli/review-patch",schemaVersion:1,systemFingerprint:e,operations:a,selectedCases:[...new Set(r)].sort()}}function pl(e,t="tfs build .",n="tfs check ."){return{kind:"three-forma-styli/agent-handoff",schemaVersion:1,patch:e,instructions:"Apply these reviewed visual decisions to the authored TFS source. Preserve helper-driven architecture, regenerate owned artifacts, run the declared checks, inspect the named review cases, and commit only the coherent source plus generated result.",verification:{generate:t,check:n}}}function _l(e,t){const n=new Blob([`${JSON.stringify(t,null,2)}
-`],{type:"application/json"}),r=URL.createObjectURL(n),a=document.createElement("a");a.href=r,a.download=e,a.click(),URL.revokeObjectURL(r)}var gl=N('<article class="foundation-item"><div class="foundation-sample"></div> <strong> </strong> <code> </code></article>'),ml=N('<div class="foundation-stage"></div>');function wl(e,t){bt(t,!0);var n=ml();Pe(n,21,()=>t.reviewCase.tokens,Ne,(r,a)=>{var s=gl(),l=p(s),c=b(l,2),o=p(c),f=b(c,2),v=p(f);q(()=>{Te(l,"data-family",t.reviewCase.family),pe(l,`--review-value:var(--${i(a).name});--review-raw:${i(a).rawValue??0}`),F(o,`--${i(a).name??""}`),F(v,i(a).value)}),M(r,s)}),M(e,n),yt()}var bl=N("<div></div>"),yl=N('<div class="motion-stage"><div class="motion-preference" aria-label="Motion preference"><button>standard</button> <button>reduced</button> <span> </span></div> <div class="motion-meta"><article><span>duration</span> <strong> </strong> <code> </code></article> <article><span>delay</span> <strong> </strong> <code> </code></article> <article><span>easing</span> <strong> </strong> <code> </code></article></div> <div class="motion-track"><!></div> <button class="motion-play">play once</button> <code class="motion-tuple"> </code></div>');function kl(e,t){bt(t,!0);let n=J(0),r=J(new URLSearchParams(location.search).get("motion")==="reduce"),a=ge(()=>i(r)?t.reviewCase.reducedMotion:t.reviewCase);function s(ee){E(r,ee,!0),E(n,i(n)+1);const ne=new URL(location.href);ne.searchParams.set("motion",ee?"reduce":"no-preference"),history.replaceState(null,"",ne)}var l=yl(),c=p(l),o=p(c);let f;var v=b(o,2);let k;var h=b(v,2),g=p(h),m=b(c,2),x=p(m),y=b(p(x),2),C=p(y),G=b(y,2),S=p(G),j=b(x,2),R=b(p(j),2),I=p(R),D=b(R,2),K=p(D),A=b(j,2),H=b(p(A),2),te=p(H),ce=b(H,2),ht=p(ce),ze=b(m,2),rt=p(ze);Wi(rt,()=>i(n),ee=>{var ne=bl();let de;q(()=>{de=De(ne,1,"motion-object",null,de,{running:i(n)>0}),pe(ne,`--review-duration:${i(a).duration.milliseconds}ms;--review-delay:${i(a).delay.milliseconds}ms;--review-easing:${i(a).easing.css}`)}),M(ee,ne)});var We=b(ze,2),Ge=b(We,2),at=p(Ge);q(()=>{f=De(o,1,"",null,f,{active:!i(r)}),k=De(v,1,"",null,k,{active:i(r)}),Te(h,"data-behavior",t.reviewCase.reducedMotion.behavior),F(g,t.reviewCase.reducedMotion.behavior),F(C,`${i(a).duration.milliseconds??""}ms`),F(S,i(a).duration.token?`--${i(a).duration.token}`:"0ms"),F(I,`${i(a).delay.milliseconds??""}ms`),F(K,i(a).delay.token?`--${i(a).delay.token}`:"0ms"),F(te,i(a).easing.name),F(ht,`--${i(a).easing.token??""}`),F(at,`${i(a).duration.milliseconds??""}ms ${i(a).easing.css??""}
-		${i(a).delay.milliseconds??""}ms`)}),le("click",o,()=>s(!1)),le("click",v,()=>s(!0)),le("click",We,()=>E(n,i(n)+1)),M(e,l),yt()}sr(["click"]);var xl=N('<div class="shadow-stage"><div class="shadow-pair"><div class="shadow-object">Aa</div> <div class="clip-boundary"><div class="shadow-object">Aa</div></div></div> <pre> </pre></div>');function El(e,t){bt(t,!0);var n=xl(),r=p(n),a=p(r),s=b(a,2),l=p(s),c=b(r,2),o=p(c);q((f,v,k)=>{pe(a,f),pe(l,v),F(o,k)},[()=>yr(t.reviewCase,t.draft),()=>yr(t.reviewCase,t.draft),()=>yr(t.reviewCase,t.draft)]),M(e,n),yt()}var Sl=N('<label><input type="checkbox"/> adjusted fallback</label> <output> </output>',1),Cl=N('<div class="metric-overlay" aria-hidden="true"><i class="metric-line" style="top:0"><span>line top</span></i> <i class="metric-line"><span>line bottom</span></i> <i class="metric-cap"><span>1cap</span></i> <i class="metric-ex"><span>1ex</span></i> <i class="metric-baseline"><span>baseline</span></i></div>'),Tl=N("<article><code> </code> <span>Aa 0123</span></article>"),Al=N(`<div><div class="type-tools"><label><input type="checkbox"/> metrics</label> <label><input type="checkbox"/> light surface</label> <label><input type="checkbox"/> WCAG spacing stress</label> <!></div> <div class="type-stage-body"><p class="eyebrow"> </p> <div><p class="type-short" contenteditable="true" aria-label="Editable typography sample" spellcheck="false">Sphinx of black quartz, judge my vow.</p> <span class="metric-probe">Hhx<span class="baseline-probe"></span><i class="cap-probe"></i><i class="ex-probe"></i></span> <!></div> <div class="type-columns"><div><span class="type-caption">narrow wrapping</span> <p>Typography becomes a system when every choice remains intentional under density, wrapping,
+var __defProp = Object.defineProperty;
+var __typeError = (msg) => {
+  throw TypeError(msg);
+};
+var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
+var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
+var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot " + msg);
+var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
+var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
+var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
+var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
+var _a, _anchor, _hydrate_open, _props, _children, _effect, _main_effect, _pending_effect, _failed_effect, _offscreen_fragment, _local_pending_count, _pending_count, _pending_count_update_queued, _dirty_effects, _maybe_dirty_effects, _effect_pending, _effect_pending_subscriber, _Boundary_instances, hydrate_resolved_content_fn, hydrate_failed_content_fn, hydrate_pending_content_fn, render_fn, resolve_fn, run_fn, update_pending_count_fn, handle_error_fn, _started, _prev, _next, _commit_callbacks, _discard_callbacks, _pending, _blocking_pending, _deferred, _roots, _new_effects, _dirty_effects2, _maybe_dirty_effects2, _skipped_branches, _unskipped_branches, _decrement_queued, _Batch_instances, is_deferred_fn, process_fn, traverse_fn, find_earlier_batch_fn, merge_fn, defer_effects_fn, commit_fn, unlink_fn, _b, _batches, _onscreen, _offscreen, _outroing, _transition, _commit, _discard, _c;
+(function polyfill() {
+  const relList = document.createElement("link").relList;
+  if (relList && relList.supports && relList.supports("modulepreload")) {
+    return;
+  }
+  for (const link2 of document.querySelectorAll('link[rel="modulepreload"]')) {
+    processPreload(link2);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== "childList") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === "LINK" && node.rel === "modulepreload")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(link2) {
+    const fetchOpts = {};
+    if (link2.integrity) fetchOpts.integrity = link2.integrity;
+    if (link2.referrerPolicy) fetchOpts.referrerPolicy = link2.referrerPolicy;
+    if (link2.crossOrigin === "use-credentials")
+      fetchOpts.credentials = "include";
+    else if (link2.crossOrigin === "anonymous") fetchOpts.credentials = "omit";
+    else fetchOpts.credentials = "same-origin";
+    return fetchOpts;
+  }
+  function processPreload(link2) {
+    if (link2.ep)
+      return;
+    link2.ep = true;
+    const fetchOpts = getFetchOpts(link2);
+    fetch(link2.href, fetchOpts);
+  }
+})();
+const DEV = false;
+var is_array = Array.isArray;
+var index_of = Array.prototype.indexOf;
+var includes = Array.prototype.includes;
+var array_from = Array.from;
+var define_property = Object.defineProperty;
+var get_descriptor = Object.getOwnPropertyDescriptor;
+var get_descriptors = Object.getOwnPropertyDescriptors;
+var object_prototype = Object.prototype;
+var array_prototype = Array.prototype;
+var get_prototype_of = Object.getPrototypeOf;
+var is_extensible = Object.isExtensible;
+const noop = () => {
+};
+function run_all(arr) {
+  for (var i = 0; i < arr.length; i++) {
+    arr[i]();
+  }
+}
+function deferred() {
+  var resolve;
+  var reject;
+  var promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+function to_array(value, n) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (!(Symbol.iterator in value)) {
+    return Array.from(value);
+  }
+  const array = [];
+  for (const element of value) {
+    array.push(element);
+    if (array.length === n) break;
+  }
+  return array;
+}
+const DERIVED = 1 << 1;
+const EFFECT = 1 << 2;
+const RENDER_EFFECT = 1 << 3;
+const MANAGED_EFFECT = 1 << 24;
+const BLOCK_EFFECT = 1 << 4;
+const BRANCH_EFFECT = 1 << 5;
+const ROOT_EFFECT = 1 << 6;
+const BOUNDARY_EFFECT = 1 << 7;
+const CONNECTED = 1 << 9;
+const CLEAN = 1 << 10;
+const DIRTY = 1 << 11;
+const MAYBE_DIRTY = 1 << 12;
+const INERT = 1 << 13;
+const DESTROYED = 1 << 14;
+const REACTION_RAN = 1 << 15;
+const DESTROYING = 1 << 25;
+const EFFECT_TRANSPARENT = 1 << 16;
+const EAGER_EFFECT = 1 << 17;
+const HEAD_EFFECT = 1 << 18;
+const EFFECT_PRESERVED = 1 << 19;
+const USER_EFFECT = 1 << 20;
+const EFFECT_OFFSCREEN = 1 << 25;
+const WAS_MARKED = 1 << 16;
+const REACTION_IS_UPDATING = 1 << 21;
+const ASYNC = 1 << 22;
+const ERROR_VALUE = 1 << 23;
+const STATE_SYMBOL = Symbol("$state");
+const LOADING_ATTR_SYMBOL = Symbol("");
+const ATTRIBUTES_CACHE = Symbol("attributes");
+const CLASS_CACHE = Symbol("class");
+const STYLE_CACHE = Symbol("style");
+const TEXT_CACHE = Symbol("text");
+const FORM_RESET_HANDLER = Symbol("form reset");
+const STALE_REACTION = new class StaleReactionError extends Error {
+  constructor() {
+    super(...arguments);
+    __publicField(this, "name", "StaleReactionError");
+    __publicField(this, "message", "The reaction that called `getAbortSignal()` was re-run or destroyed");
+  }
+}();
+const IS_XHTML = (
+  // We gotta write it like this because after downleveling the pure comment may end up in the wrong location
+  !!((_a = globalThis.document) == null ? void 0 : _a.contentType) && /* @__PURE__ */ globalThis.document.contentType.includes("xml")
+);
+function async_derived_orphan() {
+  {
+    throw new Error(`https://svelte.dev/e/async_derived_orphan`);
+  }
+}
+function each_key_duplicate(a, b, value) {
+  {
+    throw new Error(`https://svelte.dev/e/each_key_duplicate`);
+  }
+}
+function effect_in_teardown(rune) {
+  {
+    throw new Error(`https://svelte.dev/e/effect_in_teardown`);
+  }
+}
+function effect_in_unowned_derived() {
+  {
+    throw new Error(`https://svelte.dev/e/effect_in_unowned_derived`);
+  }
+}
+function effect_orphan(rune) {
+  {
+    throw new Error(`https://svelte.dev/e/effect_orphan`);
+  }
+}
+function effect_update_depth_exceeded() {
+  {
+    throw new Error(`https://svelte.dev/e/effect_update_depth_exceeded`);
+  }
+}
+function state_descriptors_fixed() {
+  {
+    throw new Error(`https://svelte.dev/e/state_descriptors_fixed`);
+  }
+}
+function state_prototype_fixed() {
+  {
+    throw new Error(`https://svelte.dev/e/state_prototype_fixed`);
+  }
+}
+function state_unsafe_mutation() {
+  {
+    throw new Error(`https://svelte.dev/e/state_unsafe_mutation`);
+  }
+}
+function svelte_boundary_reset_onerror() {
+  {
+    throw new Error(`https://svelte.dev/e/svelte_boundary_reset_onerror`);
+  }
+}
+const EACH_ITEM_REACTIVE = 1;
+const EACH_INDEX_REACTIVE = 1 << 1;
+const EACH_IS_CONTROLLED = 1 << 2;
+const EACH_IS_ANIMATED = 1 << 3;
+const EACH_ITEM_IMMUTABLE = 1 << 4;
+const TEMPLATE_FRAGMENT = 1;
+const TEMPLATE_USE_IMPORT_NODE = 1 << 1;
+const UNINITIALIZED = Symbol("uninitialized");
+const NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
+function derived_inert() {
+  {
+    console.warn(`https://svelte.dev/e/derived_inert`);
+  }
+}
+function select_multiple_invalid_value() {
+  {
+    console.warn(`https://svelte.dev/e/select_multiple_invalid_value`);
+  }
+}
+function svelte_boundary_reset_noop() {
+  {
+    console.warn(`https://svelte.dev/e/svelte_boundary_reset_noop`);
+  }
+}
+function equals(value) {
+  return value === this.v;
+}
+function safe_not_equal(a, b) {
+  return a != a ? b == b : a !== b || a !== null && typeof a === "object" || typeof a === "function";
+}
+function safe_equals(value) {
+  return !safe_not_equal(value, this.v);
+}
+let tracing_mode_flag = false;
+let component_context = null;
+function set_component_context(context) {
+  component_context = context;
+}
+function push(props, runes = false, fn) {
+  component_context = {
+    p: component_context,
+    i: false,
+    c: null,
+    e: null,
+    s: props,
+    x: null,
+    r: (
+      /** @type {Effect} */
+      active_effect
+    ),
+    l: null
+  };
+}
+function pop(component) {
+  var context = (
+    /** @type {ComponentContext} */
+    component_context
+  );
+  var effects = context.e;
+  if (effects !== null) {
+    context.e = null;
+    for (var fn of effects) {
+      create_user_effect(fn);
+    }
+  }
+  context.i = true;
+  component_context = context.p;
+  return (
+    /** @type {T} */
+    {}
+  );
+}
+function is_runes() {
+  return true;
+}
+let micro_tasks = [];
+function run_micro_tasks() {
+  var tasks = micro_tasks;
+  micro_tasks = [];
+  run_all(tasks);
+}
+function queue_micro_task(fn) {
+  if (micro_tasks.length === 0 && !is_flushing_sync) {
+    var tasks = micro_tasks;
+    queueMicrotask(() => {
+      if (tasks === micro_tasks) run_micro_tasks();
+    });
+  }
+  micro_tasks.push(fn);
+}
+function flush_tasks() {
+  while (micro_tasks.length > 0) {
+    run_micro_tasks();
+  }
+}
+function handle_error(error) {
+  var effect2 = active_effect;
+  if (effect2 === null) {
+    active_reaction.f |= ERROR_VALUE;
+    return error;
+  }
+  if ((effect2.f & REACTION_RAN) === 0 && (effect2.f & EFFECT) === 0) {
+    throw error;
+  }
+  invoke_error_boundary(error, effect2);
+}
+function invoke_error_boundary(error, effect2) {
+  if (effect2 !== null && (effect2.f & DESTROYED) !== 0) {
+    return;
+  }
+  while (effect2 !== null) {
+    if ((effect2.f & BOUNDARY_EFFECT) !== 0) {
+      if ((effect2.f & REACTION_RAN) === 0) {
+        throw error;
+      }
+      try {
+        effect2.b.error(error);
+        return;
+      } catch (e) {
+        error = e;
+      }
+    }
+    effect2 = effect2.parent;
+  }
+  throw error;
+}
+const STATUS_MASK = -7169;
+function set_signal_status(signal, status) {
+  signal.f = signal.f & STATUS_MASK | status;
+}
+function update_derived_status(derived2) {
+  if ((derived2.f & CONNECTED) !== 0 || derived2.deps === null) {
+    set_signal_status(derived2, CLEAN);
+  } else {
+    set_signal_status(derived2, MAYBE_DIRTY);
+  }
+}
+function clear_marked(deps) {
+  if (deps === null) return;
+  for (const dep of deps) {
+    if ((dep.f & DERIVED) === 0 || (dep.f & WAS_MARKED) === 0) {
+      continue;
+    }
+    dep.f ^= WAS_MARKED;
+    clear_marked(
+      /** @type {Derived} */
+      dep.deps
+    );
+  }
+}
+function defer_effect(effect2, dirty_effects, maybe_dirty_effects) {
+  if ((effect2.f & DIRTY) !== 0) {
+    dirty_effects.add(effect2);
+  } else if ((effect2.f & MAYBE_DIRTY) !== 0) {
+    maybe_dirty_effects.add(effect2);
+  }
+  clear_marked(effect2.deps);
+  set_signal_status(effect2, CLEAN);
+}
+let listening_to_form_reset = false;
+function add_form_reset_listener() {
+  if (!listening_to_form_reset) {
+    listening_to_form_reset = true;
+    document.addEventListener(
+      "reset",
+      (evt) => {
+        Promise.resolve().then(() => {
+          var _a2;
+          if (!evt.defaultPrevented) {
+            for (
+              const e of
+              /**@type {HTMLFormElement} */
+              evt.target.elements
+            ) {
+              (_a2 = e[FORM_RESET_HANDLER]) == null ? void 0 : _a2.call(e);
+            }
+          }
+        });
+      },
+      // In the capture phase to guarantee we get noticed of it (no possibility of stopPropagation)
+      { capture: true }
+    );
+  }
+}
+function without_reactive_context(fn) {
+  var previous_reaction = active_reaction;
+  var previous_effect = active_effect;
+  set_active_reaction(null);
+  set_active_effect(null);
+  try {
+    return fn();
+  } finally {
+    set_active_reaction(previous_reaction);
+    set_active_effect(previous_effect);
+  }
+}
+function listen_to_event_and_reset_event(element, event2, handler, on_reset = handler) {
+  element.addEventListener(event2, () => without_reactive_context(handler));
+  const prev = (
+    /** @type {any} */
+    element[FORM_RESET_HANDLER]
+  );
+  if (prev) {
+    element[FORM_RESET_HANDLER] = () => {
+      prev();
+      on_reset(true);
+    };
+  } else {
+    element[FORM_RESET_HANDLER] = () => on_reset(true);
+  }
+  add_form_reset_listener();
+}
+function createSubscriber(start2) {
+  let subscribers = 0;
+  let version = source(0);
+  let stop;
+  return () => {
+    if (effect_tracking()) {
+      get(version);
+      render_effect(() => {
+        if (subscribers === 0) {
+          stop = untrack(() => start2(() => increment(version)));
+        }
+        subscribers += 1;
+        return () => {
+          queue_micro_task(() => {
+            subscribers -= 1;
+            if (subscribers === 0) {
+              stop == null ? void 0 : stop();
+              stop = void 0;
+              increment(version);
+            }
+          });
+        };
+      });
+    }
+  };
+}
+var flags = EFFECT_TRANSPARENT | EFFECT_PRESERVED;
+function boundary(node, props, children, transform_error) {
+  new Boundary(node, props, children, transform_error);
+}
+class Boundary {
+  /**
+   * @param {TemplateNode} node
+   * @param {BoundaryProps} props
+   * @param {((anchor: Node) => void)} children
+   * @param {((error: unknown) => unknown) | undefined} [transform_error]
+   */
+  constructor(node, props, children, transform_error) {
+    __privateAdd(this, _Boundary_instances);
+    /** @type {Boundary | null} */
+    __publicField(this, "parent");
+    __publicField(this, "is_pending", false);
+    /**
+     * API-level transformError transform function. Transforms errors before they reach the `failed` snippet.
+     * Inherited from parent boundary, or defaults to identity.
+     * @type {(error: unknown) => unknown}
+     */
+    __publicField(this, "transform_error");
+    /** @type {TemplateNode} */
+    __privateAdd(this, _anchor);
+    /** @type {TemplateNode | null} */
+    __privateAdd(this, _hydrate_open, null);
+    /** @type {BoundaryProps} */
+    __privateAdd(this, _props);
+    /** @type {((anchor: Node) => void)} */
+    __privateAdd(this, _children);
+    /** @type {Effect} */
+    __privateAdd(this, _effect);
+    /** @type {Effect | null} */
+    __privateAdd(this, _main_effect, null);
+    /** @type {Effect | null} */
+    __privateAdd(this, _pending_effect, null);
+    /** @type {Effect | null} */
+    __privateAdd(this, _failed_effect, null);
+    /** @type {DocumentFragment | null} */
+    __privateAdd(this, _offscreen_fragment, null);
+    __privateAdd(this, _local_pending_count, 0);
+    __privateAdd(this, _pending_count, 0);
+    __privateAdd(this, _pending_count_update_queued, false);
+    /** @type {Set<Effect>} */
+    __privateAdd(this, _dirty_effects, /* @__PURE__ */ new Set());
+    /** @type {Set<Effect>} */
+    __privateAdd(this, _maybe_dirty_effects, /* @__PURE__ */ new Set());
+    /**
+     * A source containing the number of pending async deriveds/expressions.
+     * Only created if `$effect.pending()` is used inside the boundary,
+     * otherwise updating the source results in needless `Batch.ensure()`
+     * calls followed by no-op flushes
+     * @type {Source<number> | null}
+     */
+    __privateAdd(this, _effect_pending, null);
+    __privateAdd(this, _effect_pending_subscriber, createSubscriber(() => {
+      __privateSet(this, _effect_pending, source(__privateGet(this, _local_pending_count)));
+      return () => {
+        __privateSet(this, _effect_pending, null);
+      };
+    }));
+    var _a2;
+    __privateSet(this, _anchor, node);
+    __privateSet(this, _props, props);
+    __privateSet(this, _children, (anchor) => {
+      var effect2 = (
+        /** @type {Effect} */
+        active_effect
+      );
+      effect2.b = this;
+      effect2.f |= BOUNDARY_EFFECT;
+      children(anchor);
+    });
+    this.parent = /** @type {Effect} */
+    active_effect.b;
+    this.transform_error = transform_error ?? ((_a2 = this.parent) == null ? void 0 : _a2.transform_error) ?? ((e) => e);
+    __privateSet(this, _effect, block(() => {
+      {
+        __privateMethod(this, _Boundary_instances, render_fn).call(this);
+      }
+    }, flags));
+  }
+  /**
+   * Defer an effect inside a pending boundary until the boundary resolves
+   * @param {Effect} effect
+   */
+  defer_effect(effect2) {
+    defer_effect(effect2, __privateGet(this, _dirty_effects), __privateGet(this, _maybe_dirty_effects));
+  }
+  /**
+   * Returns `false` if the effect exists inside a boundary whose pending snippet is shown
+   * @returns {boolean}
+   */
+  is_rendered() {
+    return !this.is_pending && (!this.parent || this.parent.is_rendered());
+  }
+  has_pending_snippet() {
+    return !!__privateGet(this, _props).pending;
+  }
+  /**
+   * Update the source that powers `$effect.pending()` inside this boundary,
+   * and controls when the current `pending` snippet (if any) is removed.
+   * Do not call from inside the class
+   * @param {1 | -1} d
+   * @param {Batch} batch
+   */
+  update_pending_count(d, batch) {
+    __privateMethod(this, _Boundary_instances, update_pending_count_fn).call(this, d, batch);
+    __privateSet(this, _local_pending_count, __privateGet(this, _local_pending_count) + d);
+    if (!__privateGet(this, _effect_pending) || __privateGet(this, _pending_count_update_queued)) return;
+    __privateSet(this, _pending_count_update_queued, true);
+    queue_micro_task(() => {
+      __privateSet(this, _pending_count_update_queued, false);
+      if (__privateGet(this, _effect_pending)) {
+        internal_set(__privateGet(this, _effect_pending), __privateGet(this, _local_pending_count));
+      }
+    });
+  }
+  get_effect_pending() {
+    __privateGet(this, _effect_pending_subscriber).call(this);
+    return get(
+      /** @type {Source<number>} */
+      __privateGet(this, _effect_pending)
+    );
+  }
+  /** @param {unknown} error */
+  error(error) {
+    if (!__privateGet(this, _props).onerror && !__privateGet(this, _props).failed) {
+      throw error;
+    }
+    if (current_batch == null ? void 0 : current_batch.is_fork) {
+      if (__privateGet(this, _main_effect)) current_batch.skip_effect(__privateGet(this, _main_effect));
+      if (__privateGet(this, _pending_effect)) current_batch.skip_effect(__privateGet(this, _pending_effect));
+      if (__privateGet(this, _failed_effect)) current_batch.skip_effect(__privateGet(this, _failed_effect));
+      current_batch.oncommit(() => {
+        __privateMethod(this, _Boundary_instances, handle_error_fn).call(this, error);
+      });
+    } else {
+      __privateMethod(this, _Boundary_instances, handle_error_fn).call(this, error);
+    }
+  }
+}
+_anchor = new WeakMap();
+_hydrate_open = new WeakMap();
+_props = new WeakMap();
+_children = new WeakMap();
+_effect = new WeakMap();
+_main_effect = new WeakMap();
+_pending_effect = new WeakMap();
+_failed_effect = new WeakMap();
+_offscreen_fragment = new WeakMap();
+_local_pending_count = new WeakMap();
+_pending_count = new WeakMap();
+_pending_count_update_queued = new WeakMap();
+_dirty_effects = new WeakMap();
+_maybe_dirty_effects = new WeakMap();
+_effect_pending = new WeakMap();
+_effect_pending_subscriber = new WeakMap();
+_Boundary_instances = new WeakSet();
+hydrate_resolved_content_fn = function() {
+  try {
+    __privateSet(this, _main_effect, branch(() => __privateGet(this, _children).call(this, __privateGet(this, _anchor))));
+  } catch (error) {
+    this.error(error);
+  }
+};
+/**
+ * @param {unknown} error The deserialized error from the server's hydration comment
+ */
+hydrate_failed_content_fn = function(error) {
+  const failed = __privateGet(this, _props).failed;
+  if (!failed) return;
+  __privateSet(this, _failed_effect, branch(() => {
+    failed(
+      __privateGet(this, _anchor),
+      () => error,
+      () => () => {
+      }
+    );
+  }));
+};
+hydrate_pending_content_fn = function() {
+  const pending = __privateGet(this, _props).pending;
+  if (!pending) return;
+  this.is_pending = true;
+  __privateSet(this, _pending_effect, branch(() => pending(__privateGet(this, _anchor))));
+  queue_micro_task(() => {
+    var fragment = __privateSet(this, _offscreen_fragment, document.createDocumentFragment());
+    var anchor = create_text();
+    fragment.append(anchor);
+    __privateSet(this, _main_effect, __privateMethod(this, _Boundary_instances, run_fn).call(this, () => {
+      return branch(() => __privateGet(this, _children).call(this, anchor));
+    }));
+    if (__privateGet(this, _pending_count) === 0) {
+      __privateGet(this, _anchor).before(fragment);
+      __privateSet(this, _offscreen_fragment, null);
+      pause_effect(
+        /** @type {Effect} */
+        __privateGet(this, _pending_effect),
+        () => {
+          __privateSet(this, _pending_effect, null);
+        }
+      );
+      __privateMethod(this, _Boundary_instances, resolve_fn).call(
+        this,
+        /** @type {Batch} */
+        current_batch
+      );
+    }
+  });
+};
+render_fn = function() {
+  try {
+    this.is_pending = this.has_pending_snippet();
+    __privateSet(this, _pending_count, 0);
+    __privateSet(this, _local_pending_count, 0);
+    __privateSet(this, _main_effect, branch(() => {
+      __privateGet(this, _children).call(this, __privateGet(this, _anchor));
+    }));
+    if (__privateGet(this, _pending_count) > 0) {
+      var fragment = __privateSet(this, _offscreen_fragment, document.createDocumentFragment());
+      move_effect(__privateGet(this, _main_effect), fragment);
+      const pending = (
+        /** @type {(anchor: Node) => void} */
+        __privateGet(this, _props).pending
+      );
+      __privateSet(this, _pending_effect, branch(() => pending(__privateGet(this, _anchor))));
+    } else {
+      __privateMethod(this, _Boundary_instances, resolve_fn).call(
+        this,
+        /** @type {Batch} */
+        current_batch
+      );
+    }
+  } catch (error) {
+    this.error(error);
+  }
+};
+/**
+ * @param {Batch} batch
+ */
+resolve_fn = function(batch) {
+  this.is_pending = false;
+  batch.transfer_effects(__privateGet(this, _dirty_effects), __privateGet(this, _maybe_dirty_effects));
+};
+/**
+ * @template T
+ * @param {() => T} fn
+ */
+run_fn = function(fn) {
+  var previous_effect = active_effect;
+  var previous_reaction = active_reaction;
+  var previous_ctx = component_context;
+  set_active_effect(__privateGet(this, _effect));
+  set_active_reaction(__privateGet(this, _effect));
+  set_component_context(__privateGet(this, _effect).ctx);
+  try {
+    Batch.ensure();
+    return fn();
+  } catch (e) {
+    handle_error(e);
+    return null;
+  } finally {
+    set_active_effect(previous_effect);
+    set_active_reaction(previous_reaction);
+    set_component_context(previous_ctx);
+  }
+};
+/**
+ * Updates the pending count associated with the currently visible pending snippet,
+ * if any, such that we can replace the snippet with content once work is done
+ * @param {1 | -1} d
+ * @param {Batch} batch
+ */
+update_pending_count_fn = function(d, batch) {
+  var _a2;
+  if (!this.has_pending_snippet()) {
+    if (this.parent) {
+      __privateMethod(_a2 = this.parent, _Boundary_instances, update_pending_count_fn).call(_a2, d, batch);
+    }
+    return;
+  }
+  __privateSet(this, _pending_count, __privateGet(this, _pending_count) + d);
+  if (__privateGet(this, _pending_count) === 0) {
+    __privateMethod(this, _Boundary_instances, resolve_fn).call(this, batch);
+    if (__privateGet(this, _pending_effect)) {
+      pause_effect(__privateGet(this, _pending_effect), () => {
+        __privateSet(this, _pending_effect, null);
+      });
+    }
+    if (__privateGet(this, _offscreen_fragment)) {
+      __privateGet(this, _anchor).before(__privateGet(this, _offscreen_fragment));
+      __privateSet(this, _offscreen_fragment, null);
+    }
+  }
+};
+/**
+ * @param {unknown} error
+ */
+handle_error_fn = function(error) {
+  if (__privateGet(this, _main_effect)) {
+    destroy_effect(__privateGet(this, _main_effect));
+    __privateSet(this, _main_effect, null);
+  }
+  if (__privateGet(this, _pending_effect)) {
+    destroy_effect(__privateGet(this, _pending_effect));
+    __privateSet(this, _pending_effect, null);
+  }
+  if (__privateGet(this, _failed_effect)) {
+    destroy_effect(__privateGet(this, _failed_effect));
+    __privateSet(this, _failed_effect, null);
+  }
+  var onerror = __privateGet(this, _props).onerror;
+  let failed = __privateGet(this, _props).failed;
+  var did_reset = false;
+  var calling_on_error = false;
+  const reset = () => {
+    if (did_reset) {
+      svelte_boundary_reset_noop();
+      return;
+    }
+    did_reset = true;
+    if (calling_on_error) {
+      svelte_boundary_reset_onerror();
+    }
+    if (__privateGet(this, _failed_effect) !== null) {
+      pause_effect(__privateGet(this, _failed_effect), () => {
+        __privateSet(this, _failed_effect, null);
+      });
+    }
+    __privateMethod(this, _Boundary_instances, run_fn).call(this, () => {
+      __privateMethod(this, _Boundary_instances, render_fn).call(this);
+    });
+  };
+  const handle_error_result = (transformed_error) => {
+    try {
+      calling_on_error = true;
+      onerror == null ? void 0 : onerror(transformed_error, reset);
+      calling_on_error = false;
+    } catch (error2) {
+      invoke_error_boundary(error2, __privateGet(this, _effect) && __privateGet(this, _effect).parent);
+    }
+    if (failed) {
+      __privateSet(this, _failed_effect, __privateMethod(this, _Boundary_instances, run_fn).call(this, () => {
+        try {
+          return branch(() => {
+            var effect2 = (
+              /** @type {Effect} */
+              active_effect
+            );
+            effect2.b = this;
+            effect2.f |= BOUNDARY_EFFECT;
+            failed(
+              __privateGet(this, _anchor),
+              () => transformed_error,
+              () => reset
+            );
+          });
+        } catch (error2) {
+          invoke_error_boundary(
+            error2,
+            /** @type {Effect} */
+            __privateGet(this, _effect).parent
+          );
+          return null;
+        }
+      }));
+    }
+  };
+  queue_micro_task(() => {
+    var result;
+    try {
+      result = this.transform_error(error);
+    } catch (e) {
+      invoke_error_boundary(e, __privateGet(this, _effect) && __privateGet(this, _effect).parent);
+      return;
+    }
+    if (result !== null && typeof result === "object" && typeof /** @type {any} */
+    result.then === "function") {
+      result.then(
+        handle_error_result,
+        /** @param {unknown} e */
+        (e) => invoke_error_boundary(e, __privateGet(this, _effect) && __privateGet(this, _effect).parent)
+      );
+    } else {
+      handle_error_result(result);
+    }
+  });
+};
+function flatten(blockers, sync, async, fn) {
+  const d = derived;
+  var pending = blockers.filter((b) => !b.settled);
+  var deriveds = sync.map(d);
+  if (async.length === 0 && pending.length === 0) {
+    fn(deriveds);
+    return;
+  }
+  var parent = (
+    /** @type {Effect} */
+    active_effect
+  );
+  var restore = capture();
+  var blocker_promise = pending.length === 1 ? pending[0].promise : pending.length > 1 ? Promise.all(pending.map((b) => b.promise)) : null;
+  function finish(async2) {
+    if ((parent.f & DESTROYED) !== 0) {
+      return;
+    }
+    restore();
+    try {
+      fn([...deriveds, ...async2]);
+    } catch (error) {
+      invoke_error_boundary(error, parent);
+    }
+    unset_context();
+  }
+  var decrement_pending = increment_pending();
+  if (async.length === 0) {
+    blocker_promise.then(() => finish([])).finally(decrement_pending);
+    return;
+  }
+  function run() {
+    Promise.all(async.map((expression) => /* @__PURE__ */ async_derived(expression))).then(finish).catch((error) => invoke_error_boundary(error, parent)).finally(decrement_pending);
+  }
+  if (blocker_promise) {
+    blocker_promise.then(() => {
+      restore();
+      run();
+      unset_context();
+    });
+  } else {
+    run();
+  }
+}
+function capture() {
+  var previous_effect = (
+    /** @type {Effect} */
+    active_effect
+  );
+  var previous_reaction = active_reaction;
+  var previous_component_context = component_context;
+  var previous_batch2 = (
+    /** @type {Batch} */
+    current_batch
+  );
+  return function restore(activate_batch = true) {
+    set_active_effect(previous_effect);
+    set_active_reaction(previous_reaction);
+    set_component_context(previous_component_context);
+    if (activate_batch && (previous_effect.f & DESTROYED) === 0) {
+      previous_batch2 == null ? void 0 : previous_batch2.activate();
+      previous_batch2 == null ? void 0 : previous_batch2.apply();
+    }
+  };
+}
+function unset_context(deactivate_batch = true) {
+  set_active_effect(null);
+  set_active_reaction(null);
+  set_component_context(null);
+  if (deactivate_batch) current_batch == null ? void 0 : current_batch.deactivate();
+}
+function increment_pending() {
+  var effect2 = (
+    /** @type {Effect} */
+    active_effect
+  );
+  var boundary2 = effect2.b;
+  var batch = (
+    /** @type {Batch} */
+    current_batch
+  );
+  var blocking = !!(boundary2 == null ? void 0 : boundary2.is_rendered());
+  boundary2 == null ? void 0 : boundary2.update_pending_count(1, batch);
+  batch.increment(blocking, effect2);
+  return () => {
+    boundary2 == null ? void 0 : boundary2.update_pending_count(-1, batch);
+    batch.decrement(blocking, effect2);
+  };
+}
+// @__NO_SIDE_EFFECTS__
+function derived(fn) {
+  var flags2 = DERIVED | DIRTY;
+  if (active_effect !== null) {
+    active_effect.f |= EFFECT_PRESERVED;
+  }
+  const signal = {
+    ctx: component_context,
+    deps: null,
+    effects: null,
+    equals,
+    f: flags2,
+    fn,
+    reactions: null,
+    rv: 0,
+    v: (
+      /** @type {V} */
+      UNINITIALIZED
+    ),
+    wv: 0,
+    parent: active_effect,
+    ac: null
+  };
+  return signal;
+}
+const OBSOLETE = Symbol("obsolete");
+// @__NO_SIDE_EFFECTS__
+function async_derived(fn, label, location2) {
+  let parent = (
+    /** @type {Effect | null} */
+    active_effect
+  );
+  if (parent === null) {
+    async_derived_orphan();
+  }
+  var promise = (
+    /** @type {Promise<V>} */
+    /** @type {unknown} */
+    void 0
+  );
+  var signal = source(
+    /** @type {V} */
+    UNINITIALIZED
+  );
+  var should_suspend = !active_reaction;
+  var deferreds = /* @__PURE__ */ new Set();
+  async_effect(() => {
+    var _a2, _b2;
+    var effect2 = (
+      /** @type {Effect} */
+      active_effect
+    );
+    var d = deferred();
+    promise = d.promise;
+    try {
+      Promise.resolve(fn()).then(d.resolve, (e) => {
+        if (e !== STALE_REACTION) d.reject(e);
+      }).finally(unset_context);
+    } catch (error) {
+      d.reject(error);
+      unset_context();
+    }
+    var batch = (
+      /** @type {Batch} */
+      current_batch
+    );
+    if (should_suspend) {
+      if ((effect2.f & REACTION_RAN) !== 0) {
+        var decrement_pending = increment_pending();
+      }
+      if (
+        // boundary can be null if the async derived is inside an $effect.root not connected to the component render tree
+        (_a2 = parent.b) == null ? void 0 : _a2.is_rendered()
+      ) {
+        (_b2 = batch.async_deriveds.get(effect2)) == null ? void 0 : _b2.reject(OBSOLETE);
+      } else {
+        for (const d2 of deferreds.values()) {
+          d2.reject(OBSOLETE);
+        }
+      }
+      deferreds.add(d);
+      batch.async_deriveds.set(effect2, d);
+    }
+    const handler = (value, error = void 0) => {
+      decrement_pending == null ? void 0 : decrement_pending();
+      deferreds.delete(d);
+      if (error === OBSOLETE) return;
+      batch.activate();
+      if (error) {
+        signal.f |= ERROR_VALUE;
+        internal_set(signal, error);
+      } else {
+        if ((signal.f & ERROR_VALUE) !== 0) {
+          signal.f ^= ERROR_VALUE;
+        }
+        internal_set(signal, value);
+      }
+      batch.deactivate();
+    };
+    d.promise.then(handler, (e) => handler(null, e || "unknown"));
+  });
+  teardown(() => {
+    for (const d of deferreds) {
+      d.reject(OBSOLETE);
+    }
+  });
+  return new Promise((fulfil) => {
+    function next(p) {
+      function go() {
+        if (p === promise) {
+          fulfil(signal);
+        } else {
+          next(promise);
+        }
+      }
+      p.then(go, go);
+    }
+    next(promise);
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function user_derived(fn) {
+  const d = /* @__PURE__ */ derived(fn);
+  push_reaction_value(d);
+  return d;
+}
+// @__NO_SIDE_EFFECTS__
+function derived_safe_equal(fn) {
+  const signal = /* @__PURE__ */ derived(fn);
+  signal.equals = safe_equals;
+  return signal;
+}
+function destroy_derived_effects(derived2) {
+  var effects = derived2.effects;
+  if (effects !== null) {
+    derived2.effects = null;
+    for (var i = 0; i < effects.length; i += 1) {
+      destroy_effect(
+        /** @type {Effect} */
+        effects[i]
+      );
+    }
+  }
+}
+function execute_derived(derived2) {
+  var value;
+  var prev_active_effect = active_effect;
+  var parent = derived2.parent;
+  if (!is_destroying_effect && parent !== null && derived2.v !== UNINITIALIZED && // if it was never evaluated before, it's guaranteed to fail downstream, so we try to execute instead
+  (parent.f & (DESTROYED | INERT)) !== 0) {
+    derived_inert();
+    return derived2.v;
+  }
+  set_active_effect(parent);
+  {
+    try {
+      derived2.f &= ~WAS_MARKED;
+      destroy_derived_effects(derived2);
+      value = update_reaction(derived2);
+    } finally {
+      set_active_effect(prev_active_effect);
+    }
+  }
+  return value;
+}
+function update_derived(derived2) {
+  var value = execute_derived(derived2);
+  if (!derived2.equals(value)) {
+    derived2.wv = increment_write_version();
+    if (!(current_batch == null ? void 0 : current_batch.is_fork) || derived2.deps === null) {
+      if (current_batch !== null) {
+        current_batch.capture(derived2, value, true);
+        previous_batch == null ? void 0 : previous_batch.capture(derived2, value, true);
+      } else {
+        derived2.v = value;
+      }
+      if (derived2.deps === null) {
+        set_signal_status(derived2, CLEAN);
+        return;
+      }
+    }
+  }
+  if (is_destroying_effect) {
+    return;
+  }
+  if (batch_values !== null) {
+    if (effect_tracking() || (current_batch == null ? void 0 : current_batch.is_fork)) {
+      batch_values.set(derived2, value);
+    }
+  } else {
+    update_derived_status(derived2);
+  }
+}
+function freeze_derived_effects(derived2) {
+  var _a2;
+  if (derived2.effects === null) return;
+  for (const e of derived2.effects) {
+    if (e.teardown || e.ac) {
+      (_a2 = e.teardown) == null ? void 0 : _a2.call(e);
+      if (e.ac !== null) {
+        without_reactive_context(() => {
+          e.ac.abort(STALE_REACTION);
+          e.ac = null;
+        });
+      }
+      if (e.fn !== null) e.teardown = noop;
+      remove_reactions(e, 0);
+      destroy_effect_children(e);
+    }
+  }
+}
+function unfreeze_derived_effects(derived2) {
+  if (derived2.effects === null) return;
+  for (const e of derived2.effects) {
+    if (e.teardown && e.fn !== null) {
+      update_effect(e);
+    }
+  }
+}
+let first_batch = null;
+let last_batch = null;
+let current_batch = null;
+let previous_batch = null;
+let batch_values = null;
+let last_scheduled_effect = null;
+let is_flushing_sync = false;
+let is_processing = false;
+let collected_effects = null;
+let legacy_updates = null;
+var flush_count = 0;
+var source_stacks = /* @__PURE__ */ new Set();
+let uid = 1;
+const _Batch = class _Batch {
+  constructor() {
+    __privateAdd(this, _Batch_instances);
+    __publicField(this, "id", uid++);
+    /** True as soon as `#process` was called */
+    __privateAdd(this, _started, false);
+    __publicField(this, "linked", true);
+    /** @type {Batch | null} */
+    __privateAdd(this, _prev, null);
+    /** @type {Batch | null} */
+    __privateAdd(this, _next, null);
+    /** @type {Map<Effect, ReturnType<typeof deferred<any>>>} */
+    __publicField(this, "async_deriveds", /* @__PURE__ */ new Map());
+    /**
+     * The current values of any signals that are updated in this batch.
+     * Tuple format: [value, is_derived] (note: is_derived is false for deriveds, too, if they were overridden via assignment)
+     * They keys of this map are identical to `this.#previous`
+     * @type {Map<Value, [any, boolean]>}
+     */
+    __publicField(this, "current", /* @__PURE__ */ new Map());
+    /**
+     * The values of any signals (sources and deriveds) that are updated in this batch _before_ those updates took place.
+     * They keys of this map are identical to `this.#current`
+     * @type {Map<Value, any>}
+     */
+    __publicField(this, "previous", /* @__PURE__ */ new Map());
+    /**
+     * When the batch is committed (and the DOM is updated), we need to remove old branches
+     * and append new ones by calling the functions added inside (if/each/key/etc) blocks
+     * @type {Set<(batch: Batch) => void>}
+     */
+    __privateAdd(this, _commit_callbacks, /* @__PURE__ */ new Set());
+    /**
+     * If a fork is discarded, we need to destroy any effects that are no longer needed
+     * @type {Set<(batch: Batch) => void>}
+     */
+    __privateAdd(this, _discard_callbacks, /* @__PURE__ */ new Set());
+    /**
+     * The number of async effects that are currently in flight
+     */
+    __privateAdd(this, _pending, 0);
+    /**
+     * Async effects that are currently in flight, _not_ inside a pending boundary
+     * @type {Map<Effect, number>}
+     */
+    __privateAdd(this, _blocking_pending, /* @__PURE__ */ new Map());
+    /**
+     * A deferred that resolves when the batch is committed, used with `settled()`
+     * TODO replace with Promise.withResolvers once supported widely enough
+     * @type {{ promise: Promise<void>, resolve: (value?: any) => void, reject: (reason: unknown) => void } | null}
+     */
+    __privateAdd(this, _deferred, null);
+    /**
+     * The root effects that need to be flushed
+     * @type {Effect[]}
+     */
+    __privateAdd(this, _roots, []);
+    /**
+     * Effects created while this batch was active.
+     * @type {Effect[]}
+     */
+    __privateAdd(this, _new_effects, []);
+    /**
+     * Deferred effects (which run after async work has completed) that are DIRTY
+     * @type {Set<Effect>}
+     */
+    __privateAdd(this, _dirty_effects2, /* @__PURE__ */ new Set());
+    /**
+     * Deferred effects that are MAYBE_DIRTY
+     * @type {Set<Effect>}
+     */
+    __privateAdd(this, _maybe_dirty_effects2, /* @__PURE__ */ new Set());
+    /**
+     * A map of branches that still exist, but will be destroyed when this batch
+     * is committed — we skip over these during `process`.
+     * The value contains child effects that were dirty/maybe_dirty before being reset,
+     * so they can be rescheduled if the branch survives.
+     * @type {Map<Effect, { d: Effect[], m: Effect[] }>}
+     */
+    __privateAdd(this, _skipped_branches, /* @__PURE__ */ new Map());
+    /**
+     * Inverse of #skipped_branches which we need to tell prior batches to unskip them when committing
+     * @type {Set<Effect>}
+     */
+    __privateAdd(this, _unskipped_branches, /* @__PURE__ */ new Set());
+    __publicField(this, "is_fork", false);
+    __privateAdd(this, _decrement_queued, false);
+    if (last_batch === null) {
+      first_batch = last_batch = this;
+    } else {
+      __privateSet(last_batch, _next, this);
+      __privateSet(this, _prev, last_batch);
+    }
+    last_batch = this;
+  }
+  /**
+   * Add an effect to the #skipped_branches map and reset its children
+   * @param {Effect} effect
+   */
+  skip_effect(effect2) {
+    if (!__privateGet(this, _skipped_branches).has(effect2)) {
+      __privateGet(this, _skipped_branches).set(effect2, { d: [], m: [] });
+    }
+    __privateGet(this, _unskipped_branches).delete(effect2);
+  }
+  /**
+   * Remove an effect from the #skipped_branches map and reschedule
+   * any tracked dirty/maybe_dirty child effects
+   * @param {Effect} effect
+   * @param {(e: Effect) => void} callback
+   */
+  unskip_effect(effect2, callback = (e) => this.schedule(e)) {
+    var tracked = __privateGet(this, _skipped_branches).get(effect2);
+    if (tracked) {
+      __privateGet(this, _skipped_branches).delete(effect2);
+      for (var e of tracked.d) {
+        set_signal_status(e, DIRTY);
+        callback(e);
+      }
+      for (e of tracked.m) {
+        set_signal_status(e, MAYBE_DIRTY);
+        callback(e);
+      }
+    }
+    __privateGet(this, _unskipped_branches).add(effect2);
+  }
+  /**
+   * Associate a change to a given source with the current
+   * batch, noting its previous and current values
+   * @param {Value} source
+   * @param {any} value
+   * @param {boolean} [is_derived]
+   */
+  capture(source2, value, is_derived = false) {
+    if (source2.v !== UNINITIALIZED && !this.previous.has(source2)) {
+      this.previous.set(source2, source2.v);
+    }
+    if ((source2.f & ERROR_VALUE) === 0) {
+      this.current.set(source2, [value, is_derived]);
+      batch_values == null ? void 0 : batch_values.set(source2, value);
+    }
+    if (!this.is_fork) {
+      source2.v = value;
+    }
+  }
+  activate() {
+    current_batch = this;
+  }
+  deactivate() {
+    current_batch = null;
+    batch_values = null;
+  }
+  flush() {
+    try {
+      if (DEV) ;
+      is_processing = true;
+      current_batch = this;
+      __privateMethod(this, _Batch_instances, process_fn).call(this);
+    } finally {
+      flush_count = 0;
+      last_scheduled_effect = null;
+      collected_effects = null;
+      legacy_updates = null;
+      is_processing = false;
+      current_batch = null;
+      batch_values = null;
+      old_values.clear();
+    }
+  }
+  discard() {
+    var _a2;
+    for (const fn of __privateGet(this, _discard_callbacks)) fn(this);
+    __privateGet(this, _discard_callbacks).clear();
+    for (const deferred2 of this.async_deriveds.values()) {
+      deferred2.reject(OBSOLETE);
+    }
+    __privateMethod(this, _Batch_instances, unlink_fn).call(this);
+    (_a2 = __privateGet(this, _deferred)) == null ? void 0 : _a2.resolve();
+  }
+  /**
+   * @param {Effect} effect
+   */
+  register_created_effect(effect2) {
+    __privateGet(this, _new_effects).push(effect2);
+  }
+  /**
+   * @param {boolean} blocking
+   * @param {Effect} effect
+   */
+  increment(blocking, effect2) {
+    __privateSet(this, _pending, __privateGet(this, _pending) + 1);
+    if (blocking) {
+      let blocking_pending_count = __privateGet(this, _blocking_pending).get(effect2) ?? 0;
+      __privateGet(this, _blocking_pending).set(effect2, blocking_pending_count + 1);
+    }
+  }
+  /**
+   * @param {boolean} blocking
+   * @param {Effect} effect
+   */
+  decrement(blocking, effect2) {
+    __privateSet(this, _pending, __privateGet(this, _pending) - 1);
+    if (blocking) {
+      let blocking_pending_count = __privateGet(this, _blocking_pending).get(effect2) ?? 0;
+      if (blocking_pending_count === 1) {
+        __privateGet(this, _blocking_pending).delete(effect2);
+      } else {
+        __privateGet(this, _blocking_pending).set(effect2, blocking_pending_count - 1);
+      }
+    }
+    if (__privateGet(this, _decrement_queued)) return;
+    __privateSet(this, _decrement_queued, true);
+    queue_micro_task(() => {
+      __privateSet(this, _decrement_queued, false);
+      if (this.linked) {
+        this.flush();
+      }
+    });
+  }
+  /**
+   * @param {Set<Effect>} dirty_effects
+   * @param {Set<Effect>} maybe_dirty_effects
+   */
+  transfer_effects(dirty_effects, maybe_dirty_effects) {
+    for (const e of dirty_effects) {
+      __privateGet(this, _dirty_effects2).add(e);
+    }
+    for (const e of maybe_dirty_effects) {
+      __privateGet(this, _maybe_dirty_effects2).add(e);
+    }
+    dirty_effects.clear();
+    maybe_dirty_effects.clear();
+  }
+  /** @param {(batch: Batch) => void} fn */
+  oncommit(fn) {
+    __privateGet(this, _commit_callbacks).add(fn);
+  }
+  /** @param {(batch: Batch) => void} fn */
+  ondiscard(fn) {
+    __privateGet(this, _discard_callbacks).add(fn);
+  }
+  settled() {
+    return (__privateGet(this, _deferred) ?? __privateSet(this, _deferred, deferred())).promise;
+  }
+  static ensure() {
+    if (current_batch === null) {
+      const batch = current_batch = new _Batch();
+      if (!is_processing && !is_flushing_sync) {
+        queue_micro_task(() => {
+          if (!__privateGet(batch, _started)) {
+            batch.flush();
+          }
+        });
+      }
+    }
+    return current_batch;
+  }
+  apply() {
+    {
+      batch_values = null;
+      return;
+    }
+  }
+  /**
+   *
+   * @param {Effect} effect
+   */
+  schedule(effect2) {
+    var _a2;
+    last_scheduled_effect = effect2;
+    if (((_a2 = effect2.b) == null ? void 0 : _a2.is_pending) && (effect2.f & (EFFECT | RENDER_EFFECT | MANAGED_EFFECT)) !== 0 && (effect2.f & REACTION_RAN) === 0) {
+      effect2.b.defer_effect(effect2);
+      return;
+    }
+    var e = effect2;
+    while (e.parent !== null) {
+      e = e.parent;
+      var flags2 = e.f;
+      if (collected_effects !== null && e === active_effect) {
+        if ((active_reaction === null || (active_reaction.f & DERIVED) === 0) && true) {
+          return;
+        }
+      }
+      if ((flags2 & (ROOT_EFFECT | BRANCH_EFFECT)) !== 0) {
+        if ((flags2 & CLEAN) === 0) {
+          return;
+        }
+        e.f ^= CLEAN;
+      }
+    }
+    __privateGet(this, _roots).push(e);
+  }
+};
+_started = new WeakMap();
+_prev = new WeakMap();
+_next = new WeakMap();
+_commit_callbacks = new WeakMap();
+_discard_callbacks = new WeakMap();
+_pending = new WeakMap();
+_blocking_pending = new WeakMap();
+_deferred = new WeakMap();
+_roots = new WeakMap();
+_new_effects = new WeakMap();
+_dirty_effects2 = new WeakMap();
+_maybe_dirty_effects2 = new WeakMap();
+_skipped_branches = new WeakMap();
+_unskipped_branches = new WeakMap();
+_decrement_queued = new WeakMap();
+_Batch_instances = new WeakSet();
+is_deferred_fn = function() {
+  if (this.is_fork) return true;
+  for (const effect2 of __privateGet(this, _blocking_pending).keys()) {
+    var e = effect2;
+    var skipped = false;
+    while (e.parent !== null) {
+      if (__privateGet(this, _skipped_branches).has(e)) {
+        skipped = true;
+        break;
+      }
+      e = e.parent;
+    }
+    if (!skipped) {
+      return true;
+    }
+  }
+  return false;
+};
+process_fn = function() {
+  var _a2, _b2, _c2, _d;
+  __privateSet(this, _started, true);
+  if (flush_count++ > 1e3) {
+    __privateMethod(this, _Batch_instances, unlink_fn).call(this);
+    infinite_loop_guard();
+  }
+  for (const e of __privateGet(this, _dirty_effects2)) {
+    __privateGet(this, _maybe_dirty_effects2).delete(e);
+    set_signal_status(e, DIRTY);
+    this.schedule(e);
+  }
+  for (const e of __privateGet(this, _maybe_dirty_effects2)) {
+    set_signal_status(e, MAYBE_DIRTY);
+    this.schedule(e);
+  }
+  const roots = __privateGet(this, _roots);
+  __privateSet(this, _roots, []);
+  this.apply();
+  var effects = collected_effects = [];
+  var render_effects = [];
+  var updates = legacy_updates = [];
+  for (const root2 of roots) {
+    try {
+      __privateMethod(this, _Batch_instances, traverse_fn).call(this, root2, effects, render_effects);
+    } catch (e) {
+      reset_all(root2);
+      if (!__privateMethod(this, _Batch_instances, is_deferred_fn).call(this)) this.discard();
+      throw e;
+    }
+  }
+  current_batch = null;
+  if (updates.length > 0) {
+    var batch = _Batch.ensure();
+    for (const e of updates) {
+      batch.schedule(e);
+    }
+  }
+  collected_effects = null;
+  legacy_updates = null;
+  if (__privateMethod(this, _Batch_instances, is_deferred_fn).call(this)) {
+    __privateMethod(this, _Batch_instances, defer_effects_fn).call(this, render_effects);
+    __privateMethod(this, _Batch_instances, defer_effects_fn).call(this, effects);
+    for (const [e, t] of __privateGet(this, _skipped_branches)) {
+      reset_branch(e, t);
+    }
+    if (updates.length > 0) {
+      /** @type {unknown} */
+      __privateMethod(_a2 = current_batch, _Batch_instances, process_fn).call(_a2);
+    }
+    return;
+  }
+  const earlier_batch = __privateMethod(this, _Batch_instances, find_earlier_batch_fn).call(this);
+  if (earlier_batch) {
+    __privateMethod(this, _Batch_instances, defer_effects_fn).call(this, render_effects);
+    __privateMethod(this, _Batch_instances, defer_effects_fn).call(this, effects);
+    __privateMethod(_b2 = earlier_batch, _Batch_instances, merge_fn).call(_b2, this);
+    return;
+  }
+  __privateGet(this, _dirty_effects2).clear();
+  __privateGet(this, _maybe_dirty_effects2).clear();
+  for (const fn of __privateGet(this, _commit_callbacks)) fn(this);
+  __privateGet(this, _commit_callbacks).clear();
+  previous_batch = this;
+  flush_queued_effects(render_effects);
+  flush_queued_effects(effects);
+  previous_batch = null;
+  (_c2 = __privateGet(this, _deferred)) == null ? void 0 : _c2.resolve();
+  var next_batch = (
+    /** @type {Batch | null} */
+    /** @type {unknown} */
+    current_batch
+  );
+  if (__privateGet(this, _pending) === 0 && (__privateGet(this, _roots).length === 0 || next_batch !== null)) {
+    __privateMethod(this, _Batch_instances, unlink_fn).call(this);
+  }
+  if (__privateGet(this, _roots).length > 0) {
+    if (next_batch !== null) {
+      const batch2 = next_batch;
+      __privateGet(batch2, _roots).push(...__privateGet(this, _roots).filter((r) => !__privateGet(batch2, _roots).includes(r)));
+    } else {
+      next_batch = this;
+    }
+  }
+  if (next_batch !== null) {
+    __privateMethod(_d = next_batch, _Batch_instances, process_fn).call(_d);
+  }
+};
+/**
+ * Traverse the effect tree, executing effects or stashing
+ * them for later execution as appropriate
+ * @param {Effect} root
+ * @param {Effect[]} effects
+ * @param {Effect[]} render_effects
+ */
+traverse_fn = function(root2, effects, render_effects) {
+  root2.f ^= CLEAN;
+  var effect2 = root2.first;
+  while (effect2 !== null) {
+    var flags2 = effect2.f;
+    var is_branch = (flags2 & (BRANCH_EFFECT | ROOT_EFFECT)) !== 0;
+    var is_skippable_branch = is_branch && (flags2 & CLEAN) !== 0;
+    var skip = is_skippable_branch || (flags2 & INERT) !== 0 || __privateGet(this, _skipped_branches).has(effect2);
+    if (!skip && effect2.fn !== null) {
+      if (is_branch) {
+        effect2.f ^= CLEAN;
+      } else if ((flags2 & EFFECT) !== 0) {
+        effects.push(effect2);
+      } else if (is_dirty(effect2)) {
+        if ((flags2 & BLOCK_EFFECT) !== 0) __privateGet(this, _maybe_dirty_effects2).add(effect2);
+        update_effect(effect2);
+      }
+      var child2 = effect2.first;
+      if (child2 !== null) {
+        effect2 = child2;
+        continue;
+      }
+    }
+    while (effect2 !== null) {
+      var next = effect2.next;
+      if (next !== null) {
+        effect2 = next;
+        break;
+      }
+      effect2 = effect2.parent;
+    }
+  }
+};
+find_earlier_batch_fn = function() {
+  var batch = __privateGet(this, _prev);
+  while (batch !== null) {
+    if (!batch.is_fork) {
+      for (const [value, [, is_derived]] of this.current) {
+        if (batch.current.has(value) && !is_derived) {
+          return batch;
+        }
+      }
+    }
+    batch = __privateGet(batch, _prev);
+  }
+  return null;
+};
+/**
+ * @param {Batch} batch
+ */
+merge_fn = function(batch) {
+  var _a2;
+  for (const [source2, value] of batch.current) {
+    if (!this.previous.has(source2) && batch.previous.has(source2)) {
+      this.previous.set(source2, batch.previous.get(source2));
+    }
+    this.current.set(source2, value);
+  }
+  for (const [effect2, deferred2] of batch.async_deriveds) {
+    const d = this.async_deriveds.get(effect2);
+    if (d) deferred2.promise.then(d.resolve).catch(d.reject);
+  }
+  batch.async_deriveds.clear();
+  this.transfer_effects(__privateGet(batch, _dirty_effects2), __privateGet(batch, _maybe_dirty_effects2));
+  const mark = (value) => {
+    var reactions = value.reactions;
+    if (reactions === null) return;
+    if ((value.f & DERIVED) !== 0 && (value.f & (DIRTY | MAYBE_DIRTY)) === 0) {
+      return;
+    }
+    for (const reaction of reactions) {
+      var flags2 = reaction.f;
+      if ((flags2 & DERIVED) !== 0) {
+        mark(
+          /** @type {Derived} */
+          reaction
+        );
+      } else {
+        var effect2 = (
+          /** @type {Effect} */
+          reaction
+        );
+        if (flags2 & (ASYNC | BLOCK_EFFECT) && !this.async_deriveds.has(effect2)) {
+          __privateGet(this, _maybe_dirty_effects2).delete(effect2);
+          set_signal_status(effect2, DIRTY);
+          this.schedule(effect2);
+        }
+      }
+    }
+  };
+  for (const source2 of this.current.keys()) {
+    mark(source2);
+  }
+  this.oncommit(() => batch.discard());
+  __privateMethod(_a2 = batch, _Batch_instances, unlink_fn).call(_a2);
+  current_batch = this;
+  __privateMethod(this, _Batch_instances, process_fn).call(this);
+};
+/**
+ * @param {Effect[]} effects
+ */
+defer_effects_fn = function(effects) {
+  for (var i = 0; i < effects.length; i += 1) {
+    defer_effect(effects[i], __privateGet(this, _dirty_effects2), __privateGet(this, _maybe_dirty_effects2));
+  }
+};
+commit_fn = function() {
+  var _a2;
+  for (let batch = first_batch; batch !== null; batch = __privateGet(batch, _next)) {
+    var is_earlier = batch.id < this.id;
+    var sources = [];
+    for (const [source3, [value, is_derived]] of this.current) {
+      if (batch.current.has(source3)) {
+        var batch_value = (
+          /** @type {[any, boolean]} */
+          batch.current.get(source3)[0]
+        );
+        if (is_earlier && value !== batch_value) {
+          batch.current.set(source3, [value, is_derived]);
+        } else {
+          continue;
+        }
+      }
+      sources.push(source3);
+    }
+    if (is_earlier) {
+      for (const [effect2, deferred2] of this.async_deriveds) {
+        const d = batch.async_deriveds.get(effect2);
+        if (d) deferred2.promise.then(d.resolve).catch(d.reject);
+      }
+    }
+    var current = [...batch.current.keys()].filter(
+      (source3) => !/** @type {[any, boolean]} */
+      batch.current.get(source3)[1]
+    );
+    if (!__privateGet(batch, _started) || current.length === 0) continue;
+    var others = current.filter((source3) => !this.current.has(source3));
+    if (others.length === 0) {
+      if (is_earlier) {
+        batch.discard();
+      }
+    } else if (sources.length > 0) {
+      if (is_earlier) {
+        for (const unskipped of __privateGet(this, _unskipped_branches)) {
+          batch.unskip_effect(unskipped, (e) => {
+            var _a3;
+            if ((e.f & (BLOCK_EFFECT | ASYNC)) !== 0) {
+              batch.schedule(e);
+            } else {
+              __privateMethod(_a3 = batch, _Batch_instances, defer_effects_fn).call(_a3, [e]);
+            }
+          });
+        }
+      }
+      batch.activate();
+      var marked = /* @__PURE__ */ new Set();
+      var checked = /* @__PURE__ */ new Map();
+      for (var source2 of sources) {
+        mark_effects(source2, others, marked, checked);
+      }
+      checked = /* @__PURE__ */ new Map();
+      var current_unequal = [...batch.current].filter(([c, v1]) => {
+        const v2 = this.current.get(c);
+        if (!v2) return true;
+        return v2[0] !== v1[0] || v2[1] !== v1[1];
+      }).map(([c]) => c);
+      if (current_unequal.length > 0) {
+        for (const effect2 of __privateGet(this, _new_effects)) {
+          if ((effect2.f & (DESTROYED | INERT | EAGER_EFFECT)) === 0 && depends_on(effect2, current_unequal, checked)) {
+            if ((effect2.f & (ASYNC | BLOCK_EFFECT)) !== 0) {
+              set_signal_status(effect2, DIRTY);
+              batch.schedule(effect2);
+            } else {
+              __privateGet(batch, _dirty_effects2).add(effect2);
+            }
+          }
+        }
+      }
+      if (__privateGet(batch, _roots).length > 0 && !__privateGet(batch, _decrement_queued)) {
+        batch.apply();
+        for (var root2 of __privateGet(batch, _roots)) {
+          __privateMethod(_a2 = batch, _Batch_instances, traverse_fn).call(_a2, root2, [], []);
+        }
+        __privateSet(batch, _roots, []);
+      }
+      batch.deactivate();
+    }
+  }
+};
+unlink_fn = function() {
+  if (!this.linked) return;
+  var prev = __privateGet(this, _prev);
+  var next = __privateGet(this, _next);
+  if (prev === null) {
+    first_batch = next;
+  } else {
+    __privateSet(prev, _next, next);
+  }
+  if (next === null) {
+    last_batch = prev;
+  } else {
+    __privateSet(next, _prev, prev);
+  }
+  this.linked = false;
+};
+let Batch = _Batch;
+function flushSync(fn) {
+  var was_flushing_sync = is_flushing_sync;
+  is_flushing_sync = true;
+  try {
+    var result;
+    if (fn) ;
+    while (true) {
+      flush_tasks();
+      if (current_batch === null) {
+        return (
+          /** @type {T} */
+          result
+        );
+      }
+      current_batch.flush();
+    }
+  } finally {
+    is_flushing_sync = was_flushing_sync;
+  }
+}
+function infinite_loop_guard() {
+  try {
+    effect_update_depth_exceeded();
+  } catch (error) {
+    invoke_error_boundary(error, last_scheduled_effect);
+  }
+}
+let eager_block_effects = null;
+function flush_queued_effects(effects) {
+  var length = effects.length;
+  if (length === 0) return;
+  var i = 0;
+  while (i < length) {
+    var effect2 = effects[i++];
+    if ((effect2.f & (DESTROYED | INERT)) === 0 && is_dirty(effect2)) {
+      eager_block_effects = /* @__PURE__ */ new Set();
+      update_effect(effect2);
+      if (effect2.deps === null && effect2.first === null && effect2.nodes === null && effect2.teardown === null && effect2.ac === null) {
+        unlink_effect(effect2);
+      }
+      if ((eager_block_effects == null ? void 0 : eager_block_effects.size) > 0) {
+        old_values.clear();
+        for (const e of eager_block_effects) {
+          if ((e.f & (DESTROYED | INERT)) !== 0) continue;
+          const ordered_effects = [e];
+          let ancestor = e.parent;
+          while (ancestor !== null) {
+            if (eager_block_effects.has(ancestor)) {
+              eager_block_effects.delete(ancestor);
+              ordered_effects.push(ancestor);
+            }
+            ancestor = ancestor.parent;
+          }
+          for (let j = ordered_effects.length - 1; j >= 0; j--) {
+            const e2 = ordered_effects[j];
+            if ((e2.f & (DESTROYED | INERT)) !== 0) continue;
+            update_effect(e2);
+          }
+        }
+        eager_block_effects.clear();
+      }
+    }
+  }
+  eager_block_effects = null;
+}
+function mark_effects(value, sources, marked, checked) {
+  if (marked.has(value)) return;
+  marked.add(value);
+  if (value.reactions !== null) {
+    for (const reaction of value.reactions) {
+      const flags2 = reaction.f;
+      if ((flags2 & DERIVED) !== 0) {
+        mark_effects(
+          /** @type {Derived} */
+          reaction,
+          sources,
+          marked,
+          checked
+        );
+      } else if ((flags2 & (ASYNC | BLOCK_EFFECT)) !== 0 && (flags2 & DIRTY) === 0 && depends_on(reaction, sources, checked)) {
+        set_signal_status(reaction, DIRTY);
+        schedule_effect(
+          /** @type {Effect} */
+          reaction
+        );
+      }
+    }
+  }
+}
+function depends_on(reaction, sources, checked) {
+  const depends = checked.get(reaction);
+  if (depends !== void 0) return depends;
+  if (reaction.deps !== null) {
+    for (const dep of reaction.deps) {
+      if (includes.call(sources, dep)) {
+        return true;
+      }
+      if ((dep.f & DERIVED) !== 0 && depends_on(
+        /** @type {Derived} */
+        dep,
+        sources,
+        checked
+      )) {
+        checked.set(
+          /** @type {Derived} */
+          dep,
+          true
+        );
+        return true;
+      }
+    }
+  }
+  checked.set(reaction, false);
+  return false;
+}
+function schedule_effect(effect2) {
+  current_batch.schedule(effect2);
+}
+function reset_branch(effect2, tracked) {
+  if ((effect2.f & BRANCH_EFFECT) !== 0 && (effect2.f & CLEAN) !== 0) {
+    return;
+  }
+  if ((effect2.f & DIRTY) !== 0) {
+    tracked.d.push(effect2);
+  } else if ((effect2.f & MAYBE_DIRTY) !== 0) {
+    tracked.m.push(effect2);
+  }
+  set_signal_status(effect2, CLEAN);
+  var e = effect2.first;
+  while (e !== null) {
+    reset_branch(e, tracked);
+    e = e.next;
+  }
+}
+function reset_all(effect2) {
+  set_signal_status(effect2, CLEAN);
+  var e = effect2.first;
+  while (e !== null) {
+    reset_all(e);
+    e = e.next;
+  }
+}
+let eager_effects = /* @__PURE__ */ new Set();
+const old_values = /* @__PURE__ */ new Map();
+let eager_effects_deferred = false;
+function source(v, stack) {
+  var signal = {
+    f: 0,
+    // TODO ideally we could skip this altogether, but it causes type errors
+    v,
+    reactions: null,
+    equals,
+    rv: 0,
+    wv: 0
+  };
+  return signal;
+}
+// @__NO_SIDE_EFFECTS__
+function state(v, stack) {
+  const s = source(v);
+  push_reaction_value(s);
+  return s;
+}
+// @__NO_SIDE_EFFECTS__
+function mutable_source(initial_value, immutable = false, trackable = true) {
+  const s = source(initial_value);
+  if (!immutable) {
+    s.equals = safe_equals;
+  }
+  return s;
+}
+function set(source2, value, should_proxy = false) {
+  if (active_reaction !== null && // since we are untracking the function inside `$inspect.with` we need to add this check
+  // to ensure we error if state is set inside an inspect effect
+  (!untracking || (active_reaction.f & EAGER_EFFECT) !== 0) && is_runes() && (active_reaction.f & (DERIVED | BLOCK_EFFECT | ASYNC | EAGER_EFFECT)) !== 0 && (current_sources === null || !current_sources.has(source2))) {
+    state_unsafe_mutation();
+  }
+  let new_value = should_proxy ? proxy(value) : value;
+  return internal_set(source2, new_value, legacy_updates);
+}
+function internal_set(source2, value, updated_during_traversal = null) {
+  if (!source2.equals(value)) {
+    old_values.set(source2, is_destroying_effect ? value : source2.v);
+    var batch = Batch.ensure();
+    batch.capture(source2, value);
+    if ((source2.f & DERIVED) !== 0) {
+      const derived2 = (
+        /** @type {Derived} */
+        source2
+      );
+      if ((source2.f & DIRTY) !== 0) {
+        execute_derived(derived2);
+      }
+      if (batch_values === null) {
+        update_derived_status(derived2);
+      }
+    }
+    source2.wv = increment_write_version();
+    mark_reactions(source2, DIRTY, updated_during_traversal);
+    if (active_effect !== null && (active_effect.f & CLEAN) !== 0 && (active_effect.f & (BRANCH_EFFECT | ROOT_EFFECT)) === 0) {
+      if (untracked_writes === null) {
+        set_untracked_writes([source2]);
+      } else {
+        untracked_writes.push(source2);
+      }
+    }
+    if (!batch.is_fork && eager_effects.size > 0 && !eager_effects_deferred) {
+      flush_eager_effects();
+    }
+  }
+  return value;
+}
+function flush_eager_effects() {
+  eager_effects_deferred = false;
+  for (const effect2 of eager_effects) {
+    if ((effect2.f & CLEAN) !== 0) {
+      set_signal_status(effect2, MAYBE_DIRTY);
+    }
+    let dirty;
+    try {
+      dirty = is_dirty(effect2);
+    } catch {
+      dirty = true;
+    }
+    if (dirty) {
+      update_effect(effect2);
+    }
+  }
+  eager_effects.clear();
+}
+function increment(source2) {
+  set(source2, source2.v + 1);
+}
+function mark_reactions(signal, status, updated_during_traversal) {
+  var reactions = signal.reactions;
+  if (reactions === null) return;
+  var length = reactions.length;
+  for (var i = 0; i < length; i++) {
+    var reaction = reactions[i];
+    var flags2 = reaction.f;
+    var not_dirty = (flags2 & DIRTY) === 0;
+    if (not_dirty) {
+      set_signal_status(reaction, status);
+    }
+    if ((flags2 & EAGER_EFFECT) !== 0) {
+      eager_effects.add(
+        /** @type {Effect} */
+        reaction
+      );
+    } else if ((flags2 & DERIVED) !== 0) {
+      var derived2 = (
+        /** @type {Derived} */
+        reaction
+      );
+      batch_values == null ? void 0 : batch_values.delete(derived2);
+      if ((flags2 & WAS_MARKED) === 0) {
+        if (flags2 & CONNECTED && (active_effect === null || (active_effect.f & REACTION_IS_UPDATING) === 0)) {
+          reaction.f |= WAS_MARKED;
+        }
+        mark_reactions(derived2, MAYBE_DIRTY, updated_during_traversal);
+      }
+    } else if (not_dirty) {
+      var effect2 = (
+        /** @type {Effect} */
+        reaction
+      );
+      if ((flags2 & BLOCK_EFFECT) !== 0 && eager_block_effects !== null) {
+        eager_block_effects.add(effect2);
+      }
+      if (updated_during_traversal !== null) {
+        updated_during_traversal.push(effect2);
+      } else {
+        schedule_effect(effect2);
+      }
+    }
+  }
+}
+function proxy(value) {
+  if (typeof value !== "object" || value === null || STATE_SYMBOL in value) {
+    return value;
+  }
+  const prototype = get_prototype_of(value);
+  if (prototype !== object_prototype && prototype !== array_prototype) {
+    return value;
+  }
+  var sources = /* @__PURE__ */ new Map();
+  var is_proxied_array = is_array(value);
+  var version = /* @__PURE__ */ state(0);
+  var parent_version = update_version;
+  var with_parent = (fn) => {
+    if (update_version === parent_version) {
+      return fn();
+    }
+    var reaction = active_reaction;
+    var version2 = update_version;
+    set_active_reaction(null);
+    set_update_version(parent_version);
+    var result = fn();
+    set_active_reaction(reaction);
+    set_update_version(version2);
+    return result;
+  };
+  if (is_proxied_array) {
+    sources.set("length", /* @__PURE__ */ state(
+      /** @type {any[]} */
+      value.length
+    ));
+  }
+  return new Proxy(
+    /** @type {any} */
+    value,
+    {
+      defineProperty(_, prop2, descriptor) {
+        if (!("value" in descriptor) || descriptor.configurable === false || descriptor.enumerable === false || descriptor.writable === false) {
+          state_descriptors_fixed();
+        }
+        var s = sources.get(prop2);
+        if (s === void 0) {
+          with_parent(() => {
+            var s2 = /* @__PURE__ */ state(descriptor.value);
+            sources.set(prop2, s2);
+            return s2;
+          });
+        } else {
+          set(s, descriptor.value, true);
+        }
+        return true;
+      },
+      deleteProperty(target2, prop2) {
+        var s = sources.get(prop2);
+        if (s === void 0) {
+          if (prop2 in target2) {
+            const s2 = with_parent(() => /* @__PURE__ */ state(UNINITIALIZED));
+            sources.set(prop2, s2);
+            increment(version);
+          }
+        } else {
+          set(s, UNINITIALIZED);
+          increment(version);
+        }
+        return true;
+      },
+      get(target2, prop2, receiver) {
+        var _a2;
+        if (prop2 === STATE_SYMBOL) {
+          return value;
+        }
+        var s = sources.get(prop2);
+        var exists = prop2 in target2;
+        if (s === void 0 && (!exists || ((_a2 = get_descriptor(target2, prop2)) == null ? void 0 : _a2.writable))) {
+          s = with_parent(() => {
+            var p = proxy(exists ? target2[prop2] : UNINITIALIZED);
+            var s2 = /* @__PURE__ */ state(p);
+            return s2;
+          });
+          sources.set(prop2, s);
+        }
+        if (s !== void 0) {
+          var v = get(s);
+          return v === UNINITIALIZED ? void 0 : v;
+        }
+        return Reflect.get(target2, prop2, receiver);
+      },
+      getOwnPropertyDescriptor(target2, prop2) {
+        var descriptor = Reflect.getOwnPropertyDescriptor(target2, prop2);
+        if (descriptor && "value" in descriptor) {
+          var s = sources.get(prop2);
+          if (s) descriptor.value = get(s);
+        } else if (descriptor === void 0) {
+          var source2 = sources.get(prop2);
+          var value2 = source2 == null ? void 0 : source2.v;
+          if (source2 !== void 0 && value2 !== UNINITIALIZED) {
+            return {
+              enumerable: true,
+              configurable: true,
+              value: value2,
+              writable: true
+            };
+          }
+        }
+        return descriptor;
+      },
+      has(target2, prop2) {
+        var _a2;
+        if (prop2 === STATE_SYMBOL) {
+          return true;
+        }
+        var s = sources.get(prop2);
+        var has = s !== void 0 && s.v !== UNINITIALIZED || Reflect.has(target2, prop2);
+        if (s !== void 0 || active_effect !== null && (!has || ((_a2 = get_descriptor(target2, prop2)) == null ? void 0 : _a2.writable))) {
+          if (s === void 0) {
+            s = with_parent(() => {
+              var p = has ? proxy(target2[prop2]) : UNINITIALIZED;
+              var s2 = /* @__PURE__ */ state(p);
+              return s2;
+            });
+            sources.set(prop2, s);
+          }
+          var value2 = get(s);
+          if (value2 === UNINITIALIZED) {
+            return false;
+          }
+        }
+        return has;
+      },
+      set(target2, prop2, value2, receiver) {
+        var _a2;
+        var s = sources.get(prop2);
+        var has = prop2 in target2;
+        if (is_proxied_array && prop2 === "length") {
+          for (var i = value2; i < /** @type {Source<number>} */
+          s.v; i += 1) {
+            var other_s = sources.get(i + "");
+            if (other_s !== void 0) {
+              set(other_s, UNINITIALIZED);
+            } else if (i in target2) {
+              other_s = with_parent(() => /* @__PURE__ */ state(UNINITIALIZED));
+              sources.set(i + "", other_s);
+            }
+          }
+        }
+        if (s === void 0) {
+          if (!has || ((_a2 = get_descriptor(target2, prop2)) == null ? void 0 : _a2.writable)) {
+            s = with_parent(() => /* @__PURE__ */ state(void 0));
+            set(s, proxy(value2));
+            sources.set(prop2, s);
+          }
+        } else {
+          has = s.v !== UNINITIALIZED;
+          var p = with_parent(() => proxy(value2));
+          set(s, p);
+        }
+        var descriptor = Reflect.getOwnPropertyDescriptor(target2, prop2);
+        if (descriptor == null ? void 0 : descriptor.set) {
+          descriptor.set.call(receiver, value2);
+        }
+        if (!has) {
+          if (is_proxied_array && typeof prop2 === "string") {
+            var ls = (
+              /** @type {Source<number>} */
+              sources.get("length")
+            );
+            var n = Number(prop2);
+            if (Number.isInteger(n) && n >= ls.v) {
+              set(ls, n + 1);
+            }
+          }
+          increment(version);
+        }
+        return true;
+      },
+      ownKeys(target2) {
+        get(version);
+        var own_keys = Reflect.ownKeys(target2).filter((key3) => {
+          var source3 = sources.get(key3);
+          return source3 === void 0 || source3.v !== UNINITIALIZED;
+        });
+        for (var [key2, source2] of sources) {
+          if (source2.v !== UNINITIALIZED && !(key2 in target2)) {
+            own_keys.push(key2);
+          }
+        }
+        return own_keys;
+      },
+      setPrototypeOf() {
+        state_prototype_fixed();
+      }
+    }
+  );
+}
+function get_proxied_value(value) {
+  try {
+    if (value !== null && typeof value === "object" && STATE_SYMBOL in value) {
+      return value[STATE_SYMBOL];
+    }
+  } catch {
+  }
+  return value;
+}
+function is(a, b) {
+  return Object.is(get_proxied_value(a), get_proxied_value(b));
+}
+var $window;
+var is_firefox;
+var first_child_getter;
+var next_sibling_getter;
+function init_operations() {
+  if ($window !== void 0) {
+    return;
+  }
+  $window = window;
+  is_firefox = /Firefox/.test(navigator.userAgent);
+  var element_prototype = Element.prototype;
+  var node_prototype = Node.prototype;
+  var text_prototype = Text.prototype;
+  first_child_getter = get_descriptor(node_prototype, "firstChild").get;
+  next_sibling_getter = get_descriptor(node_prototype, "nextSibling").get;
+  if (is_extensible(element_prototype)) {
+    element_prototype[CLASS_CACHE] = void 0;
+    element_prototype[ATTRIBUTES_CACHE] = null;
+    element_prototype[STYLE_CACHE] = void 0;
+    element_prototype.__e = void 0;
+  }
+  if (is_extensible(text_prototype)) {
+    text_prototype[TEXT_CACHE] = void 0;
+  }
+}
+function create_text(value = "") {
+  return document.createTextNode(value);
+}
+// @__NO_SIDE_EFFECTS__
+function get_first_child(node) {
+  return (
+    /** @type {TemplateNode | null} */
+    first_child_getter.call(node)
+  );
+}
+// @__NO_SIDE_EFFECTS__
+function get_next_sibling(node) {
+  return (
+    /** @type {TemplateNode | null} */
+    next_sibling_getter.call(node)
+  );
+}
+function child(node, is_text) {
+  {
+    return /* @__PURE__ */ get_first_child(node);
+  }
+}
+function first_child(node, is_text = false) {
+  {
+    var first = /* @__PURE__ */ get_first_child(node);
+    if (first instanceof Comment && first.data === "") return /* @__PURE__ */ get_next_sibling(first);
+    return first;
+  }
+}
+function sibling(node, count = 1, is_text = false) {
+  let next_sibling = node;
+  while (count--) {
+    next_sibling = /** @type {TemplateNode} */
+    /* @__PURE__ */ get_next_sibling(next_sibling);
+  }
+  {
+    return next_sibling;
+  }
+}
+function clear_text_content(node) {
+  node.textContent = "";
+}
+function should_defer_append() {
+  return false;
+}
+function create_element(tag, namespace, is2) {
+  {
+    return (
+      /** @type {T extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[T] : Element} */
+      is2 ? document.createElement(tag, { is: is2 }) : document.createElement(tag)
+    );
+  }
+}
+function validate_effect(rune) {
+  if (active_effect === null) {
+    if (active_reaction === null) {
+      effect_orphan();
+    }
+    effect_in_unowned_derived();
+  }
+  if (is_destroying_effect) {
+    effect_in_teardown();
+  }
+}
+function push_effect(effect2, parent_effect) {
+  var parent_last = parent_effect.last;
+  if (parent_last === null) {
+    parent_effect.last = parent_effect.first = effect2;
+  } else {
+    parent_last.next = effect2;
+    effect2.prev = parent_last;
+    parent_effect.last = effect2;
+  }
+}
+function create_effect(type, fn) {
+  var parent = active_effect;
+  if (parent !== null && (parent.f & INERT) !== 0) {
+    type |= INERT;
+  }
+  var effect2 = {
+    ctx: component_context,
+    deps: null,
+    nodes: null,
+    f: type | DIRTY | CONNECTED,
+    first: null,
+    fn,
+    last: null,
+    next: null,
+    parent,
+    b: parent && parent.b,
+    prev: null,
+    teardown: null,
+    wv: 0,
+    ac: null
+  };
+  current_batch == null ? void 0 : current_batch.register_created_effect(effect2);
+  var e = effect2;
+  if ((type & EFFECT) !== 0) {
+    if (collected_effects !== null) {
+      collected_effects.push(effect2);
+    } else {
+      Batch.ensure().schedule(effect2);
+    }
+  } else if (fn !== null) {
+    try {
+      update_effect(effect2);
+    } catch (e2) {
+      destroy_effect(effect2);
+      throw e2;
+    }
+    if (e.deps === null && e.teardown === null && e.nodes === null && e.first === e.last && // either `null`, or a singular child
+    (e.f & EFFECT_PRESERVED) === 0) {
+      e = e.first;
+      if ((type & BLOCK_EFFECT) !== 0 && (type & EFFECT_TRANSPARENT) !== 0 && e !== null) {
+        e.f |= EFFECT_TRANSPARENT;
+      }
+    }
+  }
+  if (e !== null) {
+    e.parent = parent;
+    if (parent !== null) {
+      push_effect(e, parent);
+    }
+    if (active_reaction !== null && (active_reaction.f & DERIVED) !== 0 && (type & ROOT_EFFECT) === 0) {
+      var derived2 = (
+        /** @type {Derived} */
+        active_reaction
+      );
+      (derived2.effects ?? (derived2.effects = [])).push(e);
+    }
+  }
+  return effect2;
+}
+function effect_tracking() {
+  return active_reaction !== null && !untracking;
+}
+function teardown(fn) {
+  const effect2 = create_effect(RENDER_EFFECT, null);
+  set_signal_status(effect2, CLEAN);
+  effect2.teardown = fn;
+  return effect2;
+}
+function user_effect(fn) {
+  validate_effect();
+  var flags2 = (
+    /** @type {Effect} */
+    active_effect.f
+  );
+  var defer = !active_reaction && (flags2 & BRANCH_EFFECT) !== 0 && component_context !== null && !component_context.i;
+  if (defer) {
+    var context = (
+      /** @type {ComponentContext} */
+      component_context
+    );
+    (context.e ?? (context.e = [])).push(fn);
+  } else {
+    return create_user_effect(fn);
+  }
+}
+function create_user_effect(fn) {
+  return create_effect(EFFECT | USER_EFFECT, fn);
+}
+function component_root(fn) {
+  Batch.ensure();
+  const effect2 = create_effect(ROOT_EFFECT | EFFECT_PRESERVED, fn);
+  return (options = {}) => {
+    return new Promise((fulfil) => {
+      if (options.outro) {
+        pause_effect(effect2, () => {
+          destroy_effect(effect2);
+          fulfil(void 0);
+        });
+      } else {
+        destroy_effect(effect2);
+        fulfil(void 0);
+      }
+    });
+  };
+}
+function effect(fn) {
+  return create_effect(EFFECT, fn);
+}
+function async_effect(fn) {
+  return create_effect(ASYNC | EFFECT_PRESERVED, fn);
+}
+function render_effect(fn, flags2 = 0) {
+  return create_effect(RENDER_EFFECT | flags2, fn);
+}
+function template_effect(fn, sync = [], async = [], blockers = []) {
+  flatten(blockers, sync, async, (values) => {
+    create_effect(RENDER_EFFECT, () => {
+      fn(...values.map(get));
+    });
+  });
+}
+function block(fn, flags2 = 0) {
+  var effect2 = create_effect(BLOCK_EFFECT | flags2, fn);
+  return effect2;
+}
+function branch(fn) {
+  return create_effect(BRANCH_EFFECT | EFFECT_PRESERVED, fn);
+}
+function execute_effect_teardown(effect2) {
+  var teardown2 = effect2.teardown;
+  if (teardown2 !== null) {
+    const previously_destroying_effect = is_destroying_effect;
+    const previous_reaction = active_reaction;
+    set_is_destroying_effect(true);
+    set_active_reaction(null);
+    try {
+      teardown2.call(null);
+    } finally {
+      set_is_destroying_effect(previously_destroying_effect);
+      set_active_reaction(previous_reaction);
+    }
+  }
+}
+function destroy_effect_children(signal, remove_dom = false) {
+  var effect2 = signal.first;
+  signal.first = signal.last = null;
+  while (effect2 !== null) {
+    const controller = effect2.ac;
+    if (controller !== null) {
+      without_reactive_context(() => {
+        controller.abort(STALE_REACTION);
+      });
+    }
+    var next = effect2.next;
+    if ((effect2.f & ROOT_EFFECT) !== 0) {
+      effect2.parent = null;
+    } else {
+      destroy_effect(effect2, remove_dom);
+    }
+    effect2 = next;
+  }
+}
+function destroy_block_effect_children(signal) {
+  var effect2 = signal.first;
+  while (effect2 !== null) {
+    var next = effect2.next;
+    if ((effect2.f & BRANCH_EFFECT) === 0) {
+      destroy_effect(effect2);
+    }
+    effect2 = next;
+  }
+}
+function destroy_effect(effect2, remove_dom = true) {
+  var removed = false;
+  if ((remove_dom || (effect2.f & HEAD_EFFECT) !== 0) && effect2.nodes !== null && effect2.nodes.end !== null) {
+    remove_effect_dom(
+      effect2.nodes.start,
+      /** @type {TemplateNode} */
+      effect2.nodes.end
+    );
+    removed = true;
+  }
+  effect2.f |= DESTROYING;
+  destroy_effect_children(effect2, remove_dom && !removed);
+  remove_reactions(effect2, 0);
+  var transitions = effect2.nodes && effect2.nodes.t;
+  if (transitions !== null) {
+    for (const transition of transitions) {
+      transition.stop();
+    }
+  }
+  execute_effect_teardown(effect2);
+  effect2.f ^= DESTROYING;
+  effect2.f |= DESTROYED;
+  var parent = effect2.parent;
+  if (parent !== null && parent.first !== null) {
+    unlink_effect(effect2);
+  }
+  effect2.next = effect2.prev = effect2.teardown = effect2.ctx = effect2.deps = effect2.fn = effect2.nodes = effect2.ac = effect2.b = null;
+}
+function remove_effect_dom(node, end) {
+  while (node !== null) {
+    var next = node === end ? null : /* @__PURE__ */ get_next_sibling(node);
+    node.remove();
+    node = next;
+  }
+}
+function unlink_effect(effect2) {
+  var parent = effect2.parent;
+  var prev = effect2.prev;
+  var next = effect2.next;
+  if (prev !== null) prev.next = next;
+  if (next !== null) next.prev = prev;
+  if (parent !== null) {
+    if (parent.first === effect2) parent.first = next;
+    if (parent.last === effect2) parent.last = prev;
+  }
+}
+function pause_effect(effect2, callback, destroy = true) {
+  var transitions = [];
+  pause_children(effect2, transitions, true);
+  var fn = () => {
+    if (destroy) destroy_effect(effect2);
+    if (callback) callback();
+  };
+  var remaining = transitions.length;
+  if (remaining > 0) {
+    var check = () => --remaining || fn();
+    for (var transition of transitions) {
+      transition.out(check);
+    }
+  } else {
+    fn();
+  }
+}
+function pause_children(effect2, transitions, local) {
+  if ((effect2.f & INERT) !== 0) return;
+  effect2.f ^= INERT;
+  var t = effect2.nodes && effect2.nodes.t;
+  if (t !== null) {
+    for (const transition of t) {
+      if (transition.is_global || local) {
+        transitions.push(transition);
+      }
+    }
+  }
+  var child2 = effect2.first;
+  while (child2 !== null) {
+    var sibling2 = child2.next;
+    if ((child2.f & ROOT_EFFECT) === 0) {
+      var transparent = (child2.f & EFFECT_TRANSPARENT) !== 0 || // If this is a branch effect without a block effect parent,
+      // it means the parent block effect was pruned. In that case,
+      // transparency information was transferred to the branch effect.
+      (child2.f & BRANCH_EFFECT) !== 0 && (effect2.f & BLOCK_EFFECT) !== 0;
+      pause_children(child2, transitions, transparent ? local : false);
+    }
+    child2 = sibling2;
+  }
+}
+function resume_effect(effect2) {
+  resume_children(effect2, true);
+}
+function resume_children(effect2, local) {
+  if ((effect2.f & INERT) === 0) return;
+  effect2.f ^= INERT;
+  if ((effect2.f & CLEAN) === 0) {
+    set_signal_status(effect2, DIRTY);
+    Batch.ensure().schedule(effect2);
+  }
+  var child2 = effect2.first;
+  while (child2 !== null) {
+    var sibling2 = child2.next;
+    var transparent = (child2.f & EFFECT_TRANSPARENT) !== 0 || (child2.f & BRANCH_EFFECT) !== 0;
+    resume_children(child2, transparent ? local : false);
+    child2 = sibling2;
+  }
+  var t = effect2.nodes && effect2.nodes.t;
+  if (t !== null) {
+    for (const transition of t) {
+      if (transition.is_global || local) {
+        transition.in();
+      }
+    }
+  }
+}
+function move_effect(effect2, fragment) {
+  if (!effect2.nodes) return;
+  var node = effect2.nodes.start;
+  var end = effect2.nodes.end;
+  while (node !== null) {
+    var next = node === end ? null : /* @__PURE__ */ get_next_sibling(node);
+    fragment.append(node);
+    node = next;
+  }
+}
+let is_updating_effect = false;
+let is_destroying_effect = false;
+function set_is_destroying_effect(value) {
+  is_destroying_effect = value;
+}
+let active_reaction = null;
+let untracking = false;
+function set_active_reaction(reaction) {
+  active_reaction = reaction;
+}
+let active_effect = null;
+function set_active_effect(effect2) {
+  active_effect = effect2;
+}
+let current_sources = null;
+function push_reaction_value(value) {
+  if (active_reaction !== null && true) {
+    (current_sources ?? (current_sources = /* @__PURE__ */ new Set())).add(value);
+  }
+}
+let new_deps = null;
+let skipped_deps = 0;
+let untracked_writes = null;
+function set_untracked_writes(value) {
+  untracked_writes = value;
+}
+let write_version = 1;
+let read_version = 0;
+let update_version = read_version;
+function set_update_version(value) {
+  update_version = value;
+}
+function increment_write_version() {
+  return ++write_version;
+}
+function is_dirty(reaction) {
+  var flags2 = reaction.f;
+  if ((flags2 & DIRTY) !== 0) {
+    return true;
+  }
+  if (flags2 & DERIVED) {
+    reaction.f &= ~WAS_MARKED;
+  }
+  if ((flags2 & MAYBE_DIRTY) !== 0) {
+    var dependencies = (
+      /** @type {Value[]} */
+      reaction.deps
+    );
+    var length = dependencies.length;
+    for (var i = 0; i < length; i++) {
+      var dependency = dependencies[i];
+      if (is_dirty(
+        /** @type {Derived} */
+        dependency
+      )) {
+        update_derived(
+          /** @type {Derived} */
+          dependency
+        );
+      }
+      if (dependency.wv > reaction.wv) {
+        return true;
+      }
+    }
+    if ((flags2 & CONNECTED) !== 0 && // During time traveling we don't want to reset the status so that
+    // traversal of the graph in the other batches still happens
+    batch_values === null) {
+      set_signal_status(reaction, CLEAN);
+    }
+  }
+  return false;
+}
+function schedule_possible_effect_self_invalidation(signal, effect2, root2 = true) {
+  var reactions = signal.reactions;
+  if (reactions === null) return;
+  if (current_sources !== null && current_sources.has(signal)) {
+    return;
+  }
+  for (var i = 0; i < reactions.length; i++) {
+    var reaction = reactions[i];
+    if ((reaction.f & DERIVED) !== 0) {
+      schedule_possible_effect_self_invalidation(
+        /** @type {Derived} */
+        reaction,
+        effect2,
+        false
+      );
+    } else if (effect2 === reaction) {
+      if (root2) {
+        set_signal_status(reaction, DIRTY);
+      } else if ((reaction.f & CLEAN) !== 0) {
+        set_signal_status(reaction, MAYBE_DIRTY);
+      }
+      schedule_effect(
+        /** @type {Effect} */
+        reaction
+      );
+    }
+  }
+}
+function update_reaction(reaction) {
+  var _a2;
+  var previous_deps = new_deps;
+  var previous_skipped_deps = skipped_deps;
+  var previous_untracked_writes = untracked_writes;
+  var previous_reaction = active_reaction;
+  var previous_sources = current_sources;
+  var previous_component_context = component_context;
+  var previous_untracking = untracking;
+  var previous_update_version = update_version;
+  var flags2 = reaction.f;
+  new_deps = /** @type {null | Value[]} */
+  null;
+  skipped_deps = 0;
+  untracked_writes = null;
+  active_reaction = (flags2 & (BRANCH_EFFECT | ROOT_EFFECT)) === 0 ? reaction : null;
+  current_sources = null;
+  set_component_context(reaction.ctx);
+  untracking = false;
+  update_version = ++read_version;
+  if (reaction.ac !== null) {
+    without_reactive_context(() => {
+      reaction.ac.abort(STALE_REACTION);
+    });
+    reaction.ac = null;
+  }
+  try {
+    reaction.f |= REACTION_IS_UPDATING;
+    var fn = (
+      /** @type {Function} */
+      reaction.fn
+    );
+    var result = fn();
+    reaction.f |= REACTION_RAN;
+    var deps = reaction.deps;
+    var is_fork = current_batch == null ? void 0 : current_batch.is_fork;
+    if (new_deps !== null) {
+      var i;
+      if (!is_fork) {
+        remove_reactions(reaction, skipped_deps);
+      }
+      if (deps !== null && skipped_deps > 0) {
+        deps.length = skipped_deps + new_deps.length;
+        for (i = 0; i < new_deps.length; i++) {
+          deps[skipped_deps + i] = new_deps[i];
+        }
+      } else {
+        reaction.deps = deps = new_deps;
+      }
+      if (effect_tracking() && (reaction.f & CONNECTED) !== 0) {
+        for (i = skipped_deps; i < deps.length; i++) {
+          ((_a2 = deps[i]).reactions ?? (_a2.reactions = [])).push(reaction);
+        }
+      }
+    } else if (!is_fork && deps !== null && skipped_deps < deps.length) {
+      remove_reactions(reaction, skipped_deps);
+      deps.length = skipped_deps;
+    }
+    if (is_runes() && untracked_writes !== null && !untracking && deps !== null && (reaction.f & (DERIVED | MAYBE_DIRTY | DIRTY)) === 0) {
+      for (i = 0; i < /** @type {Source[]} */
+      untracked_writes.length; i++) {
+        schedule_possible_effect_self_invalidation(
+          untracked_writes[i],
+          /** @type {Effect} */
+          reaction
+        );
+      }
+    }
+    if (previous_reaction !== null && previous_reaction !== reaction) {
+      read_version++;
+      if (previous_reaction.deps !== null) {
+        for (let i2 = 0; i2 < previous_skipped_deps; i2 += 1) {
+          previous_reaction.deps[i2].rv = read_version;
+        }
+      }
+      if (previous_deps !== null) {
+        for (const dep of previous_deps) {
+          dep.rv = read_version;
+        }
+      }
+      if (untracked_writes !== null) {
+        if (previous_untracked_writes === null) {
+          previous_untracked_writes = untracked_writes;
+        } else {
+          previous_untracked_writes.push(.../** @type {Source[]} */
+          untracked_writes);
+        }
+      }
+    }
+    if ((reaction.f & ERROR_VALUE) !== 0) {
+      reaction.f ^= ERROR_VALUE;
+    }
+    return result;
+  } catch (error) {
+    return handle_error(error);
+  } finally {
+    reaction.f ^= REACTION_IS_UPDATING;
+    new_deps = previous_deps;
+    skipped_deps = previous_skipped_deps;
+    untracked_writes = previous_untracked_writes;
+    active_reaction = previous_reaction;
+    current_sources = previous_sources;
+    set_component_context(previous_component_context);
+    untracking = previous_untracking;
+    update_version = previous_update_version;
+  }
+}
+function remove_reaction(signal, dependency) {
+  let reactions = dependency.reactions;
+  if (reactions !== null) {
+    var index2 = index_of.call(reactions, signal);
+    if (index2 !== -1) {
+      var new_length = reactions.length - 1;
+      if (new_length === 0) {
+        reactions = dependency.reactions = null;
+      } else {
+        reactions[index2] = reactions[new_length];
+        reactions.pop();
+      }
+    }
+  }
+  if (reactions === null && (dependency.f & DERIVED) !== 0 && // Destroying a child effect while updating a parent effect can cause a dependency to appear
+  // to be unused, when in fact it is used by the currently-updating parent. Checking `new_deps`
+  // allows us to skip the expensive work of disconnecting and immediately reconnecting it
+  (new_deps === null || !includes.call(new_deps, dependency))) {
+    var derived2 = (
+      /** @type {Derived} */
+      dependency
+    );
+    if ((derived2.f & CONNECTED) !== 0) {
+      derived2.f ^= CONNECTED;
+      derived2.f &= ~WAS_MARKED;
+    }
+    if (derived2.v !== UNINITIALIZED) {
+      update_derived_status(derived2);
+    }
+    if (derived2.ac !== null) {
+      without_reactive_context(() => {
+        derived2.ac.abort(STALE_REACTION);
+        derived2.ac = null;
+        set_signal_status(derived2, DIRTY);
+      });
+    }
+    freeze_derived_effects(derived2);
+    remove_reactions(derived2, 0);
+  }
+}
+function remove_reactions(signal, start_index) {
+  var dependencies = signal.deps;
+  if (dependencies === null) return;
+  for (var i = start_index; i < dependencies.length; i++) {
+    remove_reaction(signal, dependencies[i]);
+  }
+}
+function update_effect(effect2) {
+  var flags2 = effect2.f;
+  if ((flags2 & DESTROYED) !== 0) {
+    return;
+  }
+  set_signal_status(effect2, CLEAN);
+  var previous_effect = active_effect;
+  var was_updating_effect = is_updating_effect;
+  active_effect = effect2;
+  is_updating_effect = (flags2 & (BRANCH_EFFECT | ROOT_EFFECT)) === 0;
+  try {
+    if ((flags2 & (BLOCK_EFFECT | MANAGED_EFFECT)) !== 0) {
+      destroy_block_effect_children(effect2);
+    } else {
+      destroy_effect_children(effect2);
+    }
+    execute_effect_teardown(effect2);
+    var teardown2 = update_reaction(effect2);
+    effect2.teardown = typeof teardown2 === "function" ? teardown2 : null;
+    effect2.wv = write_version;
+    var dep;
+    if (DEV && tracing_mode_flag && (effect2.f & DIRTY) !== 0 && effect2.deps !== null) ;
+  } finally {
+    is_updating_effect = was_updating_effect;
+    active_effect = previous_effect;
+  }
+}
+async function tick() {
+  await Promise.resolve();
+  flushSync();
+}
+function get(signal) {
+  var flags2 = signal.f;
+  var is_derived = (flags2 & DERIVED) !== 0;
+  if (active_reaction !== null && !untracking) {
+    var destroyed = active_effect !== null && (active_effect.f & DESTROYED) !== 0;
+    if (!destroyed && (current_sources === null || !current_sources.has(signal))) {
+      var deps = active_reaction.deps;
+      if ((active_reaction.f & REACTION_IS_UPDATING) !== 0) {
+        if (signal.rv < read_version) {
+          signal.rv = read_version;
+          if (new_deps === null && deps !== null && deps[skipped_deps] === signal) {
+            skipped_deps++;
+          } else if (new_deps === null) {
+            new_deps = [signal];
+          } else {
+            new_deps.push(signal);
+          }
+        }
+      } else {
+        active_reaction.deps ?? (active_reaction.deps = []);
+        if (!includes.call(active_reaction.deps, signal)) {
+          active_reaction.deps.push(signal);
+        }
+        var reactions = signal.reactions;
+        if (reactions === null) {
+          signal.reactions = [active_reaction];
+        } else if (!includes.call(reactions, active_reaction)) {
+          reactions.push(active_reaction);
+        }
+      }
+    }
+  }
+  if (is_destroying_effect && old_values.has(signal)) {
+    return old_values.get(signal);
+  }
+  if (is_derived) {
+    var derived2 = (
+      /** @type {Derived} */
+      signal
+    );
+    if (is_destroying_effect) {
+      var value = derived2.v;
+      if ((derived2.f & CLEAN) === 0 && derived2.reactions !== null || depends_on_old_values(derived2)) {
+        value = execute_derived(derived2);
+      }
+      old_values.set(derived2, value);
+      return value;
+    }
+    var should_connect = (derived2.f & CONNECTED) === 0 && !untracking && active_reaction !== null && (is_updating_effect || (active_reaction.f & CONNECTED) !== 0);
+    var is_new = (derived2.f & REACTION_RAN) === 0;
+    if (is_dirty(derived2)) {
+      if (should_connect) {
+        derived2.f |= CONNECTED;
+      }
+      update_derived(derived2);
+    }
+    if (should_connect && !is_new) {
+      unfreeze_derived_effects(derived2);
+      reconnect(derived2);
+    }
+  }
+  if (batch_values == null ? void 0 : batch_values.has(signal)) {
+    return batch_values.get(signal);
+  }
+  if ((signal.f & ERROR_VALUE) !== 0) {
+    throw signal.v;
+  }
+  return signal.v;
+}
+function reconnect(derived2) {
+  derived2.f |= CONNECTED;
+  if (derived2.deps === null) return;
+  for (const dep of derived2.deps) {
+    (dep.reactions ?? (dep.reactions = [])).push(derived2);
+    if ((dep.f & DERIVED) !== 0 && (dep.f & CONNECTED) === 0) {
+      unfreeze_derived_effects(
+        /** @type {Derived} */
+        dep
+      );
+      reconnect(
+        /** @type {Derived} */
+        dep
+      );
+    }
+  }
+}
+function depends_on_old_values(derived2) {
+  if (derived2.v === UNINITIALIZED) return true;
+  if (derived2.deps === null) return false;
+  for (const dep of derived2.deps) {
+    if (old_values.has(dep)) {
+      return true;
+    }
+    if ((dep.f & DERIVED) !== 0 && depends_on_old_values(
+      /** @type {Derived} */
+      dep
+    )) {
+      return true;
+    }
+  }
+  return false;
+}
+function untrack(fn) {
+  var previous_untracking = untracking;
+  try {
+    untracking = true;
+    return fn();
+  } finally {
+    untracking = previous_untracking;
+  }
+}
+const PASSIVE_EVENTS = ["touchstart", "touchmove"];
+function is_passive_event(name) {
+  return PASSIVE_EVENTS.includes(name);
+}
+const event_symbol = Symbol("events");
+const all_registered_events = /* @__PURE__ */ new Set();
+const root_event_handles = /* @__PURE__ */ new Set();
+function create_event(event_name, dom, handler, options = {}) {
+  function target_handler(event2) {
+    if (!options.capture) {
+      handle_event_propagation.call(dom, event2);
+    }
+    if (!event2.cancelBubble) {
+      return without_reactive_context(() => {
+        return handler == null ? void 0 : handler.call(this, event2);
+      });
+    }
+  }
+  if (event_name.startsWith("pointer") || event_name.startsWith("touch") || event_name === "wheel") {
+    queue_micro_task(() => {
+      dom.addEventListener(event_name, target_handler, options);
+    });
+  } else {
+    dom.addEventListener(event_name, target_handler, options);
+  }
+  return target_handler;
+}
+function event(event_name, dom, handler, capture2, passive) {
+  var options = { capture: capture2, passive };
+  var target_handler = create_event(event_name, dom, handler, options);
+  if (dom === document.body || // @ts-ignore
+  dom === window || // @ts-ignore
+  dom === document || // Firefox has quirky behavior, it can happen that we still get "canplay" events when the element is already removed
+  dom instanceof HTMLMediaElement) {
+    teardown(() => {
+      dom.removeEventListener(event_name, target_handler, options);
+    });
+  }
+}
+function delegated(event_name, element, handler) {
+  (element[event_symbol] ?? (element[event_symbol] = {}))[event_name] = handler;
+}
+function delegate(events) {
+  for (var i = 0; i < events.length; i++) {
+    all_registered_events.add(events[i]);
+  }
+  for (var fn of root_event_handles) {
+    fn(events);
+  }
+}
+let last_propagated_event = null;
+function handle_event_propagation(event2) {
+  var _a2, _b2;
+  var handler_element = this;
+  var owner_document = (
+    /** @type {Node} */
+    handler_element.ownerDocument
+  );
+  var event_name = event2.type;
+  var path = ((_a2 = event2.composedPath) == null ? void 0 : _a2.call(event2)) || [];
+  var current_target = (
+    /** @type {null | Element} */
+    path[0] || event2.target
+  );
+  last_propagated_event = event2;
+  var path_idx = 0;
+  var handled_at = last_propagated_event === event2 && event2[event_symbol];
+  if (handled_at) {
+    var at_idx = path.indexOf(handled_at);
+    if (at_idx !== -1 && (handler_element === document || handler_element === /** @type {any} */
+    window)) {
+      event2[event_symbol] = handler_element;
+      return;
+    }
+    var handler_idx = path.indexOf(handler_element);
+    if (handler_idx === -1) {
+      return;
+    }
+    if (at_idx <= handler_idx) {
+      path_idx = at_idx;
+    }
+  }
+  current_target = /** @type {Element} */
+  path[path_idx] || event2.target;
+  if (current_target === handler_element) return;
+  define_property(event2, "currentTarget", {
+    configurable: true,
+    get() {
+      return current_target || owner_document;
+    }
+  });
+  var previous_reaction = active_reaction;
+  var previous_effect = active_effect;
+  set_active_reaction(null);
+  set_active_effect(null);
+  try {
+    var throw_error;
+    var other_errors = [];
+    while (current_target !== null) {
+      if (current_target === handler_element) break;
+      try {
+        var delegated2 = (_b2 = current_target[event_symbol]) == null ? void 0 : _b2[event_name];
+        if (delegated2 != null && (!/** @type {any} */
+        current_target.disabled || // DOM could've been updated already by the time this is reached, so we check this as well
+        // -> the target could not have been disabled because it emits the event in the first place
+        event2.target === current_target)) {
+          delegated2.call(current_target, event2);
+        }
+      } catch (error) {
+        if (throw_error) {
+          other_errors.push(error);
+        } else {
+          throw_error = error;
+        }
+      }
+      if (event2.cancelBubble) break;
+      path_idx++;
+      current_target = path_idx < path.length ? (
+        /** @type {Element} */
+        path[path_idx]
+      ) : null;
+    }
+    if (throw_error) {
+      for (let error of other_errors) {
+        queueMicrotask(() => {
+          throw error;
+        });
+      }
+      throw throw_error;
+    }
+  } finally {
+    event2[event_symbol] = handler_element;
+    delete event2.currentTarget;
+    set_active_reaction(previous_reaction);
+    set_active_effect(previous_effect);
+  }
+}
+const policy = (
+  // We gotta write it like this because after downleveling the pure comment may end up in the wrong location
+  ((_b = globalThis == null ? void 0 : globalThis.window) == null ? void 0 : _b.trustedTypes) && /* @__PURE__ */ globalThis.window.trustedTypes.createPolicy("svelte-trusted-html", {
+    /** @param {string} html */
+    createHTML: (html) => {
+      return html;
+    }
+  })
+);
+function create_trusted_html(html) {
+  return (
+    /** @type {string} */
+    (policy == null ? void 0 : policy.createHTML(html)) ?? html
+  );
+}
+function create_fragment_from_html(html) {
+  var elem = create_element("template");
+  elem.innerHTML = create_trusted_html(html.replaceAll("<!>", "<!---->"));
+  return elem.content;
+}
+function assign_nodes(start2, end) {
+  var effect2 = (
+    /** @type {Effect} */
+    active_effect
+  );
+  if (effect2.nodes === null) {
+    effect2.nodes = { start: start2, end, a: null, t: null };
+  }
+}
+// @__NO_SIDE_EFFECTS__
+function from_html(content, flags2) {
+  var is_fragment = (flags2 & TEMPLATE_FRAGMENT) !== 0;
+  var use_import_node = (flags2 & TEMPLATE_USE_IMPORT_NODE) !== 0;
+  var node;
+  var has_start = !content.startsWith("<!>");
+  return () => {
+    if (node === void 0) {
+      node = create_fragment_from_html(has_start ? content : "<!>" + content);
+      if (!is_fragment) node = /** @type {TemplateNode} */
+      /* @__PURE__ */ get_first_child(node);
+    }
+    var clone = (
+      /** @type {TemplateNode} */
+      use_import_node || is_firefox ? document.importNode(node, true) : node.cloneNode(true)
+    );
+    if (is_fragment) {
+      var start2 = (
+        /** @type {TemplateNode} */
+        /* @__PURE__ */ get_first_child(clone)
+      );
+      var end = (
+        /** @type {TemplateNode} */
+        clone.lastChild
+      );
+      assign_nodes(start2, end);
+    } else {
+      assign_nodes(clone, clone);
+    }
+    return clone;
+  };
+}
+function comment() {
+  var frag = document.createDocumentFragment();
+  var start2 = document.createComment("");
+  var anchor = create_text();
+  frag.append(start2, anchor);
+  assign_nodes(start2, anchor);
+  return frag;
+}
+function append(anchor, dom) {
+  if (anchor === null) {
+    return;
+  }
+  anchor.before(
+    /** @type {Node} */
+    dom
+  );
+}
+function set_text(text, value) {
+  var str = value == null ? "" : typeof value === "object" ? `${value}` : value;
+  if (str !== /** @type {any} */
+  (text[TEXT_CACHE] ?? (text[TEXT_CACHE] = text.nodeValue))) {
+    text[TEXT_CACHE] = str;
+    text.nodeValue = `${str}`;
+  }
+}
+function mount(component, options) {
+  return _mount(component, options);
+}
+const listeners = /* @__PURE__ */ new Map();
+function _mount(Component, { target: target2, anchor, props = {}, events, context, intro = true, transformError }) {
+  init_operations();
+  var component = void 0;
+  var unmount = component_root(() => {
+    var anchor_node = anchor ?? target2.appendChild(create_text());
+    boundary(
+      /** @type {TemplateNode} */
+      anchor_node,
+      {
+        pending: () => {
+        }
+      },
+      (anchor_node2) => {
+        push({});
+        var ctx = (
+          /** @type {ComponentContext} */
+          component_context
+        );
+        if (context) ctx.c = context;
+        if (events) {
+          props.$$events = events;
+        }
+        component = Component(anchor_node2, props) || {};
+        pop();
+      },
+      transformError
+    );
+    var registered_events = /* @__PURE__ */ new Set();
+    var event_handle = (events2) => {
+      for (var i = 0; i < events2.length; i++) {
+        var event_name = events2[i];
+        if (registered_events.has(event_name)) continue;
+        registered_events.add(event_name);
+        var passive = is_passive_event(event_name);
+        for (const node of [target2, document]) {
+          var counts = listeners.get(node);
+          if (counts === void 0) {
+            counts = /* @__PURE__ */ new Map();
+            listeners.set(node, counts);
+          }
+          var count = counts.get(event_name);
+          if (count === void 0) {
+            node.addEventListener(event_name, handle_event_propagation, { passive });
+            counts.set(event_name, 1);
+          } else {
+            counts.set(event_name, count + 1);
+          }
+        }
+      }
+    };
+    event_handle(array_from(all_registered_events));
+    root_event_handles.add(event_handle);
+    return () => {
+      var _a2;
+      for (var event_name of registered_events) {
+        for (const node of [target2, document]) {
+          var counts = (
+            /** @type {Map<string, number>} */
+            listeners.get(node)
+          );
+          var count = (
+            /** @type {number} */
+            counts.get(event_name)
+          );
+          if (--count == 0) {
+            node.removeEventListener(event_name, handle_event_propagation);
+            counts.delete(event_name);
+            if (counts.size === 0) {
+              listeners.delete(node);
+            }
+          } else {
+            counts.set(event_name, count);
+          }
+        }
+      }
+      root_event_handles.delete(event_handle);
+      if (anchor_node !== anchor) {
+        (_a2 = anchor_node.parentNode) == null ? void 0 : _a2.removeChild(anchor_node);
+      }
+    };
+  });
+  mounted_components.set(component, unmount);
+  return component;
+}
+let mounted_components = /* @__PURE__ */ new WeakMap();
+class BranchManager {
+  /**
+   * @param {TemplateNode} anchor
+   * @param {boolean} transition
+   */
+  constructor(anchor, transition = true) {
+    /** @type {TemplateNode} */
+    __publicField(this, "anchor");
+    /** @type {Map<Batch, Key>} */
+    __privateAdd(this, _batches, /* @__PURE__ */ new Map());
+    /**
+     * Map of keys to effects that are currently rendered in the DOM.
+     * These effects are visible and actively part of the document tree.
+     * Example:
+     * ```
+     * {#if condition}
+     * 	foo
+     * {:else}
+     * 	bar
+     * {/if}
+     * ```
+     * Can result in the entries `true->Effect` and `false->Effect`
+     * @type {Map<Key, Effect>}
+     */
+    __privateAdd(this, _onscreen, /* @__PURE__ */ new Map());
+    /**
+     * Similar to #onscreen with respect to the keys, but contains branches that are not yet
+     * in the DOM, because their insertion is deferred.
+     * @type {Map<Key, Branch>}
+     */
+    __privateAdd(this, _offscreen, /* @__PURE__ */ new Map());
+    /**
+     * Keys of effects that are currently outroing
+     * @type {Set<Key>}
+     */
+    __privateAdd(this, _outroing, /* @__PURE__ */ new Set());
+    /**
+     * Whether to pause (i.e. outro) on change, or destroy immediately.
+     * This is necessary for `<svelte:element>`
+     */
+    __privateAdd(this, _transition, true);
+    /**
+     * @param {Batch} batch
+     */
+    __privateAdd(this, _commit, (batch) => {
+      if (!__privateGet(this, _batches).has(batch)) return;
+      var key2 = (
+        /** @type {Key} */
+        __privateGet(this, _batches).get(batch)
+      );
+      var onscreen = __privateGet(this, _onscreen).get(key2);
+      if (onscreen) {
+        resume_effect(onscreen);
+        __privateGet(this, _outroing).delete(key2);
+      } else {
+        var offscreen = __privateGet(this, _offscreen).get(key2);
+        if (offscreen) {
+          resume_effect(offscreen.effect);
+          __privateGet(this, _onscreen).set(key2, offscreen.effect);
+          __privateGet(this, _offscreen).delete(key2);
+          offscreen.fragment.lastChild.remove();
+          this.anchor.before(offscreen.fragment);
+          onscreen = offscreen.effect;
+        }
+      }
+      for (const [b, k] of __privateGet(this, _batches)) {
+        __privateGet(this, _batches).delete(b);
+        if (b === batch) {
+          break;
+        }
+        const offscreen2 = __privateGet(this, _offscreen).get(k);
+        if (offscreen2) {
+          destroy_effect(offscreen2.effect);
+          __privateGet(this, _offscreen).delete(k);
+        }
+      }
+      for (const [k, effect2] of __privateGet(this, _onscreen)) {
+        if (k === key2 || __privateGet(this, _outroing).has(k)) continue;
+        const on_destroy = () => {
+          const keys = Array.from(__privateGet(this, _batches).values());
+          if (keys.includes(k)) {
+            var fragment = document.createDocumentFragment();
+            move_effect(effect2, fragment);
+            fragment.append(create_text());
+            __privateGet(this, _offscreen).set(k, { effect: effect2, fragment });
+          } else {
+            destroy_effect(effect2);
+          }
+          __privateGet(this, _outroing).delete(k);
+          __privateGet(this, _onscreen).delete(k);
+        };
+        if (__privateGet(this, _transition) || !onscreen) {
+          __privateGet(this, _outroing).add(k);
+          pause_effect(effect2, on_destroy, false);
+        } else {
+          on_destroy();
+        }
+      }
+    });
+    /**
+     * @param {Batch} batch
+     */
+    __privateAdd(this, _discard, (batch) => {
+      __privateGet(this, _batches).delete(batch);
+      const keys = Array.from(__privateGet(this, _batches).values());
+      for (const [k, branch2] of __privateGet(this, _offscreen)) {
+        if (!keys.includes(k)) {
+          destroy_effect(branch2.effect);
+          __privateGet(this, _offscreen).delete(k);
+        }
+      }
+    });
+    this.anchor = anchor;
+    __privateSet(this, _transition, transition);
+  }
+  /**
+   *
+   * @param {any} key
+   * @param {null | ((target: TemplateNode) => void)} fn
+   */
+  ensure(key2, fn) {
+    var batch = (
+      /** @type {Batch} */
+      current_batch
+    );
+    var defer = should_defer_append();
+    if (fn && !__privateGet(this, _onscreen).has(key2) && !__privateGet(this, _offscreen).has(key2)) {
+      if (defer) {
+        var fragment = document.createDocumentFragment();
+        var target2 = create_text();
+        fragment.append(target2);
+        __privateGet(this, _offscreen).set(key2, {
+          effect: branch(() => fn(target2)),
+          fragment
+        });
+      } else {
+        __privateGet(this, _onscreen).set(
+          key2,
+          branch(() => fn(this.anchor))
+        );
+      }
+    }
+    __privateGet(this, _batches).set(batch, key2);
+    if (defer) {
+      for (const [k, effect2] of __privateGet(this, _onscreen)) {
+        if (k === key2) {
+          batch.unskip_effect(effect2);
+        } else {
+          batch.skip_effect(effect2);
+        }
+      }
+      for (const [k, branch2] of __privateGet(this, _offscreen)) {
+        if (k === key2) {
+          batch.unskip_effect(branch2.effect);
+        } else {
+          batch.skip_effect(branch2.effect);
+        }
+      }
+      batch.oncommit(__privateGet(this, _commit));
+      batch.ondiscard(__privateGet(this, _discard));
+    } else {
+      __privateGet(this, _commit).call(this, batch);
+    }
+  }
+}
+_batches = new WeakMap();
+_onscreen = new WeakMap();
+_offscreen = new WeakMap();
+_outroing = new WeakMap();
+_transition = new WeakMap();
+_commit = new WeakMap();
+_discard = new WeakMap();
+function if_block(node, fn, elseif = false) {
+  var branches = new BranchManager(node);
+  var flags2 = elseif ? EFFECT_TRANSPARENT : 0;
+  function update_branch(key2, fn2) {
+    branches.ensure(key2, fn2);
+  }
+  block(() => {
+    var has_branch = false;
+    fn((fn2, key2 = 0) => {
+      has_branch = true;
+      update_branch(key2, fn2);
+    });
+    if (!has_branch) {
+      update_branch(-1, null);
+    }
+  }, flags2);
+}
+const NAN = Symbol("NaN");
+function key(node, get_key, render_fn2) {
+  var branches = new BranchManager(node);
+  block(() => {
+    var key2 = get_key();
+    if (key2 !== key2) {
+      key2 = /** @type {any} */
+      NAN;
+    }
+    branches.ensure(key2, render_fn2);
+  });
+}
+function index(_, i) {
+  return i;
+}
+function pause_effects(state2, to_destroy, controlled_anchor) {
+  var transitions = [];
+  var length = to_destroy.length;
+  var group;
+  var remaining = to_destroy.length;
+  for (var i = 0; i < length; i++) {
+    let effect2 = to_destroy[i];
+    pause_effect(
+      effect2,
+      () => {
+        if (group) {
+          group.pending.delete(effect2);
+          group.done.add(effect2);
+          if (group.pending.size === 0) {
+            var groups = (
+              /** @type {Set<EachOutroGroup>} */
+              state2.outrogroups
+            );
+            destroy_effects(state2, array_from(group.done));
+            groups.delete(group);
+            if (groups.size === 0) {
+              state2.outrogroups = null;
+            }
+          }
+        } else {
+          remaining -= 1;
+        }
+      },
+      false
+    );
+  }
+  if (remaining === 0) {
+    var fast_path = transitions.length === 0 && controlled_anchor !== null;
+    if (fast_path) {
+      var anchor = (
+        /** @type {Element} */
+        controlled_anchor
+      );
+      var parent_node = (
+        /** @type {Element} */
+        anchor.parentNode
+      );
+      clear_text_content(parent_node);
+      parent_node.append(anchor);
+      state2.items.clear();
+    }
+    destroy_effects(state2, to_destroy, !fast_path);
+  } else {
+    group = {
+      pending: new Set(to_destroy),
+      done: /* @__PURE__ */ new Set()
+    };
+    (state2.outrogroups ?? (state2.outrogroups = /* @__PURE__ */ new Set())).add(group);
+  }
+}
+function destroy_effects(state2, to_destroy, remove_dom = true) {
+  var preserved_effects;
+  if (state2.pending.size > 0) {
+    preserved_effects = /* @__PURE__ */ new Set();
+    for (const keys of state2.pending.values()) {
+      for (const key2 of keys) {
+        preserved_effects.add(
+          /** @type {EachItem} */
+          state2.items.get(key2).e
+        );
+      }
+    }
+  }
+  for (var i = 0; i < to_destroy.length; i++) {
+    var e = to_destroy[i];
+    if (preserved_effects == null ? void 0 : preserved_effects.has(e)) {
+      e.f |= EFFECT_OFFSCREEN;
+      const fragment = document.createDocumentFragment();
+      move_effect(e, fragment);
+    } else {
+      destroy_effect(to_destroy[i], remove_dom);
+    }
+  }
+}
+var offscreen_anchor;
+function each(node, flags2, get_collection, get_key, render_fn2, fallback_fn = null) {
+  var anchor = node;
+  var items = /* @__PURE__ */ new Map();
+  var is_controlled = (flags2 & EACH_IS_CONTROLLED) !== 0;
+  if (is_controlled) {
+    var parent_node = (
+      /** @type {Element} */
+      node
+    );
+    anchor = parent_node.appendChild(create_text());
+  }
+  var fallback = null;
+  var each_array = /* @__PURE__ */ derived_safe_equal(() => {
+    var collection = get_collection();
+    return (
+      /** @type {V[]} */
+      is_array(collection) ? collection : collection == null ? [] : array_from(collection)
+    );
+  });
+  var array;
+  var pending = /* @__PURE__ */ new Map();
+  var first_run = true;
+  function commit(batch) {
+    if ((state2.effect.f & DESTROYED) !== 0) {
+      return;
+    }
+    state2.pending.delete(batch);
+    state2.fallback = fallback;
+    reconcile(state2, array, anchor, flags2, get_key);
+    if (fallback !== null) {
+      if (array.length === 0) {
+        if ((fallback.f & EFFECT_OFFSCREEN) === 0) {
+          resume_effect(fallback);
+        } else {
+          fallback.f ^= EFFECT_OFFSCREEN;
+          move(fallback, null, anchor);
+        }
+      } else {
+        pause_effect(fallback, () => {
+          fallback = null;
+        });
+      }
+    }
+  }
+  function discard(batch) {
+    state2.pending.delete(batch);
+  }
+  var effect2 = block(() => {
+    array = /** @type {V[]} */
+    get(each_array);
+    var length = array.length;
+    var keys = /* @__PURE__ */ new Set();
+    var batch = (
+      /** @type {Batch} */
+      current_batch
+    );
+    var defer = should_defer_append();
+    for (var index2 = 0; index2 < length; index2 += 1) {
+      var value = array[index2];
+      var key2 = get_key(value, index2);
+      var item = first_run ? null : items.get(key2);
+      if (item) {
+        if (item.v) internal_set(item.v, value);
+        if (item.i) internal_set(item.i, index2);
+        if (defer) {
+          batch.unskip_effect(item.e);
+        }
+      } else {
+        item = create_item(
+          items,
+          first_run ? anchor : offscreen_anchor ?? (offscreen_anchor = create_text()),
+          value,
+          key2,
+          index2,
+          render_fn2,
+          flags2,
+          get_collection
+        );
+        if (!first_run) {
+          item.e.f |= EFFECT_OFFSCREEN;
+        }
+        items.set(key2, item);
+      }
+      keys.add(key2);
+    }
+    if (length === 0 && fallback_fn && !fallback) {
+      if (first_run) {
+        fallback = branch(() => fallback_fn(anchor));
+      } else {
+        fallback = branch(() => fallback_fn(offscreen_anchor ?? (offscreen_anchor = create_text())));
+        fallback.f |= EFFECT_OFFSCREEN;
+      }
+    }
+    if (length > keys.size) {
+      {
+        each_key_duplicate();
+      }
+    }
+    if (!first_run) {
+      pending.set(batch, keys);
+      if (defer) {
+        for (const [key3, item2] of items) {
+          if (!keys.has(key3)) {
+            batch.skip_effect(item2.e);
+          }
+        }
+        batch.oncommit(commit);
+        batch.ondiscard(discard);
+      } else {
+        commit(batch);
+      }
+    }
+    get(each_array);
+  });
+  var state2 = { effect: effect2, items, pending, outrogroups: null, fallback };
+  first_run = false;
+}
+function skip_to_branch(effect2) {
+  while (effect2 !== null && (effect2.f & BRANCH_EFFECT) === 0) {
+    effect2 = effect2.next;
+  }
+  return effect2;
+}
+function reconcile(state2, array, anchor, flags2, get_key) {
+  var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i;
+  var is_animated = (flags2 & EACH_IS_ANIMATED) !== 0;
+  var length = array.length;
+  var items = state2.items;
+  var current = skip_to_branch(state2.effect.first);
+  var seen;
+  var prev = null;
+  var to_animate;
+  var matched = [];
+  var stashed = [];
+  var value;
+  var key2;
+  var effect2;
+  var i;
+  if (is_animated) {
+    for (i = 0; i < length; i += 1) {
+      value = array[i];
+      key2 = get_key(value, i);
+      effect2 = /** @type {EachItem} */
+      items.get(key2).e;
+      if ((effect2.f & EFFECT_OFFSCREEN) === 0) {
+        (_b2 = (_a2 = effect2.nodes) == null ? void 0 : _a2.a) == null ? void 0 : _b2.measure();
+        (to_animate ?? (to_animate = /* @__PURE__ */ new Set())).add(effect2);
+      }
+    }
+  }
+  for (i = 0; i < length; i += 1) {
+    value = array[i];
+    key2 = get_key(value, i);
+    effect2 = /** @type {EachItem} */
+    items.get(key2).e;
+    if (state2.outrogroups !== null) {
+      for (const group of state2.outrogroups) {
+        group.pending.delete(effect2);
+        group.done.delete(effect2);
+      }
+    }
+    if ((effect2.f & INERT) !== 0) {
+      resume_effect(effect2);
+      if (is_animated) {
+        (_d = (_c2 = effect2.nodes) == null ? void 0 : _c2.a) == null ? void 0 : _d.unfix();
+        (to_animate ?? (to_animate = /* @__PURE__ */ new Set())).delete(effect2);
+      }
+    }
+    if ((effect2.f & EFFECT_OFFSCREEN) !== 0) {
+      effect2.f ^= EFFECT_OFFSCREEN;
+      if (effect2 === current) {
+        move(effect2, null, anchor);
+      } else {
+        var next = prev ? prev.next : current;
+        if (effect2 === state2.effect.last) {
+          state2.effect.last = effect2.prev;
+        }
+        if (effect2.prev) effect2.prev.next = effect2.next;
+        if (effect2.next) effect2.next.prev = effect2.prev;
+        link(state2, prev, effect2);
+        link(state2, effect2, next);
+        move(effect2, next, anchor);
+        prev = effect2;
+        matched = [];
+        stashed = [];
+        current = skip_to_branch(prev.next);
+        continue;
+      }
+    }
+    if (effect2 !== current) {
+      if (seen !== void 0 && seen.has(effect2)) {
+        if (matched.length < stashed.length) {
+          var start2 = stashed[0];
+          var j;
+          prev = start2.prev;
+          var a = matched[0];
+          var b = matched[matched.length - 1];
+          for (j = 0; j < matched.length; j += 1) {
+            move(matched[j], start2, anchor);
+          }
+          for (j = 0; j < stashed.length; j += 1) {
+            seen.delete(stashed[j]);
+          }
+          link(state2, a.prev, b.next);
+          link(state2, prev, a);
+          link(state2, b, start2);
+          current = start2;
+          prev = b;
+          i -= 1;
+          matched = [];
+          stashed = [];
+        } else {
+          seen.delete(effect2);
+          move(effect2, current, anchor);
+          link(state2, effect2.prev, effect2.next);
+          link(state2, effect2, prev === null ? state2.effect.first : prev.next);
+          link(state2, prev, effect2);
+          prev = effect2;
+        }
+        continue;
+      }
+      matched = [];
+      stashed = [];
+      while (current !== null && current !== effect2) {
+        (seen ?? (seen = /* @__PURE__ */ new Set())).add(current);
+        stashed.push(current);
+        current = skip_to_branch(current.next);
+      }
+      if (current === null) {
+        continue;
+      }
+    }
+    if ((effect2.f & EFFECT_OFFSCREEN) === 0) {
+      matched.push(effect2);
+    }
+    prev = effect2;
+    current = skip_to_branch(effect2.next);
+  }
+  if (state2.outrogroups !== null) {
+    for (const group of state2.outrogroups) {
+      if (group.pending.size === 0) {
+        destroy_effects(state2, array_from(group.done));
+        (_e = state2.outrogroups) == null ? void 0 : _e.delete(group);
+      }
+    }
+    if (state2.outrogroups.size === 0) {
+      state2.outrogroups = null;
+    }
+  }
+  if (current !== null || seen !== void 0) {
+    var to_destroy = [];
+    if (seen !== void 0) {
+      for (effect2 of seen) {
+        if ((effect2.f & INERT) === 0) {
+          to_destroy.push(effect2);
+        }
+      }
+    }
+    while (current !== null) {
+      if ((current.f & INERT) === 0 && current !== state2.fallback) {
+        to_destroy.push(current);
+      }
+      current = skip_to_branch(current.next);
+    }
+    var destroy_length = to_destroy.length;
+    if (destroy_length > 0) {
+      var controlled_anchor = (flags2 & EACH_IS_CONTROLLED) !== 0 && length === 0 ? anchor : null;
+      if (is_animated) {
+        for (i = 0; i < destroy_length; i += 1) {
+          (_g = (_f = to_destroy[i].nodes) == null ? void 0 : _f.a) == null ? void 0 : _g.measure();
+        }
+        for (i = 0; i < destroy_length; i += 1) {
+          (_i = (_h = to_destroy[i].nodes) == null ? void 0 : _h.a) == null ? void 0 : _i.fix();
+        }
+      }
+      pause_effects(state2, to_destroy, controlled_anchor);
+    }
+  }
+  if (is_animated) {
+    queue_micro_task(() => {
+      var _a3, _b3;
+      if (to_animate === void 0) return;
+      for (effect2 of to_animate) {
+        (_b3 = (_a3 = effect2.nodes) == null ? void 0 : _a3.a) == null ? void 0 : _b3.apply();
+      }
+    });
+  }
+}
+function create_item(items, anchor, value, key2, index2, render_fn2, flags2, get_collection) {
+  var v = (flags2 & EACH_ITEM_REACTIVE) !== 0 ? (flags2 & EACH_ITEM_IMMUTABLE) === 0 ? /* @__PURE__ */ mutable_source(value, false, false) : source(value) : null;
+  var i = (flags2 & EACH_INDEX_REACTIVE) !== 0 ? source(index2) : null;
+  return {
+    v,
+    i,
+    e: branch(() => {
+      render_fn2(anchor, v ?? value, i ?? index2, get_collection);
+      return () => {
+        items.delete(key2);
+      };
+    })
+  };
+}
+function move(effect2, next, anchor) {
+  if (!effect2.nodes) return;
+  var node = effect2.nodes.start;
+  var end = effect2.nodes.end;
+  var dest = next && (next.f & EFFECT_OFFSCREEN) === 0 ? (
+    /** @type {EffectNodes} */
+    next.nodes.start
+  ) : anchor;
+  while (node !== null) {
+    var next_node = (
+      /** @type {TemplateNode} */
+      /* @__PURE__ */ get_next_sibling(node)
+    );
+    dest.before(node);
+    if (node === end) {
+      return;
+    }
+    node = next_node;
+  }
+}
+function link(state2, prev, next) {
+  if (prev === null) {
+    state2.effect.first = next;
+  } else {
+    prev.next = next;
+  }
+  if (next === null) {
+    state2.effect.last = prev;
+  } else {
+    next.prev = prev;
+  }
+}
+const whitespace = [..." 	\n\r\f \v\uFEFF"];
+function to_class(value, hash, directives) {
+  var classname = value == null ? "" : "" + value;
+  if (directives) {
+    for (var key2 of Object.keys(directives)) {
+      if (directives[key2]) {
+        classname = classname ? classname + " " + key2 : key2;
+      } else if (classname.length) {
+        var len = key2.length;
+        var a = 0;
+        while ((a = classname.indexOf(key2, a)) >= 0) {
+          var b = a + len;
+          if ((a === 0 || whitespace.includes(classname[a - 1])) && (b === classname.length || whitespace.includes(classname[b]))) {
+            classname = (a === 0 ? "" : classname.substring(0, a)) + classname.substring(b + 1);
+          } else {
+            a = b;
+          }
+        }
+      }
+    }
+  }
+  return classname === "" ? null : classname;
+}
+function to_style(value, styles) {
+  return value == null ? null : String(value);
+}
+function set_class(dom, is_html, value, hash, prev_classes, next_classes) {
+  var prev = (
+    /** @type {any} */
+    dom[CLASS_CACHE]
+  );
+  if (prev !== value || prev === void 0) {
+    var next_class_name = to_class(value, hash, next_classes);
+    {
+      if (next_class_name == null) {
+        dom.removeAttribute("class");
+      } else {
+        dom.className = next_class_name;
+      }
+    }
+    dom[CLASS_CACHE] = value;
+  } else if (next_classes && prev_classes !== next_classes) {
+    for (var key2 in next_classes) {
+      var is_present = !!next_classes[key2];
+      if (prev_classes == null || is_present !== !!prev_classes[key2]) {
+        dom.classList.toggle(key2, is_present);
+      }
+    }
+  }
+  return next_classes;
+}
+function set_style(dom, value, prev_styles, next_styles) {
+  var prev = (
+    /** @type {any} */
+    dom[STYLE_CACHE]
+  );
+  if (prev !== value) {
+    var next_style_attr = to_style(value);
+    {
+      if (next_style_attr == null) {
+        dom.removeAttribute("style");
+      } else {
+        dom.style.cssText = next_style_attr;
+      }
+    }
+    dom[STYLE_CACHE] = value;
+  }
+  return next_styles;
+}
+function select_option(select, value, mounting = false) {
+  if (select.multiple) {
+    if (value == void 0) {
+      return;
+    }
+    if (!is_array(value)) {
+      return select_multiple_invalid_value();
+    }
+    for (var option of select.options) {
+      option.selected = value.includes(get_option_value(option));
+    }
+    return;
+  }
+  for (option of select.options) {
+    var option_value = get_option_value(option);
+    if (is(option_value, value)) {
+      option.selected = true;
+      return;
+    }
+  }
+  if (!mounting || value !== void 0) {
+    select.selectedIndex = -1;
+  }
+}
+function init_select(select) {
+  var observer = new MutationObserver(() => {
+    select_option(select, select.__value);
+  });
+  observer.observe(select, {
+    // Listen to option element changes
+    childList: true,
+    subtree: true,
+    // because of <optgroup>
+    // Listen to option element value attribute changes
+    // (doesn't get notified of select value changes,
+    // because that property is not reflected as an attribute)
+    attributes: true,
+    attributeFilter: ["value"]
+  });
+  teardown(() => {
+    observer.disconnect();
+  });
+}
+function bind_select_value(select, get2, set2 = get2) {
+  var batches = /* @__PURE__ */ new WeakSet();
+  var mounting = true;
+  listen_to_event_and_reset_event(select, "change", (is_reset) => {
+    var query = is_reset ? "[selected]" : ":checked";
+    var value;
+    if (select.multiple) {
+      value = [].map.call(select.querySelectorAll(query), get_option_value);
+    } else {
+      var selected_option = select.querySelector(query) ?? // will fall back to first non-disabled option if no option is selected
+      select.querySelector("option:not([disabled])");
+      value = selected_option && get_option_value(selected_option);
+    }
+    set2(value);
+    select.__value = value;
+    if (current_batch !== null) {
+      batches.add(current_batch);
+    }
+  });
+  effect(() => {
+    var value = get2();
+    if (select === document.activeElement) {
+      var batch = (
+        /** @type {Batch} */
+        current_batch
+      );
+      if (batches.has(batch)) {
+        return;
+      }
+    }
+    select_option(select, value, mounting);
+    if (mounting && value === void 0) {
+      var selected_option = select.querySelector(":checked");
+      if (selected_option !== null) {
+        value = get_option_value(selected_option);
+        set2(value);
+      }
+    }
+    select.__value = value;
+    mounting = false;
+  });
+  init_select(select);
+}
+function get_option_value(option) {
+  if ("__value" in option) {
+    return option.__value;
+  } else {
+    return option.value;
+  }
+}
+const IS_CUSTOM_ELEMENT = Symbol("is custom element");
+const IS_HTML = Symbol("is html");
+const PROGRESS_TAG = IS_XHTML ? "progress" : "PROGRESS";
+function set_value(element, value) {
+  var attributes = get_attributes(element);
+  if (attributes.value === (attributes.value = // treat null and undefined the same for the initial value
+  value ?? void 0) || // @ts-expect-error
+  // `progress` elements always need their value set when it's `0`
+  element.value === value && (value !== 0 || element.nodeName !== PROGRESS_TAG)) {
+    return;
+  }
+  element.value = value ?? "";
+}
+function set_selected(element, selected) {
+  if (selected) {
+    if (!element.hasAttribute("selected")) {
+      element.setAttribute("selected", "");
+    }
+  } else {
+    element.removeAttribute("selected");
+  }
+}
+function set_attribute(element, attribute, value, skip_warning) {
+  var attributes = get_attributes(element);
+  if (attributes[attribute] === (attributes[attribute] = value)) return;
+  if (attribute === "loading") {
+    element[LOADING_ATTR_SYMBOL] = value;
+  }
+  if (value == null) {
+    element.removeAttribute(attribute);
+  } else if (typeof value !== "string" && get_setters(element).includes(attribute)) {
+    element[attribute] = value;
+  } else {
+    element.setAttribute(attribute, value);
+  }
+}
+function get_attributes(element) {
+  return (
+    /** @type {Record<string | symbol, unknown>} **/
+    /** @type {any} */
+    element[ATTRIBUTES_CACHE] ?? (element[ATTRIBUTES_CACHE] = {
+      [IS_CUSTOM_ELEMENT]: element.nodeName.includes("-"),
+      [IS_HTML]: element.namespaceURI === NAMESPACE_HTML
+    })
+  );
+}
+var setters_cache = /* @__PURE__ */ new Map();
+function get_setters(element) {
+  var cache_key = element.getAttribute("is") || element.nodeName;
+  var setters = setters_cache.get(cache_key);
+  if (setters) return setters;
+  setters_cache.set(cache_key, setters = []);
+  var descriptors;
+  var proto = element;
+  var element_proto = Element.prototype;
+  while (element_proto !== proto) {
+    descriptors = get_descriptors(proto);
+    for (var key2 in descriptors) {
+      if (descriptors[key2].set && // better safe than sorry, we don't want spread attributes to mess with HTML content
+      key2 !== "innerHTML" && key2 !== "textContent" && key2 !== "innerText") {
+        setters.push(key2);
+      }
+    }
+    proto = get_prototype_of(proto);
+  }
+  return setters;
+}
+function bind_value(input, get2, set2 = get2) {
+  var batches = /* @__PURE__ */ new WeakSet();
+  listen_to_event_and_reset_event(input, "input", async (is_reset) => {
+    var value = is_reset ? input.defaultValue : input.value;
+    value = is_numberlike_input(input) ? to_number(value) : value;
+    set2(value);
+    if (current_batch !== null) {
+      batches.add(current_batch);
+    }
+    await tick();
+    if (value !== (value = get2())) {
+      var start2 = input.selectionStart;
+      var end = input.selectionEnd;
+      var length = input.value.length;
+      input.value = value ?? "";
+      if (end !== null) {
+        var new_length = input.value.length;
+        if (start2 === end && end === length && new_length > length) {
+          input.selectionStart = new_length;
+          input.selectionEnd = new_length;
+        } else {
+          input.selectionStart = start2;
+          input.selectionEnd = Math.min(end, new_length);
+        }
+      }
+    }
+  });
+  if (
+    // If we are hydrating and the value has since changed,
+    // then use the updated value from the input instead.
+    // If defaultValue is set, then value == defaultValue
+    // TODO Svelte 6: remove input.value check and set to empty string?
+    untrack(get2) == null && input.value
+  ) {
+    set2(is_numberlike_input(input) ? to_number(input.value) : input.value);
+    if (current_batch !== null) {
+      batches.add(current_batch);
+    }
+  }
+  render_effect(() => {
+    var value = get2();
+    if (input === document.activeElement) {
+      var batch = (
+        /** @type {Batch} */
+        current_batch
+      );
+      if (batches.has(batch)) {
+        return;
+      }
+    }
+    if (is_numberlike_input(input) && value === to_number(input.value)) {
+      return;
+    }
+    if (input.type === "date" && !value && !input.value) {
+      return;
+    }
+    if (value !== input.value) {
+      input.value = value ?? "";
+    }
+  });
+}
+function bind_checked(input, get2, set2 = get2) {
+  listen_to_event_and_reset_event(input, "change", (is_reset) => {
+    var value = is_reset ? input.defaultChecked : input.checked;
+    set2(value);
+  });
+  if (
+    // If we are hydrating and the value has since changed,
+    // then use the update value from the input instead.
+    // If defaultChecked is set, then checked == defaultChecked
+    untrack(get2) == null
+  ) {
+    set2(input.checked);
+  }
+  render_effect(() => {
+    var value = get2();
+    input.checked = Boolean(value);
+  });
+}
+function is_numberlike_input(input) {
+  var type = input.type;
+  return type === "number" || type === "range";
+}
+function to_number(value) {
+  return value === "" ? null : +value;
+}
+function is_bound_this(bound_value, element_or_component) {
+  return bound_value === element_or_component || (bound_value == null ? void 0 : bound_value[STATE_SYMBOL]) === element_or_component;
+}
+function bind_this(element_or_component = {}, update, get_value, get_parts) {
+  var component_effect = (
+    /** @type {ComponentContext} */
+    component_context.r
+  );
+  var parent = (
+    /** @type {Effect} */
+    active_effect
+  );
+  effect(() => {
+    var old_parts;
+    var parts;
+    render_effect(() => {
+      old_parts = parts;
+      parts = [];
+      untrack(() => {
+        if (!is_bound_this(get_value(...parts), element_or_component)) {
+          update(element_or_component, ...parts);
+          if (old_parts && is_bound_this(get_value(...old_parts), element_or_component)) {
+            update(null, ...old_parts);
+          }
+        }
+      });
+    });
+    return () => {
+      let p = parent;
+      while (p !== component_effect && p.parent !== null && p.parent.f & DESTROYING) {
+        p = p.parent;
+      }
+      const teardown2 = () => {
+        if (parts && is_bound_this(get_value(...parts), element_or_component)) {
+          update(null, ...parts);
+        }
+      };
+      const original_teardown = p.teardown;
+      p.teardown = () => {
+        teardown2();
+        original_teardown == null ? void 0 : original_teardown();
+      };
+    };
+  });
+  return element_or_component;
+}
+function prop(props, key2, flags2, fallback) {
+  var fallback_value = (
+    /** @type {V} */
+    fallback
+  );
+  var fallback_dirty = true;
+  var get_fallback = () => {
+    if (fallback_dirty) {
+      fallback_dirty = false;
+      fallback_value = /** @type {V} */
+      fallback;
+    }
+    return fallback_value;
+  };
+  var initial_value;
+  {
+    initial_value = /** @type {V} */
+    props[key2];
+  }
+  if (initial_value === void 0 && fallback !== void 0) {
+    initial_value = get_fallback();
+  }
+  var getter;
+  {
+    getter = () => {
+      var value = (
+        /** @type {V} */
+        props[key2]
+      );
+      if (value === void 0) return get_fallback();
+      fallback_dirty = true;
+      return value;
+    };
+  }
+  {
+    return getter;
+  }
+}
+const PUBLIC_VERSION = "5";
+if (typeof window !== "undefined") {
+  ((_c = window.__svelte ?? (window.__svelte = {})).v ?? (_c.v = /* @__PURE__ */ new Set())).add(PUBLIC_VERSION);
+}
+const genericFamilies = /* @__PURE__ */ new Set([
+  "serif",
+  "sans-serif",
+  "monospace",
+  "cursive",
+  "fantasy",
+  "system-ui",
+  "ui-serif",
+  "ui-sans-serif",
+  "ui-monospace",
+  "ui-rounded",
+  "emoji",
+  "math",
+  "fangsong"
+]);
+function cssFamily(value) {
+  return genericFamilies.has(value.toLowerCase()) ? value : JSON.stringify(value);
+}
+function controlValue(control, draft) {
+  const value = draft[control.path];
+  return typeof value === "string" || typeof value === "number" ? value : control.value;
+}
+function colorStyle(reviewCase, draft, alpha = 1) {
+  const values = Object.fromEntries(
+    reviewCase.controls.map((control) => [control.id, Number(controlValue(control, draft))])
+  );
+  const l = values.l ?? reviewCase.value.l;
+  const c = values.c ?? reviewCase.value.c;
+  const h = values.h ?? reviewCase.value.h;
+  return `oklch(${l} ${c} ${h}${alpha === 1 ? "" : ` / ${alpha}`})`;
+}
+function canvasVariables(modeGroups, colorMode, sizeMode) {
+  var _a2, _b2;
+  const selected = [
+    (_a2 = modeGroups.find((group) => group.category === "color")) == null ? void 0 : _a2.modes.find((mode) => mode.name === colorMode),
+    (_b2 = modeGroups.find((group) => group.category === "size")) == null ? void 0 : _b2.modes.find((mode) => mode.name === sizeMode)
+  ];
+  return selected.flatMap((mode) => Object.entries((mode == null ? void 0 : mode.tokens) ?? {})).map(([name, value]) => `${name}:${value}`).join(";");
+}
+function typographyStyle(reviewCase, draft, options = {}) {
+  var _a2;
+  const values = Object.fromEntries(
+    reviewCase.controls.map((control) => [control.id, controlValue(control, draft)])
+  );
+  const sizeControl = reviewCase.controls.find(
+    (control) => control.kind === "select" && control.id === "fontSize"
+  );
+  const sizeOption = (sizeControl == null ? void 0 : sizeControl.kind) === "select" ? sizeControl.options.find((option) => option.value === values.fontSize) : void 0;
+  const weight = ((_a2 = reviewCase.availableWeights.find((entry) => entry.alias === values.weight)) == null ? void 0 : _a2.value) ?? reviewCase.weight.value;
+  const primaryStack = [
+    reviewCase.font.family,
+    ...reviewCase.font.adjustedFallback ? [reviewCase.font.adjustedFallback] : [],
+    ...reviewCase.font.fallbacks
+  ];
+  const fallbackStack = [
+    ...reviewCase.font.adjustedFallback ? [reviewCase.font.adjustedFallback] : [],
+    ...reviewCase.font.fallbacks
+  ];
+  return [
+    `font-family:${(options.forceFallback ? fallbackStack : primaryStack).map(cssFamily).join(",")}`,
+    `font-size:${(sizeOption == null ? void 0 : sizeOption.css) ?? `var(--${reviewCase.recipe.atomicFontSizeToken})`}`,
+    `font-style:${reviewCase.style}`,
+    `font-weight:${weight}`,
+    "font-synthesis:none",
+    `line-height:${options.wcagSpacing ? 1.5 : values.lineHeight}`,
+    `letter-spacing:${options.wcagSpacing ? "0.12em" : values.letterSpacing === 0 ? "0" : `${values.letterSpacing}em`}`,
+    ...options.wcagSpacing ? ["word-spacing:0.16em"] : [],
+    `text-transform:${reviewCase.recipe.textTransform ?? "none"}`,
+    ...reviewCase.recipe.fontKerningToken ? [`font-kerning:var(--${reviewCase.recipe.fontKerningToken})`] : [],
+    ...reviewCase.recipe.fontOpticalSizingToken ? [`font-optical-sizing:var(--${reviewCase.recipe.fontOpticalSizingToken})`] : [],
+    ...reviewCase.recipe.fontFeatureSettingsToken ? [`font-feature-settings:var(--${reviewCase.recipe.fontFeatureSettingsToken})`] : [],
+    ...reviewCase.recipe.fontVariationSettingsToken ? [`font-variation-settings:var(--${reviewCase.recipe.fontVariationSettingsToken})`] : []
+  ].join(";");
+}
+function shadowStyle(reviewCase, draft) {
+  const controls = Object.fromEntries(
+    reviewCase.controls.map((control) => [control.id, Number(controlValue(control, draft))])
+  );
+  const css = reviewCase.layers.map((layer, index2) => {
+    const prefix = `layer-${index2}`;
+    const x = controls[`${prefix}-x`] ?? layer.x;
+    const y = controls[`${prefix}-y`] ?? layer.y;
+    const blur = controls[`${prefix}-blur`] ?? layer.blur;
+    const spread = reviewCase.shadowKind === "box" ? controls[`${prefix}-spread`] ?? layer.spread ?? 0 : void 0;
+    return [
+      layer.inset ? "inset" : "",
+      `${x}${reviewCase.unit}`,
+      `${y}${reviewCase.unit}`,
+      `${blur}${reviewCase.unit}`,
+      spread === void 0 ? "" : `${spread}${reviewCase.unit}`,
+      layer.color.css
+    ].filter(Boolean).join(" ");
+  }).join(", ");
+  return `${reviewCase.shadowKind === "box" ? "box-shadow" : "text-shadow"}:${css}`;
+}
+var root$7 = /* @__PURE__ */ from_html(`<div class="matrix-color"></div> <code> </code>`, 1);
+var root_1$6 = /* @__PURE__ */ from_html(`<span class="matrix-type">Sphinx of black quartz, judge my vow.</span> <code> </code>`, 1);
+var root_2$3 = /* @__PURE__ */ from_html(`<div class="matrix-shadow"><span>Aa</span></div> <code> </code>`, 1);
+var root_3$3 = /* @__PURE__ */ from_html(`<div class="matrix-motion"><span></span></div> <code> </code>`, 1);
+var root_4$2 = /* @__PURE__ */ from_html(`<div class="matrix-foundation"><strong> </strong> <span>generated tokens</span></div> <code> </code>`, 1);
+var root_5$2 = /* @__PURE__ */ from_html(`<button class="matrix-card"><header><strong> </strong> <code> </code></header> <!></button>`);
+var root_6$2 = /* @__PURE__ */ from_html(`<div></div>`);
+function CaseMatrix($$anchor, $$props) {
+  push($$props, true);
+  let compact = prop($$props, "compact", 3, false);
+  let domain = /* @__PURE__ */ user_derived(() => {
+    var _a2;
+    return ((_a2 = $$props.cases[0]) == null ? void 0 : _a2.kind) ?? "empty";
+  });
+  var div = root_6$2();
+  let classes;
+  each(div, 21, () => $$props.cases, index, ($$anchor2, reviewCase) => {
+    var button = root_5$2();
+    var header = child(button);
+    var strong = child(header);
+    var text = child(strong);
+    var code = sibling(strong, 2);
+    var text_1 = child(code);
+    var node = sibling(header, 2);
+    {
+      var consequent = ($$anchor3) => {
+        var fragment = root$7();
+        var div_1 = first_child(fragment);
+        var code_1 = sibling(div_1, 2);
+        var text_2 = child(code_1);
+        template_effect(
+          ($0, $1) => {
+            set_style(div_1, $0);
+            set_text(text_2, $1);
+          },
+          [
+            () => `--review-color:${colorStyle(get(reviewCase), $$props.draft)}`,
+            () => colorStyle(get(reviewCase), $$props.draft)
+          ]
+        );
+        append($$anchor3, fragment);
+      };
+      var consequent_1 = ($$anchor3) => {
+        var fragment_1 = root_1$6();
+        var span = first_child(fragment_1);
+        var code_2 = sibling(span, 2);
+        var text_3 = child(code_2);
+        template_effect(
+          ($0) => {
+            set_style(span, $0);
+            set_text(text_3, `--${get(reviewCase).recipe.atomicFontSizeToken ?? ""} · ${get(reviewCase).weight.alias ?? ""} ·
+					${get(reviewCase).recipe.lineHeight ?? ""}`);
+          },
+          [() => typographyStyle(get(reviewCase), $$props.draft)]
+        );
+        append($$anchor3, fragment_1);
+      };
+      var consequent_2 = ($$anchor3) => {
+        var fragment_2 = root_2$3();
+        var div_2 = first_child(fragment_2);
+        var span_1 = child(div_2);
+        var code_3 = sibling(div_2, 2);
+        var text_4 = child(code_3);
+        template_effect(
+          ($0) => {
+            set_style(span_1, $0);
+            set_text(text_4, get(reviewCase).css);
+          },
+          [() => shadowStyle(get(reviewCase), $$props.draft)]
+        );
+        append($$anchor3, fragment_2);
+      };
+      var consequent_3 = ($$anchor3) => {
+        var fragment_3 = root_3$3();
+        var div_3 = first_child(fragment_3);
+        var span_2 = child(div_3);
+        var code_4 = sibling(div_3, 2);
+        var text_5 = child(code_4);
+        template_effect(
+          ($0) => {
+            set_style(span_2, $0);
+            set_text(text_5, `${get(reviewCase).duration.milliseconds ?? ""}ms · ${get(reviewCase).easing.name ?? ""}`);
+          },
+          [
+            () => `width:${Math.max(8, Math.min(100, get(reviewCase).duration.milliseconds / 4))}%`
+          ]
+        );
+        append($$anchor3, fragment_3);
+      };
+      var consequent_4 = ($$anchor3) => {
+        var fragment_4 = root_4$2();
+        var div_4 = first_child(fragment_4);
+        var strong_1 = child(div_4);
+        var text_6 = child(strong_1);
+        var code_5 = sibling(div_4, 2);
+        var text_7 = child(code_5);
+        template_effect(
+          ($0) => {
+            var _a2;
+            set_text(text_6, get(reviewCase).tokens.length);
+            set_text(text_7, `${((_a2 = get(reviewCase).tokens[0]) == null ? void 0 : _a2.value) ?? ""} → ${$0 ?? ""}`);
+          },
+          [() => {
+            var _a2;
+            return (_a2 = get(reviewCase).tokens.at(-1)) == null ? void 0 : _a2.value;
+          }]
+        );
+        append($$anchor3, fragment_4);
+      };
+      if_block(node, ($$render) => {
+        if (get(reviewCase).kind === "color") $$render(consequent);
+        else if (get(reviewCase).kind === "typography") $$render(consequent_1, 1);
+        else if (get(reviewCase).kind === "shadow") $$render(consequent_2, 2);
+        else if (get(reviewCase).kind === "motion") $$render(consequent_3, 3);
+        else if (get(reviewCase).kind === "foundation") $$render(consequent_4, 4);
+      });
+    }
+    template_effect(() => {
+      set_text(text, get(reviewCase).label);
+      set_text(text_1, get(reviewCase).sourcePath);
+    });
+    delegated("click", button, () => $$props.onselect(get(reviewCase).id));
+    append($$anchor2, button);
+  });
+  template_effect(() => {
+    classes = set_class(div, 1, "case-matrix", null, classes, { compact: compact() });
+    set_attribute(div, "data-lab", get(domain));
+  });
+  append($$anchor, div);
+  pop();
+}
+delegate(["click"]);
+var root$6 = /* @__PURE__ */ from_html(`<article><div class="alpha-chip"></div> <strong> </strong> <small> </small> <code> </code></article>`);
+var root_1$5 = /* @__PURE__ */ from_html(`<div class="color-stage"><div class="color-hero"><div class="color-chip"><strong> </strong> <span> </span> <code> </code></div></div> <div class="alpha-ramp"></div></div>`);
+function ColorCase($$anchor, $$props) {
+  push($$props, true);
+  var div = root_1$5();
+  var div_1 = child(div);
+  var div_2 = child(div_1);
+  var strong = child(div_2);
+  var text = child(strong);
+  var span = sibling(strong, 2);
+  var text_1 = child(span);
+  var code = sibling(span, 2);
+  var text_2 = child(code);
+  var div_3 = sibling(div_1, 2);
+  each(div_3, 21, () => $$props.reviewCase.alphaVariants, index, ($$anchor2, alpha) => {
+    var article = root$6();
+    var div_4 = child(article);
+    var strong_1 = sibling(div_4, 2);
+    var text_3 = child(strong_1);
+    var small = sibling(strong_1, 2);
+    var text_4 = child(small);
+    var code_1 = sibling(small, 2);
+    var text_5 = child(code_1);
+    template_effect(
+      ($0, $1) => {
+        set_style(div_4, $0);
+        set_text(text_3, get(alpha).label);
+        set_text(text_4, `${$1 ?? ""}%`);
+        set_text(text_5, `--${get(alpha).token ?? ""}`);
+      },
+      [
+        () => `--review-color:${colorStyle($$props.reviewCase, $$props.draft, get(alpha).alpha)}`,
+        () => Math.round(get(alpha).alpha * 100)
+      ]
+    );
+    append($$anchor2, article);
+  });
+  template_effect(
+    ($0, $1) => {
+      set_style(div_1, $0);
+      set_text(text, $$props.reviewCase.color);
+      set_text(text_1, $$props.reviewCase.mode);
+      set_text(text_2, $1);
+    },
+    [
+      () => `--review-color:${colorStyle($$props.reviewCase, $$props.draft)}`,
+      () => colorStyle($$props.reviewCase, $$props.draft)
+    ]
+  );
+  append($$anchor, div);
+  pop();
+}
+function isObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+function validateControlValue(control, value) {
+  if (control.kind === "select") {
+    if (typeof value !== "string" && typeof value !== "number" || !control.options.some((option) => option.value === value)) {
+      throw new Error(`Patch value for ${control.path} is not an available option`);
+    }
+    return value;
+  }
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new Error(`Patch value for ${control.path} must be a finite number`);
+  }
+  if (value < control.min || value > control.max) {
+    throw new Error(
+      `Patch value for ${control.path} must be between ${control.min} and ${control.max}`
+    );
+  }
+  return value;
+}
+function importReviewPatch(value, systemFingerprint, controls, caseIds) {
+  if (!isObject(value)) throw new Error("Review patch must be a JSON object");
+  if (value.kind !== "three-forma-styli/review-patch" || value.schemaVersion !== 1) {
+    throw new Error("Unsupported review patch kind or schema version");
+  }
+  if (value.systemFingerprint !== systemFingerprint) {
+    throw new Error("Review patch belongs to a different generated design system");
+  }
+  if (!Array.isArray(value.operations) || !Array.isArray(value.selectedCases)) {
+    throw new Error("Review patch operations and selectedCases must be arrays");
+  }
+  const controlsByPath = new Map(controls.map((control) => [control.path, control]));
+  const operations = [];
+  const draft = {};
+  for (const candidate of value.operations) {
+    if (!isObject(candidate) || typeof candidate.path !== "string") {
+      throw new Error("Every review patch operation must contain a path");
+    }
+    if (candidate.path in draft) {
+      throw new Error(`Review patch contains duplicate path ${candidate.path}`);
+    }
+    const control = controlsByPath.get(candidate.path);
+    if (!control) throw new Error(`Review patch references unknown path ${candidate.path}`);
+    if (candidate.previous !== control.value) {
+      throw new Error(`Review patch baseline is stale at ${candidate.path}`);
+    }
+    const next = validateControlValue(control, candidate.value);
+    draft[candidate.path] = next;
+    operations.push({
+      path: candidate.path,
+      previous: control.value,
+      value: next
+    });
+  }
+  const selectedCases = value.selectedCases.map((candidate) => {
+    if (typeof candidate !== "string" || !caseIds.has(candidate)) {
+      throw new Error(`Review patch references unknown selected case ${String(candidate)}`);
+    }
+    return candidate;
+  });
+  return {
+    patch: {
+      kind: "three-forma-styli/review-patch",
+      schemaVersion: 1,
+      systemFingerprint,
+      operations,
+      selectedCases: [...new Set(selectedCases)].sort(),
+      ...typeof value.note === "string" ? { note: value.note } : {}
+    },
+    draft
+  };
+}
+function patchFromDraft(systemFingerprint, baseValues, draft, selectedCases) {
+  const operations = Object.entries(draft).filter(([path, value]) => baseValues[path] !== value).map(([path, value]) => ({
+    path,
+    previous: baseValues[path] ?? null,
+    value
+  })).sort((left, right) => left.path.localeCompare(right.path));
+  return {
+    kind: "three-forma-styli/review-patch",
+    schemaVersion: 1,
+    systemFingerprint,
+    operations,
+    selectedCases: [...new Set(selectedCases)].sort()
+  };
+}
+function agentHandoff(patch, generate = "tfs build .", check = "tfs check .") {
+  return {
+    kind: "three-forma-styli/agent-handoff",
+    schemaVersion: 1,
+    patch,
+    instructions: "Apply these reviewed visual decisions to the authored TFS source. Preserve helper-driven architecture, regenerate owned artifacts, run the declared checks, inspect the named review cases, and commit only the coherent source plus generated result.",
+    verification: { generate, check }
+  };
+}
+function downloadJson(name, value) {
+  const blob = new Blob([`${JSON.stringify(value, null, 2)}
+`], {
+    type: "application/json"
+  });
+  const url = URL.createObjectURL(blob);
+  const link2 = document.createElement("a");
+  link2.href = url;
+  link2.download = name;
+  link2.click();
+  URL.revokeObjectURL(url);
+}
+var root$5 = /* @__PURE__ */ from_html(`<article class="foundation-item"><div class="foundation-sample"></div> <strong> </strong> <code> </code></article>`);
+var root_1$4 = /* @__PURE__ */ from_html(`<div class="foundation-stage"></div>`);
+function FoundationCase($$anchor, $$props) {
+  push($$props, true);
+  var div = root_1$4();
+  each(div, 21, () => $$props.reviewCase.tokens, index, ($$anchor2, token) => {
+    var article = root$5();
+    var div_1 = child(article);
+    var strong = sibling(div_1, 2);
+    var text = child(strong);
+    var code = sibling(strong, 2);
+    var text_1 = child(code);
+    template_effect(() => {
+      set_attribute(div_1, "data-family", $$props.reviewCase.family);
+      set_style(div_1, `--review-value:var(--${get(token).name});--review-raw:${get(token).rawValue ?? 0}`);
+      set_text(text, `--${get(token).name ?? ""}`);
+      set_text(text_1, get(token).value);
+    });
+    append($$anchor2, article);
+  });
+  append($$anchor, div);
+  pop();
+}
+var root$4 = /* @__PURE__ */ from_html(`<div></div>`);
+var root_1$3 = /* @__PURE__ */ from_html(`<div class="motion-stage"><div class="motion-preference" aria-label="Motion preference"><button>standard</button> <button>reduced</button> <span> </span></div> <div class="motion-meta"><article><span>duration</span> <strong> </strong> <code> </code></article> <article><span>delay</span> <strong> </strong> <code> </code></article> <article><span>easing</span> <strong> </strong> <code> </code></article></div> <div class="motion-track"><!></div> <button class="motion-play">play once</button> <code class="motion-tuple"> </code></div>`);
+function MotionCase($$anchor, $$props) {
+  push($$props, true);
+  let motionRun = /* @__PURE__ */ state(0);
+  let reduced = /* @__PURE__ */ state(new URLSearchParams(location.search).get("motion") === "reduce");
+  let value = /* @__PURE__ */ user_derived(() => get(reduced) ? $$props.reviewCase.reducedMotion : $$props.reviewCase);
+  function setReduced(next) {
+    set(reduced, next, true);
+    set(motionRun, get(motionRun) + 1);
+    const url = new URL(location.href);
+    url.searchParams.set("motion", next ? "reduce" : "no-preference");
+    history.replaceState(null, "", url);
+  }
+  var div = root_1$3();
+  var div_1 = child(div);
+  var button = child(div_1);
+  let classes;
+  var button_1 = sibling(button, 2);
+  let classes_1;
+  var span = sibling(button_1, 2);
+  var text = child(span);
+  var div_2 = sibling(div_1, 2);
+  var article = child(div_2);
+  var strong = sibling(child(article), 2);
+  var text_1 = child(strong);
+  var code = sibling(strong, 2);
+  var text_2 = child(code);
+  var article_1 = sibling(article, 2);
+  var strong_1 = sibling(child(article_1), 2);
+  var text_3 = child(strong_1);
+  var code_1 = sibling(strong_1, 2);
+  var text_4 = child(code_1);
+  var article_2 = sibling(article_1, 2);
+  var strong_2 = sibling(child(article_2), 2);
+  var text_5 = child(strong_2);
+  var code_2 = sibling(strong_2, 2);
+  var text_6 = child(code_2);
+  var div_3 = sibling(div_2, 2);
+  var node = child(div_3);
+  key(node, () => get(motionRun), ($$anchor2) => {
+    var div_4 = root$4();
+    let classes_2;
+    template_effect(() => {
+      classes_2 = set_class(div_4, 1, "motion-object", null, classes_2, { running: get(motionRun) > 0 });
+      set_style(div_4, `--review-duration:${get(value).duration.milliseconds}ms;--review-delay:${get(value).delay.milliseconds}ms;--review-easing:${get(value).easing.css}`);
+    });
+    append($$anchor2, div_4);
+  });
+  var button_2 = sibling(div_3, 2);
+  var code_3 = sibling(button_2, 2);
+  var text_7 = child(code_3);
+  template_effect(() => {
+    classes = set_class(button, 1, "", null, classes, { active: !get(reduced) });
+    classes_1 = set_class(button_1, 1, "", null, classes_1, { active: get(reduced) });
+    set_attribute(span, "data-behavior", $$props.reviewCase.reducedMotion.behavior);
+    set_text(text, $$props.reviewCase.reducedMotion.behavior);
+    set_text(text_1, `${get(value).duration.milliseconds ?? ""}ms`);
+    set_text(text_2, get(value).duration.token ? `--${get(value).duration.token}` : "0ms");
+    set_text(text_3, `${get(value).delay.milliseconds ?? ""}ms`);
+    set_text(text_4, get(value).delay.token ? `--${get(value).delay.token}` : "0ms");
+    set_text(text_5, get(value).easing.name);
+    set_text(text_6, `--${get(value).easing.token ?? ""}`);
+    set_text(text_7, `${get(value).duration.milliseconds ?? ""}ms ${get(value).easing.css ?? ""}
+		${get(value).delay.milliseconds ?? ""}ms`);
+  });
+  delegated("click", button, () => setReduced(false));
+  delegated("click", button_1, () => setReduced(true));
+  delegated("click", button_2, () => set(motionRun, get(motionRun) + 1));
+  append($$anchor, div);
+  pop();
+}
+delegate(["click"]);
+var root$3 = /* @__PURE__ */ from_html(`<div class="shadow-stage"><div class="shadow-pair"><div class="shadow-object">Aa</div> <div class="clip-boundary"><div class="shadow-object">Aa</div></div></div> <pre> </pre></div>`);
+function ShadowCase($$anchor, $$props) {
+  push($$props, true);
+  var div = root$3();
+  var div_1 = child(div);
+  var div_2 = child(div_1);
+  var div_3 = sibling(div_2, 2);
+  var div_4 = child(div_3);
+  var pre = sibling(div_1, 2);
+  var text = child(pre);
+  template_effect(
+    ($0, $1, $2) => {
+      set_style(div_2, $0);
+      set_style(div_4, $1);
+      set_text(text, $2);
+    },
+    [
+      () => shadowStyle($$props.reviewCase, $$props.draft),
+      () => shadowStyle($$props.reviewCase, $$props.draft),
+      () => shadowStyle($$props.reviewCase, $$props.draft)
+    ]
+  );
+  append($$anchor, div);
+  pop();
+}
+var root$2 = /* @__PURE__ */ from_html(`<label><input type="checkbox"/> adjusted fallback</label> <output> </output>`, 1);
+var root_1$2 = /* @__PURE__ */ from_html(`<div class="metric-overlay" aria-hidden="true"><i class="metric-line" style="top:0"><span>line top</span></i> <i class="metric-line"><span>line bottom</span></i> <i class="metric-cap"><span>1cap</span></i> <i class="metric-ex"><span>1ex</span></i> <i class="metric-baseline"><span>baseline</span></i></div>`);
+var root_2$2 = /* @__PURE__ */ from_html(`<article><code> </code> <span>Aa 0123</span></article>`);
+var root_3$2 = /* @__PURE__ */ from_html(`<div><div class="type-tools"><label><input type="checkbox"/> metrics</label> <label><input type="checkbox"/> light surface</label> <label><input type="checkbox"/> WCAG spacing stress</label> <!></div> <div class="type-stage-body"><p class="eyebrow"> </p> <div><p class="type-short" contenteditable="true" aria-label="Editable typography sample" spellcheck="false">Sphinx of black quartz, judge my vow.</p> <span class="metric-probe">Hhx<span class="baseline-probe"></span><i class="cap-probe"></i><i class="ex-probe"></i></span> <!></div> <div class="type-columns"><div><span class="type-caption">narrow wrapping</span> <p>Typography becomes a system when every choice remains intentional under density, wrapping,
 					different surfaces, real content and imperfect loading conditions.</p></div> <div><span class="type-caption">glyph stress</span> <p class="glyph-stress">ABCDEFGHIJKLMNOPQRSTUVWXYZ · abcdefghijklmnopqrstuvwxyz · 0123456789 · $€£¥ ₿ ± × ÷ → ← ↑
-					↓ &#123; &#125; [ ] ( )</p></div></div> <div class="weight-matrix"></div></div></div>`);function Fl(e,t){bt(t,!0);let n=J(!1),r=J(!1),a=J(!1),s=J(!1),l=J(void 0),c=J(void 0),o=J(void 0),f=J(void 0),v=J(void 0),k=J(void 0),h=J(void 0),g=J(je({lineBottom:0,baseline:0,cap:0,ex:0})),m=J(""),x=0;_n(()=>{t.reviewCase.id,t.draft,i(n),i(s),i(a);const L=requestAnimationFrame(()=>{y(),j()});return()=>cancelAnimationFrame(L)});function y(){if(!i(f)||!i(v)||!i(k)||!i(h))return;const L=i(f).getBoundingClientRect(),re=i(v).getBoundingClientRect().top-L.top;E(g,{lineBottom:L.height,baseline:re,cap:re-i(k).getBoundingClientRect().height,ex:re-i(h).getBoundingClientRect().height},!0)}function C(L){const re=document.createRange();re.selectNodeContents(L);const se=[...re.getClientRects()].filter(ae=>ae.width>0&&ae.height>0).map(ae=>Math.round(ae.top*10)/10);return new Set(se).size}function G(L,re,se){const ae=Yt(t.reviewCase,t.draft,{forceFallback:L,wcagSpacing:i(a)}),he=document.createElement(se===void 0?"span":"div");he.textContent=re,he.style.cssText=se===void 0?`${ae};position:fixed;left:-100000px;top:0;visibility:hidden;display:inline-block;width:max-content;max-width:none;white-space:pre`:`${ae};position:fixed;left:-100000px;top:0;visibility:hidden;width:${se}px`,document.body.append(he);const Ee={width:he.getBoundingClientRect().width,lines:se===void 0?1:C(he)};return he.remove(),Ee}async function S(L,re,se,ae){try{return(await document.fonts.load(`${re} ${se} 16px ${JSON.stringify(L)}`,ae)).some(Ee=>Ee.status==="loaded")}catch{return!1}}async function j(){var dn;const L=++x;if(!t.reviewCase.font.adjustedFallback){E(m,"");return}if(await document.fonts.ready,L!==x||!i(l)||!i(c)||!i(o))return;const re=t.reviewCase.controls.find(Ke=>Ke.id==="weight"),se=re&&typeof t.draft[re.path]=="string"?String(t.draft[re.path]):t.reviewCase.weight.alias,ae=((dn=t.reviewCase.availableWeights.find(Ke=>Ke.alias===se))==null?void 0:dn.value)??t.reviewCase.weight.value,he=i(l).textContent??"",Ee=await S(t.reviewCase.font.family,t.reviewCase.style,ae,he);if(L!==x)return;if(!Ee){E(m,`primary face unavailable: ${t.reviewCase.font.family} ${t.reviewCase.style} ${ae}`);return}const Ht=await S(t.reviewCase.font.adjustedFallback,t.reviewCase.style,ae,he);if(L!==x)return;if(!Ht){E(m,`adjusted fallback unavailable: ${t.reviewCase.font.adjustedFallback} ${t.reviewCase.style} ${ae}`);return}const un=Ke=>{const Et=G(!1,Ke),dr=G(!0,Ke).width-Et.width;return{delta:dr,percent:Et.width===0?0:dr/Et.width*100}},Ot=un(i(l).textContent??""),Wt=un(i(o).textContent??""),kt=i(c).getBoundingClientRect().width,jt=G(!1,i(c).textContent??"",kt),Lt=G(!0,i(c).textContent??"",kt);if(L!==x)return;const xt=(Ke,Et)=>`${Ke>0?"+":""}${Ke.toFixed(Et)}`,fr=Lt.lines-jt.lines;E(m,[`phrase width Δ ${xt(Ot.delta,2)}px (${xt(Ot.percent,2)}%)`,`narrow lines Δ ${fr>=0?"+":""}${fr} (${jt.lines}→${Lt.lines})`,`glyph stress width Δ ${xt(Wt.delta,2)}px (${xt(Wt.percent,2)}%)`].join(" · "),!0)}var R=Al();let I;var D=p(R),K=p(D),A=p(K),H=b(K,2),te=p(H),ce=b(H,2),ht=p(ce),ze=b(ce,2);{var rt=L=>{var re=Sl(),se=ft(re),ae=p(se),he=b(se,2),Ee=p(he);q(()=>F(Ee,i(m)||"measuring primary → adjusted fallback…")),hr(ae,()=>i(s),Ht=>E(s,Ht)),M(L,re)};ve(ze,L=>{t.reviewCase.font.adjustedFallback&&L(rt)})}var We=b(D,2),Ge=p(We),at=p(Ge),ee=b(Ge,2);let ne;var de=p(ee);Pt(de,L=>E(l,L),()=>i(l));var ie=b(de,2),ke=b(p(ie));Pt(ke,L=>E(v,L),()=>i(v));var xe=b(ke);Pt(xe,L=>E(k,L),()=>i(k));var it=b(xe);Pt(it,L=>E(h,L),()=>i(h)),Pt(ie,L=>E(f,L),()=>i(f));var Mt=b(ie,2);{var Nn=L=>{var re=Cl(),se=b(p(re),2),ae=b(se,2),he=b(ae,2),Ee=b(he,2);q(()=>{pe(se,`top:${i(g).lineBottom}px`),pe(ae,`top:${i(g).cap}px`),pe(he,`top:${i(g).ex}px`),pe(Ee,`top:${i(g).baseline}px`)}),M(L,re)};ve(Mt,L=>{i(n)&&L(Nn)})}var or=b(ee,2),lr=p(or),Pn=b(p(lr),2);Pt(Pn,L=>E(c,L),()=>i(c));var cr=b(lr,2),Dn=b(p(cr),2);Pt(Dn,L=>E(o,L),()=>i(o));var Dr=b(or,2);Pe(Dr,21,()=>Object.entries(t.reviewCase.styleWeights),Ne,(L,re)=>{var se=ge(()=>si(i(re),2));let ae=()=>i(se)[0],he=()=>i(se)[1];var Ee=ca(),Ht=ft(Ee);Pe(Ht,17,he,Ne,(un,Ot)=>{var Wt=Tl(),kt=p(Wt),jt=p(kt),Lt=b(kt,2);q(xt=>{F(jt,`${ae()??""} · ${i(Ot).alias??""} · ${i(Ot).value??""}`),pe(Lt,xt)},[()=>`${Yt(t.reviewCase,t.draft,{forceFallback:i(s),wcagSpacing:i(a)})};font-style:${ae()};font-weight:${i(Ot).value}`]),M(un,Wt)}),M(L,Ee)}),q((L,re,se,ae)=>{I=De(R,1,"typography-stage",null,I,{"light-surface":i(r)}),F(at,`${t.reviewCase.role??""} · ${t.reviewCase.variant??"base"??""}`),ne=De(ee,1,"metric-sample",null,ne,{diagnostics:i(n)}),pe(de,L),pe(ie,re),pe(Pn,se),pe(Dn,ae)},[()=>Yt(t.reviewCase,t.draft,{forceFallback:i(s),wcagSpacing:i(a)}),()=>Yt(t.reviewCase,t.draft,{forceFallback:i(s),wcagSpacing:i(a)}),()=>Yt(t.reviewCase,t.draft,{forceFallback:i(s),wcagSpacing:i(a)}),()=>Yt(t.reviewCase,t.draft,{forceFallback:i(s),wcagSpacing:i(a)})]),hr(A,()=>i(n),L=>E(n,L)),hr(te,()=>i(r),L=>E(r,L)),hr(ht,()=>i(a),L=>E(a,L)),le("input",de,()=>{y(),j()}),M(e,R),yt()}sr(["input"]);function Yr(e,t){bt(t,!0);var n=ca(),r=ft(n);{var a=f=>{ul(f,{get reviewCase(){return t.reviewCase},get draft(){return t.draft}})},s=f=>{Fl(f,{get reviewCase(){return t.reviewCase},get draft(){return t.draft}})},l=f=>{El(f,{get reviewCase(){return t.reviewCase},get draft(){return t.draft}})},c=f=>{var v=ca(),k=ft(v);Wi(k,()=>t.reviewCase.id,h=>{kl(h,{get reviewCase(){return t.reviewCase}})}),M(f,v)},o=f=>{wl(f,{get reviewCase(){return t.reviewCase}})};ve(r,f=>{var v,k,h,g,m;((v=t.reviewCase)==null?void 0:v.kind)==="color"?f(a):((k=t.reviewCase)==null?void 0:k.kind)==="typography"?f(s,1):((h=t.reviewCase)==null?void 0:h.kind)==="shadow"?f(l,2):((g=t.reviewCase)==null?void 0:g.kind)==="motion"?f(c,3):((m=t.reviewCase)==null?void 0:m.kind)==="foundation"&&f(o,4)})}M(e,n),yt()}var Rl=N('<div class="inspector-title"><div><span>matrix overview</span> <strong> </strong></div></div> <div class="empty-inspector"><strong> </strong> <p> </p></div>',1),Ml=N("<button>reset case</button>"),Ol=N('<div class="number-pair"><input type="range"/> <input type="number"/> <small> </small></div>'),jl=N("<option> </option>"),Ll=N("<select></select>"),Nl=N("<label><span> </span> <!> <code> </code></label>"),Pl=N('<div class="controls"></div>'),Dl=N(`<strong>Playback-only review</strong> <p>This case exposes resolved timing and easing facts. Its authored references remain
-						source-controlled until structured time-reference editing is designed.</p>`,1),Il=N(`<strong>Derived scale</strong> <p>These values are generated from compact authored anchors. Calibrate the source schedule
-						rather than patching individual derived tokens.</p>`,1),zl=N('<div class="empty-inspector"><!></div>'),Bl=N('<div class="inspector-title"><div><span> </span> <strong> </strong></div> <!></div> <!>',1),ql=N('<div class="empty-inspector"><strong>Resolved system</strong> <p>Select a lab and case to inspect source decisions and create a non-destructive draft.</p></div>'),Ul=N('<aside class="inspector" aria-label="Case inspector"><!> <div class="draft-footer"><button>discard all edits</button></div></aside>');function Vl(e,t){bt(t,!0);var n=Ul(),r=p(n);{var a=f=>{var v=Rl(),k=ft(v),h=p(k),g=b(p(h),2),m=p(g),x=b(k,2),y=p(x),C=p(y),G=b(y,2),S=p(G);q(j=>{F(m,t.labLabel),F(C,`${t.visibleCaseCount??""} visible cases`),F(S,`Compare the full ${j??""} system at once. Filter or change modes to narrow the
-				matrix, then select any specimen for precise calibration and source paths.`)},[()=>{var j;return(j=t.labLabel)==null?void 0:j.toLowerCase()}]),M(f,v)},s=f=>{var v=Bl(),k=ft(v),h=p(k),g=p(h),m=p(g),x=b(g,2),y=p(x),C=b(h,2);{var G=I=>{var D=Ml();le("click",D,function(...K){var A;(A=t.resetCase)==null||A.apply(this,K)}),M(I,D)};ve(C,I=>{t.activeCase.controls.length>0&&I(G)})}var S=b(k,2);{var j=I=>{var D=Pl();Pe(D,21,()=>t.activeCase.controls,Ne,(K,A)=>{var H=Nl();let te;var ce=p(H),ht=p(ce),ze=b(ce,2);{var rt=ee=>{var ne=Ol(),de=p(ne),ie=b(de,2),ke=b(ie,2),xe=p(ke);q((it,Mt)=>{Te(de,"aria-label",`${i(A).label} slider`),Te(de,"min",i(A).min),Te(de,"max",i(A).max),Te(de,"step",i(A).step),Ya(de,it),Te(ie,"aria-label",`${i(A).label} value`),Te(ie,"min",i(A).min),Te(ie,"max",i(A).max),Te(ie,"step",i(A).step),Ya(ie,Mt),F(xe,i(A).unit)},[()=>Xt(i(A),t.draft),()=>Xt(i(A),t.draft)]),le("input",de,it=>t.setControl(i(A),Number(it.currentTarget.value))),le("dblclick",de,()=>t.resetControl(i(A))),le("input",ie,it=>t.setControl(i(A),Number(it.currentTarget.value))),M(ee,ne)},We=ee=>{var ne=Ll();Pe(ne,21,()=>i(A).options,Ne,(ie,ke)=>{var xe=jl(),it=p(xe),Mt={};q(Nn=>{Yo(xe,Nn),F(it,i(ke).label),Mt!==(Mt=i(ke).value)&&(xe.value=(xe.__value=i(ke).value)??"")},[()=>i(ke).value===Xt(i(A),t.draft)]),M(ie,xe)});var de;Gi(ne),q(ie=>{Te(ne,"aria-label",i(A).label),de!==(de=ie)&&(ne.value=(ne.__value=ie)??"",xa(ne,ie))},[()=>Xt(i(A),t.draft)]),le("change",ne,ie=>{const ke=i(A).options.find(xe=>String(xe.value)===ie.currentTarget.value);ke&&t.setControl(i(A),ke.value)}),M(ee,ne)};ve(ze,ee=>{i(A).kind==="number"?ee(rt):ee(We,-1)})}var Ge=b(ze,2),at=p(Ge);q(()=>{te=De(H,1,"",null,te,{changed:t.draft[i(A).path]!==void 0}),F(ht,i(A).label),F(at,i(A).path)}),M(K,H)}),M(I,D)},R=I=>{var D=zl(),K=p(D);{var A=te=>{var ce=Dl();M(te,ce)},H=te=>{var ce=Il();M(te,ce)};ve(K,te=>{t.activeCase.kind==="motion"?te(A):te(H,-1)})}M(I,D)};ve(S,I=>{t.activeCase.controls.length>0?I(j):I(R,-1)})}q(()=>{F(m,t.activeCase.controls.length>0?"calibration":"resolved case"),F(y,t.activeCase.label)}),M(f,v)},l=f=>{var v=ql();M(f,v)};ve(r,f=>{t.matrix?f(a):t.activeCase?f(s,1):f(l,-1)})}var c=b(r,2),o=p(c);q(()=>o.disabled=t.editCount===0),le("click",o,function(...f){var v;(v=t.clearDraft)==null||v.apply(this,f)}),M(e,n),yt()}sr(["click","input","dblclick","change"]);var Xa=N("<option> </option>"),Hl=N('<label><span>color</span> <select data-testid="color-mode" aria-label="color mode"></select></label>'),Wl=N('<label><span>size</span> <select data-testid="size-mode" aria-label="size mode"></select></label>'),Gl=N('<span class="action-status" aria-live="polite"> </span>'),Kl=N("<small> </small>"),Yl=N("<button><span> </span> <!></button>"),Jl=N('<label class="case-filter"><span class="sr-only"> </span> <input type="search" placeholder="filter cases"/></label>'),Zl=N("<button> </button>"),Ql=N('<p class="no-cases">No matching cases</p>'),Xl=N('<div class="case-list"><!> <!> <!></div>'),$l=N('<div class="view-switch" aria-label="Canvas view"><button>matrix</button> <button>case</button> <button>compare</button></div>'),$a=N("<code> </code>"),ec=N('<div class="comparison" data-testid="baseline-draft-comparison"><section class="comparison-frame" data-state="baseline"><header><span>immutable source</span> <strong>baseline</strong></header> <div class="comparison-body"><!></div></section> <section class="comparison-frame" data-state="draft"><header><span>review overlay</span> <strong>draft</strong></header> <div class="comparison-body"><!></div></section></div>'),tc=N("<article><span> </span><strong> </strong></article>"),nc=N("<li><span> </span> <div><strong> </strong> <!></div></li>"),rc=N('<section class="overview-diagnostics" aria-label="Build diagnostics"><header><div><span>build evidence</span> <strong>diagnostics</strong></div> <small> </small></header> <ul></ul></section>'),ac=N('<section class="overview-section"><header><div><span>system domain</span> <strong> </strong></div> <button> </button></header> <!></section>'),ic=N('<div class="system-overview"><div class="overview-grid"></div> <!> <!></div>'),sc=N('<div class="workbench" data-testid="workbench"><header class="topbar"><div class="identity"><span class="mark">TFS</span> <div><strong> </strong> <small> </small></div></div> <div class="globals"><!> <!></div> <div class="actions"><button aria-label="Undo draft">↶</button> <button aria-label="Redo draft">↷</button> <span> </span> <input class="patch-input" type="file" accept="application/json,.json" aria-label="Import review patch" data-testid="patch-input"/> <button>import</button> <button>export</button> <button>copy agent handoff</button> <!></div></header> <aside class="navigation" aria-label="Workbench labs"><nav></nav> <!></aside> <main class="canvas-shell"><div class="canvas-header"><div><span> </span> <strong> </strong></div> <!> <!></div> <section data-testid="review-canvas"><!></section></main> <!></div>');function oc(e,t){var Oa,ja;bt(t,!0);function n(u){return u.labs.flatMap(_=>_.kind==="color"||_.kind==="typography"||_.kind==="shadows"||_.kind==="motion"||_.kind==="foundation"?_.cases.flatMap(w=>w.controls):[])}function r(u){const _=localStorage.getItem(`tfs-workbench:${u.systemFingerprint}`);if(!_)return{};try{const w=JSON.parse(_);if(!w||typeof w!="object"||Array.isArray(w))return{};const T=new Map(n(u).map(P=>[P.path,P]));return Object.fromEntries(Object.entries(w).filter(([P,Q])=>{const X=T.get(P);return X?X.kind==="number"?typeof Q=="number"&&Number.isFinite(Q):typeof Q=="string"||typeof Q=="number":!1}))}catch{return{}}}const a=ir(()=>t.contract),s=new URLSearchParams(location.search),l=s.get("case")??"",c=s.get("view")==="matrix"?"matrix":s.get("view")==="compare"?"compare":"case";let o=J(je(r(a))),f=J(je([])),v=J(je([])),k=J(je(s.get("lab")??"overview")),h=J(je(l)),g=J(""),m=J(je(c)),x=J(je(s.get("color")??((Oa=a.globals.modes.find(u=>u.category==="color"))==null?void 0:Oa.default)??"")),y=J(je(s.get("size")??((ja=a.globals.modes.find(u=>u.category==="size"))==null?void 0:ja.default)??"")),C=J(""),G=J(void 0),S=ge(()=>t.contract.labs.find(u=>u.id===i(k))??t.contract.labs[0]),j=ge(()=>{var u,_,w,T,P;return((u=i(S))==null?void 0:u.kind)==="color"||((_=i(S))==null?void 0:_.kind)==="typography"||((w=i(S))==null?void 0:w.kind)==="shadows"||((T=i(S))==null?void 0:T.kind)==="motion"||((P=i(S))==null?void 0:P.kind)==="foundation"?i(S).cases:[]}),R=ge(()=>i(j).find(u=>u.id===i(h))??i(j)[0]),I=ge(()=>{var u,_,w;return((u=i(S))==null?void 0:u.kind)==="typography"?((_=i(S).cases.find(T=>T.mode===i(y)))==null?void 0:_.mode)??((w=i(S).cases[0])==null?void 0:w.mode):void 0}),D=ge(()=>i(j).filter(u=>{var _,w;return((_=i(S))==null?void 0:_.kind)==="color"&&u.kind==="color"&&u.mode!==i(x)||((w=i(S))==null?void 0:w.kind)==="typography"&&u.kind==="typography"&&u.mode!==i(I)?!1:u.label.toLowerCase().includes(i(g).trim().toLowerCase())})),K=ge(()=>{const u=[];for(const _ of t.contract.labs)if(!(_.kind!=="color"&&_.kind!=="typography"&&_.kind!=="shadows"&&_.kind!=="motion"&&_.kind!=="foundation"))for(const w of _.cases)for(const T of w.controls)u.push([T.path,T.value]);return Object.fromEntries(u)}),A=ge(()=>hl(t.contract.systemFingerprint,i(K),i(o),t.contract.labs.flatMap(u=>u.kind==="overview"?[]:u.cases.filter(_=>_.controls.some(w=>i(o)[w.path]!==void 0)).map(_=>_.id)))),H=ge(()=>t.contract.globals.modes),te=ge(()=>i(H).find(u=>u.category==="color")),ce=ge(()=>i(H).find(u=>u.category==="size")),ht=ge(()=>tl(i(H),i(x),i(y))),ze=ge(()=>{var u;return!!((u=i(R))!=null&&u.controls.some(_=>i(o)[_.path]!==void 0))});_n(()=>{localStorage.setItem(`tfs-workbench:${t.contract.systemFingerprint}`,JSON.stringify(i(o)))}),_n(()=>{var _;const u=new URL(location.href);u.searchParams.set("lab",i(k)),(_=i(R))!=null&&_.id?u.searchParams.set("case",i(R).id):u.searchParams.delete("case"),i(x)&&u.searchParams.set("color",i(x)),i(y)&&u.searchParams.set("size",i(y)),u.searchParams.set("view",i(m)),history.replaceState(null,"",u)}),_n(()=>{i(m)==="compare"&&!i(ze)&&E(m,"case")}),_n(()=>{var _,w;if(((_=i(S))==null?void 0:_.kind)!=="color"||((w=i(R))==null?void 0:w.kind)!=="color"||i(R).mode===i(x))return;const u=i(S).cases.find(T=>T.mode===i(x)&&T.color===i(R).color)??i(S).cases.find(T=>T.mode===i(x));u&&E(h,u.id,!0)}),_n(()=>{var _,w;if(((_=i(S))==null?void 0:_.kind)!=="typography"||((w=i(R))==null?void 0:w.kind)!=="typography"||i(R).mode===i(I))return;const u=i(S).cases.find(T=>T.mode===i(I)&&T.role===i(R).role&&T.variant===i(R).variant)??i(S).cases.find(T=>T.mode===i(I));u&&E(h,u.id,!0)});function rt(u){var _;E(k,u.id,!0),E(g,""),E(m,u.kind==="overview"?"case":"matrix",!0),E(h,u.kind==="color"||u.kind==="typography"||u.kind==="shadows"||u.kind==="motion"||u.kind==="foundation"?((_=u.cases[0])==null?void 0:_.id)??"":"",!0),u.kind==="color"&&u.cases[0]&&E(x,u.cases[0].mode,!0)}function We(u){E(h,u,!0),E(m,"case");const _=i(j).find(w=>w.id===u);(_==null?void 0:_.kind)==="color"&&E(x,_.mode,!0),(_==null?void 0:_.kind)==="typography"&&E(y,_.mode,!0)}function Ge(u,_){if(u.kind==="overview")return;E(k,u.id,!0),E(h,_,!0),E(g,""),E(m,"case");const w=u.cases.find(T=>T.id===_);(w==null?void 0:w.kind)==="color"&&E(x,w.mode,!0),(w==null?void 0:w.kind)==="typography"&&E(y,w.mode,!0)}function at(u){var _,w;if(u.kind==="overview")return[];if(u.kind==="color")return u.cases.filter(T=>T.mode===i(x));if(u.kind==="typography"){const T=((_=u.cases.find(P=>P.mode===i(y)))==null?void 0:_.mode)??((w=u.cases[0])==null?void 0:w.mode);return u.cases.filter(P=>P.mode===T)}return u.cases}function ee(u){return u.replace(/([a-z])([A-Z])/g,"$1 $2").toLowerCase()}function ne(u,_){const w=i(o)[u.path]??u.value;w!==_&&(E(f,[...i(f),{changes:[{path:u.path,previous:w,value:_}]}],!0),E(v,[],!0),E(o,{...i(o),[u.path]:_},!0))}function de(u,_){const w={...i(o)};_===i(K)[u]?delete w[u]:w[u]=_,E(o,w,!0)}function ie(u,_){const w={...i(o)};for(const T of u.changes){const P=_==="undo"?T.previous:T.value;P===i(K)[T.path]?delete w[T.path]:w[T.path]=P}E(o,w,!0)}function ke(){const u=i(f).at(-1);u&&(E(f,i(f).slice(0,-1),!0),E(v,[...i(v),u],!0),ie(u,"undo"))}function xe(){const u=i(v).at(-1);u&&(E(v,i(v).slice(0,-1),!0),E(f,[...i(f),u],!0),ie(u,"redo"))}function it(u){const _=i(o)[u.path];_!==void 0&&(E(f,[...i(f),{changes:[{path:u.path,previous:_,value:u.value}]}],!0),E(v,[],!0),de(u.path,u.value))}function Mt(){if(!i(R))return;const u=i(R).controls.filter(w=>i(o)[w.path]!==void 0).map(w=>({path:w.path,previous:i(o)[w.path],value:w.value}));if(u.length===0)return;E(f,[...i(f),{changes:u}],!0),E(v,[],!0);const _={...i(o)};for(const w of u)delete _[w.path];E(o,_,!0)}function Nn(){const u=Object.entries(i(o)).map(([_,w])=>({path:_,previous:w,value:i(K)[_]??null}));u.length!==0&&(E(f,[...i(f),{changes:u}],!0),E(v,[],!0),E(o,{},!0))}async function or(u){var T;const _=u.currentTarget,w=(T=_.files)==null?void 0:T[0];if(_.value="",!!w)try{if(w.size>1e6)throw new Error("Review patch exceeds the 1 MB import limit");const P=vl(JSON.parse(await w.text()),t.contract.systemFingerprint,n(t.contract),new Set(t.contract.labs.flatMap(U=>U.kind==="overview"?[]:U.cases.map(oe=>oe.id)))),Q=[...new Set([...Object.keys(i(o)),...Object.keys(P.draft)])].map(U=>({path:U,previous:i(o)[U]??i(K)[U]??null,value:P.draft[U]??i(K)[U]??null})).filter(U=>U.previous!==U.value);Q.length>0&&E(f,[...i(f),{changes:Q}],!0),E(v,[],!0),E(o,P.draft,!0);const X=P.patch.selectedCases[0];if(X){const U=t.contract.labs.find(oe=>oe.kind!=="overview"&&oe.cases.some(Se=>Se.id===X));U&&Ge(U,X)}const W=P.patch.operations.length;E(C,`Imported ${W} reviewed edit${W===1?"":"s"}`)}catch(P){E(C,P instanceof Error?P.message:"Unable to import review patch",!0)}}async function lr(){const u=pl(i(A),t.contract.agent.verification.generate,t.contract.agent.verification.check),_=`${u.instructions}
+					↓ &#123; &#125; [ ] ( )</p></div></div> <div class="weight-matrix"></div></div></div>`);
+function TypographyCase($$anchor, $$props) {
+  push($$props, true);
+  let lineDiagnostics = /* @__PURE__ */ state(false);
+  let lightSurface = /* @__PURE__ */ state(false);
+  let wcagSpacing = /* @__PURE__ */ state(false);
+  let forceFallback = /* @__PURE__ */ state(false);
+  let typeSample = /* @__PURE__ */ state(void 0);
+  let wrapSample = /* @__PURE__ */ state(void 0);
+  let glyphSample = /* @__PURE__ */ state(void 0);
+  let metricProbe = /* @__PURE__ */ state(void 0);
+  let baselineProbe = /* @__PURE__ */ state(void 0);
+  let capProbe = /* @__PURE__ */ state(void 0);
+  let exProbe = /* @__PURE__ */ state(void 0);
+  let metricGuides = /* @__PURE__ */ state(proxy({ lineBottom: 0, baseline: 0, cap: 0, ex: 0 }));
+  let fallbackEvidence = /* @__PURE__ */ state("");
+  let fallbackMeasurementRun = 0;
+  user_effect(() => {
+    $$props.reviewCase.id;
+    $$props.draft;
+    get(lineDiagnostics);
+    get(forceFallback);
+    get(wcagSpacing);
+    const frame = requestAnimationFrame(() => {
+      refreshMetricGuides();
+      void refreshFallbackEvidence();
+    });
+    return () => cancelAnimationFrame(frame);
+  });
+  function refreshMetricGuides() {
+    if (!get(metricProbe) || !get(baselineProbe) || !get(capProbe) || !get(exProbe)) return;
+    const probe = get(metricProbe).getBoundingClientRect();
+    const baseline = get(baselineProbe).getBoundingClientRect().top - probe.top;
+    set(
+      metricGuides,
+      {
+        lineBottom: probe.height,
+        baseline,
+        cap: baseline - get(capProbe).getBoundingClientRect().height,
+        ex: baseline - get(exProbe).getBoundingClientRect().height
+      },
+      true
+    );
+  }
+  function renderedLineCount(element) {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const tops = [...range.getClientRects()].filter((rect) => rect.width > 0 && rect.height > 0).map((rect) => Math.round(rect.top * 10) / 10);
+    return new Set(tops).size;
+  }
+  function measureTypography(forceAdjustedFallback, text, width) {
+    const style = typographyStyle($$props.reviewCase, $$props.draft, {
+      forceFallback: forceAdjustedFallback,
+      wcagSpacing: get(wcagSpacing)
+    });
+    const probe = document.createElement(width === void 0 ? "span" : "div");
+    probe.textContent = text;
+    probe.style.cssText = width === void 0 ? `${style};position:fixed;left:-100000px;top:0;visibility:hidden;display:inline-block;width:max-content;max-width:none;white-space:pre` : `${style};position:fixed;left:-100000px;top:0;visibility:hidden;width:${width}px`;
+    document.body.append(probe);
+    const result = {
+      width: probe.getBoundingClientRect().width,
+      lines: width === void 0 ? 1 : renderedLineCount(probe)
+    };
+    probe.remove();
+    return result;
+  }
+  async function hasLoadedFace(family, style, weight, text) {
+    try {
+      const faces = await document.fonts.load(`${style} ${weight} 16px ${JSON.stringify(family)}`, text);
+      return faces.some((face) => face.status === "loaded");
+    } catch {
+      return false;
+    }
+  }
+  async function refreshFallbackEvidence() {
+    var _a2;
+    const run = ++fallbackMeasurementRun;
+    if (!$$props.reviewCase.font.adjustedFallback) {
+      set(fallbackEvidence, "");
+      return;
+    }
+    await document.fonts.ready;
+    if (run !== fallbackMeasurementRun) return;
+    if (!get(typeSample) || !get(wrapSample) || !get(glyphSample)) return;
+    const weightControl = $$props.reviewCase.controls.find((control) => control.id === "weight");
+    const weightAlias = weightControl && typeof $$props.draft[weightControl.path] === "string" ? String($$props.draft[weightControl.path]) : $$props.reviewCase.weight.alias;
+    const weight = ((_a2 = $$props.reviewCase.availableWeights.find((entry) => entry.alias === weightAlias)) == null ? void 0 : _a2.value) ?? $$props.reviewCase.weight.value;
+    const sampleText = get(typeSample).textContent ?? "";
+    const primaryReady = await hasLoadedFace($$props.reviewCase.font.family, $$props.reviewCase.style, weight, sampleText);
+    if (run !== fallbackMeasurementRun) return;
+    if (!primaryReady) {
+      set(fallbackEvidence, `primary face unavailable: ${$$props.reviewCase.font.family} ${$$props.reviewCase.style} ${weight}`);
+      return;
+    }
+    const adjustedReady = await hasLoadedFace($$props.reviewCase.font.adjustedFallback, $$props.reviewCase.style, weight, sampleText);
+    if (run !== fallbackMeasurementRun) return;
+    if (!adjustedReady) {
+      set(fallbackEvidence, `adjusted fallback unavailable: ${$$props.reviewCase.font.adjustedFallback} ${$$props.reviewCase.style} ${weight}`);
+      return;
+    }
+    const widthEvidence = (text) => {
+      const primary = measureTypography(false, text);
+      const adjusted = measureTypography(true, text);
+      const delta = adjusted.width - primary.width;
+      return {
+        delta,
+        percent: primary.width === 0 ? 0 : delta / primary.width * 100
+      };
+    };
+    const phrase = widthEvidence(get(typeSample).textContent ?? "");
+    const glyphs = widthEvidence(get(glyphSample).textContent ?? "");
+    const wrapWidth = get(wrapSample).getBoundingClientRect().width;
+    const primaryWrap = measureTypography(false, get(wrapSample).textContent ?? "", wrapWidth);
+    const adjustedWrap = measureTypography(true, get(wrapSample).textContent ?? "", wrapWidth);
+    if (run !== fallbackMeasurementRun) return;
+    const signed = (value, digits) => `${value > 0 ? "+" : ""}${value.toFixed(digits)}`;
+    const lineDelta = adjustedWrap.lines - primaryWrap.lines;
+    set(
+      fallbackEvidence,
+      [
+        `phrase width Δ ${signed(phrase.delta, 2)}px (${signed(phrase.percent, 2)}%)`,
+        `narrow lines Δ ${lineDelta >= 0 ? "+" : ""}${lineDelta} (${primaryWrap.lines}→${adjustedWrap.lines})`,
+        `glyph stress width Δ ${signed(glyphs.delta, 2)}px (${signed(glyphs.percent, 2)}%)`
+      ].join(" · "),
+      true
+    );
+  }
+  var div = root_3$2();
+  let classes;
+  var div_1 = child(div);
+  var label = child(div_1);
+  var input = child(label);
+  var label_1 = sibling(label, 2);
+  var input_1 = child(label_1);
+  var label_2 = sibling(label_1, 2);
+  var input_2 = child(label_2);
+  var node = sibling(label_2, 2);
+  {
+    var consequent = ($$anchor2) => {
+      var fragment = root$2();
+      var label_3 = first_child(fragment);
+      var input_3 = child(label_3);
+      var output = sibling(label_3, 2);
+      var text_1 = child(output);
+      template_effect(() => set_text(text_1, get(fallbackEvidence) || "measuring primary → adjusted fallback…"));
+      bind_checked(input_3, () => get(forceFallback), ($$value) => set(forceFallback, $$value));
+      append($$anchor2, fragment);
+    };
+    if_block(node, ($$render) => {
+      if ($$props.reviewCase.font.adjustedFallback) $$render(consequent);
+    });
+  }
+  var div_2 = sibling(div_1, 2);
+  var p = child(div_2);
+  var text_2 = child(p);
+  var div_3 = sibling(p, 2);
+  let classes_1;
+  var p_1 = child(div_3);
+  bind_this(p_1, ($$value) => set(typeSample, $$value), () => get(typeSample));
+  var span = sibling(p_1, 2);
+  var span_1 = sibling(child(span));
+  bind_this(span_1, ($$value) => set(baselineProbe, $$value), () => get(baselineProbe));
+  var i = sibling(span_1);
+  bind_this(i, ($$value) => set(capProbe, $$value), () => get(capProbe));
+  var i_1 = sibling(i);
+  bind_this(i_1, ($$value) => set(exProbe, $$value), () => get(exProbe));
+  bind_this(span, ($$value) => set(metricProbe, $$value), () => get(metricProbe));
+  var node_1 = sibling(span, 2);
+  {
+    var consequent_1 = ($$anchor2) => {
+      var div_4 = root_1$2();
+      var i_2 = sibling(child(div_4), 2);
+      var i_3 = sibling(i_2, 2);
+      var i_4 = sibling(i_3, 2);
+      var i_5 = sibling(i_4, 2);
+      template_effect(() => {
+        set_style(i_2, `top:${get(metricGuides).lineBottom}px`);
+        set_style(i_3, `top:${get(metricGuides).cap}px`);
+        set_style(i_4, `top:${get(metricGuides).ex}px`);
+        set_style(i_5, `top:${get(metricGuides).baseline}px`);
+      });
+      append($$anchor2, div_4);
+    };
+    if_block(node_1, ($$render) => {
+      if (get(lineDiagnostics)) $$render(consequent_1);
+    });
+  }
+  var div_5 = sibling(div_3, 2);
+  var div_6 = child(div_5);
+  var p_2 = sibling(child(div_6), 2);
+  bind_this(p_2, ($$value) => set(wrapSample, $$value), () => get(wrapSample));
+  var div_7 = sibling(div_6, 2);
+  var p_3 = sibling(child(div_7), 2);
+  bind_this(p_3, ($$value) => set(glyphSample, $$value), () => get(glyphSample));
+  var div_8 = sibling(div_5, 2);
+  each(div_8, 21, () => Object.entries($$props.reviewCase.styleWeights), index, ($$anchor2, $$item) => {
+    var $$array = /* @__PURE__ */ user_derived(() => to_array(get($$item), 2));
+    let style = () => get($$array)[0];
+    let weights = () => get($$array)[1];
+    var fragment_1 = comment();
+    var node_2 = first_child(fragment_1);
+    each(node_2, 17, weights, index, ($$anchor3, weight) => {
+      var article = root_2$2();
+      var code = child(article);
+      var text_3 = child(code);
+      var span_2 = sibling(code, 2);
+      template_effect(
+        ($0) => {
+          set_text(text_3, `${style() ?? ""} · ${get(weight).alias ?? ""} · ${get(weight).value ?? ""}`);
+          set_style(span_2, $0);
+        },
+        [
+          () => `${typographyStyle($$props.reviewCase, $$props.draft, {
+            forceFallback: get(forceFallback),
+            wcagSpacing: get(wcagSpacing)
+          })};font-style:${style()};font-weight:${get(weight).value}`
+        ]
+      );
+      append($$anchor3, article);
+    });
+    append($$anchor2, fragment_1);
+  });
+  template_effect(
+    ($0, $1, $2, $3) => {
+      classes = set_class(div, 1, "typography-stage", null, classes, { "light-surface": get(lightSurface) });
+      set_text(text_2, `${$$props.reviewCase.role ?? ""} · ${$$props.reviewCase.variant ?? "base" ?? ""}`);
+      classes_1 = set_class(div_3, 1, "metric-sample", null, classes_1, { diagnostics: get(lineDiagnostics) });
+      set_style(p_1, $0);
+      set_style(span, $1);
+      set_style(p_2, $2);
+      set_style(p_3, $3);
+    },
+    [
+      () => typographyStyle($$props.reviewCase, $$props.draft, {
+        forceFallback: get(forceFallback),
+        wcagSpacing: get(wcagSpacing)
+      }),
+      () => typographyStyle($$props.reviewCase, $$props.draft, {
+        forceFallback: get(forceFallback),
+        wcagSpacing: get(wcagSpacing)
+      }),
+      () => typographyStyle($$props.reviewCase, $$props.draft, {
+        forceFallback: get(forceFallback),
+        wcagSpacing: get(wcagSpacing)
+      }),
+      () => typographyStyle($$props.reviewCase, $$props.draft, {
+        forceFallback: get(forceFallback),
+        wcagSpacing: get(wcagSpacing)
+      })
+    ]
+  );
+  bind_checked(input, () => get(lineDiagnostics), ($$value) => set(lineDiagnostics, $$value));
+  bind_checked(input_1, () => get(lightSurface), ($$value) => set(lightSurface, $$value));
+  bind_checked(input_2, () => get(wcagSpacing), ($$value) => set(wcagSpacing, $$value));
+  delegated("input", p_1, () => {
+    refreshMetricGuides();
+    void refreshFallbackEvidence();
+  });
+  append($$anchor, div);
+  pop();
+}
+delegate(["input"]);
+function CaseView($$anchor, $$props) {
+  push($$props, true);
+  var fragment = comment();
+  var node = first_child(fragment);
+  {
+    var consequent = ($$anchor2) => {
+      ColorCase($$anchor2, {
+        get reviewCase() {
+          return $$props.reviewCase;
+        },
+        get draft() {
+          return $$props.draft;
+        }
+      });
+    };
+    var consequent_1 = ($$anchor2) => {
+      TypographyCase($$anchor2, {
+        get reviewCase() {
+          return $$props.reviewCase;
+        },
+        get draft() {
+          return $$props.draft;
+        }
+      });
+    };
+    var consequent_2 = ($$anchor2) => {
+      ShadowCase($$anchor2, {
+        get reviewCase() {
+          return $$props.reviewCase;
+        },
+        get draft() {
+          return $$props.draft;
+        }
+      });
+    };
+    var consequent_3 = ($$anchor2) => {
+      var fragment_4 = comment();
+      var node_1 = first_child(fragment_4);
+      key(node_1, () => $$props.reviewCase.id, ($$anchor3) => {
+        MotionCase($$anchor3, {
+          get reviewCase() {
+            return $$props.reviewCase;
+          }
+        });
+      });
+      append($$anchor2, fragment_4);
+    };
+    var consequent_4 = ($$anchor2) => {
+      FoundationCase($$anchor2, {
+        get reviewCase() {
+          return $$props.reviewCase;
+        }
+      });
+    };
+    if_block(node, ($$render) => {
+      var _a2, _b2, _c2, _d, _e;
+      if (((_a2 = $$props.reviewCase) == null ? void 0 : _a2.kind) === "color") $$render(consequent);
+      else if (((_b2 = $$props.reviewCase) == null ? void 0 : _b2.kind) === "typography") $$render(consequent_1, 1);
+      else if (((_c2 = $$props.reviewCase) == null ? void 0 : _c2.kind) === "shadow") $$render(consequent_2, 2);
+      else if (((_d = $$props.reviewCase) == null ? void 0 : _d.kind) === "motion") $$render(consequent_3, 3);
+      else if (((_e = $$props.reviewCase) == null ? void 0 : _e.kind) === "foundation") $$render(consequent_4, 4);
+    });
+  }
+  append($$anchor, fragment);
+  pop();
+}
+var root$1 = /* @__PURE__ */ from_html(`<div class="inspector-title"><div><span>matrix overview</span> <strong> </strong></div></div> <div class="empty-inspector"><strong> </strong> <p> </p></div>`, 1);
+var root_1$1 = /* @__PURE__ */ from_html(`<button>reset case</button>`);
+var root_2$1 = /* @__PURE__ */ from_html(`<div class="number-pair"><input type="range"/> <input type="number"/> <small> </small></div>`);
+var root_3$1 = /* @__PURE__ */ from_html(`<option> </option>`);
+var root_4$1 = /* @__PURE__ */ from_html(`<select></select>`);
+var root_5$1 = /* @__PURE__ */ from_html(`<label><span> </span> <!> <code> </code></label>`);
+var root_6$1 = /* @__PURE__ */ from_html(`<div class="controls"></div>`);
+var root_7$1 = /* @__PURE__ */ from_html(
+  `<strong>Playback-only review</strong> <p>This case exposes resolved timing and easing facts. Its authored references remain
+						source-controlled until structured time-reference editing is designed.</p>`,
+  1
+);
+var root_8$1 = /* @__PURE__ */ from_html(
+  `<strong>Derived scale</strong> <p>These values are generated from compact authored anchors. Calibrate the source schedule
+						rather than patching individual derived tokens.</p>`,
+  1
+);
+var root_9$1 = /* @__PURE__ */ from_html(`<div class="empty-inspector"><!></div>`);
+var root_10$1 = /* @__PURE__ */ from_html(`<div class="inspector-title"><div><span> </span> <strong> </strong></div> <!></div> <!>`, 1);
+var root_11$1 = /* @__PURE__ */ from_html(`<div class="empty-inspector"><strong>Resolved system</strong> <p>Select a lab and case to inspect source decisions and create a non-destructive draft.</p></div>`);
+var root_12$1 = /* @__PURE__ */ from_html(`<aside class="inspector" aria-label="Case inspector"><!> <div class="draft-footer"><button>discard all edits</button></div></aside>`);
+function Inspector($$anchor, $$props) {
+  push($$props, true);
+  var aside = root_12$1();
+  var node = child(aside);
+  {
+    var consequent = ($$anchor2) => {
+      var fragment = root$1();
+      var div = first_child(fragment);
+      var div_1 = child(div);
+      var strong = sibling(child(div_1), 2);
+      var text = child(strong);
+      var div_2 = sibling(div, 2);
+      var strong_1 = child(div_2);
+      var text_1 = child(strong_1);
+      var p = sibling(strong_1, 2);
+      var text_2 = child(p);
+      template_effect(
+        ($0) => {
+          set_text(text, $$props.labLabel);
+          set_text(text_1, `${$$props.visibleCaseCount ?? ""} visible cases`);
+          set_text(text_2, `Compare the full ${$0 ?? ""} system at once. Filter or change modes to narrow the
+				matrix, then select any specimen for precise calibration and source paths.`);
+        },
+        [() => {
+          var _a2;
+          return (_a2 = $$props.labLabel) == null ? void 0 : _a2.toLowerCase();
+        }]
+      );
+      append($$anchor2, fragment);
+    };
+    var consequent_5 = ($$anchor2) => {
+      var fragment_1 = root_10$1();
+      var div_3 = first_child(fragment_1);
+      var div_4 = child(div_3);
+      var span = child(div_4);
+      var text_3 = child(span);
+      var strong_2 = sibling(span, 2);
+      var text_4 = child(strong_2);
+      var node_1 = sibling(div_4, 2);
+      {
+        var consequent_1 = ($$anchor3) => {
+          var button = root_1$1();
+          delegated("click", button, function(...$$args) {
+            var _a2;
+            (_a2 = $$props.resetCase) == null ? void 0 : _a2.apply(this, $$args);
+          });
+          append($$anchor3, button);
+        };
+        if_block(node_1, ($$render) => {
+          if ($$props.activeCase.controls.length > 0) $$render(consequent_1);
+        });
+      }
+      var node_2 = sibling(div_3, 2);
+      {
+        var consequent_3 = ($$anchor3) => {
+          var div_5 = root_6$1();
+          each(div_5, 21, () => $$props.activeCase.controls, index, ($$anchor4, control) => {
+            var label = root_5$1();
+            let classes;
+            var span_1 = child(label);
+            var text_5 = child(span_1);
+            var node_3 = sibling(span_1, 2);
+            {
+              var consequent_2 = ($$anchor5) => {
+                var div_6 = root_2$1();
+                var input = child(div_6);
+                var input_1 = sibling(input, 2);
+                var small = sibling(input_1, 2);
+                var text_6 = child(small);
+                template_effect(
+                  ($0, $1) => {
+                    set_attribute(input, "aria-label", `${get(control).label} slider`);
+                    set_attribute(input, "min", get(control).min);
+                    set_attribute(input, "max", get(control).max);
+                    set_attribute(input, "step", get(control).step);
+                    set_value(input, $0);
+                    set_attribute(input_1, "aria-label", `${get(control).label} value`);
+                    set_attribute(input_1, "min", get(control).min);
+                    set_attribute(input_1, "max", get(control).max);
+                    set_attribute(input_1, "step", get(control).step);
+                    set_value(input_1, $1);
+                    set_text(text_6, get(control).unit);
+                  },
+                  [
+                    () => controlValue(get(control), $$props.draft),
+                    () => controlValue(get(control), $$props.draft)
+                  ]
+                );
+                delegated("input", input, (event2) => $$props.setControl(get(control), Number(event2.currentTarget.value)));
+                delegated("dblclick", input, () => $$props.resetControl(get(control)));
+                delegated("input", input_1, (event2) => $$props.setControl(get(control), Number(event2.currentTarget.value)));
+                append($$anchor5, div_6);
+              };
+              var alternate = ($$anchor5) => {
+                var select = root_4$1();
+                each(select, 21, () => get(control).options, index, ($$anchor6, option) => {
+                  var option_1 = root_3$1();
+                  var text_7 = child(option_1);
+                  var option_1_value = {};
+                  template_effect(
+                    ($0) => {
+                      set_selected(option_1, $0);
+                      set_text(text_7, get(option).label);
+                      if (option_1_value !== (option_1_value = get(option).value)) {
+                        option_1.value = (option_1.__value = get(option).value) ?? "";
+                      }
+                    },
+                    [
+                      () => get(option).value === controlValue(get(control), $$props.draft)
+                    ]
+                  );
+                  append($$anchor6, option_1);
+                });
+                var select_value;
+                init_select(select);
+                template_effect(
+                  ($0) => {
+                    set_attribute(select, "aria-label", get(control).label);
+                    if (select_value !== (select_value = $0)) {
+                      select.value = (select.__value = $0) ?? "", select_option(select, $0);
+                    }
+                  },
+                  [() => controlValue(get(control), $$props.draft)]
+                );
+                delegated("change", select, (event2) => {
+                  const option = get(control).options.find((entry) => String(entry.value) === event2.currentTarget.value);
+                  if (option) $$props.setControl(get(control), option.value);
+                });
+                append($$anchor5, select);
+              };
+              if_block(node_3, ($$render) => {
+                if (get(control).kind === "number") $$render(consequent_2);
+                else $$render(alternate, -1);
+              });
+            }
+            var code = sibling(node_3, 2);
+            var text_8 = child(code);
+            template_effect(() => {
+              classes = set_class(label, 1, "", null, classes, { changed: $$props.draft[get(control).path] !== void 0 });
+              set_text(text_5, get(control).label);
+              set_text(text_8, get(control).path);
+            });
+            append($$anchor4, label);
+          });
+          append($$anchor3, div_5);
+        };
+        var alternate_2 = ($$anchor3) => {
+          var div_7 = root_9$1();
+          var node_4 = child(div_7);
+          {
+            var consequent_4 = ($$anchor4) => {
+              var fragment_2 = root_7$1();
+              append($$anchor4, fragment_2);
+            };
+            var alternate_1 = ($$anchor4) => {
+              var fragment_3 = root_8$1();
+              append($$anchor4, fragment_3);
+            };
+            if_block(node_4, ($$render) => {
+              if ($$props.activeCase.kind === "motion") $$render(consequent_4);
+              else $$render(alternate_1, -1);
+            });
+          }
+          append($$anchor3, div_7);
+        };
+        if_block(node_2, ($$render) => {
+          if ($$props.activeCase.controls.length > 0) $$render(consequent_3);
+          else $$render(alternate_2, -1);
+        });
+      }
+      template_effect(() => {
+        set_text(text_3, $$props.activeCase.controls.length > 0 ? "calibration" : "resolved case");
+        set_text(text_4, $$props.activeCase.label);
+      });
+      append($$anchor2, fragment_1);
+    };
+    var alternate_3 = ($$anchor2) => {
+      var div_8 = root_11$1();
+      append($$anchor2, div_8);
+    };
+    if_block(node, ($$render) => {
+      if ($$props.matrix) $$render(consequent);
+      else if ($$props.activeCase) $$render(consequent_5, 1);
+      else $$render(alternate_3, -1);
+    });
+  }
+  var div_9 = sibling(node, 2);
+  var button_1 = child(div_9);
+  template_effect(() => button_1.disabled = $$props.editCount === 0);
+  delegated("click", button_1, function(...$$args) {
+    var _a2;
+    (_a2 = $$props.clearDraft) == null ? void 0 : _a2.apply(this, $$args);
+  });
+  append($$anchor, aside);
+  pop();
+}
+delegate(["click", "input", "dblclick", "change"]);
+var root = /* @__PURE__ */ from_html(`<option> </option>`);
+var root_1 = /* @__PURE__ */ from_html(`<label><span>color</span> <select data-testid="color-mode" aria-label="color mode"></select></label>`);
+var root_2 = /* @__PURE__ */ from_html(`<label><span>size</span> <select data-testid="size-mode" aria-label="size mode"></select></label>`);
+var root_3 = /* @__PURE__ */ from_html(`<span class="action-status" aria-live="polite"> </span>`);
+var root_4 = /* @__PURE__ */ from_html(`<small> </small>`);
+var root_5 = /* @__PURE__ */ from_html(`<button><span> </span> <!></button>`);
+var root_6 = /* @__PURE__ */ from_html(`<label class="case-filter"><span class="sr-only"> </span> <input type="search" placeholder="filter cases"/></label>`);
+var root_7 = /* @__PURE__ */ from_html(`<button> </button>`);
+var root_8 = /* @__PURE__ */ from_html(`<p class="no-cases">No matching cases</p>`);
+var root_9 = /* @__PURE__ */ from_html(`<div class="case-list"><!> <!> <!></div>`);
+var root_10 = /* @__PURE__ */ from_html(`<div class="view-switch" aria-label="Canvas view"><button>matrix</button> <button>case</button> <button>compare</button></div>`);
+var root_11 = /* @__PURE__ */ from_html(`<code> </code>`);
+var root_12 = /* @__PURE__ */ from_html(`<div class="comparison" data-testid="baseline-draft-comparison"><section class="comparison-frame" data-state="baseline"><header><span>immutable source</span> <strong>baseline</strong></header> <div class="comparison-body"><!></div></section> <section class="comparison-frame" data-state="draft"><header><span>review overlay</span> <strong>draft</strong></header> <div class="comparison-body"><!></div></section></div>`);
+var root_13 = /* @__PURE__ */ from_html(`<article><span> </span><strong> </strong></article>`);
+var root_14 = /* @__PURE__ */ from_html(`<li><span> </span> <div><strong> </strong> <!></div></li>`);
+var root_15 = /* @__PURE__ */ from_html(`<section class="overview-diagnostics" aria-label="Build diagnostics"><header><div><span>build evidence</span> <strong>diagnostics</strong></div> <small> </small></header> <ul></ul></section>`);
+var root_16 = /* @__PURE__ */ from_html(`<section class="overview-section"><header><div><span>system domain</span> <strong> </strong></div> <button> </button></header> <!></section>`);
+var root_17 = /* @__PURE__ */ from_html(`<div class="system-overview"><div class="overview-grid"></div> <!> <!></div>`);
+var root_18 = /* @__PURE__ */ from_html(`<div class="workbench" data-testid="workbench"><header class="topbar"><div class="identity"><span class="mark">TFS</span> <div><strong> </strong> <small> </small></div></div> <div class="globals"><!> <!></div> <div class="actions"><button aria-label="Undo draft">↶</button> <button aria-label="Redo draft">↷</button> <span> </span> <input class="patch-input" type="file" accept="application/json,.json" aria-label="Import review patch" data-testid="patch-input"/> <button>import</button> <button>export</button> <button>copy agent handoff</button> <!></div></header> <aside class="navigation" aria-label="Workbench labs"><nav></nav> <!></aside> <main class="canvas-shell"><div class="canvas-header"><div><span> </span> <strong> </strong></div> <!> <!></div> <section data-testid="review-canvas"><!></section></main> <!></div>`);
+function App($$anchor, $$props) {
+  var _a2, _b2;
+  push($$props, true);
+  function contractControls(value) {
+    return value.labs.flatMap((lab) => lab.kind === "color" || lab.kind === "typography" || lab.kind === "shadows" || lab.kind === "motion" || lab.kind === "foundation" ? lab.cases.flatMap((reviewCase) => reviewCase.controls) : []);
+  }
+  function storedDraft(value) {
+    const raw = localStorage.getItem(`tfs-workbench:${value.systemFingerprint}`);
+    if (!raw) return {};
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+      const allowed = new Map(contractControls(value).map((control) => [control.path, control]));
+      return Object.fromEntries(Object.entries(parsed).filter(([path, draftValue]) => {
+        const control = allowed.get(path);
+        if (!control) return false;
+        return control.kind === "number" ? typeof draftValue === "number" && Number.isFinite(draftValue) : typeof draftValue === "string" || typeof draftValue === "number";
+      }));
+    } catch {
+      return {};
+    }
+  }
+  const initialContract = untrack(() => $$props.contract);
+  const params = new URLSearchParams(location.search);
+  const initialCaseId = params.get("case") ?? "";
+  const initialView = params.get("view") === "matrix" ? "matrix" : params.get("view") === "compare" ? "compare" : "case";
+  let draft = /* @__PURE__ */ state(proxy(storedDraft(initialContract)));
+  let undo = /* @__PURE__ */ state(proxy([]));
+  let redo = /* @__PURE__ */ state(proxy([]));
+  let activeLabId = /* @__PURE__ */ state(proxy(params.get("lab") ?? "overview"));
+  let activeCaseId = /* @__PURE__ */ state(proxy(initialCaseId));
+  let caseQuery = /* @__PURE__ */ state("");
+  let viewMode = /* @__PURE__ */ state(proxy(initialView));
+  let colorMode = /* @__PURE__ */ state(proxy(params.get("color") ?? ((_a2 = initialContract.globals.modes.find((group) => group.category === "color")) == null ? void 0 : _a2.default) ?? ""));
+  let sizeMode = /* @__PURE__ */ state(proxy(params.get("size") ?? ((_b2 = initialContract.globals.modes.find((group) => group.category === "size")) == null ? void 0 : _b2.default) ?? ""));
+  let handoffStatus = /* @__PURE__ */ state("");
+  let patchInput = /* @__PURE__ */ state(void 0);
+  let activeLab = /* @__PURE__ */ user_derived(() => $$props.contract.labs.find((lab) => lab.id === get(activeLabId)) ?? $$props.contract.labs[0]);
+  let cases = /* @__PURE__ */ user_derived(() => {
+    var _a3, _b3, _c2, _d, _e;
+    return ((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) === "color" || ((_b3 = get(activeLab)) == null ? void 0 : _b3.kind) === "typography" || ((_c2 = get(activeLab)) == null ? void 0 : _c2.kind) === "shadows" || ((_d = get(activeLab)) == null ? void 0 : _d.kind) === "motion" || ((_e = get(activeLab)) == null ? void 0 : _e.kind) === "foundation" ? get(activeLab).cases : [];
+  });
+  let activeCase = /* @__PURE__ */ user_derived(() => get(cases).find((reviewCase) => reviewCase.id === get(activeCaseId)) ?? get(cases)[0]);
+  let visibleTypographyMode = /* @__PURE__ */ user_derived(() => {
+    var _a3, _b3, _c2;
+    return ((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) === "typography" ? ((_b3 = get(activeLab).cases.find((reviewCase) => reviewCase.mode === get(sizeMode))) == null ? void 0 : _b3.mode) ?? ((_c2 = get(activeLab).cases[0]) == null ? void 0 : _c2.mode) : void 0;
+  });
+  let visibleCases = /* @__PURE__ */ user_derived(() => get(cases).filter((reviewCase) => {
+    var _a3, _b3;
+    if (((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) === "color" && reviewCase.kind === "color" && reviewCase.mode !== get(colorMode)) return false;
+    if (((_b3 = get(activeLab)) == null ? void 0 : _b3.kind) === "typography" && reviewCase.kind === "typography" && reviewCase.mode !== get(visibleTypographyMode)) return false;
+    return reviewCase.label.toLowerCase().includes(get(caseQuery).trim().toLowerCase());
+  }));
+  let baseValues = /* @__PURE__ */ user_derived(() => {
+    const entries = [];
+    for (const lab of $$props.contract.labs) {
+      if (lab.kind !== "color" && lab.kind !== "typography" && lab.kind !== "shadows" && lab.kind !== "motion" && lab.kind !== "foundation") continue;
+      for (const reviewCase of lab.cases) {
+        for (const control of reviewCase.controls) entries.push([control.path, control.value]);
+      }
+    }
+    return Object.fromEntries(entries);
+  });
+  let patch = /* @__PURE__ */ user_derived(() => patchFromDraft($$props.contract.systemFingerprint, get(baseValues), get(draft), $$props.contract.labs.flatMap((lab) => lab.kind === "overview" ? [] : lab.cases.filter((reviewCase) => reviewCase.controls.some((control) => get(draft)[control.path] !== void 0)).map((reviewCase) => reviewCase.id))));
+  let modeGroups = /* @__PURE__ */ user_derived(() => $$props.contract.globals.modes);
+  let colorGroup = /* @__PURE__ */ user_derived(() => get(modeGroups).find((entry) => entry.category === "color"));
+  let sizeGroup = /* @__PURE__ */ user_derived(() => get(modeGroups).find((entry) => entry.category === "size"));
+  let canvasStyle = /* @__PURE__ */ user_derived(() => canvasVariables(get(modeGroups), get(colorMode), get(sizeMode)));
+  let activeCaseChanged = /* @__PURE__ */ user_derived(() => {
+    var _a3;
+    return Boolean((_a3 = get(activeCase)) == null ? void 0 : _a3.controls.some((control) => get(draft)[control.path] !== void 0));
+  });
+  user_effect(() => {
+    localStorage.setItem(`tfs-workbench:${$$props.contract.systemFingerprint}`, JSON.stringify(get(draft)));
+  });
+  user_effect(() => {
+    var _a3;
+    const next = new URL(location.href);
+    next.searchParams.set("lab", get(activeLabId));
+    if ((_a3 = get(activeCase)) == null ? void 0 : _a3.id) next.searchParams.set("case", get(activeCase).id);
+    else next.searchParams.delete("case");
+    if (get(colorMode)) next.searchParams.set("color", get(colorMode));
+    if (get(sizeMode)) next.searchParams.set("size", get(sizeMode));
+    next.searchParams.set("view", get(viewMode));
+    history.replaceState(null, "", next);
+  });
+  user_effect(() => {
+    if (get(viewMode) === "compare" && !get(activeCaseChanged)) set(viewMode, "case");
+  });
+  user_effect(() => {
+    var _a3, _b3;
+    if (((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) !== "color" || ((_b3 = get(activeCase)) == null ? void 0 : _b3.kind) !== "color") return;
+    if (get(activeCase).mode === get(colorMode)) return;
+    const replacement = get(activeLab).cases.find((reviewCase) => reviewCase.mode === get(colorMode) && reviewCase.color === get(activeCase).color) ?? get(activeLab).cases.find((reviewCase) => reviewCase.mode === get(colorMode));
+    if (replacement) set(activeCaseId, replacement.id, true);
+  });
+  user_effect(() => {
+    var _a3, _b3;
+    if (((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) !== "typography" || ((_b3 = get(activeCase)) == null ? void 0 : _b3.kind) !== "typography") return;
+    if (get(activeCase).mode === get(visibleTypographyMode)) return;
+    const replacement = get(activeLab).cases.find((reviewCase) => reviewCase.mode === get(visibleTypographyMode) && reviewCase.role === get(activeCase).role && reviewCase.variant === get(activeCase).variant) ?? get(activeLab).cases.find((reviewCase) => reviewCase.mode === get(visibleTypographyMode));
+    if (replacement) set(activeCaseId, replacement.id, true);
+  });
+  function selectLab(lab) {
+    var _a3;
+    set(activeLabId, lab.id, true);
+    set(caseQuery, "");
+    set(viewMode, lab.kind === "overview" ? "case" : "matrix", true);
+    set(activeCaseId, lab.kind === "color" || lab.kind === "typography" || lab.kind === "shadows" || lab.kind === "motion" || lab.kind === "foundation" ? ((_a3 = lab.cases[0]) == null ? void 0 : _a3.id) ?? "" : "", true);
+    if (lab.kind === "color" && lab.cases[0]) set(colorMode, lab.cases[0].mode, true);
+  }
+  function selectCase(id) {
+    set(activeCaseId, id, true);
+    set(viewMode, "case");
+    const selected = get(cases).find((reviewCase) => reviewCase.id === id);
+    if ((selected == null ? void 0 : selected.kind) === "color") set(colorMode, selected.mode, true);
+    if ((selected == null ? void 0 : selected.kind) === "typography") set(sizeMode, selected.mode, true);
+  }
+  function selectCaseFromLab(lab, id) {
+    if (lab.kind === "overview") return;
+    set(activeLabId, lab.id, true);
+    set(activeCaseId, id, true);
+    set(caseQuery, "");
+    set(viewMode, "case");
+    const selected = lab.cases.find((reviewCase) => reviewCase.id === id);
+    if ((selected == null ? void 0 : selected.kind) === "color") set(colorMode, selected.mode, true);
+    if ((selected == null ? void 0 : selected.kind) === "typography") set(sizeMode, selected.mode, true);
+  }
+  function visibleLabCases(lab) {
+    var _a3, _b3;
+    if (lab.kind === "overview") return [];
+    if (lab.kind === "color") return lab.cases.filter((reviewCase) => reviewCase.mode === get(colorMode));
+    if (lab.kind === "typography") {
+      const mode = ((_a3 = lab.cases.find((reviewCase) => reviewCase.mode === get(sizeMode))) == null ? void 0 : _a3.mode) ?? ((_b3 = lab.cases[0]) == null ? void 0 : _b3.mode);
+      return lab.cases.filter((reviewCase) => reviewCase.mode === mode);
+    }
+    return lab.cases;
+  }
+  function readableIdentifier(value) {
+    return value.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+  }
+  function setControl(control, value) {
+    const previous = get(draft)[control.path] ?? control.value;
+    if (previous === value) return;
+    set(
+      undo,
+      [
+        ...get(undo),
+        { changes: [{ path: control.path, previous, value }] }
+      ],
+      true
+    );
+    set(redo, [], true);
+    set(draft, { ...get(draft), [control.path]: value }, true);
+  }
+  function applyDraftValue(path, value) {
+    const next = { ...get(draft) };
+    if (value === get(baseValues)[path]) delete next[path];
+    else next[path] = value;
+    set(draft, next, true);
+  }
+  function applyTransaction(transaction, direction) {
+    const next = { ...get(draft) };
+    for (const change of transaction.changes) {
+      const value = direction === "undo" ? change.previous : change.value;
+      if (value === get(baseValues)[change.path]) delete next[change.path];
+      else next[change.path] = value;
+    }
+    set(draft, next, true);
+  }
+  function undoDraft() {
+    const transaction = get(undo).at(-1);
+    if (!transaction) return;
+    set(undo, get(undo).slice(0, -1), true);
+    set(redo, [...get(redo), transaction], true);
+    applyTransaction(transaction, "undo");
+  }
+  function redoDraft() {
+    const transaction = get(redo).at(-1);
+    if (!transaction) return;
+    set(redo, get(redo).slice(0, -1), true);
+    set(undo, [...get(undo), transaction], true);
+    applyTransaction(transaction, "redo");
+  }
+  function resetControl(control) {
+    const previous = get(draft)[control.path];
+    if (previous === void 0) return;
+    set(
+      undo,
+      [
+        ...get(undo),
+        {
+          changes: [{ path: control.path, previous, value: control.value }]
+        }
+      ],
+      true
+    );
+    set(redo, [], true);
+    applyDraftValue(control.path, control.value);
+  }
+  function resetCase() {
+    if (!get(activeCase)) return;
+    const changes = get(activeCase).controls.filter((control) => get(draft)[control.path] !== void 0).map((control) => ({
+      path: control.path,
+      previous: get(draft)[control.path],
+      value: control.value
+    }));
+    if (changes.length === 0) return;
+    set(undo, [...get(undo), { changes }], true);
+    set(redo, [], true);
+    const next = { ...get(draft) };
+    for (const change of changes) delete next[change.path];
+    set(draft, next, true);
+  }
+  function clearDraft() {
+    const changes = Object.entries(get(draft)).map(([path, previous]) => ({ path, previous, value: get(baseValues)[path] ?? null }));
+    if (changes.length === 0) return;
+    set(undo, [...get(undo), { changes }], true);
+    set(redo, [], true);
+    set(draft, {}, true);
+  }
+  async function importPatch(event2) {
+    var _a3;
+    const input = event2.currentTarget;
+    const file = (_a3 = input.files) == null ? void 0 : _a3[0];
+    input.value = "";
+    if (!file) return;
+    try {
+      if (file.size > 1e6) throw new Error("Review patch exceeds the 1 MB import limit");
+      const imported = importReviewPatch(JSON.parse(await file.text()), $$props.contract.systemFingerprint, contractControls($$props.contract), new Set($$props.contract.labs.flatMap((lab) => lab.kind === "overview" ? [] : lab.cases.map((item) => item.id))));
+      const changes = [
+        .../* @__PURE__ */ new Set([...Object.keys(get(draft)), ...Object.keys(imported.draft)])
+      ].map((path) => ({
+        path,
+        previous: get(draft)[path] ?? get(baseValues)[path] ?? null,
+        value: imported.draft[path] ?? get(baseValues)[path] ?? null
+      })).filter((change) => change.previous !== change.value);
+      if (changes.length > 0) set(undo, [...get(undo), { changes }], true);
+      set(redo, [], true);
+      set(draft, imported.draft, true);
+      const selectedCase = imported.patch.selectedCases[0];
+      if (selectedCase) {
+        const selectedLab = $$props.contract.labs.find((lab) => lab.kind !== "overview" && lab.cases.some((item) => item.id === selectedCase));
+        if (selectedLab) selectCaseFromLab(selectedLab, selectedCase);
+      }
+      const importedCount = imported.patch.operations.length;
+      set(handoffStatus, `Imported ${importedCount} reviewed edit${importedCount === 1 ? "" : "s"}`);
+    } catch (error) {
+      set(handoffStatus, error instanceof Error ? error.message : "Unable to import review patch", true);
+    }
+  }
+  async function copyHandoff() {
+    const handoff = agentHandoff(get(patch), $$props.contract.agent.verification.generate, $$props.contract.agent.verification.check);
+    const prompt = `${handoff.instructions}
 
 \`\`\`json
-${JSON.stringify(u,null,2)}
-\`\`\``;try{await navigator.clipboard.writeText(_),E(C,"Agent handoff copied")}catch{E(C,"Clipboard unavailable; export the patch instead")}}var Pn=sc();jo("keydown",ia,u=>{(u.metaKey||u.ctrlKey)&&(u.key.toLowerCase()==="z"&&u.shiftKey?(u.preventDefault(),xe()):u.key.toLowerCase()==="z"&&(u.preventDefault(),ke()))});var cr=p(Pn),Dn=p(cr),Dr=b(p(Dn),2),L=p(Dr),re=p(L),se=b(L,2),ae=p(se),he=b(Dn,2),Ee=p(he);{var Ht=u=>{var _=Hl(),w=b(p(_),2);Pe(w,21,()=>i(te).modes,Ne,(T,P)=>{var Q=Xa(),X=p(Q),W={};q(()=>{F(X,i(P).name),W!==(W=i(P).name)&&(Q.value=(Q.__value=i(P).name)??"")}),M(T,Q)}),Ka(w,()=>i(x),T=>E(x,T)),M(u,_)};ve(Ee,u=>{i(te)&&u(Ht)})}var un=b(Ee,2);{var Ot=u=>{var _=Wl(),w=b(p(_),2);Pe(w,21,()=>i(ce).modes,Ne,(T,P)=>{var Q=Xa(),X=p(Q),W={};q(()=>{F(X,i(P).name),W!==(W=i(P).name)&&(Q.value=(Q.__value=i(P).name)??"")}),M(T,Q)}),Ka(w,()=>i(y),T=>E(y,T)),M(u,_)};ve(un,u=>{i(ce)&&u(Ot)})}var Wt=b(he,2),kt=p(Wt),jt=b(kt,2),Lt=b(jt,2);let xt;var fr=p(Lt),dn=b(Lt,2);Pt(dn,u=>E(G,u),()=>i(G));var Ke=b(dn,2),Et=b(Ke,2),ur=b(Et,2),dr=b(ur,2);{var Yi=u=>{var _=Gl(),w=p(_);q(()=>F(w,i(C))),M(u,_)};ve(dr,u=>{i(C)&&u(Yi)})}var Ea=b(cr,2),Sa=p(Ea);Pe(Sa,21,()=>t.contract.labs,Ne,(u,_)=>{var w=Yl();let T;var P=p(w),Q=p(P),X=b(P,2);{var W=U=>{var oe=Kl(),Se=p(oe);q(()=>F(Se,i(_).cases.length)),M(U,oe)};ve(X,U=>{(i(_).kind==="color"||i(_).kind==="typography"||i(_).kind==="shadows"||i(_).kind==="motion"||i(_).kind==="foundation")&&U(W)})}q(()=>{T=De(w,1,"",null,T,{active:i(_).id===i(k)}),F(Q,i(_).label)}),le("click",w,()=>rt(i(_))),M(u,w)});var Ji=b(Sa,2);{var Zi=u=>{var _=Xl(),w=p(_);{var T=W=>{var U=Jl(),oe=p(U),Se=p(oe),st=b(oe,2);q(()=>{var Re,Be;F(Se,`Filter ${((Re=i(S))==null?void 0:Re.label)??""} cases`),Te(st,"aria-label",`Filter ${(Be=i(S))==null?void 0:Be.label} cases`)}),Zo(st,()=>i(g),Re=>E(g,Re)),M(W,U)};ve(w,W=>{i(j).length>10&&W(T)})}var P=b(w,2);Pe(P,17,()=>i(D),Ne,(W,U)=>{var oe=Zl();let Se;var st=p(oe);q(()=>{var Re;Te(oe,"title",i(U).label),Se=De(oe,1,"",null,Se,{active:i(m)!=="matrix"&&i(U).id===((Re=i(R))==null?void 0:Re.id)}),F(st,i(U).label)}),le("click",oe,()=>We(i(U).id)),M(W,oe)});var Q=b(P,2);{var X=W=>{var U=Ql();M(W,U)};ve(Q,W=>{i(D).length===0&&W(X)})}M(u,_)};ve(Ji,u=>{i(j).length>0&&u(Zi)})}var Ca=b(Ea,2),Ta=p(Ca),Aa=p(Ta),Fa=p(Aa),Qi=p(Fa),Xi=b(Fa,2),$i=p(Xi),Ra=b(Aa,2);{var es=u=>{var _=$l(),w=p(_);let T;var P=b(w,2);let Q;var X=b(P,2);let W;q(()=>{T=De(w,1,"",null,T,{active:i(m)==="matrix"}),Q=De(P,1,"",null,Q,{active:i(m)==="case"}),X.disabled=!i(ze),W=De(X,1,"",null,W,{active:i(m)==="compare"})}),le("click",w,()=>E(m,"matrix")),le("click",P,()=>E(m,"case")),le("click",X,()=>E(m,"compare")),M(u,_)};ve(Ra,u=>{var _;((_=i(S))==null?void 0:_.kind)!=="overview"&&u(es)})}var ts=b(Ra,2);{var ns=u=>{var _=$a(),w=p(_);q(()=>F(w,i(R).sourcePath)),M(u,_)};ve(ts,u=>{i(R)&&i(m)!=="matrix"&&u(ns)})}var Ir=b(Ta,2);let Ma;var rs=p(Ir);{var as=u=>{Za(u,{get cases(){return i(D)},get draft(){return i(o)},onselect:We})},is=u=>{var _=ec(),w=p(_),T=b(p(w),2),P=p(T);Yr(P,{get reviewCase(){return i(R)},draft:{}});var Q=b(w,2),X=b(p(Q),2),W=p(X);Yr(W,{get reviewCase(){return i(R)},get draft(){return i(o)}}),M(u,_)},ss=u=>{var _=ic(),w=p(_);Pe(w,21,()=>Object.entries(i(S).summary),Ne,(X,W)=>{var U=ge(()=>si(i(W),2));let oe=()=>i(U)[0],Se=()=>i(U)[1];var st=tc(),Re=p(st),Be=p(Re),Gt=b(Re),vn=p(Gt);q(Kt=>{F(Be,Kt),F(vn,Se())},[()=>ee(oe())]),M(X,st)});var T=b(w,2);{var P=X=>{var W=rc(),U=p(W),oe=b(p(U),2),Se=p(oe),st=b(U,2);Pe(st,21,()=>t.contract.diagnostics,Ne,(Re,Be)=>{var Gt=nc(),vn=p(Gt),Kt=p(vn),zr=b(vn,2),La=p(zr),cs=p(La),fs=b(La,2);{var us=Br=>{var Na=$a(),ds=p(Na);q(()=>F(ds,i(Be).path)),M(Br,Na)};ve(fs,Br=>{i(Be).path&&Br(us)})}q(()=>{Te(Gt,"data-severity",i(Be).severity),F(Kt,i(Be).severity),F(cs,i(Be).message)}),M(Re,Gt)}),q(()=>F(Se,t.contract.diagnostics.length)),M(X,W)};ve(T,X=>{t.contract.diagnostics.length>0&&X(P)})}var Q=b(T,2);Pe(Q,17,()=>t.contract.labs.filter(X=>X.kind!=="overview"),Ne,(X,W)=>{var U=ac(),oe=p(U),Se=p(oe),st=b(p(Se),2),Re=p(st),Be=b(Se,2),Gt=p(Be),vn=b(oe,2);{let Kt=ge(()=>at(i(W)));Za(vn,{get cases(){return i(Kt)},get draft(){return i(o)},compact:!0,onselect:zr=>Ge(i(W),zr)})}q(Kt=>{F(Re,i(W).label),F(Gt,`inspect all ${Kt??""}`)},[()=>at(i(W)).length]),le("click",Be,()=>rt(i(W))),M(X,U)}),M(u,_)},os=u=>{Yr(u,{get reviewCase(){return i(R)},get draft(){return i(o)}})};ve(rs,u=>{var _,w;i(m)==="matrix"&&((_=i(S))==null?void 0:_.kind)!=="overview"?u(as):i(m)==="compare"&&i(R)?u(is,1):((w=i(S))==null?void 0:w.kind)==="overview"?u(ss,2):u(os,-1)})}var ls=b(Ca,2);{let u=ge(()=>{var w;return i(m)==="matrix"&&((w=i(S))==null?void 0:w.kind)!=="overview"}),_=ge(()=>{var w;return(w=i(S))==null?void 0:w.label});Vl(ls,{get activeCase(){return i(R)},get matrix(){return i(u)},get labLabel(){return i(_)},get visibleCaseCount(){return i(D).length},get draft(){return i(o)},get editCount(){return i(A).operations.length},setControl:ne,resetControl:it,resetCase:Mt,clearDraft:Nn})}q(u=>{var _,w,T,P,Q;F(re,t.contract.title),F(ae,u),kt.disabled=i(f).length===0,jt.disabled=i(v).length===0,xt=De(Lt,1,"",null,xt,{dirty:i(A).operations.length>0}),F(fr,`${i(A).operations.length??""} edits`),Et.disabled=i(A).operations.length===0,ur.disabled=i(A).operations.length===0,F(Qi,(_=i(S))==null?void 0:_.label),F($i,i(m)==="matrix"&&((w=i(S))==null?void 0:w.kind)!=="overview"?`${i(D).length} cases`:((T=i(R))==null?void 0:T.label)??"system overview"),Ma=De(Ir,1,"canvas",null,Ma,{"matrix-view":i(m)==="matrix"&&((P=i(S))==null?void 0:P.kind)!=="overview","overview-view":((Q=i(S))==null?void 0:Q.kind)==="overview","compare-view":i(m)==="compare"}),pe(Ir,i(ht))},[()=>t.contract.systemFingerprint.slice(0,10)]),le("click",kt,ke),le("click",jt,xe),le("change",dn,or),le("click",Ke,()=>{var u;return(u=i(G))==null?void 0:u.click()}),le("click",Et,()=>_l("tfs.review.patch.json",i(A))),le("click",ur,lr),M(e,Pn),yt()}sr(["click","change"]);async function lc(){const e=await fetch("./workbench.json",{cache:"no-store"});if(!e.ok)throw new Error(`Unable to load workbench contract (${e.status})`);const t=await e.json();if(!t||typeof t!="object"||t.kind!=="three-forma-styli/workbench"||t.schemaVersion!==2)throw new Error("Unsupported TFS workbench contract");return t}const kr=document.querySelector("#tfs-workbench");if(!kr)throw new Error("TFS workbench mount point is missing");function cc(e){return new Promise((t,n)=>{const r=document.createElement("link");r.rel="stylesheet",r.href=e,r.dataset.tfsReviewAsset="",r.addEventListener("load",()=>t(),{once:!0}),r.addEventListener("error",()=>n(new Error(`Unable to load stylesheet: ${e}`)),{once:!0}),document.head.append(r)})}async function fc(){try{const e=await lc();await Promise.all(e.assets.stylesheets.map(cc)),document.title=e.title,Po(oc,{target:kr,props:{contract:e}}),await document.fonts.ready,document.documentElement.dataset.tfsWorkbenchReady="true"}catch(e){kr.innerHTML='<main class="fatal"><strong>Workbench unavailable</strong><pre></pre></main>';const t=kr.querySelector("pre");throw t&&(t.textContent=e instanceof Error?e.message:String(e)),e}}fc();
+${JSON.stringify(handoff, null, 2)}
+\`\`\``;
+    try {
+      await navigator.clipboard.writeText(prompt);
+      set(handoffStatus, "Agent handoff copied");
+    } catch {
+      set(handoffStatus, "Clipboard unavailable; export the patch instead");
+    }
+  }
+  var div = root_18();
+  event("keydown", $window, (event2) => {
+    if (!(event2.metaKey || event2.ctrlKey)) return;
+    if (event2.key.toLowerCase() === "z" && event2.shiftKey) {
+      event2.preventDefault();
+      redoDraft();
+    } else if (event2.key.toLowerCase() === "z") {
+      event2.preventDefault();
+      undoDraft();
+    }
+  });
+  var header = child(div);
+  var div_1 = child(header);
+  var div_2 = sibling(child(div_1), 2);
+  var strong = child(div_2);
+  var text = child(strong);
+  var small = sibling(strong, 2);
+  var text_1 = child(small);
+  var div_3 = sibling(div_1, 2);
+  var node = child(div_3);
+  {
+    var consequent = ($$anchor2) => {
+      var label_1 = root_1();
+      var select = sibling(child(label_1), 2);
+      each(select, 21, () => get(colorGroup).modes, index, ($$anchor3, mode) => {
+        var option = root();
+        var text_2 = child(option);
+        var option_value = {};
+        template_effect(() => {
+          set_text(text_2, get(mode).name);
+          if (option_value !== (option_value = get(mode).name)) {
+            option.value = (option.__value = get(mode).name) ?? "";
+          }
+        });
+        append($$anchor3, option);
+      });
+      bind_select_value(select, () => get(colorMode), ($$value) => set(colorMode, $$value));
+      append($$anchor2, label_1);
+    };
+    if_block(node, ($$render) => {
+      if (get(colorGroup)) $$render(consequent);
+    });
+  }
+  var node_1 = sibling(node, 2);
+  {
+    var consequent_1 = ($$anchor2) => {
+      var label_2 = root_2();
+      var select_1 = sibling(child(label_2), 2);
+      each(select_1, 21, () => get(sizeGroup).modes, index, ($$anchor3, mode) => {
+        var option_1 = root();
+        var text_3 = child(option_1);
+        var option_1_value = {};
+        template_effect(() => {
+          set_text(text_3, get(mode).name);
+          if (option_1_value !== (option_1_value = get(mode).name)) {
+            option_1.value = (option_1.__value = get(mode).name) ?? "";
+          }
+        });
+        append($$anchor3, option_1);
+      });
+      bind_select_value(select_1, () => get(sizeMode), ($$value) => set(sizeMode, $$value));
+      append($$anchor2, label_2);
+    };
+    if_block(node_1, ($$render) => {
+      if (get(sizeGroup)) $$render(consequent_1);
+    });
+  }
+  var div_4 = sibling(div_3, 2);
+  var button = child(div_4);
+  var button_1 = sibling(button, 2);
+  var span = sibling(button_1, 2);
+  let classes;
+  var text_4 = child(span);
+  var input_1 = sibling(span, 2);
+  bind_this(input_1, ($$value) => set(patchInput, $$value), () => get(patchInput));
+  var button_2 = sibling(input_1, 2);
+  var button_3 = sibling(button_2, 2);
+  var button_4 = sibling(button_3, 2);
+  var node_2 = sibling(button_4, 2);
+  {
+    var consequent_2 = ($$anchor2) => {
+      var span_1 = root_3();
+      var text_5 = child(span_1);
+      template_effect(() => set_text(text_5, get(handoffStatus)));
+      append($$anchor2, span_1);
+    };
+    if_block(node_2, ($$render) => {
+      if (get(handoffStatus)) $$render(consequent_2);
+    });
+  }
+  var aside = sibling(header, 2);
+  var nav = child(aside);
+  each(nav, 21, () => $$props.contract.labs, index, ($$anchor2, lab) => {
+    var button_5 = root_5();
+    let classes_1;
+    var span_2 = child(button_5);
+    var text_6 = child(span_2);
+    var node_3 = sibling(span_2, 2);
+    {
+      var consequent_3 = ($$anchor3) => {
+        var small_1 = root_4();
+        var text_7 = child(small_1);
+        template_effect(() => set_text(text_7, get(lab).cases.length));
+        append($$anchor3, small_1);
+      };
+      if_block(node_3, ($$render) => {
+        if (get(lab).kind === "color" || get(lab).kind === "typography" || get(lab).kind === "shadows" || get(lab).kind === "motion" || get(lab).kind === "foundation") $$render(consequent_3);
+      });
+    }
+    template_effect(() => {
+      classes_1 = set_class(button_5, 1, "", null, classes_1, { active: get(lab).id === get(activeLabId) });
+      set_text(text_6, get(lab).label);
+    });
+    delegated("click", button_5, () => selectLab(get(lab)));
+    append($$anchor2, button_5);
+  });
+  var node_4 = sibling(nav, 2);
+  {
+    var consequent_6 = ($$anchor2) => {
+      var div_5 = root_9();
+      var node_5 = child(div_5);
+      {
+        var consequent_4 = ($$anchor3) => {
+          var label_3 = root_6();
+          var span_3 = child(label_3);
+          var text_8 = child(span_3);
+          var input_2 = sibling(span_3, 2);
+          template_effect(() => {
+            var _a3, _b3;
+            set_text(text_8, `Filter ${((_a3 = get(activeLab)) == null ? void 0 : _a3.label) ?? ""} cases`);
+            set_attribute(input_2, "aria-label", `Filter ${(_b3 = get(activeLab)) == null ? void 0 : _b3.label} cases`);
+          });
+          bind_value(input_2, () => get(caseQuery), ($$value) => set(caseQuery, $$value));
+          append($$anchor3, label_3);
+        };
+        if_block(node_5, ($$render) => {
+          if (get(cases).length > 10) $$render(consequent_4);
+        });
+      }
+      var node_6 = sibling(node_5, 2);
+      each(node_6, 17, () => get(visibleCases), index, ($$anchor3, reviewCase) => {
+        var button_6 = root_7();
+        let classes_2;
+        var text_9 = child(button_6);
+        template_effect(() => {
+          var _a3;
+          set_attribute(button_6, "title", get(reviewCase).label);
+          classes_2 = set_class(button_6, 1, "", null, classes_2, {
+            active: get(viewMode) !== "matrix" && get(reviewCase).id === ((_a3 = get(activeCase)) == null ? void 0 : _a3.id)
+          });
+          set_text(text_9, get(reviewCase).label);
+        });
+        delegated("click", button_6, () => selectCase(get(reviewCase).id));
+        append($$anchor3, button_6);
+      });
+      var node_7 = sibling(node_6, 2);
+      {
+        var consequent_5 = ($$anchor3) => {
+          var p = root_8();
+          append($$anchor3, p);
+        };
+        if_block(node_7, ($$render) => {
+          if (get(visibleCases).length === 0) $$render(consequent_5);
+        });
+      }
+      append($$anchor2, div_5);
+    };
+    if_block(node_4, ($$render) => {
+      if (get(cases).length > 0) $$render(consequent_6);
+    });
+  }
+  var main = sibling(aside, 2);
+  var div_6 = child(main);
+  var div_7 = child(div_6);
+  var span_4 = child(div_7);
+  var text_10 = child(span_4);
+  var strong_1 = sibling(span_4, 2);
+  var text_11 = child(strong_1);
+  var node_8 = sibling(div_7, 2);
+  {
+    var consequent_7 = ($$anchor2) => {
+      var div_8 = root_10();
+      var button_7 = child(div_8);
+      let classes_3;
+      var button_8 = sibling(button_7, 2);
+      let classes_4;
+      var button_9 = sibling(button_8, 2);
+      let classes_5;
+      template_effect(() => {
+        classes_3 = set_class(button_7, 1, "", null, classes_3, { active: get(viewMode) === "matrix" });
+        classes_4 = set_class(button_8, 1, "", null, classes_4, { active: get(viewMode) === "case" });
+        button_9.disabled = !get(activeCaseChanged);
+        classes_5 = set_class(button_9, 1, "", null, classes_5, { active: get(viewMode) === "compare" });
+      });
+      delegated("click", button_7, () => set(viewMode, "matrix"));
+      delegated("click", button_8, () => set(viewMode, "case"));
+      delegated("click", button_9, () => set(viewMode, "compare"));
+      append($$anchor2, div_8);
+    };
+    if_block(node_8, ($$render) => {
+      var _a3;
+      if (((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) !== "overview") $$render(consequent_7);
+    });
+  }
+  var node_9 = sibling(node_8, 2);
+  {
+    var consequent_8 = ($$anchor2) => {
+      var code = root_11();
+      var text_12 = child(code);
+      template_effect(() => set_text(text_12, get(activeCase).sourcePath));
+      append($$anchor2, code);
+    };
+    if_block(node_9, ($$render) => {
+      if (get(activeCase) && get(viewMode) !== "matrix") $$render(consequent_8);
+    });
+  }
+  var section = sibling(div_6, 2);
+  let classes_6;
+  var node_10 = child(section);
+  {
+    var consequent_9 = ($$anchor2) => {
+      CaseMatrix($$anchor2, {
+        get cases() {
+          return get(visibleCases);
+        },
+        get draft() {
+          return get(draft);
+        },
+        onselect: selectCase
+      });
+    };
+    var consequent_10 = ($$anchor2) => {
+      var div_9 = root_12();
+      var section_1 = child(div_9);
+      var div_10 = sibling(child(section_1), 2);
+      var node_11 = child(div_10);
+      CaseView(node_11, {
+        get reviewCase() {
+          return get(activeCase);
+        },
+        draft: {}
+      });
+      var section_2 = sibling(section_1, 2);
+      var div_11 = sibling(child(section_2), 2);
+      var node_12 = child(div_11);
+      CaseView(node_12, {
+        get reviewCase() {
+          return get(activeCase);
+        },
+        get draft() {
+          return get(draft);
+        }
+      });
+      append($$anchor2, div_9);
+    };
+    var consequent_13 = ($$anchor2) => {
+      var div_12 = root_17();
+      var div_13 = child(div_12);
+      each(div_13, 21, () => Object.entries(get(activeLab).summary), index, ($$anchor3, $$item) => {
+        var $$array = /* @__PURE__ */ user_derived(() => to_array(get($$item), 2));
+        let label = () => get($$array)[0];
+        let value = () => get($$array)[1];
+        var article = root_13();
+        var span_5 = child(article);
+        var text_13 = child(span_5);
+        var strong_2 = sibling(span_5);
+        var text_14 = child(strong_2);
+        template_effect(
+          ($0) => {
+            set_text(text_13, $0);
+            set_text(text_14, value());
+          },
+          [() => readableIdentifier(label())]
+        );
+        append($$anchor3, article);
+      });
+      var node_13 = sibling(div_13, 2);
+      {
+        var consequent_12 = ($$anchor3) => {
+          var section_3 = root_15();
+          var header_1 = child(section_3);
+          var small_2 = sibling(child(header_1), 2);
+          var text_15 = child(small_2);
+          var ul = sibling(header_1, 2);
+          each(ul, 21, () => $$props.contract.diagnostics, index, ($$anchor4, diagnostic) => {
+            var li = root_14();
+            var span_6 = child(li);
+            var text_16 = child(span_6);
+            var div_14 = sibling(span_6, 2);
+            var strong_3 = child(div_14);
+            var text_17 = child(strong_3);
+            var node_14 = sibling(strong_3, 2);
+            {
+              var consequent_11 = ($$anchor5) => {
+                var code_1 = root_11();
+                var text_18 = child(code_1);
+                template_effect(() => set_text(text_18, get(diagnostic).path));
+                append($$anchor5, code_1);
+              };
+              if_block(node_14, ($$render) => {
+                if (get(diagnostic).path) $$render(consequent_11);
+              });
+            }
+            template_effect(() => {
+              set_attribute(li, "data-severity", get(diagnostic).severity);
+              set_text(text_16, get(diagnostic).severity);
+              set_text(text_17, get(diagnostic).message);
+            });
+            append($$anchor4, li);
+          });
+          template_effect(() => set_text(text_15, $$props.contract.diagnostics.length));
+          append($$anchor3, section_3);
+        };
+        if_block(node_13, ($$render) => {
+          if ($$props.contract.diagnostics.length > 0) $$render(consequent_12);
+        });
+      }
+      var node_15 = sibling(node_13, 2);
+      each(node_15, 17, () => $$props.contract.labs.filter((lab) => lab.kind !== "overview"), index, ($$anchor3, lab) => {
+        var section_4 = root_16();
+        var header_2 = child(section_4);
+        var div_15 = child(header_2);
+        var strong_4 = sibling(child(div_15), 2);
+        var text_19 = child(strong_4);
+        var button_10 = sibling(div_15, 2);
+        var text_20 = child(button_10);
+        var node_16 = sibling(header_2, 2);
+        {
+          let $0 = /* @__PURE__ */ user_derived(() => visibleLabCases(get(lab)));
+          CaseMatrix(node_16, {
+            get cases() {
+              return get($0);
+            },
+            get draft() {
+              return get(draft);
+            },
+            compact: true,
+            onselect: (id) => selectCaseFromLab(get(lab), id)
+          });
+        }
+        template_effect(
+          ($0) => {
+            set_text(text_19, get(lab).label);
+            set_text(text_20, `inspect all ${$0 ?? ""}`);
+          },
+          [() => visibleLabCases(get(lab)).length]
+        );
+        delegated("click", button_10, () => selectLab(get(lab)));
+        append($$anchor3, section_4);
+      });
+      append($$anchor2, div_12);
+    };
+    var alternate = ($$anchor2) => {
+      CaseView($$anchor2, {
+        get reviewCase() {
+          return get(activeCase);
+        },
+        get draft() {
+          return get(draft);
+        }
+      });
+    };
+    if_block(node_10, ($$render) => {
+      var _a3, _b3;
+      if (get(viewMode) === "matrix" && ((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) !== "overview") $$render(consequent_9);
+      else if (get(viewMode) === "compare" && get(activeCase)) $$render(consequent_10, 1);
+      else if (((_b3 = get(activeLab)) == null ? void 0 : _b3.kind) === "overview") $$render(consequent_13, 2);
+      else $$render(alternate, -1);
+    });
+  }
+  var node_17 = sibling(main, 2);
+  {
+    let $0 = /* @__PURE__ */ user_derived(() => {
+      var _a3;
+      return get(viewMode) === "matrix" && ((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) !== "overview";
+    });
+    let $1 = /* @__PURE__ */ user_derived(() => {
+      var _a3;
+      return (_a3 = get(activeLab)) == null ? void 0 : _a3.label;
+    });
+    Inspector(node_17, {
+      get activeCase() {
+        return get(activeCase);
+      },
+      get matrix() {
+        return get($0);
+      },
+      get labLabel() {
+        return get($1);
+      },
+      get visibleCaseCount() {
+        return get(visibleCases).length;
+      },
+      get draft() {
+        return get(draft);
+      },
+      get editCount() {
+        return get(patch).operations.length;
+      },
+      setControl,
+      resetControl,
+      resetCase,
+      clearDraft
+    });
+  }
+  template_effect(
+    ($0) => {
+      var _a3, _b3, _c2, _d, _e;
+      set_text(text, $$props.contract.title);
+      set_text(text_1, $0);
+      button.disabled = get(undo).length === 0;
+      button_1.disabled = get(redo).length === 0;
+      classes = set_class(span, 1, "", null, classes, { dirty: get(patch).operations.length > 0 });
+      set_text(text_4, `${get(patch).operations.length ?? ""} edits`);
+      button_3.disabled = get(patch).operations.length === 0;
+      button_4.disabled = get(patch).operations.length === 0;
+      set_text(text_10, (_a3 = get(activeLab)) == null ? void 0 : _a3.label);
+      set_text(text_11, get(viewMode) === "matrix" && ((_b3 = get(activeLab)) == null ? void 0 : _b3.kind) !== "overview" ? `${get(visibleCases).length} cases` : ((_c2 = get(activeCase)) == null ? void 0 : _c2.label) ?? "system overview");
+      classes_6 = set_class(section, 1, "canvas", null, classes_6, {
+        "matrix-view": get(viewMode) === "matrix" && ((_d = get(activeLab)) == null ? void 0 : _d.kind) !== "overview",
+        "overview-view": ((_e = get(activeLab)) == null ? void 0 : _e.kind) === "overview",
+        "compare-view": get(viewMode) === "compare"
+      });
+      set_style(section, get(canvasStyle));
+    },
+    [() => $$props.contract.systemFingerprint.slice(0, 10)]
+  );
+  delegated("click", button, undoDraft);
+  delegated("click", button_1, redoDraft);
+  delegated("change", input_1, importPatch);
+  delegated("click", button_2, () => {
+    var _a3;
+    return (_a3 = get(patchInput)) == null ? void 0 : _a3.click();
+  });
+  delegated("click", button_3, () => downloadJson("tfs.review.patch.json", get(patch)));
+  delegated("click", button_4, copyHandoff);
+  append($$anchor, div);
+  pop();
+}
+delegate(["click", "change"]);
+async function loadContract() {
+  const response = await fetch("./workbench.json", { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Unable to load workbench contract (${response.status})`);
+  }
+  const value = await response.json();
+  if (!value || typeof value !== "object" || value.kind !== "three-forma-styli/workbench" || value.schemaVersion !== 2) {
+    throw new Error("Unsupported TFS workbench contract");
+  }
+  return value;
+}
+const target = document.querySelector("#tfs-workbench");
+if (!target) throw new Error("TFS workbench mount point is missing");
+function loadStylesheet(href) {
+  return new Promise((resolve, reject) => {
+    const link2 = document.createElement("link");
+    link2.rel = "stylesheet";
+    link2.href = href;
+    link2.dataset.tfsReviewAsset = "";
+    link2.addEventListener("load", () => resolve(), { once: true });
+    link2.addEventListener("error", () => reject(new Error(`Unable to load stylesheet: ${href}`)), {
+      once: true
+    });
+    document.head.append(link2);
+  });
+}
+async function start() {
+  try {
+    const contract = await loadContract();
+    await Promise.all(contract.assets.stylesheets.map(loadStylesheet));
+    document.title = contract.title;
+    mount(App, { target, props: { contract } });
+    await document.fonts.ready;
+    document.documentElement.dataset.tfsWorkbenchReady = "true";
+  } catch (error) {
+    target.innerHTML = `<main class="fatal"><strong>Workbench unavailable</strong><pre></pre></main>`;
+    const pre = target.querySelector("pre");
+    if (pre) pre.textContent = error instanceof Error ? error.message : String(error);
+    throw error;
+  }
+}
+void start();
