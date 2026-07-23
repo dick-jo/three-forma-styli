@@ -101,6 +101,19 @@ The industry patterns support this split:
 - [Next Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
   make an unnecessary client boundary a material application decision.
 
+## Proven framework boundary
+
+The release matrix builds the packed generated package through two fresh,
+independent consumers:
+
+- a React 19/Next 16 host component used from both Server and Client Component
+  trees; and
+- a Svelte 5 host component with its own deliberately smaller element API.
+
+Both consume the same generated resolver and CSS Module. Their component source
+is intentionally different. This proves that the portable contract is the
+shared product surface while framework semantics remain host-owned.
+
 ## Possible future scaffold
 
 After the real Scatter React implementation and at least one Svelte

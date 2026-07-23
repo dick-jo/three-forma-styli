@@ -382,3 +382,9 @@ reference evidence, not hardcoded policy.
   client boundary, and is proven by exact type tests, server rendering, a
   production Storybook bundle, and Chromium-computed Supreme/JetBrains styles.
   Broader typography migration remains gated on representative visual approval.
+- **2026-07-23 — independent framework proof.** The packed release matrix now
+  builds genuinely host-owned `Text` adapters in fresh React 19/Next 16 and
+  Svelte 5 projects. The React adapter is exercised from Server and Client
+  Component trees; the Svelte adapter deliberately owns a different, smaller
+  element surface. Their only shared implementation dependency is TFS's typed,
+  framework-neutral resolver and CSS Module contract.

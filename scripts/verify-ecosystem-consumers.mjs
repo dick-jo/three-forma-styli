@@ -8,6 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { buildNextConsumer } from './ecosystem/next-consumer.mjs';
+import { buildSvelteConsumer } from './ecosystem/svelte-consumer.mjs';
 import { buildTurborepoConsumer } from './ecosystem/turborepo-consumer.mjs';
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -19,7 +20,9 @@ const releaseVersion = JSON.parse(
 	await readFile(path.join(repositoryRoot, 'packages/core/package.json'), 'utf8')
 ).version;
 const browserProofRequested = process.argv.includes('--browser');
-const nextProofRequested = process.argv.includes('--next');
+const frameworkProofRequested = process.argv.includes('--frameworks');
+const nextProofRequested = process.argv.includes('--next') || frameworkProofRequested;
+const svelteProofRequested = process.argv.includes('--svelte') || frameworkProofRequested;
 const monorepoProofRequested = process.argv.includes('--monorepo');
 
 function run(command, args, options = {}) {
@@ -709,6 +712,9 @@ try {
 	if (nextProofRequested) {
 		await buildNextConsumer({ temporaryRoot, designSystemTarball });
 	}
+	if (svelteProofRequested) {
+		await buildSvelteConsumer({ temporaryRoot, designSystemTarball });
+	}
 	if (monorepoProofRequested) {
 		await buildTurborepoConsumer({ temporaryRoot, workspaceRoot, tarballs });
 	}
@@ -721,6 +727,7 @@ try {
 			'Real tarball installs, standalone/workspace scaffolds, generated-package packing',
 			'a production browser bundle',
 			nextProofRequested ? 'a production Next 16 build' : undefined,
+			svelteProofRequested ? 'a production Svelte 5 build' : undefined,
 			monorepoProofRequested ? 'a pnpm/Turborepo workspace build and check graph' : undefined,
 			browserProofRequested ? 'Chromium runtime and Workbench interactions' : undefined,
 			'all passed.',
