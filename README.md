@@ -190,6 +190,7 @@ const typography = {
 	roles: {
 		prose: {
 			font: 'sans',
+			textTransform: 'none',
 			base: { fontSize: 2, weight: 'lo', lineHeight: 1.25, letterSpacing: 0 },
 			variants: {
 				s: { fontSize: 1, weight: 'min', lineHeight: 1.3, letterSpacing: 0.005 },
@@ -246,9 +247,52 @@ Prepared custom fonts provide authoritative face capabilities. Roles explicitly
 choose supported weights and styles; unavailable cuts fail instead of being
 silently remapped. See [the typography foundation](docs/typography-foundation.md).
 
-### Border & Time
+### Time & Motion
 
-Similar patterns for border radius/width and timing values.
+Time defines one or more simultaneously available atomic duration scales.
+Motion recipes turn those primitives into author-named, property-agnostic
+duration/easing/delay fragments:
+
+```typescript
+time: {
+  scales: [{
+    name: 'default',
+    isDefault: true,
+    tokens: { unit: 'ms', base: 100, min: 50, range: 10 },
+  }],
+},
+motion: {
+  easings: { standard: [0.2, 0, 0.38, 0.9] },
+  recipes: {
+    hover: {
+      base: { duration: 2, easing: 'standard' },
+      variants: {
+        min: { duration: 'min' },
+        lo: { duration: 1 },
+        hi: { duration: 3 },
+        max: { duration: 4 },
+      },
+    },
+  },
+}
+```
+
+```css
+.control {
+	transition:
+		color var(--motion-hover),
+		box-shadow var(--motion-hover);
+}
+```
+
+The generated TypeScript contract exposes the same easing tuple and resolved
+millisecond/second values for JavaScript animation libraries. TFS deliberately
+does not attach CSS property names to recipes.
+
+### Border
+
+Border radius derives semantic choices from spacing; border width remains a
+small explicit system.
 
 ## Luminance Constraints
 

@@ -339,6 +339,54 @@ export interface TimeSystem {
 	scales: Array<TimeScale & { name: string }>;
 }
 
+// MOTION ----------------------------------------------- //
+
+/**
+ * Reference one value from an atomic time scale. A bare step uses the default
+ * scale; qualified references address another simultaneously emitted scale.
+ */
+export type TimeReference =
+	| 'min'
+	| number
+	| Readonly<{
+			scale: string;
+			step: 'min' | number;
+	  }>;
+
+/** A portable cubic Bézier curve shared by CSS and JavaScript motion engines. */
+export type MotionEasing = readonly [number, number, number, number];
+
+export interface MotionRecipeBase {
+	duration: TimeReference;
+	easing: string;
+	/** Omitted delay resolves to a literal zero milliseconds. */
+	delay?: 0 | TimeReference;
+}
+
+/**
+ * A named alternative inherits omitted easing and delay decisions from base.
+ * Duration may also be inherited, although a variant normally changes it.
+ */
+export type MotionRecipeVariant = Partial<MotionRecipeBase>;
+
+export interface MotionRecipe {
+	/** Unsuffixed/default fragment, emitted as --motion-{recipe}. */
+	base: MotionRecipeBase;
+	/** Arbitrarily named alternatives such as min, lo, hi and max. */
+	variants?: Record<string, MotionRecipeVariant>;
+	/** Optional review order containing base and every variant exactly once. */
+	displayOrder?: string[];
+}
+
+/**
+ * Semantic transition fragments. Recipe names describe interactions or motion
+ * intent; call sites continue to own selectors and animated CSS properties.
+ */
+export interface MotionSystem {
+	easings: Record<string, MotionEasing>;
+	recipes: Record<string, MotionRecipe>;
+}
+
 // MAIN CONFIG ------------------------------------------ //
 
 /**
@@ -359,6 +407,7 @@ export interface DesignSystem {
 	typography: TypographySystem;
 	border: BorderSystem;
 	time: TimeSystem;
+	motion?: MotionSystem;
 }
 
 /**
@@ -394,4 +443,5 @@ export interface PartialDesignSystem {
 	typography?: TypographySystem;
 	border?: BorderSystem;
 	time?: TimeSystem;
+	motion?: MotionSystem;
 }

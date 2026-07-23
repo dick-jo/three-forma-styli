@@ -87,8 +87,10 @@ references an arbitrary alias in that role's intentional `weights` map; there is
 no hidden role-wide default alias. `fontSize` references the atomic scale, line
 height is unitless, and numeric `letterSpacing` is emitted
 in `em` so it follows the selected size. Roles deliberately exclude color,
-margin, layout, and text transform. Generated CSS uses font longhands because the
-`font` shorthand resets related properties that TFS does not necessarily own.
+margin, and layout. Presentational `textTransform` may be set on a role and
+overridden by its base or a particular variant; it never rewrites source text.
+Generated CSS uses font longhands because the `font` shorthand resets related
+properties that TFS does not necessarily own.
 
 ## Optional mode-specific calibration
 

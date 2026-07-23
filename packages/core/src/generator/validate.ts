@@ -8,6 +8,7 @@ import type {
 	AlphaSchedule,
 	DesignSystem,
 	PartialDesignSystem,
+	TimeReference,
 	TypographyFontStyle,
 	TypographyRecipe,
 	TypographyRole,
@@ -81,6 +82,7 @@ export function validateDesignSystem(ds: DesignSystem): void {
 	validateTypography(ds);
 	validateBorder(ds);
 	validateTime(ds);
+	if (ds.motion) validateMotionPartial(ds.motion, ds.time);
 }
 
 /**
@@ -100,8 +102,17 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 	const hasTypography = !!ds.typography;
 	const hasBorder = !!ds.border;
 	const hasTime = !!ds.time;
+	const hasMotion = !!ds.motion;
 
-	if (!hasColors && !hasSpacing && !hasGap && !hasTypography && !hasBorder && !hasTime) {
+	if (
+		!hasColors &&
+		!hasSpacing &&
+		!hasGap &&
+		!hasTypography &&
+		!hasBorder &&
+		!hasTime &&
+		!hasMotion
+	) {
 		throw new ValidationError('At least one token family must be provided');
 	}
 
@@ -114,6 +125,9 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 		throw new ValidationError(
 			'Border radius requires spacing (radius values reference spacing tokens)'
 		);
+	}
+	if (hasMotion && !hasTime) {
+		throw new ValidationError('Motion requires time (motion durations reference time scales)');
 	}
 
 	// Validate each provided family
@@ -134,6 +148,9 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 	}
 	if (hasTime) {
 		validateTimePartial(ds.time!);
+	}
+	if (hasMotion) {
+		validateMotionPartial(ds.motion!, ds.time!);
 	}
 }
 
@@ -977,6 +994,120 @@ function validateTimePartial(time: NonNullable<PartialDesignSystem['time']>): vo
 
 		validateTimeTokens(scale.tokens, `time.scales["${scale.name}"].tokens`);
 	});
+}
+
+function validateTimeReference(
+	reference: TimeReference,
+	time: NonNullable<PartialDesignSystem['time']>,
+	path: string,
+	allowZero: boolean
+): void {
+	if (reference === 0 && allowZero) return;
+	const defaultScale = time.scales.find((scale) => scale.isDefault) ?? time.scales[0];
+	const scaleName = typeof reference === 'object' ? reference.scale : defaultScale?.name;
+	const step = typeof reference === 'object' ? reference.step : reference;
+	const scale = time.scales.find((candidate) => candidate.name === scaleName);
+
+	if (!scale) {
+		throw new ValidationError(`${path} references unknown time scale "${scaleName}"`);
+	}
+	if (scale.tokens.unit !== 'ms' && scale.tokens.unit !== 's') {
+		throw new ValidationError(
+			`${path} references time scale "${scaleName}" with unit "${scale.tokens.unit}"; motion requires "ms" or "s"`
+		);
+	}
+	if (step !== 'min' && (!Number.isInteger(step) || step < 1 || step > scale.tokens.range)) {
+		throw new ValidationError(
+			`${path} step must be "min" or an integer from 1 through ${scale.tokens.range}`
+		);
+	}
+}
+
+function validateMotionPartial(
+	motion: NonNullable<PartialDesignSystem['motion']>,
+	time: NonNullable<PartialDesignSystem['time']>
+): void {
+	if (!motion.easings || typeof motion.easings !== 'object' || Array.isArray(motion.easings)) {
+		throw new ValidationError('motion.easings must be an object');
+	}
+	if (Object.keys(motion.easings).length === 0) {
+		throw new ValidationError('motion.easings must contain at least one easing');
+	}
+	for (const [name, easing] of Object.entries(motion.easings)) {
+		if (!tokenNamePattern.test(name)) {
+			throw new ValidationError(`motion.easings name "${name}" is not CSS-token safe`);
+		}
+		if (!Array.isArray(easing) || easing.length !== 4 || !easing.every(Number.isFinite)) {
+			throw new ValidationError(`motion.easings.${name} must be four finite Bézier values`);
+		}
+		if (easing[0] < 0 || easing[0] > 1 || easing[2] < 0 || easing[2] > 1) {
+			throw new ValidationError(
+				`motion.easings.${name} Bézier x coordinates must be between 0 and 1`
+			);
+		}
+	}
+
+	if (!motion.recipes || typeof motion.recipes !== 'object' || Array.isArray(motion.recipes)) {
+		throw new ValidationError('motion.recipes must be an object');
+	}
+	if (Object.keys(motion.recipes).length === 0) {
+		throw new ValidationError('motion.recipes must contain at least one recipe');
+	}
+	for (const [recipeName, recipe] of Object.entries(motion.recipes)) {
+		if (!tokenNamePattern.test(recipeName)) {
+			throw new ValidationError(`motion.recipes name "${recipeName}" is not CSS-token safe`);
+		}
+		if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe) || !recipe.base) {
+			throw new ValidationError(`motion.recipes.${recipeName}.base is required`);
+		}
+		if ('base' in (recipe.variants ?? {})) {
+			throw new ValidationError(
+				`motion.recipes.${recipeName}.variants must not contain reserved name "base"`
+			);
+		}
+		for (const variantName of Object.keys(recipe.variants ?? {})) {
+			if (!tokenNamePattern.test(variantName)) {
+				throw new ValidationError(
+					`motion.recipes.${recipeName}.variants name "${variantName}" is not CSS-token safe`
+				);
+			}
+		}
+		if (recipe.displayOrder) {
+			const expected = ['base', ...Object.keys(recipe.variants ?? {})].sort();
+			const received = [...recipe.displayOrder].sort();
+			if (
+				expected.length !== received.length ||
+				expected.some((name, index) => name !== received[index])
+			) {
+				throw new ValidationError(
+					`motion.recipes.${recipeName}.displayOrder must contain base and every variant exactly once`
+				);
+			}
+		}
+
+		for (const [variantName, variant] of [
+			['base', recipe.base] as const,
+			...Object.entries(recipe.variants ?? {}),
+		]) {
+			const path = `motion.recipes.${recipeName}.${variantName}`;
+			if (!variant || typeof variant !== 'object' || Array.isArray(variant)) {
+				throw new ValidationError(`${path} must be an object`);
+			}
+			const allowed = new Set(['duration', 'easing', 'delay']);
+			for (const key of Object.keys(variant)) {
+				if (!allowed.has(key)) throw new ValidationError(`${path} contains unknown field "${key}"`);
+			}
+			const duration = variant.duration ?? recipe.base.duration;
+			const easing = variant.easing ?? recipe.base.easing;
+			const delay = variant.delay ?? recipe.base.delay ?? 0;
+			if (duration === undefined) throw new ValidationError(`${path}.duration is required`);
+			if (typeof easing !== 'string' || !motion.easings[easing]) {
+				throw new ValidationError(`${path}.easing references unknown easing "${String(easing)}"`);
+			}
+			validateTimeReference(duration, time, `${path}.duration`, false);
+			validateTimeReference(delay, time, `${path}.delay`, true);
+		}
+	}
 }
 
 function validateAlphaSchedule(schedule: AlphaSchedule, path: string): void {

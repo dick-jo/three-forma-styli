@@ -1,8 +1,39 @@
 import type { IR, PartialDesignSystem, TokenValue } from '@three-forma-styli/core';
 
 type ModeCategory = keyof IR['modes'];
-type TokenCategory = ModeCategory | 'time';
+type TokenCategory = ModeCategory | 'time' | 'motion';
 type SourceMode = { name: string; isDefault?: boolean; tokens: unknown; metadata?: unknown };
+type ProjectModeEntry = {
+	isDefault: boolean;
+	metadata?: unknown;
+	systems: Record<string, unknown>;
+	resolvedTokens: Record<string, string>;
+};
+type ProjectSystemContract = {
+	schemaVersion: 2;
+	modes: Record<
+		ModeCategory,
+		{
+			default: string;
+			entries: Record<string, ProjectModeEntry>;
+		}
+	>;
+	scales: {
+		time: {
+			default: string;
+			entries: Record<
+				string,
+				{
+					isDefault: boolean;
+					metadata?: unknown;
+					source: unknown;
+					resolvedTokens: Record<string, string>;
+				}
+			>;
+		};
+	};
+	motion?: IR['motion'];
+};
 
 const FAMILY_CATEGORIES: Record<TokenValue['family'], TokenCategory> = {
 	color: 'color',
@@ -12,6 +43,7 @@ const FAMILY_CATEGORIES: Record<TokenValue['family'], TokenCategory> = {
 	borderRadius: 'size',
 	borderWidth: 'size',
 	time: 'time',
+	motion: 'motion',
 };
 
 function tokenValues(
@@ -82,7 +114,7 @@ function entrySource(
 }
 
 /** Build a standalone, serializable contract for generated consumers. */
-export function projectSystemContract(system: PartialDesignSystem, ir: IR) {
+export function projectSystemContract(system: PartialDesignSystem, ir: IR): ProjectSystemContract {
 	const modes = Object.fromEntries(
 		(['color', 'size'] as const).map((category) => {
 			const info = ir.modes[category];
@@ -125,7 +157,12 @@ export function projectSystemContract(system: PartialDesignSystem, ir: IR) {
 		},
 	};
 
-	return { schemaVersion: 2, modes, scales } as const;
+	return {
+		schemaVersion: 2,
+		modes: modes as ProjectSystemContract['modes'],
+		scales,
+		...(ir.motion ? { motion: ir.motion } : {}),
+	} as const;
 }
 
 export function generateProjectSystemTypescript(system: PartialDesignSystem, ir: IR): string {

@@ -10,7 +10,8 @@
  */
 export interface TokenValue {
 	/** Token family (color, spacing, gap, etc.) */
-	family: 'color' | 'spacing' | 'gap' | 'typography' | 'borderRadius' | 'borderWidth' | 'time';
+	family:
+		'color' | 'spacing' | 'gap' | 'typography' | 'borderRadius' | 'borderWidth' | 'time' | 'motion';
 
 	/** Full token name without -- prefix (e.g., 'clr-bg', 'sp-1', 'gap-s') */
 	name: string;
@@ -46,6 +47,12 @@ export interface TokenMetadata {
 
 	/** For time tokens: which simultaneously emitted scale owns this token. */
 	timeScale?: string;
+
+	/** For motion tokens: which semantic recipe owns this token. */
+	motionRecipe?: string;
+
+	/** For motion tokens: base or an authored variant name. */
+	motionVariant?: string;
 }
 
 /**
@@ -121,6 +128,46 @@ export interface TypographyContract {
 	>;
 }
 
+export interface MotionContractTimeValue {
+	/** CSS custom property name without the leading `--`; null means literal zero. */
+	token: string | null;
+	css: string;
+	milliseconds: number;
+	seconds: number;
+}
+
+export interface MotionContractValue {
+	token: string;
+	duration: MotionContractTimeValue;
+	delay: MotionContractTimeValue;
+	easing: {
+		name: string;
+		token: string;
+		css: string;
+		value: import('../types.js').MotionEasing;
+	};
+}
+
+export interface MotionContract {
+	namespace: string;
+	easings: Record<
+		string,
+		{
+			token: string;
+			css: string;
+			value: import('../types.js').MotionEasing;
+		}
+	>;
+	recipes: Record<
+		string,
+		{
+			base: MotionContractValue;
+			variants: Record<string, MotionContractValue>;
+			displayOrder: string[];
+		}
+	>;
+}
+
 /**
  * The complete Intermediate Representation
  */
@@ -144,6 +191,9 @@ export interface IR {
 
 	/** Structured typography decisions for typed and non-CSS transformers. */
 	typography?: TypographyContract;
+
+	/** Structured semantic motion decisions for CSS and JavaScript consumers. */
+	motion?: MotionContract;
 }
 
 /**
@@ -161,6 +211,7 @@ export interface GeneratorConfig {
 		borderRadius: string;
 		borderWidth: string;
 		time: string;
+		motion: string;
 	};
 
 	/** Color output format */
@@ -190,6 +241,7 @@ export const defaultGeneratorConfig: GeneratorConfig = {
 		borderRadius: 'bdr',
 		borderWidth: 'bdw',
 		time: 't',
+		motion: 'motion',
 	},
 	colorFormat: {
 		base: 'oklch',
@@ -216,4 +268,10 @@ export interface GeneratorResult {
 export interface TimeGeneratorResult {
 	defaultTokens: TokenValue[];
 	scaleInfo: ScaleInfo;
+}
+
+/** Motion recipes are root fragments and do not participate in CSS modes. */
+export interface MotionGeneratorResult {
+	defaultTokens: TokenValue[];
+	contract: MotionContract;
 }

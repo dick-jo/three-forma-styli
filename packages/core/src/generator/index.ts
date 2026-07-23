@@ -15,6 +15,7 @@ import type {
 	ModeInfo,
 	ScaleInfo,
 	TimeGeneratorResult,
+	MotionGeneratorResult,
 } from './types.js';
 import { defaultGeneratorConfig } from './types.js';
 import { validatePartialDesignSystem, ValidationError } from './validate.js';
@@ -24,6 +25,7 @@ import { generateGapTokens } from './gap.js';
 import { generateTypographyContract, generateTypographyTokens } from './typography.js';
 import { generateBorderRadiusTokens, generateBorderWidthTokens } from './border.js';
 import { generateTimeTokens } from './time.js';
+import { generateMotionTokens } from './motion.js';
 
 export { ValidationError };
 export type {
@@ -35,6 +37,8 @@ export type {
 	ModeInfo,
 	ScaleInfo,
 	TimeGeneratorResult,
+	MotionGeneratorResult,
+	MotionContract,
 	TypographyContract,
 } from './types.js';
 
@@ -197,6 +201,10 @@ export function generate(
 	const timeResult = designSystem.time
 		? generateTimeTokens(designSystem.time, config)
 		: emptyTimeResult;
+	const motionResult =
+		designSystem.motion && designSystem.time
+			? generateMotionTokens(designSystem.motion, designSystem.time, config)
+			: undefined;
 
 	const results = {
 		colors: colorResult,
@@ -216,6 +224,7 @@ export function generate(
 		...borderRadiusResult.defaultTokens,
 		...borderWidthResult.defaultTokens,
 		...timeResult.defaultTokens,
+		...(motionResult?.defaultTokens ?? []),
 	];
 
 	// Collect all override mode names
@@ -275,6 +284,7 @@ export function generate(
 		typography: designSystem.typography
 			? generateTypographyContract(designSystem.typography, config)
 			: undefined,
+		motion: motionResult?.contract,
 		modes: {
 			color: {
 				default: colorResult.modeInfo.default,

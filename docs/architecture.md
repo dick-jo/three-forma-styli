@@ -318,9 +318,68 @@ interface TimeScale {
 --t-2: 200ms;
 --t-anim-min: 500ms;
 --t-anim-1: 1000ms;
---t-ix-hover: var(--t-1);
---t-ix-active: var(--t-min);
 ```
+
+---
+
+### Motion
+
+**Philosophy:** Semantic, property-agnostic transition fragments derived from
+the atomic time scales. TFS decides a consistent duration/easing/delay
+vocabulary; each application still decides which selectors and properties
+animate.
+
+**Input:**
+
+```typescript
+motion: {
+  easings: {
+    standard: [0.2, 0, 0.38, 0.9],
+    enter: [0, 0, 0.38, 0.9],
+    exit: [0.2, 0, 1, 0.9],
+  },
+  recipes: {
+    hover: {
+      base: { duration: 2, easing: "standard" },
+      variants: {
+        min: { duration: "min" },
+        lo: { duration: 1 },
+        hi: { duration: 3 },
+        max: { duration: 4 },
+      },
+      displayOrder: ["min", "lo", "base", "hi", "max"],
+    },
+  },
+}
+```
+
+Recipe, variant, and easing names are entirely author-defined. Duration numbers
+reference the default time scale; `{ scale: "ambient", step: 2 }` explicitly
+references another scale. Variants inherit omitted easing and delay decisions
+from their base.
+
+**Output:**
+
+```css
+--motion-ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+--motion-hover-duration: var(--t-2);
+--motion-hover-easing: var(--motion-ease-standard);
+--motion-hover-delay: 0ms;
+--motion-hover: var(--motion-hover-duration) var(--motion-hover-easing) var(--motion-hover-delay);
+```
+
+```css
+.control {
+	transition:
+		color var(--motion-hover),
+		box-shadow var(--motion-hover);
+}
+```
+
+The generated system TypeScript contract also exposes the resolved cubic Bézier
+tuple plus duration/delay in milliseconds and seconds for Motion, Framer Motion,
+or another JavaScript engine. TFS does not encode CSS property names and does
+not emit motion helper classes.
 
 ---
 
@@ -340,6 +399,7 @@ interface GeneratorConfig {
 		borderRadius: string; // default: 'bdr'
 		borderWidth: string; // default: 'bdw'
 		time: string; // default: 't'
+		motion: string; // default: 'motion'
 	};
 }
 ```

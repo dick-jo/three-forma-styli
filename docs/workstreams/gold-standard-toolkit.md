@@ -125,11 +125,11 @@ reference evidence, not hardcoded policy.
 - [x] Correct the under-specified time model: simultaneously emitted duration
       namespaces are now authored and exported as `time.scales`, not switchable
       modes. Easing and semantic motion recipes remain pending.
-- [ ] Preserve atomic duration primitives, add arbitrary author-named cubic-bezier
+- [x] Preserve atomic duration primitives, add arbitrary author-named cubic-bezier
       easing primitives, and add arbitrary author-named semantic motion recipes.
       Each recipe has an unsuffixed base plus any author-named variants and resolves
       only duration, easing, and delay—never a list of CSS properties.
-- [ ] Generate equivalent CSS and typed JavaScript motion contracts so CSS
+- [x] Generate equivalent CSS and typed JavaScript motion contracts so CSS
       transitions and application animation libraries do not maintain separate
       timing values.
 - [ ] Make reduced-motion behavior explicit per semantic recipe and generate a

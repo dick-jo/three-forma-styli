@@ -34,6 +34,15 @@ describe('project system TypeScript contract', () => {
 					},
 				],
 			},
+			motion: {
+				easings: { standard: [0.2, 0, 0.38, 0.9] },
+				recipes: {
+					hover: {
+						base: { duration: 1, easing: 'standard' },
+						variants: { max: { duration: { scale: 'ambient', step: 2 } } },
+					},
+				},
+			},
 		} satisfies PartialDesignSystem;
 		const contract = projectSystemContract(system, generate(system));
 
@@ -58,6 +67,16 @@ describe('project system TypeScript contract', () => {
 			't-ambient-1': '1000ms',
 			't-ambient-2': '2000ms',
 			't-ambient-min': '500ms',
+		});
+		expect(contract.motion?.recipes.hover?.base.duration).toMatchObject({
+			token: 't-1',
+			milliseconds: 100,
+			seconds: 0.1,
+		});
+		expect(contract.motion?.recipes.hover?.variants.max?.duration).toMatchObject({
+			token: 't-ambient-2',
+			milliseconds: 2000,
+			seconds: 2,
 		});
 		expect(generateProjectSystemTypescript(system, generate(system))).toContain(
 			'export type TfsColorMode'
