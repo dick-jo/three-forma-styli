@@ -1,6 +1,7 @@
 # Scatter monorepo rollout handoff
 
-Status: implementation contract prepared from read-only audits on 2026-07-23.
+Status: runtime/theme integration implemented and production-shaped verification
+completed in the isolated `splinter-tfs-integration` worktree on 2026-07-23.
 Nothing in `/Users/dickjones/project-local/splinter` was changed.
 
 Scatter is the first demanding production integration, not a TFS preset. Every
@@ -136,17 +137,40 @@ network conventions into core based on one consumer.
 
 ## Regression gates
 
-- byte/semantic comparison against production tokens, including Robinhood and
-  excluding removed Monad Testnet;
-- current P3 vibrancy preserved in real Chromium rendering;
-- Default, Light and Nonon Ten switch without runtime CSS generation;
-- valid legacy collection records retain their exact visual output;
-- malformed/hostile runtime payloads fail before DOM assignment;
-- custom-to-native and route transitions leave no stale properties or mode
-  attributes;
-- exactly the five declared core colors and their alpha schedule are emitted;
-- cold-cache font loading, adjusted fallbacks and CLS checked in browser;
-- no compiler, FontTools, prompt, Svelte or Workbench dependency enters an app
-  production graph;
-- root `pnpm check`, production build and security review pass in the isolated
-  worktree before merge.
+- [x] Byte/semantic comparison against production tokens, including Robinhood
+      and excluding removed Monad Testnet.
+- [x] Current P3 vibrancy preserved in real Chromium rendering. The Robinio
+      Quants primary retains its authored `oklch(0.7972 0.4900 125.28)`.
+- [x] Default, Light and Nonon Ten switch without runtime CSS generation.
+- [x] Real collection records exercise color-only, partial-logo and two-logo
+      custom themes in a production Next server.
+- [x] Malformed/hostile runtime payloads fail before DOM assignment.
+- [x] Custom-to-native and route transitions leave no active stale properties,
+      logos or mode attributes.
+- [x] Exactly the five declared core colors and their alpha schedule are
+      emitted by the latest TFS runtime contract.
+- [ ] Complete the separate cold-cache font loading, adjusted-fallback and CLS
+      review as part of the full typography replacement.
+- [x] No compiler, FontTools, prompt, Svelte or Workbench dependency enters the
+      application production graph.
+- [x] TFS packed-release, production Next 16/Svelte 5/Turborepo/Chromium gates,
+      Scatter theme tests, strict type-check and the Scatter production build
+      pass.
+
+## Release handoff
+
+The accumulated Changesets resolve the coordinated public release to `0.3.0`.
+The integration branch intentionally requests exact
+`@three-forma-styli/core@0.3.0`; its lockfile must not be regenerated against an
+older registry version or a committed local override.
+
+Before pushing the Scatter integration commit:
+
+1. authenticate npm for the `@three-forma-styli` scope;
+2. prepare and review the coordinated `0.3.0` release diff;
+3. publish the exact canary under `next`;
+4. install that exact registry version in the isolated Scatter worktree and
+   regenerate the lockfile;
+5. rerun the full Scatter check/build/browser matrix;
+6. promote the already-proven version to `latest`, then push the integration
+   branch.
