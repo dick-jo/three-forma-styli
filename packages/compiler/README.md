@@ -1,0 +1,81 @@
+# @three-forma-styli/compiler
+
+Node.js project and font compiler for Three-Forma-Styli. It contains no command
+parser, prompts, terminal presentation, HTTP server, TypeScript config loader,
+or network sync.
+
+Author a project without loading the heavy build graph:
+
+```ts
+import { defineTfsProject } from '@three-forma-styli/compiler';
+```
+
+Compile an already-loaded project programmatically:
+
+```ts
+import { buildProject } from '@three-forma-styli/compiler/build';
+
+await buildProject(project, '/absolute/path/to/tfs.config.ts');
+```
+
+Font preparation and inspection APIs live at
+`@three-forma-styli/compiler/fonts`. Use `@three-forma-styli/cli` when you want
+the `tfs` executable, config loading, scaffolding, browser specimen server, or
+Figma network sync.
+
+## Workspace-package output
+
+Use the discriminated workspace layout when a repository should consume one
+generated design-system package instead of copying unrelated files by hand:
+
+```ts
+export default defineTfsProject({
+	fonts,
+	system,
+	output: {
+		layout: 'workspace-package',
+		directory: './generated',
+		targets: {
+			runtime: {
+				css: {
+					fontUrls: { mode: 'relative' },
+				},
+				contracts: {},
+			},
+			review: { specimen: { title: 'Design system review' } },
+			design: { dtcg: true, figmaVariables: true },
+		},
+	},
+});
+```
+
+An enabled `css: {}` emits the entry, tokens, available semantic typography,
+and CSS Module targets. An enabled `contracts: {}` emits the system, available
+typography, and available native-color-mode contracts. Set individual fields to
+`false` for explicit opt-outs; `runtime: true`, `review: true`, and
+`design: true` are complete shorthands.
+
+The generated tree is stable and target-oriented:
+
+```text
+generated/
+  runtime/                 dependency-free ESM, declarations, and styles
+  review/typography.html   local authoring evidence, not a package export
+  design/                  DTCG and Figma interchange, not a package export
+  assets/fonts/            one prepared font asset set shared by runtime/review
+  build.manifest.json      deterministic schema-v2 artifact graph
+```
+
+TFS owns and atomically replaces only `output.directory`. It never creates or
+edits the host `package.json`. Before rendering and immediately around the
+atomic swap, the compiler validates and hashes that human-owned manifest. It
+requires `type: "module"`, exact enabled runtime exports, CSS `sideEffects`
+coverage, and an explicit publishable `files` allowlist covering runtime and
+font assets. Unrelated exports remain author-owned and are allowed.
+
+Runtime font URLs may be `relative`, `public`, or `absolute`. Review output
+always links the same prepared bytes through a relative stylesheet, so a CDN or
+application public path never leaks into the portable specimen.
+
+The original flat output remains available by omitting `layout` (or selecting
+`layout: 'flat'`). Flat and workspace keys cannot be mixed.

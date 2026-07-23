@@ -1,6 +1,7 @@
 // src/utils.ts
 import { toGamut, formatHex, formatRgb } from "culori";
 import type { Oklch, P3, Rgb } from "culori";
+import { formatNativeOklch, formatNativeOklchWithAlpha } from './color-css.js';
 
 /**
  * Create an OKLCH color object
@@ -30,11 +31,7 @@ function toGamutMappedRgb(oklchColor: Oklch): Rgb {
  * dedicated converters which clip as needed.
  */
 export function oklchToCss(oklchColor: Oklch): string {
-  const l = oklchColor.l.toFixed(4);
-  const c = (oklchColor.c ?? 0).toFixed(4);
-  const h = (oklchColor.h || 0).toFixed(2);
-
-  return `oklch(${l} ${c} ${h})`;
+  return formatNativeOklch(oklchColor);
 }
 
 /**
@@ -60,12 +57,7 @@ export function oklchToRgb(oklchColor: Oklch): string {
  * Returns oklch() string with alpha channel — no gamut mapping (see oklchToCss).
  */
 export function applyAlpha(oklchColor: Oklch, opacity: number): string {
-  const l = oklchColor.l.toFixed(4);
-  const c = (oklchColor.c ?? 0).toFixed(4);
-  const h = (oklchColor.h || 0).toFixed(2);
-  const a = opacity.toFixed(4);
-
-  return `oklch(${l} ${c} ${h} / ${a})`;
+  return formatNativeOklchWithAlpha(oklchColor, opacity);
 }
 
 /**

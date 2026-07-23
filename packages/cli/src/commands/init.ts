@@ -206,7 +206,7 @@ function generateProjectFile(moduleNames: string[]): string {
 	const properties = moduleNames
 		.map((name) => (name === 'color' ? '    colors: color,' : `    ${name},`))
 		.join('\n');
-	return `import { defineTfsProject } from "@three-forma-styli/cli";
+	return `import { defineTfsProject } from "@three-forma-styli/compiler";
 ${imports}
 
 export default defineTfsProject({
@@ -279,6 +279,7 @@ function generatePackageJson(projectName: string): string {
 				},
 				devDependencies: {
 					'@three-forma-styli/cli': `^${CLI_VERSION}`,
+					'@three-forma-styli/compiler': `^${CLI_VERSION}`,
 					typescript: '^5.9.3',
 				},
 				engines: { node: '>=22' },

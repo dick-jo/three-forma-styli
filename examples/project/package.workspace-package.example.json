@@ -1,0 +1,30 @@
+{
+	"name": "@example/design-system",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"sideEffects": ["./generated/runtime/styles/*.css"],
+	"exports": {
+		".": {
+			"types": "./generated/runtime/index.d.ts",
+			"import": "./generated/runtime/index.js"
+		},
+		"./system": {
+			"types": "./generated/runtime/system.d.ts",
+			"import": "./generated/runtime/system.js"
+		},
+		"./typography": {
+			"types": "./generated/runtime/typography.d.ts",
+			"import": "./generated/runtime/typography.js"
+		},
+		"./native-color-modes": {
+			"types": "./generated/runtime/native-color-modes.d.ts",
+			"import": "./generated/runtime/native-color-modes.js"
+		},
+		"./styles.css": "./generated/runtime/styles/index.css",
+		"./tokens.css": "./generated/runtime/styles/tokens.css",
+		"./typography.css": "./generated/runtime/styles/typography.css",
+		"./typography.module.css": "./generated/runtime/styles/typography.module.css",
+		"./package.json": "./package.json"
+	}
+}

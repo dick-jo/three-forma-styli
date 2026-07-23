@@ -1,4 +1,5 @@
 import { defineTfsProject } from '../src/api.js';
+import type { LegacyTfsProjectOutput, TfsProjectOutput } from '../src/api.js';
 
 const fonts = {
 	supreme: {
@@ -46,6 +47,60 @@ defineTfsProject({
 		},
 		typographyCss: { classPrefix: 'text', specificity: 'zero', fontFaces: 'include' },
 		systemTypescript: true,
+	},
+});
+
+const legacyOutput: LegacyTfsProjectOutput = {
+	directory: './dist',
+	css: true,
+};
+const publicOutput: TfsProjectOutput = legacyOutput;
+void publicOutput;
+
+defineTfsProject({
+	fonts,
+	system: {
+		typography: {
+			modes: [mode],
+			roles: {
+				heading: {
+					font: 'supreme',
+					base: { fontSize: 6, weight: 'max', lineHeight: 1, letterSpacing: -0.01 },
+					weights: { max: 800 },
+				},
+			},
+		},
+	},
+	output: {
+		layout: 'workspace-package',
+		directory: './generated',
+		hostPackage: { rootExport: true, verifyPublishedFiles: 'if-publishable' },
+		assets: { fonts: { directory: 'assets/fonts' } },
+		targets: {
+			runtime: {
+				css: {
+					entry: true,
+					tokens: { selectors: { root: ':host' } },
+					typography: { classPrefix: 'text', specificity: 'class' },
+					module: true,
+					fontUrls: { mode: 'public', prefix: '/fonts' },
+				},
+				contracts: { system: true, typography: true, nativeColorModes: false },
+			},
+			review: { specimen: { title: 'Review', fonts: 'prepared' } },
+			design: { dtcg: { colorSpace: 'display-p3' } },
+		},
+	},
+});
+
+defineTfsProject({
+	system: {},
+	// @ts-expect-error workspace-package cannot mix legacy flat output keys
+	output: {
+		layout: 'workspace-package',
+		directory: './generated',
+		targets: {},
+		css: true,
 	},
 });
 

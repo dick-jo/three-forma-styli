@@ -33,6 +33,10 @@ describe('tfs init', () => {
 		expect(manifest.version).toBeUndefined();
 		expect(manifest.dependencies['@three-forma-styli/core']).toBe('^0.2.0');
 		expect(manifest.devDependencies['@three-forma-styli/cli']).toBe('^0.2.0');
+		expect(manifest.devDependencies['@three-forma-styli/compiler']).toBe('^0.2.0');
+		expect(await fs.readFile(path.join(projectRoot, 'tfs.config.ts'), 'utf8')).toContain(
+			'from "@three-forma-styli/compiler"'
+		);
 		expect(manifest.scripts).toEqual({
 			build: 'tfs build .',
 			check: 'tsc --noEmit && tfs build .',

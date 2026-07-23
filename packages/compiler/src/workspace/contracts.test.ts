@@ -1,0 +1,110 @@
+import { describe, expect, it } from 'vitest';
+import { generate, type PartialDesignSystem } from '@three-forma-styli/core';
+import {
+	nativeColorModesContract,
+	renderNativeColorModesContract,
+	renderSystemContract,
+} from './contracts.js';
+
+describe('workspace runtime contracts', () => {
+	it('represents absent system mode categories as null plus empty entries', () => {
+		const system: PartialDesignSystem = {
+			colors: {
+				alphaSchedule: { max: 0.9 },
+				modes: [
+					{
+						name: 'only',
+						isDefault: true,
+						tokens: { ink: { mode: 'oklch', l: 0.2, c: 0, h: 0 } },
+					},
+				],
+			},
+		};
+		const rendered = renderSystemContract(system, generate(system));
+		expect(rendered.javascript).toContain('"default": null');
+		expect(rendered.javascript).not.toContain('"": {');
+		expect(rendered.declaration).toContain('readonly default: null;');
+		expect(rendered.declaration).toContain('export type TfsSizeMode = keyof');
+	});
+
+	it('keeps default colors complete, override colors authored, and inheritance explicit', () => {
+		const system: PartialDesignSystem = {
+			colors: {
+				alphaSchedule: { min: 0.1, max: 0.9 },
+				modes: [
+					{
+						name: 'dark',
+						isDefault: true,
+						tokens: {
+							neutral: { mode: 'oklch', l: 0.2 },
+							brand: { mode: 'oklch', l: 0.7, c: 0.2, h: 30 },
+						},
+					},
+					{
+						name: 'light',
+						metadata: { label: 'Light' },
+						tokens: { neutral: { mode: 'oklch', l: 0.95 } },
+					},
+					{
+						name: 'warm',
+						tokens: {
+							brand: { mode: 'oklch', l: 0.8, c: 0.15, h: 70 },
+							accent: { mode: 'oklch', l: 0.75, c: 0.1, h: 110 },
+						},
+						alphaSchedule: { min: 0.2, max: 0.8 },
+					},
+				],
+			},
+		};
+		const contract = nativeColorModesContract(system);
+		expect(contract.defaultMode).toBe('dark');
+		expect(contract.colorNames).toEqual(['neutral', 'brand', 'accent']);
+		expect(contract.alphaSchedule).toEqual({ min: 0.1, max: 0.9 });
+		expect(contract.modes.map((mode) => mode.name)).toEqual(['dark', 'light', 'warm']);
+		expect(contract.modes[0]!.metadata).toBeNull();
+		expect(contract.modes[0]!.source.colors.neutral).toEqual({ l: 0.2, c: 0, h: 0 });
+		expect(contract.modes[1]!.source.colors).toEqual({ neutral: { l: 0.95, c: 0, h: 0 } });
+		expect(contract.modes[1]!.source.alphaSchedule).toBeNull();
+		expect(contract.modes[2]!.source.alphaSchedule).toEqual({ min: 0.2, max: 0.8 });
+
+		const declaration = renderNativeColorModesContract(system).declaration;
+		expect(declaration).toContain('readonly defaultMode: "dark";');
+		expect(declaration).toContain('readonly colorNames: readonly [');
+		expect(declaration).toContain('readonly l: number;');
+		expect(declaration).toContain('readonly min: number;');
+		expect(declaration).not.toContain('readonly l: 0.2;');
+		expect(declaration).toContain('readonly schemaVersion: 1;');
+	});
+
+	it('uses null for a schedule-less valid runtime contract', () => {
+		const system = {
+			colors: {
+				alphaSchedule: undefined,
+				modes: [
+					{
+						name: 'default',
+						isDefault: true,
+						tokens: { neutral: { mode: 'oklch', l: 0.5 } },
+					},
+				],
+			},
+		} as unknown as PartialDesignSystem;
+		expect(nativeColorModesContract(system).alphaSchedule).toBeNull();
+		expect(() => renderNativeColorModesContract(system)).not.toThrow();
+	});
+
+	it('uses the first authored mode when no explicit default marker exists', () => {
+		const system = {
+			colors: {
+				alphaSchedule: { max: 1 },
+				modes: [
+					{ name: 'first', tokens: { ink: { mode: 'oklch', l: 0.2 } } },
+					{ name: 'second', tokens: { ink: { mode: 'oklch', l: 0.8 } } },
+				],
+			},
+		} as unknown as PartialDesignSystem;
+		const contract = nativeColorModesContract(system);
+		expect(contract.defaultMode).toBe('first');
+		expect(contract.modes.map((mode) => mode.name)).toEqual(['first', 'second']);
+	});
+});

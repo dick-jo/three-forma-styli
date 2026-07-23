@@ -21,6 +21,7 @@ describe('validateLuminance', () => {
 				foregroundColors: ['primary'],
 			});
 
+			expect(result.metric).toBe('oklch-l');
 			expect(result.deltaValid).toBe(true);
 			expect(result.actualDelta).toBeCloseTo(0.6, 2);
 		});

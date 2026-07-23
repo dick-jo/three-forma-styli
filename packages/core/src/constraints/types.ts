@@ -6,6 +6,9 @@
  * @property minDelta - Minimum required luminance difference between groups
  * @property backgroundColors - Array of color keys to treat as background (e.g., ['bg', 'ev'])
  * @property foregroundColors - Array of color keys to treat as foreground (e.g., ['primary', 'ink'])
+ *
+ * TFS currently evaluates this constraint using authored OKLCH L. It does not
+ * calculate WCAG relative luminance or a contrast ratio.
  */
 export interface LuminanceConstraintConfig {
 	polarity: 'negative' | 'positive';
@@ -19,15 +22,22 @@ export interface LuminanceConstraintConfig {
  */
 export interface ColorDiagnostic {
 	group: 'background' | 'foreground';
+	/** Authored OKLCH L under the current TFS luminance metric. */
 	luminance: number;
 	/** Distance from the constraint boundary. Positive = safe, zero = at limit, negative = violation */
 	headroom: number;
 }
 
 /**
- * Result of luminance validation with full diagnostics
+ * Result of luminance validation with full OKLCH-L diagnostics.
+ *
+ * The explicit `metric` discriminator keeps this result honest and allows a
+ * future, separate WCAG relative-luminance diagnostic to coexist safely.
  */
 export interface LuminanceValidation {
+	/** The exact measurement used by this constraint. Not WCAG relative luminance. */
+	metric: 'oklch-l';
+
 	// Delta validation (primary constraint)
 	deltaValid: boolean;
 	actualDelta: number;

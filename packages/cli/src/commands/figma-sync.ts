@@ -18,7 +18,7 @@ import {
 	type FigmaCollection,
 } from '@three-forma-styli/core';
 import { loadConfigModule, resolveDesignSystemExport } from '../config/load-module.js';
-import type { TfsProject } from '../project.js';
+import type { TfsProject } from '@three-forma-styli/compiler/project';
 
 // ─── Figma API Types ──────────────────────────────────────────
 

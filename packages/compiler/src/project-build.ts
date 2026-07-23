@@ -26,15 +26,16 @@ import {
 	type AdjustedFallbackBuildResult,
 } from './fonts/adjusted-fallbacks.js';
 import type {
+	LegacyTfsProjectOutput,
 	ProjectFontAssetUrlPolicy,
 	ProjectFont,
 	ProjectJsonOutput,
 	ProjectOutputFormat,
 	TfsProject,
-	TfsProjectOutput,
 } from './project.js';
-import { CLI_VERSION } from './version.js';
+import { COMPILER_VERSION } from './version.js';
 import { generateProjectSystemTypescript } from './system-typescript.js';
+import { buildWorkspacePackageProject } from './workspace/build.js';
 
 interface OutputPlan {
 	css?: string;
@@ -56,7 +57,7 @@ function selectedFile(
 	return option === true ? fallback : (option.file ?? fallback);
 }
 
-function typographyCssOptions(output: TfsProjectOutput) {
+function typographyCssOptions(output: LegacyTfsProjectOutput) {
 	const configured =
 		output.typographyCss && output.typographyCss !== true ? output.typographyCss : {};
 	return {
@@ -66,12 +67,12 @@ function typographyCssOptions(output: TfsProjectOutput) {
 	};
 }
 
-function tokenCssOptions(output: TfsProjectOutput) {
+function tokenCssOptions(output: LegacyTfsProjectOutput) {
 	const configured = output.css && output.css !== true ? output.css : {};
 	return { selectors: configured.selectors };
 }
 
-function fontAssetsOptions(output: TfsProjectOutput) {
+function fontAssetsOptions(output: LegacyTfsProjectOutput) {
 	return {
 		directory: assertPortableRelativePath(
 			output.fontAssets?.directory ?? 'fonts',
@@ -119,7 +120,7 @@ function fontFaceUrl(
 	return relative.startsWith('.') ? relative : `./${relative}`;
 }
 
-function outputPlan(output: TfsProjectOutput): OutputPlan {
+function outputPlan(output: LegacyTfsProjectOutput): OutputPlan {
 	const typographyCss = selectedFile(output.typographyCss, 'typography.css');
 	const typographyModule = selectedFile(output.typographyModule, 'typography.generated.module.css');
 	const typescript = selectedFile(output.typescript, 'typography.generated.ts');
@@ -303,8 +304,8 @@ function joinFontFaceCss(primary: string, adjusted?: string): string {
 	return adjusted ? `${primary.trimEnd()}\n\n${adjusted.trim()}\n` : primary;
 }
 
-export async function buildProject(
-	project: TfsProject,
+async function buildLegacyProject(
+	project: TfsProject & { output: LegacyTfsProjectOutput },
 	configPath: string
 ): Promise<{ outputDirectory: string; files: string[] }> {
 	if (project.schemaVersion !== 1) throw new Error('Unsupported TFS project schemaVersion.');
@@ -552,7 +553,7 @@ export async function buildProject(
 			.join('/');
 		const manifest = {
 			schemaVersion: 1,
-			tool: { name: 'three-forma-styli', version: CLI_VERSION },
+			tool: { name: 'three-forma-styli', version: COMPILER_VERSION },
 			project: { config: path.basename(configPath) },
 			artifacts,
 			dependencies: {
@@ -628,4 +629,40 @@ export async function buildProject(
 		await fs.remove(lockPath);
 		await fs.remove(staging);
 	}
+}
+
+export async function buildProject(
+	project: TfsProject,
+	configPath: string
+): Promise<{ outputDirectory: string; files: string[] }> {
+	const output = project.output as unknown as Record<string, unknown>;
+	const layout = output.layout;
+	if (layout !== undefined && layout !== 'flat' && layout !== 'workspace-package') {
+		throw new Error(`Unknown TFS output layout ${JSON.stringify(layout)}.`);
+	}
+	const legacyKeys = [
+		'fontAssets',
+		'css',
+		'indexCss',
+		'typographyCss',
+		'typographyModule',
+		'typescript',
+		'systemTypescript',
+		'specimen',
+		'dtcg',
+		'figmaVariables',
+	];
+	const workspaceKeys = ['hostPackage', 'assets', 'targets'];
+	if (layout === 'workspace-package') {
+		const mixed = legacyKeys.filter((key) => output[key] !== undefined);
+		if (mixed.length > 0) {
+			throw new Error(`workspace-package output cannot use legacy keys: ${mixed.join(', ')}.`);
+		}
+		return buildWorkspacePackageProject(project, configPath);
+	}
+	const mixed = workspaceKeys.filter((key) => output[key] !== undefined);
+	if (mixed.length > 0) {
+		throw new Error(`Flat output cannot use workspace-package keys: ${mixed.join(', ')}.`);
+	}
+	return buildLegacyProject(project as TfsProject & { output: LegacyTfsProjectOutput }, configPath);
 }

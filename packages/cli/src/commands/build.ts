@@ -12,8 +12,8 @@ import {
 } from '@three-forma-styli/core';
 import { CLI_VERSION } from '../version.js';
 import { loadConfigModule, resolveDesignSystemExport } from '../config/load-module.js';
-import { buildProject } from '../project-build.js';
-import type { TfsProject } from '../project.js';
+import { buildProject } from '@three-forma-styli/compiler/build';
+import type { TfsProject } from '@three-forma-styli/compiler/project';
 
 export type OutputFormat = 'css' | 'dtcg' | 'figma-variables' | 'typescript' | 'specimen';
 

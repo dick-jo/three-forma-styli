@@ -1,5 +1,6 @@
 import os from 'node:os';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import fs from 'fs-extra';
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildProject } from './project-build.js';
@@ -90,6 +91,33 @@ describe('portable project build', () => {
 			'utf8'
 		);
 		expect(systemTypescript).toContain('export const tfsSystem =');
+		const legacyFixture = Object.fromEntries(
+			await Promise.all(
+				second.files.map(
+					async (file) =>
+						[
+							file,
+							createHash('sha256')
+								.update(await fs.readFile(path.join(second.outputDirectory, file)))
+								.digest('hex'),
+						] as const
+				)
+			)
+		);
+		expect(legacyFixture).toEqual({
+			'build.manifest.json': '190018be57f5748c818f51e2611d964a1c68b55f197d196953c469c85e66505a',
+			'index.css': '4cb2f483ae8a8ccca27250d862e726233646c40571ecfbb5e9a32e66ad79436a',
+			'system.generated.ts': '18a655155852930d0d54a783507b36c35b09cf62cf76d6b62a57db634bfef716',
+			'tokens.css': 'f2fb21be48defa144feed8d91243839e135b3d5332fc5366f17ebd86c89d623a',
+			'typography.css': '6af6c4d0b10c01e4288a761b0fb122a0c6d0673370f33f11b7853a3511d108ba',
+			'typography.generated.module.css':
+				'05bb1d5e817cd42847141f5446f16f33a32b5b0a87be7365b9cb4acf63cc726b',
+			'typography.generated.module.css.d.ts':
+				'c0d5b47824c3b1196fa61c19bbb9960fca2ef26165a59f07d8894b622c973fce',
+			'typography.generated.ts': '51e96732b2b5b735a0cd583f24800ab8633e5cc5aaa820478612ae6de4f8736c',
+			'typography.specimen.html':
+				'f36a18da80a019a33043d7fd41ab3e1db9d50d98cd698e1a4647dc9003a2756a',
+		});
 	});
 
 	it('passes an explicit zero-specificity policy to global helpers', async () => {

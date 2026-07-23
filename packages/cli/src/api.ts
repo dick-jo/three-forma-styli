@@ -1,2 +1,2 @@
-/** Import-safe authoring API for tfs.config.ts. The executable remains dist/index.js. */
-export * from './project.js';
+/** Compatibility authoring API. New projects may import from the compiler directly. */
+export * from '@three-forma-styli/compiler';

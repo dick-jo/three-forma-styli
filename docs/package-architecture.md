@@ -8,7 +8,8 @@ apps/
 
 packages/
 ├── core/        public, browser-safe generator and programmatic runtime
-├── cli/         public, Node-only project compiler and `tfs` executable
+├── compiler/    public, Node-only project and font compiler
+├── cli/         public, interactive `tfs` command shell and compatibility API
 └── themes/      public starter/reference source systems
 ```
 
@@ -23,14 +24,17 @@ prevents a packed CLI from resolving an older, API-incompatible core from npm.
 `pnpm check:release` proves the packed artifacts work together outside the
 workspace before anything is published.
 
-Project configs should use the import-safe CLI root:
+Project configs should use the import-safe compiler root:
 
 ```ts
-import { defineTfsProject } from '@three-forma-styli/cli';
+import { defineTfsProject } from '@three-forma-styli/compiler';
 ```
 
-The existing `/project` and `/fonts` subpaths remain compatibility/advanced entry
-points. The executable has its own `bin` entry and is not evaluated by API imports.
+Programmatic compilation lives at `@three-forma-styli/compiler/build`, and font
+preparation/inspection lives at `@three-forma-styli/compiler/fonts`. The CLI
+retains its existing root, `/project`, and `/fonts` exports as compatibility
+re-exports. Only the CLI has a `bin`; importing either authoring root does not
+evaluate the command parser or heavy compiler graph.
 
 ## The one unresolved public-package decision
 
@@ -71,12 +75,13 @@ finished branded themes rather than source presets.
 
 ## Recommended release shape
 
-Long term there are still three public responsibilities, even if `themes` becomes
+Long term there are still four public responsibilities, even if `themes` becomes
 `presets`:
 
 1. `core` — stable, browser-safe programmatic API;
-2. `cli` — install as a dev dependency, author/build/inspect projects;
-3. `presets` — optional starting systems and derivation defaults.
+2. `compiler` — Node-only project/font compilation;
+3. `cli` — interactive config loading and command workflows;
+4. `presets` — optional starting systems and derivation defaults.
 
 Applications consume generated design-system packages, not the TFS preview app and
 not necessarily the CLI at runtime.

@@ -1,4 +1,4 @@
-import type { FontsPreparationConfig } from '@three-forma-styli/cli/fonts';
+import type { FontsPreparationConfig } from '@three-forma-styli/compiler/fonts';
 
 /** Replace the source and license paths with files you are licensed to ship. */
 export default {

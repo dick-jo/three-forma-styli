@@ -1,17 +1,21 @@
-import type { Oklch } from 'culori';
 import type {
 	ColorDiagnostic,
 	LuminanceConstraintConfig,
 	LuminanceValidation,
 } from './types.js';
 
+interface OklchLightness {
+	readonly l: number;
+}
+
 /**
- * Validates luminance constraints for a set of colors
+ * Validates luminance constraints for a set of colors.
  *
- * Checks that the luminance delta between background and foreground color groups
- * meets the minimum requirement for readability.
+ * TFS's current public `luminance` metric is the authored OKLCH L component. It
+ * is useful for controlling the perceptual lightness separation of a palette,
+ * but it is not WCAG relative luminance or a contrast-ratio calculation.
  *
- * @param colors - Record of color keys to Oklch colors to validate
+ * @param colors - Record of color keys to values containing an OKLCH L component
  * @param config - Constraint configuration (polarity, minDelta, color groups)
  * @returns Diagnostic information about constraint satisfaction
  *
@@ -29,7 +33,7 @@ import type {
  * ```
  */
 export function validateLuminance(
-	colors: Record<string, Oklch | undefined>,
+	colors: Record<string, OklchLightness | undefined>,
 	config: LuminanceConstraintConfig
 ): LuminanceValidation {
 	const { polarity, minDelta, backgroundColors, foregroundColors } = config;
@@ -46,6 +50,7 @@ export function validateLuminance(
 	// Handle empty groups
 	if (bgLuminances.length === 0 || fgLuminances.length === 0) {
 		return {
+			metric: 'oklch-l',
 			deltaValid: false,
 			actualDelta: 0,
 			requiredDelta: minDelta,
@@ -122,6 +127,7 @@ export function validateLuminance(
 	}
 
 	return {
+		metric: 'oklch-l',
 		deltaValid,
 		actualDelta,
 		requiredDelta: minDelta,

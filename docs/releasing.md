@@ -1,9 +1,9 @@
 # Releasing to npm
 
-The three public packages are published under the npm scope
+The four public packages are published under the npm scope
 `@three-forma-styli`. Changesets records release intent and maintains changelogs;
-its fixed group keeps the packages on one coordinated version because the CLI composes
-the exact core and themes APIs from the same source release. This deliberately
+its fixed group keeps the packages on one coordinated version because the compiler
+and CLI compose the exact core and source-preset APIs from the same release. This deliberately
 favours a predictable pre-1.0 toolchain over independently versioned packages.
 
 The production Scatter app currently consumes `@three-forma-styli/core`; it does
@@ -13,25 +13,25 @@ not consume the CLI or themes package at runtime.
 
 - [ ] Review this procedure with fresh eyes and confirm npm scope/account access.
 - [ ] Add the appropriate Changeset for the post-`0.2.0` hardening, scoped
-  typography-mode fix, and any other unreleased public changes.
+      typography-mode fix, and any other unreleased public changes.
 - [ ] Publish an exact `next` canary, install it in Splinter, and run the full
-  application and visual-regression checks before promoting `latest`.
+      application and visual-regression checks before promoting `latest`.
 - [ ] Replace temporary vendored TFS tarballs in downstream design-system
-  projects with the reviewed published version.
+      projects with the reviewed published version.
 
 No npm publication was performed during the current toolkit/design-system work.
 
 ## Safe release sequence
 
 1. Add `pnpm changeset` with every user-visible package change. Choose the
-   semver impact of the public API; the fixed group advances all three packages.
+   semver impact of the public API; the fixed group advances all four packages.
 2. When preparing a release, start from a clean `master`, run
    `pnpm release:version`, and review every version, changelog and lockfile change.
    Commit and merge that release-preparation diff before publishing.
 3. Run `npm whoami` and confirm the account can publish the scope.
 4. Run `pnpm install --frozen-lockfile`, `pnpm check:release`, and
    `pnpm audit --prod --audit-level=moderate`.
-   `check:release` installs all three packed artifacts into a clean temporary
+   `check:release` installs all four packed artifacts into a clean temporary
    consumer and checks the import API, public declarations through strict
    TypeScript compilation, and the executable.
 5. Review each package listed by `pnpm exec changeset status --verbose`. The
@@ -59,6 +59,7 @@ its checks and visual QA, and only then promote the version:
 pnpm exec changeset publish --tag next
 npm dist-tag add @three-forma-styli/core@<version> latest
 npm dist-tag add @three-forma-styli/themes@<version> latest
+npm dist-tag add @three-forma-styli/compiler@<version> latest
 npm dist-tag add @three-forma-styli/cli@<version> latest
 ```
 

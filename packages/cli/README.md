@@ -5,11 +5,11 @@ color-only DTCG/Figma Variables JSON, and typography specimens from TypeScript d
 
 ## Installation
 
-Install it in the design-system project so `tfs.config.ts`, the executable and
-the lockfile always use the same release:
+Install the compiler and CLI in the design-system project so `tfs.config.ts`,
+the executable and the lockfile always use the same release:
 
 ```bash
-npm install --save-dev @three-forma-styli/cli
+npm install --save-dev @three-forma-styli/compiler @three-forma-styli/cli
 npx tfs --help
 ```
 
@@ -29,8 +29,8 @@ tfs init
 
 Creates authored system files, `tfs.config.ts`, a programmatic `index.ts`, local
 build/check/specimen scripts, package metadata, TypeScript configuration, and a
-project README. The scaffold pins core and CLI to the same compatible release;
-it never writes independent `latest` ranges.
+project README. The scaffold pins core, compiler and CLI to the same compatible
+release; it never writes independent `latest` ranges.
 
 Options:
 
@@ -49,6 +49,15 @@ Project mode uses the output plan in `defineTfsProject()`. It prepares configure
 fonts, validates explicit typography against the in-memory font manifest, writes every artifact
 to a sibling stage, hashes the result, and replaces only a TFS-owned output
 directory. No separate font/build command order is required.
+
+The project contract comes from the import-safe compiler root:
+
+```ts
+import { defineTfsProject } from '@three-forma-styli/compiler';
+```
+
+Existing imports from `@three-forma-styli/cli`, `/project`, and `/fonts` remain
+supported compatibility paths.
 
 The legacy single-file workflow remains available:
 

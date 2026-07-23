@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -27,7 +27,7 @@ try {
 	await mkdir(consumerDirectory, { recursive: true });
 	await mkdir(packageDirectory, { recursive: true });
 
-	const packageDirectories = ['core', 'themes', 'cli'];
+	const packageDirectories = ['core', 'themes', 'compiler', 'cli'];
 	const tarballs = [];
 	const packedManifests = {};
 
@@ -58,9 +58,16 @@ try {
 		assert.equal(manifest.version, packedManifests.core.version);
 
 		const installManifest = structuredClone(manifest);
-		for (const dependencyName of Object.keys(installManifest.dependencies ?? {})) {
-			if (dependencyName.startsWith('@three-forma-styli/')) {
-				installManifest.dependencies[dependencyName] = 'workspace:*';
+		for (const section of [
+			'dependencies',
+			'devDependencies',
+			'optionalDependencies',
+			'peerDependencies',
+		]) {
+			for (const dependencyName of Object.keys(installManifest[section] ?? {})) {
+				if (dependencyName.startsWith('@three-forma-styli/')) {
+					installManifest[section][dependencyName] = 'workspace:*';
+				}
 			}
 		}
 		await writeFile(
@@ -96,11 +103,19 @@ try {
 	const smokeTest = `
     import assert from 'node:assert/strict';
     import * as core from '@three-forma-styli/core';
-    import { defineTfsProject } from '@three-forma-styli/cli';
+    import * as runtime from '@three-forma-styli/core/runtime';
+	import { defineTfsProject as defineWithCompiler } from '@three-forma-styli/compiler';
+	import { buildProject } from '@three-forma-styli/compiler/build';
+	import * as fontCompiler from '@three-forma-styli/compiler/fonts';
+	import { defineTfsProject as defineWithCli } from '@three-forma-styli/cli';
     import * as themes from '@three-forma-styli/themes';
 
     assert.equal(typeof core.fontFromManifest, 'function');
-    assert.equal(typeof defineTfsProject, 'function');
+    assert.equal(typeof runtime.generateRuntimeColorTheme, 'function');
+	assert.equal(typeof defineWithCompiler, 'function');
+	assert.equal(defineWithCli, defineWithCompiler);
+	assert.equal(typeof buildProject, 'function');
+	assert.equal(typeof fontCompiler.prepareFonts, 'function');
     assert.ok(Object.keys(themes).length > 0);
   `;
 
@@ -109,7 +124,9 @@ try {
 	await writeFile(
 		path.join(consumerDirectory, 'index.ts'),
 		`import { generate } from '@three-forma-styli/core';
-import { defineTfsProject } from '@three-forma-styli/cli';
+import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
+import { defineTfsProject } from '@three-forma-styli/compiler';
+import { defineTfsProject as defineTfsProjectWithCli } from '@three-forma-styli/cli';
 import { designSystem } from '@three-forma-styli/themes/default';
 
 const project = defineTfsProject({
@@ -118,6 +135,21 @@ const project = defineTfsProject({
 });
 
 generate(project.system);
+defineTfsProjectWithCli({ system: {}, output: { directory: './compat-dist' } });
+generateRuntimeColorTheme(
+  {
+    polarity: 'negative',
+    colors: { canvas: { l: 0.1, c: 0, h: 0 }, ink: { l: 0.9, c: 0, h: 0 } },
+  },
+  {
+    colorNames: ['canvas', 'ink'],
+    luminance: {
+      minDelta: 0.5,
+      backgroundColors: ['canvas'],
+      foregroundColors: ['ink'],
+    },
+  },
+);
 `
 	);
 	await writeFile(
@@ -140,13 +172,36 @@ generate(project.system);
 	);
 	run(process.execPath, [typescriptBin, '--project', 'tsconfig.json'], { cwd: consumerDirectory });
 
+	await writeFile(
+		path.join(consumerDirectory, 'tfs.config.js'),
+		`import { defineTfsProject } from '@three-forma-styli/compiler';
+
+export default defineTfsProject({
+  system: {
+    spacing: {
+      modes: [{
+        name: 'default',
+        isDefault: true,
+        tokens: { unit: 'rem', base: 1, min: 0.5, increment: 0.25, range: 2 },
+      }],
+    },
+  },
+  output: { directory: './dist', css: true },
+});
+`
+	);
+
 	const help = run(path.join(consumerDirectory, 'node_modules', '.bin', 'tfs'), ['--help'], {
 		cwd: consumerDirectory,
 	});
 	assert.match(help, /Usage: tfs/);
+	run(path.join(consumerDirectory, 'node_modules', '.bin', 'tfs'), ['build', '.'], {
+		cwd: consumerDirectory,
+	});
+	assert.match(await readFile(path.join(consumerDirectory, 'dist/tokens.css'), 'utf8'), /--sp-1/);
 
 	console.log(
-		'Packed core, themes and CLI import and type-check together in an isolated consumer.'
+		'Packed core, themes, compiler and CLI import, type-check and build together in an isolated consumer.'
 	);
 } finally {
 	await rm(temporaryRoot, { recursive: true, force: true });

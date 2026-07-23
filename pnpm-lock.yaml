@@ -23,6 +23,9 @@ importers:
       '@three-forma-styli/cli':
         specifier: workspace:*
         version: link:packages/cli
+      '@three-forma-styli/compiler':
+        specifier: workspace:*
+        version: link:packages/compiler
       '@three-forma-styli/core':
         specifier: workspace:*
         version: link:packages/core
@@ -75,6 +78,9 @@ importers:
       '@inquirer/prompts':
         specifier: ^7.2.0
         version: 7.10.1(@types/node@22.20.1)
+      '@three-forma-styli/compiler':
+        specifier: workspace:^
+        version: link:../compiler
       '@three-forma-styli/core':
         specifier: workspace:^
         version: link:../core
@@ -90,16 +96,10 @@ importers:
       esbuild:
         specifier: ^0.28.1
         version: 0.28.1
-      fontkit:
-        specifier: 2.0.4
-        version: 2.0.4
       fs-extra:
         specifier: ^11.3.0
         version: 11.3.6
     devDependencies:
-      '@types/fontkit':
-        specifier: 2.0.9
-        version: 2.0.9
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
@@ -112,6 +112,37 @@ importers:
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.20.1)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.7
+        version: 3.2.7(@types/node@22.20.1)(supports-color@5.5.0)
+
+  packages/compiler:
+    dependencies:
+      '@three-forma-styli/core':
+        specifier: workspace:^
+        version: link:../core
+      fontkit:
+        specifier: 2.0.4
+        version: 2.0.4
+      fs-extra:
+        specifier: ^11.3.0
+        version: 11.3.6
+    devDependencies:
+      '@three-forma-styli/themes':
+        specifier: workspace:^
+        version: link:../themes
+      '@types/fontkit':
+        specifier: 2.0.9
+        version: 2.0.9
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
+      '@types/node':
+        specifier: ^22.13.9
+        version: 22.20.1
       typescript:
         specifier: ^5.8.2
         version: 5.9.3

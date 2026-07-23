@@ -5,7 +5,7 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import chalk from 'chalk';
 import { loadConfigModule } from '../config/load-module.js';
-import type { TfsProject } from '../project.js';
+import type { TfsProject } from '@three-forma-styli/compiler/project';
 
 const DEFAULT_PORT = 4173;
 const DEFAULT_HOST = '127.0.0.1';

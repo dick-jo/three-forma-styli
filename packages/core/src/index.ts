@@ -21,7 +21,7 @@ export { toCss, defaultCssConfig } from './transformers/index.js';
 export type { CssTransformerConfig, FileHeaderConfig } from './transformers/index.js';
 
 export { toFigmaJson } from './transformers/index.js';
-export { toTypographyTypescript } from './transformers/index.js';
+export { toTypographyTypescript, typographyContractData } from './transformers/index.js';
 export { toTypographySpecimen } from './transformers/index.js';
 export { toTypographyCss, toTypographyCssModuleTypes } from './transformers/index.js';
 export type { TypographySpecimenConfig } from './transformers/index.js';

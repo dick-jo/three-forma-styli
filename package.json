@@ -5,10 +5,11 @@
 	"scripts": {
 		"build": "pnpm -r --filter '!@three-forma-styli/preview' build",
 		"build:all": "pnpm -r build",
-		"test": "pnpm --filter @three-forma-styli/core test && pnpm --filter @three-forma-styli/cli test",
+		"test": "pnpm --filter @three-forma-styli/core test && pnpm --filter @three-forma-styli/compiler test && pnpm --filter @three-forma-styli/cli test",
 		"check:versions": "node scripts/verify-package-versions.mjs",
-		"check:packages": "publint packages/core && publint packages/themes && publint packages/cli",
-		"check": "pnpm check:versions && pnpm build:all && pnpm test && pnpm --filter @three-forma-styli/preview check",
+		"check:packages": "publint packages/core && publint packages/themes && publint packages/compiler && publint packages/cli",
+		"check:split": "node scripts/verify-compiler-split.mjs",
+		"check": "pnpm check:versions && pnpm build:all && pnpm check:split && pnpm test && pnpm --filter @three-forma-styli/preview check",
 		"check:release": "pnpm check && pnpm check:packages && node scripts/verify-packed-release.mjs",
 		"changeset": "changeset",
 		"release:version": "changeset version",
@@ -32,6 +33,7 @@
 	"devDependencies": {
 		"@changesets/cli": "2.31.0",
 		"@three-forma-styli/cli": "workspace:*",
+		"@three-forma-styli/compiler": "workspace:*",
 		"@three-forma-styli/core": "workspace:*",
 		"@three-forma-styli/themes": "workspace:*",
 		"prettier": "^3.6.2",

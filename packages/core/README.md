@@ -74,6 +74,44 @@ const colorsCss = toCss(generate(partial));
 - `GeneratorOptions` - Deeply optional user-facing generator configuration
 - `CssTransformerConfig` - Configuration for CSS output
 
+## Browser runtime color themes
+
+Use the dependency-light runtime entrypoint when a browser receives a saved or
+user-authored color theme as unknown data:
+
+```typescript
+import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
+
+const result = generateRuntimeColorTheme(untrustedJson, {
+	colorNames: ['canvas', 'ink', 'accent'],
+	alphaSchedule: { min: 0.07, lo: 0.25, hi: 0.68, max: 0.93 },
+	prefixes: { color: 'clr' },
+	colorFormat: { alphaModifier: 'a' },
+	luminance: {
+		minDelta: 0.4,
+		backgroundColors: ['canvas'],
+		foregroundColors: ['ink'],
+	},
+});
+
+if (!result.luminance.deltaValid) {
+	console.warn('Theme does not meet its OKLCH-L separation requirement');
+}
+for (const [property, value] of Object.entries(result.customProperties)) {
+	element.style.setProperty(property, value);
+}
+```
+
+The input must contain exactly `polarity` and the declared `{ l, c, h }` colors;
+missing fields, extra fields, unsafe names, non-finite numbers, and invalid ranges
+fail before CSS is emitted. CSS values stay in native `oklch()`, preserving
+Display-P3-capable chroma for the browser instead of clipping through sRGB.
+
+TFS retains its public `luminance` terminology. Shared and runtime validation
+results identify the current metric as `oklch-l`: they compare the authored
+OKLCH L components. This palette-separation diagnostic is not WCAG relative
+luminance and is not a contrast-ratio or accessibility-conformance result.
+
 Display-P3 output uses profile-relative RGB components and must only be sent to
 a Display-P3 Figma file. CSS output should stay in native OKLCH; TFS rejects P3
 component bytes passed to `generateCss()` as CSS hex.

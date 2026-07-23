@@ -41,11 +41,12 @@ both `file_variables:read` and `file_variables:write` scopes. Run with
 
 ## Packages
 
-| Package                     | Description                               |
-| --------------------------- | ----------------------------------------- |
-| `@three-forma-styli/core`   | Core library for generating design tokens |
-| `@three-forma-styli/cli`    | CLI tool (`tfs` command)                  |
-| `@three-forma-styli/themes` | Starter/reference themes                  |
+| Package                       | Description                               |
+| ----------------------------- | ----------------------------------------- |
+| `@three-forma-styli/core`     | Core library for generating design tokens |
+| `@three-forma-styli/compiler` | Node project and font compiler            |
+| `@three-forma-styli/cli`      | CLI tool (`tfs` command)                  |
+| `@three-forma-styli/themes`   | Starter/reference themes                  |
 
 The private Svelte review application lives under `apps/preview`; it is repository
 tooling, not a published package or consumer dependency. Installing the CLI/core
