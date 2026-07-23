@@ -517,7 +517,11 @@ async function buildLegacyProject(
 			await writeText(staging, `${plan.typographyModule}.d.ts`, toTypographyCssModuleTypes(ir));
 		}
 		if (plan.typescript) {
-			await writeText(staging, plan.typescript, generateTypographyTypescript(system));
+			await writeText(
+				staging,
+				plan.typescript,
+				generateTypographyTypescript(system, project.generator)
+			);
 		}
 		if (plan.systemTypescript) {
 			await writeText(staging, plan.systemTypescript, generateProjectSystemTypescript(system, ir));
@@ -535,6 +539,7 @@ async function buildLegacyProject(
 				staging,
 				plan.specimen,
 				generateTypographySpecimen(system, {
+					generator: project.generator,
 					specimen: {
 						title: specimenOption && specimenOption !== true ? specimenOption.title : undefined,
 						fontFaceHref: fontHref,
@@ -560,6 +565,7 @@ async function buildLegacyProject(
 				generateFigmaJson(
 					system,
 					{
+						generator: project.generator,
 						transformer: { colorSpace: options.colorSpace, collectionName: options.collectionName },
 					},
 					'dtcg'
@@ -574,6 +580,7 @@ async function buildLegacyProject(
 				generateFigmaJson(
 					system,
 					{
+						generator: project.generator,
 						transformer: { colorSpace: options.colorSpace, collectionName: options.collectionName },
 					},
 					'figma-variables'

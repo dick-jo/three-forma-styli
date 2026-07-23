@@ -57,6 +57,25 @@ There is one generated package and many consumers—not several configured copy
 destinations that can drift independently. A deployment tool may still copy the
 package's public assets as part of its normal bundling process.
 
+Project-wide naming and color-format policy belongs beside the system, not in
+individual targets:
+
+```ts
+defineTfsProject({
+	system,
+	generator: {
+		prefixes: { color: 'palette', typographyRole: 'copy' },
+		colorFormat: { alphaModifier: 'opacity' },
+	},
+	output,
+});
+```
+
+The resolved policy applies to runtime CSS and contracts, Workbench/review
+output, TypeScript, DTCG and Figma artifacts together. TFS tests this as a
+cross-target invariant; a project cannot quietly publish different namespaces
+to different consumers.
+
 ## Command and CI contract
 
 The scaffold deliberately separates authoring from ordinary repository checks:

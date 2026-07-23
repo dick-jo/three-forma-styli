@@ -239,6 +239,48 @@ describe('portable project build', () => {
 		expect(css).not.toContain('[data-color-mode="light"]');
 	});
 
+	it('applies one generator policy to every flat output target', async () => {
+		const directory = await fixtureDirectory();
+		const project = defineTfsProject({
+			generator: {
+				prefixes: { color: 'palette', typographyRole: 'copy' },
+				colorFormat: { alphaModifier: 'opacity' },
+			},
+			system: {
+				colors: {
+					modes: [
+						{
+							name: 'default',
+							isDefault: true,
+							tokens: { accent: { mode: 'oklch', l: 0.7, c: 0.2, h: 30 } },
+						},
+					],
+					alphaSchedule: { half: 0.5 },
+				},
+				typography: defaultTypography,
+			},
+			output: {
+				directory: './dist',
+				css: true,
+				typescript: true,
+				specimen: true,
+				dtcg: true,
+			},
+		});
+		const result = await buildProject(project, path.join(directory, 'tfs.config.ts'));
+		const read = (file: string) => fs.readFile(path.join(result.outputDirectory, file), 'utf8');
+		const tokens = await read('tokens.css');
+		const typography = await read('typography.generated.ts');
+		const specimen = await read('typography.specimen.html');
+		const dtcg = JSON.parse(await read('figma/colors.dtcg.json'));
+
+		expect(tokens).toContain('--palette-accent-opacity-half:');
+		expect(tokens).toContain('--copy-prose-font-size:');
+		expect(typography).toContain('--copy-prose-font-size');
+		expect(specimen).toContain('--copy-prose-font-size');
+		expect(dtcg.color).toHaveProperty('palette-accent-opacity-half');
+	});
+
 	it('refuses to overwrite an unowned non-empty directory', async () => {
 		const directory = await fixtureDirectory();
 		const output = path.join(directory, 'dist');

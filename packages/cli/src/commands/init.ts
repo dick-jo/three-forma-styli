@@ -311,21 +311,13 @@ export { ${exportList} };
  * Generate package.json
  */
 function generatePackageJson(packageName: string, workspacePackage: boolean): string {
-	const scripts = workspacePackage
-		? {
-				generate: 'tfs build .',
-				build: 'tfs validate .',
-				check: 'tsc --noEmit && tfs validate .',
-				'check:generated': 'tfs check .',
-				review: 'tfs review serve .',
-			}
-		: {
-				generate: 'tfs build .',
-				build: 'tfs validate .',
-				check: 'tsc --noEmit && tfs validate .',
-				'check:generated': 'tfs check .',
-				review: 'tfs review serve .',
-			};
+	const scripts = {
+		generate: 'tfs build .',
+		build: 'tfs validate .',
+		check: 'tsc --noEmit && tfs validate .',
+		'check:generated': 'tfs check .',
+		review: 'tfs review serve .',
+	};
 	const workspaceFields = workspacePackage
 		? {
 				files: ['generated/runtime', 'generated/assets', 'README.md'],
@@ -381,7 +373,7 @@ function generatePackageJson(packageName: string, workspacePackage: boolean): st
 					'@three-forma-styli/cli': CLI_VERSION,
 					'@three-forma-styli/compiler': CLI_VERSION,
 					...(workspacePackage ? { '@three-forma-styli/core': CLI_VERSION } : {}),
-					typescript: '^5.9.3',
+					typescript: '5.9.3',
 				},
 				engines: { node: '>=22' },
 			},

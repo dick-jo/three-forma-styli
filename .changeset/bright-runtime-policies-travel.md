@@ -11,5 +11,5 @@ color subset as part of a color system, rename the public threshold to
 for strict browser theme processing.
 
 Project compiler configurations may now customize the shared generator naming
-and color-format policy once; CSS, review, and runtime contracts resolve from
-the same configuration.
+and color-format policy once; CSS, TypeScript, design interchange, review, and
+runtime contracts resolve from the same configuration.

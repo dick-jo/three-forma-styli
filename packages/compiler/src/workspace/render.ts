@@ -313,6 +313,7 @@ export async function renderWorkspacePackage(
 			staging,
 			'review/typography.html',
 			generateTypographySpecimen(system, {
+				generator: project.generator,
 				specimen: {
 					title: plan.review.title,
 					interactive: plan.review.interactive,
@@ -376,14 +377,22 @@ export async function renderWorkspacePackage(
 		await writeText(
 			staging,
 			'design/tokens.dtcg.json',
-			generateFigmaJson(system, { transformer: plan.design.dtcg }, 'dtcg')
+			generateFigmaJson(
+				system,
+				{ generator: project.generator, transformer: plan.design.dtcg },
+				'dtcg'
+			)
 		);
 	}
 	if (plan.design.figmaVariables) {
 		await writeText(
 			staging,
 			'design/figma.variables.json',
-			generateFigmaJson(system, { transformer: plan.design.figmaVariables }, 'figma-variables')
+			generateFigmaJson(
+				system,
+				{ generator: project.generator, transformer: plan.design.figmaVariables },
+				'figma-variables'
+			)
 		);
 	}
 	return result;

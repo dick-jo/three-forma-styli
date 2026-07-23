@@ -36,6 +36,7 @@ describe('tfs init', () => {
 		expect(manifest.dependencies['@three-forma-styli/core']).toBe('0.2.0');
 		expect(manifest.devDependencies['@three-forma-styli/cli']).toBe('0.2.0');
 		expect(manifest.devDependencies['@three-forma-styli/compiler']).toBe('0.2.0');
+		expect(manifest.devDependencies.typescript).toBe('5.9.3');
 		expect(await fs.readFile(path.join(projectRoot, 'tfs.config.ts'), 'utf8')).toContain(
 			'from "@three-forma-styli/compiler"'
 		);
@@ -99,6 +100,7 @@ describe('tfs init', () => {
 		expect(config).toContain('directory: "./generated"');
 		expect(manifest.dependencies).toBeUndefined();
 		expect(manifest.devDependencies['@three-forma-styli/core']).toBe('0.2.0');
+		expect(manifest.devDependencies.typescript).toBe('5.9.3');
 		expect(manifest.scripts).toEqual({
 			generate: 'tfs build .',
 			build: 'tfs validate .',

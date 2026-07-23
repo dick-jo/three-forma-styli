@@ -247,6 +247,34 @@ describe('workspace-package build', () => {
 		expect(manifest.targets.runtime.entrypoints).not.toHaveProperty('./design/dtcg');
 	});
 
+	it('applies one generator policy across runtime, review and design targets', async () => {
+		const { directory, configPath } = await fixture();
+		const project = defineTfsProject({
+			generator: {
+				prefixes: { color: 'palette', typographyRole: 'copy' },
+				colorFormat: { alphaModifier: 'opacity' },
+			},
+			system: { colors: colors(), typography: defaultTypography },
+			output: {
+				layout: 'workspace-package',
+				directory: './generated',
+				targets: { runtime: true, review: true, design: true },
+			},
+		});
+		await buildProject(project, configPath);
+		const generated = path.join(directory, 'generated');
+		const read = (file: string) => fs.readFile(path.join(generated, file), 'utf8');
+		const runtime = await read('runtime/styles/tokens.css');
+		const review = await read('review/system.css');
+		const dtcg = JSON.parse(await read('design/tokens.dtcg.json'));
+
+		for (const css of [runtime, review]) {
+			expect(css).toContain('--palette-pri-opacity-min:');
+			expect(css).toContain('--copy-prose-font-size:');
+		}
+		expect(dtcg.color).toHaveProperty('palette-pri-opacity-min');
+	});
+
 	it('emits global and module shadow helpers as explicit package surfaces', async () => {
 		const manifest = hostManifest({
 			exports: {
