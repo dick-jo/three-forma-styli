@@ -108,6 +108,37 @@ remaining work so decisions do not depend on one chat transcript.
       hands-on marketing calibration. Treat its authored values as proposals;
       do not overwrite or silently absorb them during the output-layout migration.
 
+## Candidate system expansions
+
+These are active design investigations, not approved core contracts. Resolve the
+author-facing vocabulary and derivation rules before implementation; Scatter is
+reference evidence, not hardcoded policy.
+
+- [ ] Add typography-role text-transform decisions, resolved into every complete
+      recipe and available to generated CSS/TypeScript consumers. Preserve source
+      text and keep role names and transform values author-defined.
+- [ ] Add first-class composite shadow tokens with ordered multi-layer values,
+      explicit semantic colour references, safe interpolation rules, and review
+      specimens for elevation, glow, clipping, banding, and light/dark surfaces.
+- [ ] Recalibrate Scatter's shimmer palette per native colour mode. Separate the
+      effect's authored colour contract from its animation/motion contract, and
+      include the chosen fixed-colour policy in custom runtime themes.
+- [ ] Replace the under-specified time model with a coherent duration/easing/motion
+      architecture. Current `time.modes` are actually simultaneously emitted
+      duration namespaces, not switchable modes.
+- [ ] Preserve atomic duration primitives, add arbitrary author-named cubic-bezier
+      easing primitives, and add a deliberately small set of semantic transition
+      recipes containing property, duration, easing, and delay.
+- [ ] Generate equivalent CSS and typed JavaScript motion contracts so CSS
+      transitions and application animation libraries do not maintain separate
+      timing values.
+- [ ] Make reduced-motion behavior explicit per semantic recipe and generate a
+      `prefers-reduced-motion` contract. Do not globally erase essential feedback
+      or assume every motion should degrade in the same way.
+- [ ] Keep component state/selectors and arbitrary keyframes outside the initial
+      core motion model. Investigate optional higher-level interaction recipes
+      only after the transition contract works across real consumers.
+
 ## Deferred application rollout
 
 - [ ] Replace Scatter's legacy generated CSS boundary with the workspace package.
