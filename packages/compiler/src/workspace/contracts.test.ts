@@ -4,6 +4,7 @@ import {
 	nativeColorModesContract,
 	renderNativeColorModesContract,
 	renderSystemContract,
+	renderTypographyContract,
 } from './contracts.js';
 
 describe('workspace runtime contracts', () => {
@@ -25,6 +26,47 @@ describe('workspace runtime contracts', () => {
 		expect(rendered.javascript).not.toContain('"": {');
 		expect(rendered.declaration).toContain('readonly default: null;');
 		expect(rendered.declaration).toContain('export type TfsSizeMode = keyof');
+	});
+
+	it('shares the complete discriminated typography selection surface', () => {
+		const system: PartialDesignSystem = {
+			typography: {
+				modes: [
+					{
+						name: 'default',
+						isDefault: true,
+						tokens: { unit: 'rem', base: 1, min: 0.75, increment: 0.25, range: 8 },
+					},
+				],
+				fonts: {
+					ui: {
+						family: 'UI',
+						verification: 'prepared',
+						capabilities: {
+							faces: [
+								{ style: 'normal', weights: [400, 700] },
+								{ style: 'italic', weights: [400] },
+							],
+						},
+					},
+				},
+				roles: {
+					prose: {
+						font: 'ui',
+						base: { fontSize: 2, weight: 'regular', lineHeight: 1.4, letterSpacing: 0 },
+						weights: { regular: 400, strong: 700 },
+						styles: {
+							normal: { weights: ['regular', 'strong'] },
+							italic: { weights: ['regular'] },
+						},
+					},
+				},
+			},
+		};
+		const declaration = renderTypographyContract(generate(system)).declaration;
+		expect(declaration).toContain('export type TypographySelection =');
+		expect(declaration).toContain('fontStyle: "italic"; weight: TypographyWeightForStyle');
+		expect(declaration).toContain('TypographySelectionByRole[R]');
 	});
 
 	it('keeps default colors complete, override colors authored, and inheritance explicit', () => {

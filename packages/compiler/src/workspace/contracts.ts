@@ -1,5 +1,5 @@
 import type { IR, PartialDesignSystem } from '@three-forma-styli/core';
-import { typographyContractData } from '@three-forma-styli/core';
+import { typographyContractData, typographyContractTypes } from '@three-forma-styli/core';
 import { projectSystemContract } from '../system-typescript.js';
 
 type JsonPrimitive = string | number | boolean | null;
@@ -104,10 +104,7 @@ export function renderTypographyContract(ir: IR) {
 		throw new Error('A typography system with semantic roles is required.');
 	}
 	return renderLiteralModule('typography', typographyContractData(ir.typography), [
-		'export type TypographyRole = keyof typeof typography.roles;',
-		'export type TypographyVariant<R extends TypographyRole> = keyof typeof typography.roles[R]["variants"];',
-		'export type TypographyWeight<R extends TypographyRole> = keyof typeof typography.roles[R]["weights"];',
-		'export type TypographyStyle<R extends TypographyRole> = keyof typeof typography.roles[R]["styles"];',
+		typographyContractTypes(ir.typography).trimEnd(),
 	]);
 }
 

@@ -14,7 +14,11 @@ export type {
 	FigmaColor,
 } from './figma-json.js';
 
-export { toTypographyTypescript, typographyContractData } from './typography-typescript.js';
+export {
+	toTypographyTypescript,
+	typographyContractData,
+	typographyContractTypes,
+} from './typography-typescript.js';
 export { toTypographySpecimen } from './typography-specimen.js';
 export type { TypographySpecimenConfig } from './typography-specimen.js';
 export { toTypographyCss, toTypographyCssModuleTypes } from './typography-css.js';

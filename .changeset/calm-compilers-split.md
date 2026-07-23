@@ -15,3 +15,6 @@ owned and validated by its author.
 
 Export the intermediate project-font and project-system authoring types so
 split source files retain literal font-ID validation with `satisfies`.
+
+Keep the complete discriminated typography-selection type contract identical
+between flat and workspace-package outputs.
