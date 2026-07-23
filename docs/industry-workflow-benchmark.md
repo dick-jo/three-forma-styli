@@ -38,11 +38,18 @@ component stories:
 - draft edits remain overlays until exported as a source-aware agent handoff;
 - packed release tests execute a generated design-system package and strict
   runtime theme in Chromium;
+- the same neutral generated package is installed from a real tarball and
+  compiled by a production Next.js build, rather than relying on one reference
+  consumer's framework proof;
 - browser binaries and Playwright remain repository/release tooling, outside all
   published TFS and generated design-system packages.
 
 Future visual checks should grow from named Workbench cases, not from a parallel
 set of test-only HTML fixtures.
+
+`pnpm check:integration` performs the full browser plus framework proof.
+`pnpm check:frameworks` is the non-browser Next.js proof for environments where
+Chromium is intentionally unavailable.
 
 Reference: [Storybook UI testing](https://storybook.js.org/docs/writing-tests/index).
 
@@ -81,6 +88,13 @@ outputs but does not edit a monorepo's task graph:
   FontTools, and Brotli identity participate in the key;
 - `--dry-run --json` makes the TFS artifact graph inspectable beside the host
   task graph.
+- a disposable pnpm/Turborepo fixture installs the packed TFS toolchain into a
+  generated workspace package, runs ordinary package `build`/`check` tasks, and
+  rejects both output mutation and compiler/CLI leakage into an application
+  production dependency graph.
+
+`pnpm check:monorepo` runs that proof alone. `pnpm check:integration` composes it
+with the packed Next.js and Chromium proofs.
 
 References: [Turborepo caching](https://turborepo.dev/docs/crafting-your-repository/caching),
 [Turborepo dry runs](https://turborepo.dev/docs/reference/run#--dry--dry-run).

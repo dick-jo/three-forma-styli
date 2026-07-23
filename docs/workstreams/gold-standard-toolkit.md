@@ -165,6 +165,22 @@ reference evidence, not hardcoded policy.
 - [ ] Add optional
       project-owned screenshots in a pinned rendering environment.
 
+## Universal product boundary
+
+- [x] Record the consumer-neutral architecture and review rules in
+      `docs/universal-product-invariants.md`.
+- [x] Prove Workbench case IDs remain deterministic, URL/CSS-safe and
+      collision-free under hostile author-owned names.
+- [x] Split the Workbench shell from domain rendering, typography measurement
+      and calibration controls so application orchestration does not become a
+      domain-logic monolith.
+- [ ] Add maintained minimal, editorial, display, Vite, Next.js, workspace and
+      runtime-theme fixtures to the release matrix. Scatter may exercise them,
+      but must not be their only implementation.
+- [ ] Add explicit framework-neutral review-runner output so pinned screenshot
+      projects can enumerate the same versioned cases without importing the
+      Workbench source application.
+
 ## Deferred application rollout
 
 - [ ] Replace Scatter's legacy generated CSS boundary with the workspace package.

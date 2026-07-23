@@ -7,10 +7,10 @@ import type {
 } from '../src/api.js';
 
 const fonts = {
-	supreme: {
-		family: 'Supreme',
+	editorial: {
+		family: 'Editorial Sans',
 		category: 'sans' as const,
-		sources: ['./Supreme.woff2'],
+		sources: ['./EditorialSans.woff2'],
 		license: {
 			id: 'example',
 			file: './license.txt',
@@ -65,7 +65,7 @@ defineTfsProject({
 			modes: [mode],
 			roles: {
 				heading: {
-					font: 'supreme',
+					font: 'editorial',
 					base: { fontSize: 6, weight: 'strong', lineHeight: 1, letterSpacing: -0.01 },
 					weights: { strong: 700, max: 800 },
 				},
@@ -101,7 +101,7 @@ defineTfsProject({
 			modes: [mode],
 			roles: {
 				heading: {
-					font: 'supreme',
+					font: 'editorial',
 					base: { fontSize: 6, weight: 'max', lineHeight: 1, letterSpacing: -0.01 },
 					weights: { max: 800 },
 				},
@@ -149,7 +149,7 @@ defineTfsProject({
 			modes: [mode],
 			roles: {
 				heading: {
-					font: 'suprme',
+					font: 'editoriall',
 					base: { fontSize: 6, weight: 'strong', lineHeight: 1, letterSpacing: -0.01 },
 					weights: { strong: 700 },
 				},
@@ -166,7 +166,7 @@ defineTfsProject({
 			modes: [mode],
 			roles: {
 				heading: {
-					font: 'supreme',
+					font: 'editorial',
 					base: { fontSize: 6, weight: 'strong', lineHeight: 1, letterSpacing: 0 },
 					weights: { strong: 700 },
 				},

@@ -21,6 +21,23 @@ const defaultCapture: ReviewCapturePolicy = {
 	sizeModes: ['*'],
 };
 
+/**
+ * Encode an authored name as one unambiguous case-ID segment.
+ *
+ * Only ASCII alphanumerics pass through. Every other Unicode code point,
+ * including `_` and `-`, is escaped between underscores, so authored `--`
+ * sequences can never collide with the case ID's structural delimiter.
+ */
+function caseIdSegment(value: string): string {
+	return Array.from(value)
+		.map((character) =>
+			/[A-Za-z0-9]/.test(character)
+				? character
+				: `_${character.codePointAt(0)!.toString(16).toUpperCase()}_`
+		)
+		.join('');
+}
+
 function colorCases(system: PartialDesignSystem, ir: IR): ColorReviewCase[] {
 	if (!system.colors) return [];
 	return system.colors.modes.flatMap((mode, modeIndex) => {
@@ -51,7 +68,7 @@ function colorCases(system: PartialDesignSystem, ir: IR): ColorReviewCase[] {
 			return [
 				{
 					kind: 'color',
-					id: `color--${mode.name}--${colorName}`,
+					id: `color--${caseIdSegment(mode.name)}--${caseIdSegment(colorName)}`,
 					label: `${colorName} / ${mode.name}`,
 					sourcePath,
 					mode: mode.name,
@@ -165,10 +182,7 @@ function recipeControls(
 	const weightAlias = recipe.weight;
 	const currentSuffix =
 		recipe.fontSizeReference === 'min' ? 'min' : String(recipe.fontSizeReference);
-	const atomicPrefix = recipe.atomicFontSizeToken.slice(
-		0,
-		-(currentSuffix.length + 1)
-	);
+	const atomicPrefix = recipe.atomicFontSizeToken.slice(0, -(currentSuffix.length + 1));
 	return [
 		{
 			kind: 'select',
@@ -247,7 +261,7 @@ function typographyCases(
 			const adjustedFallback = adjustedFallbackFamilies[roleName];
 			return {
 				kind: 'typography',
-				id: `typography--${roleName}--${variantName ?? 'base'}`,
+				id: `typography--${caseIdSegment(roleName)}--${caseIdSegment(variantName ?? 'base')}`,
 				label: `${roleName} / ${variantName ?? 'base'}`,
 				sourcePath,
 				role: roleName,
@@ -362,7 +376,7 @@ function shadowRecipeCases(
 	);
 	return values.map(([variantName, value]) => ({
 		kind: 'shadow',
-		id: `shadows--${kind}--${name}--${variantName ?? 'base'}`,
+		id: `shadows--${kind}--${caseIdSegment(name)}--${caseIdSegment(variantName ?? 'base')}`,
 		label: `${kind} / ${name} / ${variantName ?? 'base'}`,
 		sourcePath: `/shadows/${kind}/${pointerSegment(name)}/${
 			variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`
@@ -404,7 +418,7 @@ function motionCases(ir: IR): MotionReviewCase[] {
 		);
 		return values.map(([variantName, value]) => ({
 			kind: 'motion',
-			id: `motion--${recipeName}--${variantName ?? 'base'}`,
+			id: `motion--${caseIdSegment(recipeName)}--${caseIdSegment(variantName ?? 'base')}`,
 			label: `${recipeName} / ${variantName ?? 'base'}`,
 			sourcePath: `/motion/recipes/${pointerSegment(recipeName)}/${
 				variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`

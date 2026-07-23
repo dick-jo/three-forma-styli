@@ -1,0 +1,7 @@
+.claude/
+**/dist/
+**/generated/
+node_modules/
+packages/compiler/workbench-assets/
+pnpm-lock.yaml
+

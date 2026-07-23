@@ -177,6 +177,7 @@ export type {
 	MotionReviewLab,
 	FoundationReviewCase,
 	FoundationReviewLab,
+	ReviewCase,
 	ReviewControl,
 	ReviewDiagnostic,
 	ReviewLab,

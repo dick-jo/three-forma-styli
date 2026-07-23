@@ -161,9 +161,7 @@ describe('tfs init', () => {
 		await expect(checkCommand(projectRoot)).resolves.toBeUndefined();
 		expect(await fs.pathExists(path.join(projectRoot, 'dist'))).toBe(false);
 		expect(await fs.pathExists(path.join(projectRoot, 'generated/runtime/index.js'))).toBe(true);
-		expect(await fs.pathExists(path.join(projectRoot, 'generated/review/index.html'))).toBe(
-			true
-		);
+		expect(await fs.pathExists(path.join(projectRoot, 'generated/review/index.html'))).toBe(true);
 	});
 
 	it('rejects path-like and otherwise unsafe non-interactive project names', async () => {

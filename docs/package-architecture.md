@@ -97,3 +97,6 @@ not necessarily the CLI at runtime.
 
 See [monorepo integration](monorepo-integration.md) for the concrete package,
 task, cache, dependency, and staged-adoption contract.
+
+The non-negotiable consumer-neutrality and code-review rules live in
+[universal product invariants](universal-product-invariants.md).

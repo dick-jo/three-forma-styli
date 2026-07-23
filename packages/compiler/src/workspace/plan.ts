@@ -182,14 +182,10 @@ export function planWorkspacePackage(
 	}
 
 	const reviewTarget = output.targets.review;
-	const review =
-		reviewTarget === true
-			? { workbench: true }
-			: reviewTarget || {};
+	const review = reviewTarget === true ? { workbench: true } : reviewTarget || {};
 	const workbenchOption = review.workbench;
 	const workbench = Boolean(workbenchOption);
-	const workbenchConfig =
-		workbenchOption && workbenchOption !== true ? workbenchOption : {};
+	const workbenchConfig = workbenchOption && workbenchOption !== true ? workbenchOption : {};
 	const specimenOption = review.specimen;
 	const specimen = Boolean(specimenOption);
 	if (specimen && !context.hasTypography) {
@@ -336,10 +332,7 @@ export function planWorkspacePackage(
 			['review/workbench.css', []],
 			[
 				'review/workbench.json',
-				[
-					'review/system.css',
-					...(context.hasFonts ? [`${fontDirectory}/fonts.css`] : []),
-				],
+				['review/system.css', ...(context.hasFonts ? [`${fontDirectory}/fonts.css`] : [])],
 			],
 			['review/system.css', []],
 		] as const) {

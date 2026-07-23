@@ -780,10 +780,7 @@ describe('workspace-package build', () => {
 			'utf8'
 		);
 		const reviewContract = JSON.parse(
-			await fs.readFile(
-				path.join(result.outputDirectory, 'review/workbench.json'),
-				'utf8'
-			)
+			await fs.readFile(path.join(result.outputDirectory, 'review/workbench.json'), 'utf8')
 		) as { assets: { stylesheets: string[] } };
 		const reviewSystemCss = await fs.readFile(
 			path.join(result.outputDirectory, 'review/system.css'),

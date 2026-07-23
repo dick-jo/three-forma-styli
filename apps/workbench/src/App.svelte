@@ -1,25 +1,20 @@
 <script lang="ts">
 	import type {
-		ColorReviewCase,
-		MotionReviewCase,
-		FoundationReviewCase,
 		ReviewControl,
 		ReviewLab,
-		ShadowReviewCase,
 		TfsWorkbenchContract,
-		TypographyReviewCase,
 		WorkbenchDraftOperation,
 	} from '@three-forma-styli/core';
 	import { untrack } from 'svelte';
-	import { agentHandoff, downloadJson, patchFromDraft, type DraftValues } from './lib/draft';
 	import CaseMatrix from './lib/CaseMatrix.svelte';
-	import {
-		canvasVariables,
-		colorStyle,
-		controlValue,
-		shadowStyle,
-		typographyStyle,
-	} from './lib/review';
+	import ColorCase from './lib/ColorCase.svelte';
+	import { agentHandoff, downloadJson, patchFromDraft, type DraftValues } from './lib/draft';
+	import FoundationCase from './lib/FoundationCase.svelte';
+	import Inspector from './lib/Inspector.svelte';
+	import MotionCase from './lib/MotionCase.svelte';
+	import { canvasVariables } from './lib/review';
+	import ShadowCase from './lib/ShadowCase.svelte';
+	import TypographyCase from './lib/TypographyCase.svelte';
 
 	interface Props {
 		contract: TfsWorkbenchContract;
@@ -91,20 +86,6 @@
 			''
 	);
 	let handoffStatus = $state('');
-	let motionRun = $state(0);
-	let lineDiagnostics = $state(false);
-	let lightSurface = $state(false);
-	let wcagSpacing = $state(false);
-	let forceFallback = $state(false);
-	let typeSample = $state<HTMLElement | undefined>();
-	let wrapSample = $state<HTMLElement | undefined>();
-	let metricProbe = $state<HTMLElement | undefined>();
-	let baselineProbe = $state<HTMLElement | undefined>();
-	let capProbe = $state<HTMLElement | undefined>();
-	let exProbe = $state<HTMLElement | undefined>();
-	let metricGuides = $state({ lineBottom: 0, baseline: 0, cap: 0, ex: 0 });
-	let fallbackEvidence = $state('');
-	let fallbackMeasurementRun = 0;
 
 	let activeLab = $derived(contract.labs.find((lab) => lab.id === activeLabId) ?? contract.labs[0]);
 	let cases = $derived(
@@ -191,23 +172,6 @@
 		if (replacement) activeCaseId = replacement.id;
 	});
 
-	$effect(() => {
-		activeCase?.id;
-		draft;
-		sizeMode;
-		colorMode;
-		lineDiagnostics;
-		forceFallback;
-		wcagSpacing;
-		if (activeCase?.kind !== 'typography') return;
-		const reviewCase = activeCase as TypographyReviewCase;
-		const frame = requestAnimationFrame(() => {
-			refreshMetricGuides();
-			void refreshFallbackEvidence(reviewCase);
-		});
-		return () => cancelAnimationFrame(frame);
-	});
-
 	function selectLab(lab: ReviewLab): void {
 		activeLabId = lab.id;
 		caseQuery = '';
@@ -221,7 +185,6 @@
 				? (lab.cases[0]?.id ?? '')
 				: '';
 		if (lab.kind === 'color' && lab.cases[0]) colorMode = lab.cases[0].mode;
-		motionRun = 0;
 	}
 
 	function selectCase(id: string): void {
@@ -229,7 +192,6 @@
 		viewMode = 'case';
 		const selected = cases.find((reviewCase) => reviewCase.id === id);
 		if (selected?.kind === 'color') colorMode = selected.mode;
-		motionRun = 0;
 	}
 
 	function selectCaseFromLab(lab: ReviewLab, id: string): void {
@@ -240,7 +202,6 @@
 		viewMode = 'case';
 		const selected = lab.cases.find((reviewCase) => reviewCase.id === id);
 		if (selected?.kind === 'color') colorMode = selected.mode;
-		motionRun = 0;
 	}
 
 	function visibleLabCases(lab: ReviewLab) {
@@ -345,67 +306,6 @@
 		} catch {
 			handoffStatus = 'Clipboard unavailable; export the patch instead';
 		}
-	}
-
-	function refreshMetricGuides(): void {
-		if (!metricProbe || !baselineProbe || !capProbe || !exProbe) return;
-		const probe = metricProbe.getBoundingClientRect();
-		const baseline = baselineProbe.getBoundingClientRect().top - probe.top;
-		metricGuides = {
-			lineBottom: probe.height,
-			baseline,
-			cap: baseline - capProbe.getBoundingClientRect().height,
-			ex: baseline - exProbe.getBoundingClientRect().height,
-		};
-	}
-
-	function renderedLineCount(element: HTMLElement): number {
-		const range = document.createRange();
-		range.selectNodeContents(element);
-		const tops = [...range.getClientRects()]
-			.filter((rect) => rect.width > 0 && rect.height > 0)
-			.map((rect) => Math.round(rect.top * 10) / 10);
-		return new Set(tops).size;
-	}
-
-	function measureTypography(
-		reviewCase: TypographyReviewCase,
-		forceAdjustedFallback: boolean
-	): { width: number; lines: number } {
-		if (!typeSample || !wrapSample) return { width: 0, lines: 0 };
-		const style = typographyStyle(reviewCase, draft, {
-			forceFallback: forceAdjustedFallback,
-			wcagSpacing,
-		});
-		const inline = document.createElement('span');
-		inline.textContent = typeSample.textContent;
-		inline.style.cssText = `${style};position:fixed;left:-100000px;top:0;visibility:hidden;display:inline-block;width:max-content;max-width:none;white-space:pre`;
-		const wrap = document.createElement('div');
-		wrap.textContent = wrapSample.textContent;
-		wrap.style.cssText = `${style};position:fixed;left:-100000px;top:0;visibility:hidden;width:${wrapSample.getBoundingClientRect().width}px`;
-		document.body.append(inline, wrap);
-		const result = { width: inline.getBoundingClientRect().width, lines: renderedLineCount(wrap) };
-		inline.remove();
-		wrap.remove();
-		return result;
-	}
-
-	async function refreshFallbackEvidence(reviewCase: TypographyReviewCase): Promise<void> {
-		const run = ++fallbackMeasurementRun;
-		if (!reviewCase.font.adjustedFallback) {
-			fallbackEvidence = '';
-			return;
-		}
-		await document.fonts.ready;
-		if (run !== fallbackMeasurementRun) return;
-		const primary = measureTypography(reviewCase, false);
-		const adjusted = measureTypography(reviewCase, true);
-		if (run !== fallbackMeasurementRun || primary.width === 0) return;
-		const widthDelta = adjusted.width - primary.width;
-		const percent = (widthDelta / primary.width) * 100;
-		const signed = (value: number, digits: number) =>
-			`${value > 0 ? '+' : ''}${value.toFixed(digits)}`;
-		fallbackEvidence = `inline width Δ ${signed(widthDelta, 2)}px (${signed(percent, 2)}%) · line count Δ ${adjusted.lines - primary.lines >= 0 ? '+' : ''}${adjusted.lines - primary.lines} (${primary.lines}→${adjusted.lines})`;
 	}
 </script>
 
@@ -572,309 +472,31 @@
 					{/each}
 				</div>
 			{:else if activeCase?.kind === 'color'}
-				<div class="color-stage">
-					<div
-						class="color-hero"
-						style={`--review-color:${colorStyle(activeCase as ColorReviewCase, draft)}`}
-					>
-						<div class="color-chip">
-							<strong>{activeCase.color}</strong>
-							<span>{activeCase.mode}</span>
-							<code>{colorStyle(activeCase as ColorReviewCase, draft)}</code>
-						</div>
-					</div>
-					<div class="alpha-ramp">
-						{#each activeCase.alphaVariants as alpha}
-							<article>
-								<div
-									class="alpha-chip"
-									style={`--review-color:${colorStyle(activeCase as ColorReviewCase, draft, alpha.alpha)}`}
-								></div>
-								<strong>{alpha.label}</strong>
-								<small>{Math.round(alpha.alpha * 100)}%</small>
-								<code>--{alpha.token}</code>
-							</article>
-						{/each}
-					</div>
-				</div>
+				<ColorCase reviewCase={activeCase} {draft} />
 			{:else if activeCase?.kind === 'typography'}
-				<div class="typography-stage" class:light-surface={lightSurface}>
-					<div class="type-tools">
-						<label><input type="checkbox" bind:checked={lineDiagnostics} /> metrics</label>
-						<label><input type="checkbox" bind:checked={lightSurface} /> light surface</label>
-						<label><input type="checkbox" bind:checked={wcagSpacing} /> WCAG spacing stress</label>
-						{#if activeCase.font.adjustedFallback}
-							<label>
-								<input type="checkbox" bind:checked={forceFallback} /> adjusted fallback
-							</label>
-							<output>{fallbackEvidence || 'measuring primary → adjusted fallback…'}</output>
-						{/if}
-					</div>
-					<div class="type-stage-body">
-						<p class="eyebrow">{activeCase.role} · {activeCase.variant ?? 'base'}</p>
-						<div class="metric-sample" class:diagnostics={lineDiagnostics}>
-							<p
-								class="type-short"
-								bind:this={typeSample}
-								style={typographyStyle(activeCase as TypographyReviewCase, draft, {
-									forceFallback,
-									wcagSpacing,
-								})}
-								contenteditable="true"
-								aria-label="Editable typography sample"
-								spellcheck="false"
-								oninput={() => {
-									refreshMetricGuides();
-									void refreshFallbackEvidence(activeCase as TypographyReviewCase);
-								}}
-							>
-								Sphinx of black quartz, judge my vow.
-							</p>
-							<span
-								class="metric-probe"
-								bind:this={metricProbe}
-								style={typographyStyle(activeCase as TypographyReviewCase, draft, {
-									forceFallback,
-									wcagSpacing,
-								})}
-							>
-								Hhx<span class="baseline-probe" bind:this={baselineProbe}></span><i
-									class="cap-probe"
-									bind:this={capProbe}
-								></i><i class="ex-probe" bind:this={exProbe}></i>
-							</span>
-							{#if lineDiagnostics}
-								<div class="metric-overlay" aria-hidden="true">
-									<i class="metric-line" style="top:0"><span>line top</span></i>
-									<i class="metric-line" style={`top:${metricGuides.lineBottom}px`}
-										><span>line bottom</span></i
-									>
-									<i class="metric-cap" style={`top:${metricGuides.cap}px`}><span>1cap</span></i>
-									<i class="metric-ex" style={`top:${metricGuides.ex}px`}><span>1ex</span></i>
-									<i class="metric-baseline" style={`top:${metricGuides.baseline}px`}
-										><span>baseline</span></i
-									>
-								</div>
-							{/if}
-						</div>
-						<div class="type-columns">
-							<div>
-								<span class="type-caption">narrow wrapping</span>
-								<p
-									bind:this={wrapSample}
-									style={typographyStyle(activeCase as TypographyReviewCase, draft, {
-										forceFallback,
-										wcagSpacing,
-									})}
-								>
-									Typography becomes a system when every choice remains intentional under density,
-									wrapping, different surfaces, real content and imperfect loading conditions.
-								</p>
-							</div>
-							<div>
-								<span class="type-caption">glyph stress</span>
-								<p
-									class="glyph-stress"
-									style={typographyStyle(activeCase as TypographyReviewCase, draft, {
-										forceFallback,
-										wcagSpacing,
-									})}
-								>
-									ABCDEFGHIJKLMNOPQRSTUVWXYZ · abcdefghijklmnopqrstuvwxyz · 0123456789 · $€£¥ ₿ ± ×
-									÷ → ← ↑ ↓ &#123; &#125; [ ] ( )
-								</p>
-							</div>
-						</div>
-						<div class="weight-matrix">
-							{#each Object.entries(activeCase.styleWeights) as [style, weights]}
-								{#each weights as weight}
-									<article>
-										<code>{style} · {weight.alias} · {weight.value}</code>
-										<span
-											style={`${typographyStyle(activeCase as TypographyReviewCase, draft, {
-												forceFallback,
-												wcagSpacing,
-											})};font-style:${style};font-weight:${weight.value}`}
-										>
-											Aa 0123
-										</span>
-									</article>
-								{/each}
-							{/each}
-						</div>
-					</div>
-				</div>
+				<TypographyCase reviewCase={activeCase} {draft} />
 			{:else if activeCase?.kind === 'shadow'}
-				<div class="shadow-stage">
-					<div class="shadow-pair">
-						<div class="shadow-object" style={shadowStyle(activeCase as ShadowReviewCase, draft)}>
-							Aa
-						</div>
-						<div class="clip-boundary">
-							<div class="shadow-object" style={shadowStyle(activeCase as ShadowReviewCase, draft)}>
-								Aa
-							</div>
-						</div>
-					</div>
-					<pre>{shadowStyle(activeCase as ShadowReviewCase, draft)}</pre>
-				</div>
+				<ShadowCase reviewCase={activeCase} {draft} />
 			{:else if activeCase?.kind === 'motion'}
-				<div class="motion-stage">
-					<div class="motion-meta">
-						<article>
-							<span>duration</span>
-							<strong>{activeCase.duration.milliseconds}ms</strong>
-							<code>{activeCase.duration.token ? `--${activeCase.duration.token}` : '0ms'}</code>
-						</article>
-						<article>
-							<span>delay</span>
-							<strong>{activeCase.delay.milliseconds}ms</strong>
-							<code>{activeCase.delay.token ? `--${activeCase.delay.token}` : '0ms'}</code>
-						</article>
-						<article>
-							<span>easing</span>
-							<strong>{activeCase.easing.name}</strong>
-							<code>--{activeCase.easing.token}</code>
-						</article>
-					</div>
-					<div class="motion-track">
-						{#key motionRun}
-							<div
-								class:running={motionRun > 0}
-								class="motion-object"
-								style={`--review-duration:${(activeCase as MotionReviewCase).duration.milliseconds}ms;--review-delay:${(activeCase as MotionReviewCase).delay.milliseconds}ms;--review-easing:${(activeCase as MotionReviewCase).easing.css}`}
-							></div>
-						{/key}
-					</div>
-					<button class="motion-play" onclick={() => (motionRun += 1)}>play once</button>
-					<code class="motion-tuple">
-						{activeCase.duration.milliseconds}ms {activeCase.easing.css}
-						{activeCase.delay.milliseconds}ms
-					</code>
-				</div>
+				{#key activeCase.id}
+					<MotionCase reviewCase={activeCase} />
+				{/key}
 			{:else if activeCase?.kind === 'foundation'}
-				<div class="foundation-stage">
-					{#each (activeCase as FoundationReviewCase).tokens as token}
-						<article class="foundation-item">
-							<div
-								class="foundation-sample"
-								data-family={(activeCase as FoundationReviewCase).family}
-								style={`--review-value:var(--${token.name});--review-raw:${token.rawValue ?? 0}`}
-							></div>
-							<strong>--{token.name}</strong>
-							<code>{token.value}</code>
-						</article>
-					{/each}
-				</div>
+				<FoundationCase reviewCase={activeCase} />
 			{/if}
 		</section>
 	</main>
 
-	<aside class="inspector" aria-label="Case inspector">
-		{#if viewMode === 'matrix' && activeLab?.kind !== 'overview'}
-			<div class="inspector-title">
-				<div>
-					<span>matrix overview</span>
-					<strong>{activeLab?.label}</strong>
-				</div>
-			</div>
-			<div class="empty-inspector">
-				<strong>{visibleCases.length} visible cases</strong>
-				<p>
-					Compare the full {activeLab?.label.toLowerCase()} system at once. Filter or change modes to
-					narrow the matrix, then select any specimen for precise calibration and source paths.
-				</p>
-			</div>
-		{:else if activeCase}
-			<div class="inspector-title">
-				<div>
-					<span>{activeCase.controls.length > 0 ? 'calibration' : 'resolved case'}</span>
-					<strong>{activeCase.label}</strong>
-				</div>
-				{#if activeCase.controls.length > 0}
-					<button onclick={resetCase}>reset case</button>
-				{/if}
-			</div>
-			{#if activeCase.controls.length > 0}
-				<div class="controls">
-					{#each activeCase.controls as control}
-						<label class:changed={draft[control.path] !== undefined}>
-							<span>{control.label}</span>
-							{#if control.kind === 'number'}
-								<div class="number-pair">
-									<input
-										type="range"
-										aria-label={`${control.label} slider`}
-										min={control.min}
-										max={control.max}
-										step={control.step}
-										value={controlValue(control, draft)}
-										oninput={(event) => setControl(control, Number(event.currentTarget.value))}
-										ondblclick={() => resetControl(control)}
-									/>
-									<input
-										type="number"
-										aria-label={`${control.label} value`}
-										min={control.min}
-										max={control.max}
-										step={control.step}
-										value={controlValue(control, draft)}
-										oninput={(event) => setControl(control, Number(event.currentTarget.value))}
-									/>
-									<small>{control.unit}</small>
-								</div>
-							{:else}
-								<select
-									aria-label={control.label}
-									value={controlValue(control, draft)}
-									onchange={(event) => {
-										const option = control.options.find(
-											(entry) => String(entry.value) === event.currentTarget.value
-										);
-										if (option) setControl(control, option.value);
-									}}
-								>
-									{#each control.options as option}
-										<option
-											value={option.value}
-											selected={option.value === controlValue(control, draft)}
-										>
-											{option.label}
-										</option>
-									{/each}
-								</select>
-							{/if}
-							<code>{control.path}</code>
-						</label>
-					{/each}
-				</div>
-			{:else}
-				<div class="empty-inspector">
-					{#if activeCase.kind === 'motion'}
-						<strong>Playback-only review</strong>
-						<p>
-							This case exposes resolved timing and easing facts. Its authored references remain
-							source-controlled until structured time-reference editing is designed.
-						</p>
-					{:else}
-						<strong>Derived scale</strong>
-						<p>
-							These values are generated from compact authored anchors. Calibrate the source
-							schedule rather than patching individual derived tokens.
-						</p>
-					{/if}
-				</div>
-			{/if}
-		{:else}
-			<div class="empty-inspector">
-				<strong>Resolved system</strong>
-				<p>Select a lab and case to inspect source decisions and create a non-destructive draft.</p>
-			</div>
-		{/if}
-		<div class="draft-footer">
-			<button onclick={clearDraft} disabled={patch.operations.length === 0}
-				>discard all edits</button
-			>
-		</div>
-	</aside>
+	<Inspector
+		{activeCase}
+		matrix={viewMode === 'matrix' && activeLab?.kind !== 'overview'}
+		labLabel={activeLab?.label}
+		visibleCaseCount={visibleCases.length}
+		{draft}
+		editCount={patch.operations.length}
+		{setControl}
+		{resetControl}
+		{resetCase}
+		{clearDraft}
+	/>
 </div>

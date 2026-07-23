@@ -7,8 +7,8 @@ describe('fontFromManifest', () => {
 			{
 				schemaVersion: 2,
 				families: {
-					supreme: {
-						family: 'Supreme',
+					editorial: {
+						family: 'Editorial Sans',
 						faces: [
 							{
 								style: 'normal',
@@ -21,12 +21,12 @@ describe('fontFromManifest', () => {
 					},
 				},
 			},
-			'supreme',
+			'editorial',
 			{ category: 'sans' }
 		);
 
 		expect(font).toEqual({
-			family: 'Supreme',
+			family: 'Editorial Sans',
 			fallbacks: ['system-ui', 'sans-serif'],
 			verification: 'prepared',
 			diagnostics: { warnings: [] },

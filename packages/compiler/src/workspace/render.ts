@@ -59,9 +59,7 @@ async function writeText(staging: string, relative: string, contents: string): P
 	await fs.writeFile(destination, contents);
 }
 
-const workbenchAssetDirectory = fileURLToPath(
-	new URL('../../workbench-assets/', import.meta.url)
-);
+const workbenchAssetDirectory = fileURLToPath(new URL('../../workbench-assets/', import.meta.url));
 
 async function workbenchAsset(file: 'index.html' | 'workbench.css' | 'workbench.js') {
 	return fs.readFile(path.join(workbenchAssetDirectory, file), 'utf8');
@@ -327,21 +325,14 @@ export async function renderWorkspacePackage(
 		const systemCss = generateCss(system, {
 			selectors: plan.css.tokenSelectors,
 		});
-		const fingerprint = createHash('sha256')
-			.update(JSON.stringify(ir))
-			.digest('hex');
+		const fingerprint = createHash('sha256').update(JSON.stringify(ir)).digest('hex');
 		const contract = createWorkbenchContract(system, ir, {
 			title: plan.review.workbenchTitle,
 			systemFingerprint: fingerprint,
 			toolVersion: COMPILER_VERSION,
 			stylesheets: [
 				...(preparedFonts
-					? [
-							relativeUrl(
-								'review/index.html',
-								path.posix.join(plan.fontDirectory, 'fonts.css')
-							),
-						]
+					? [relativeUrl('review/index.html', path.posix.join(plan.fontDirectory, 'fonts.css'))]
 					: []),
 				'./system.css',
 			],

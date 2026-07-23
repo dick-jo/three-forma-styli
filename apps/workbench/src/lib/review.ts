@@ -48,12 +48,12 @@ export function canvasVariables(
 	sizeMode: string
 ): string {
 	const selected = [
-		modeGroups.find((group) => group.category === 'color')?.modes.find(
-			(mode) => mode.name === colorMode
-		),
-		modeGroups.find((group) => group.category === 'size')?.modes.find(
-			(mode) => mode.name === sizeMode
-		),
+		modeGroups
+			.find((group) => group.category === 'color')
+			?.modes.find((mode) => mode.name === colorMode),
+		modeGroups
+			.find((group) => group.category === 'size')
+			?.modes.find((mode) => mode.name === sizeMode),
 	];
 	return selected
 		.flatMap((mode) => Object.entries(mode?.tokens ?? {}))

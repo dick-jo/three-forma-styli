@@ -6,12 +6,7 @@ import type {
 import type { FontSizeReference } from '../types.js';
 
 export type ReviewLabId =
-	| 'overview'
-	| 'color'
-	| 'typography'
-	| 'shadows'
-	| 'motion'
-	| 'foundations';
+	'overview' | 'color' | 'typography' | 'shadows' | 'motion' | 'foundations';
 export type ReviewModeCategory = 'color' | 'size';
 
 export interface ReviewAssetContract {
@@ -190,6 +185,13 @@ export interface FoundationReviewLab {
 	label: string;
 	cases: FoundationReviewCase[];
 }
+
+export type ReviewCase =
+	| ColorReviewCase
+	| TypographyReviewCase
+	| ShadowReviewCase
+	| MotionReviewCase
+	| FoundationReviewCase;
 
 export type ReviewLab =
 	| OverviewReviewLab

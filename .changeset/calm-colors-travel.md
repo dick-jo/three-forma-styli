@@ -1,5 +1,5 @@
 ---
-"@three-forma-styli/core": minor
+'@three-forma-styli/core': minor
 ---
 
 Add a strict, dependency-light browser runtime entrypoint for parsing unknown

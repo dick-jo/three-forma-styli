@@ -160,4 +160,73 @@ describe('workbench review contract', () => {
 			fallbacks: ['Arial', 'sans-serif'],
 		});
 	});
+
+	it('preserves arbitrary author vocabulary while emitting safe, collision-free case IDs', () => {
+		const authored: PartialDesignSystem = {
+			colors: {
+				modes: [
+					{
+						name: 'a--b',
+						isDefault: true,
+						tokens: { c: { mode: 'oklch', l: 0.2, c: 0.03, h: 30 } },
+					},
+					{
+						name: 'a',
+						tokens: { 'b--c': { mode: 'oklch', l: 0.8, c: 0.04, h: 210 } },
+					},
+				],
+			},
+			typography: {
+				modes: [
+					{
+						name: 'screen-default',
+						isDefault: true,
+						tokens: { unit: 'rem', base: 1, min: 0.75, increment: 0.125, range: 4 },
+					},
+				],
+				fonts: {
+					editorial: {
+						family: 'Author Sans',
+						fallbacks: ['sans-serif'],
+						verification: 'unavailable',
+						faces: [{ style: 'normal', weight: { min: 350, max: 800 } }],
+					},
+				},
+				roles: {
+					'editorial-copy': {
+						font: 'editorial',
+						weights: { book: 350, black: 800 },
+						base: { fontSize: 2, lineHeight: 1.4, letterSpacing: 0, weight: 'book' },
+						variants: {
+							'hero--wide': {
+								fontSize: 4,
+								lineHeight: 0.95,
+								letterSpacing: -0.02,
+								weight: 'black',
+							},
+						},
+						displayOrder: ['base', 'hero--wide'],
+					},
+				},
+			},
+		};
+		const contract = createWorkbenchContract(authored, generate(authored), {
+			systemFingerprint: 'arbitrary-vocabulary',
+			toolVersion: '0.2.0',
+			stylesheets: ['./system.css'],
+		});
+		const cases = contract.labs.flatMap((lab) => (lab.kind === 'overview' ? [] : lab.cases));
+		const ids = cases.map((reviewCase) => reviewCase.id);
+
+		expect(new Set(ids).size).toBe(ids.length);
+		expect(ids.every((id) => /^[A-Za-z0-9]+(?:--[A-Za-z0-9_]+)+$/.test(id))).toBe(true);
+		expect(ids).toContain('color--a_2D__2D_b--c');
+		expect(ids).toContain('color--a--b_2D__2D_c');
+		expect(ids).toContain('typography--editorial_2D_copy--hero_2D__2D_wide');
+		expect(
+			cases.find(
+				(reviewCase) => reviewCase.id === 'typography--editorial_2D_copy--hero_2D__2D_wide'
+			)?.label
+		).toBe('editorial-copy / hero--wide');
+	});
 });

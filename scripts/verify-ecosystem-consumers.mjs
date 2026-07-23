@@ -7,6 +7,8 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
+import { buildNextConsumer } from './ecosystem/next-consumer.mjs';
+import { buildTurborepoConsumer } from './ecosystem/turborepo-consumer.mjs';
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const temporaryRoot = await mkdtemp(path.join(tmpdir(), 'tfs-ecosystem-consumers-'));
@@ -17,6 +19,8 @@ const releaseVersion = JSON.parse(
 	await readFile(path.join(repositoryRoot, 'packages/core/package.json'), 'utf8')
 ).version;
 const browserProofRequested = process.argv.includes('--browser');
+const nextProofRequested = process.argv.includes('--next');
+const monorepoProofRequested = process.argv.includes('--monorepo');
 
 function run(command, args, options = {}) {
 	return execFileSync(command, args, {
@@ -513,12 +517,27 @@ try {
 	await exerciseMachineCli(workspaceRoot);
 	const designSystemTarball = await packGeneratedDesignSystem(workspaceRoot);
 	await buildBrowserConsumer(designSystemTarball, tarballs.core);
+	if (nextProofRequested) {
+		await buildNextConsumer({ temporaryRoot, designSystemTarball });
+	}
+	if (monorepoProofRequested) {
+		await buildTurborepoConsumer({ temporaryRoot, workspaceRoot, tarballs });
+	}
 	if (browserProofRequested) {
 		await runWorkbenchBrowserProof(workspaceRoot);
 	}
 
 	console.log(
-		`Real tarball installs, standalone/workspace scaffolds, generated-package packing and a production browser bundle${browserProofRequested ? ' executed in Chromium' : ''} all passed.`
+		[
+			'Real tarball installs, standalone/workspace scaffolds, generated-package packing',
+			'a production browser bundle',
+			nextProofRequested ? 'a production Next 16 build' : undefined,
+			monorepoProofRequested ? 'a pnpm/Turborepo workspace build and check graph' : undefined,
+			browserProofRequested ? 'Chromium runtime and Workbench interactions' : undefined,
+			'all passed.',
+		]
+			.filter(Boolean)
+			.join(', ')
 	);
 } finally {
 	await rm(temporaryRoot, { recursive: true, force: true });

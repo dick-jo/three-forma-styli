@@ -34,8 +34,8 @@ describe('parseOutputFormat', () => {
 		expect(
 			relativeStylesheetHref(
 				path.join('/project', 'review pages', 'specimen #1.html'),
-				path.join('/project', 'font assets', 'Supreme ü.css')
+				path.join('/project', 'font assets', 'Editorial ü.css')
 			)
-		).toBe('../font%20assets/Supreme%20%C3%BC.css');
+		).toBe('../font%20assets/Editorial%20%C3%BC.css');
 	});
 });

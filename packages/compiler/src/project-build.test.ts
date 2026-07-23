@@ -227,7 +227,7 @@ describe('portable project build', () => {
 				css: {
 					selectors: {
 						root: ':host',
-						colorMode: '[data-scatter-theme="{mode}"]',
+						colorMode: '[data-visual-theme="{mode}"]',
 					},
 				},
 			},
@@ -235,7 +235,7 @@ describe('portable project build', () => {
 		const result = await buildProject(project, path.join(directory, 'tfs.config.ts'));
 		const css = await fs.readFile(path.join(result.outputDirectory, 'tokens.css'), 'utf8');
 		expect(css).toContain(':host {');
-		expect(css).toContain('[data-scatter-theme="light"] {');
+		expect(css).toContain('[data-visual-theme="light"] {');
 		expect(css).not.toContain('[data-color-mode="light"]');
 	});
 

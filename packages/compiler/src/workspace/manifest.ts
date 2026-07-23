@@ -103,12 +103,8 @@ export async function createWorkspaceManifest(
 							legacy:
 								plan.review.specimen || plan.review.shadowSpecimen
 									? {
-											typography: plan.review.specimen
-												? 'review/typography.html'
-												: undefined,
-											shadows: plan.review.shadowSpecimen
-												? 'review/shadows.html'
-												: undefined,
+											typography: plan.review.specimen ? 'review/typography.html' : undefined,
+											shadows: plan.review.shadowSpecimen ? 'review/shadows.html' : undefined,
 										}
 									: undefined,
 						}

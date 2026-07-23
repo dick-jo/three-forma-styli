@@ -8,19 +8,19 @@ describe('generated asset URLs', () => {
 				'review pages/type # specimen.html',
 				'font assets/über',
 				{ mode: 'relative' },
-				'Supreme #1?.woff2'
+				'Editorial #1?.woff2'
 			)
-		).toBe('../font%20assets/%C3%BCber/Supreme%20%231%3F.woff2');
+		).toBe('../font%20assets/%C3%BCber/Editorial%20%231%3F.woff2');
 		expect(relativeUrl('styles/main #1.css', 'tokens ?/mode.css')).toBe('../tokens%20%3F/mode.css');
 	});
 
 	it('appends an encoded filename to public and absolute prefixes', () => {
-		expect(joinUrlPath('/static/design-fonts', 'Supreme #1 ü.woff2')).toBe(
-			'/static/design-fonts/Supreme%20%231%20%C3%BC.woff2'
+		expect(joinUrlPath('/static/design-fonts', 'Editorial #1 ü.woff2')).toBe(
+			'/static/design-fonts/Editorial%20%231%20%C3%BC.woff2'
 		);
 		expect(joinUrlPath('/already%20encoded', 'font.woff2')).toBe('/already%20encoded/font.woff2');
-		expect(joinUrlPath('https://cdn.example/fonts', 'Supreme #1?.woff2')).toBe(
-			'https://cdn.example/fonts/Supreme%20%231%3F.woff2'
+		expect(joinUrlPath('https://cdn.example/fonts', 'Editorial #1?.woff2')).toBe(
+			'https://cdn.example/fonts/Editorial%20%231%3F.woff2'
 		);
 	});
 
