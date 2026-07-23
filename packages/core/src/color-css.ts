@@ -14,10 +14,7 @@ export function formatNativeOklch(color: NativeOklchColor): string {
 }
 
 /** Format native OKLCH with alpha using TFS's stable build-time precision. */
-export function formatNativeOklchWithAlpha(
-	color: NativeOklchColor,
-	opacity: number
-): string {
+export function formatNativeOklchWithAlpha(color: NativeOklchColor, opacity: number): string {
 	const l = color.l.toFixed(4);
 	const c = (color.c ?? 0).toFixed(4);
 	const h = (color.h || 0).toFixed(2);
