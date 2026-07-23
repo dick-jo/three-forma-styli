@@ -102,8 +102,12 @@ Generated projects use a strict write/check split:
 The repository release gate then packs the actual npm tarballs, installs them
 through ordinary package-manager resolution, scaffolds standalone and workspace
 projects, packs the generated design-system package, type-checks its CSS Module
-export, and creates a production browser bundle. CI runs the matrix on Linux
-Node 22/24 and the path/install/package checks on Windows Node 22.
+export, and creates a production browser bundle. A separate browser gate serves
+that packed bundle and executes it in Chromium, proving native OKLCH support,
+computed typography, strict hostile-payload rejection, clean console/page state,
+and the browser-safe dependency boundary. CI runs the normal matrix on Linux
+Node 22/24, the path/install/package checks on Windows Node 22, and the real
+browser proof in its own job so routine package checks do not download browsers.
 
 URL-bearing generated paths are encoded segment-by-segment. Spaces, `#`, and
 Unicode remain valid filenames; ambiguous query/fragment prefixes and

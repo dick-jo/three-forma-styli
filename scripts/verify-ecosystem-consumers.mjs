@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const temporaryRoot = await mkdtemp(path.join(tmpdir(), 'tfs-ecosystem-consumers-'));
@@ -14,6 +16,7 @@ const projectsDirectory = path.join(toolchainDirectory, 'projects');
 const releaseVersion = JSON.parse(
 	await readFile(path.join(repositoryRoot, 'packages/core/package.json'), 'utf8')
 ).version;
+const browserProofRequested = process.argv.includes('--browser');
 
 function run(command, args, options = {}) {
 	return execFileSync(command, args, {
@@ -227,12 +230,30 @@ const generated = generateRuntimeColorTheme(storedTheme, {
   },
 });
 
+let hostilePayloadRejected = false;
+try {
+  generateRuntimeColorTheme({
+    polarity: 'negative',
+    colors: { canvas: { l: 0.1, c: 0, h: 0 }, ink: { l: 0.9, c: 0, h: 0 }, extra: {} },
+  }, {
+    colorNames: ['canvas', 'ink'],
+    luminance: {
+      minDelta: 0.6,
+      backgroundColors: ['canvas'],
+      foregroundColors: ['ink'],
+    },
+  });
+} catch {
+  hostilePayloadRejected = true;
+}
+
 const root = document.documentElement;
 for (const [property, value] of Object.entries(generated.customProperties)) {
   root.style.setProperty(property, value);
 }
 root.dataset.runtimeValid = String(generated.luminance.deltaValid);
 root.dataset.nativeModeCount = String(nativeColorModes.modes.length);
+root.dataset.hostilePayloadRejected = String(hostilePayloadRejected);
 const app = document.querySelector<HTMLElement>('#app');
 if (!app) throw new Error('Missing app root');
 app.className = typographyClasses.prose;
@@ -271,6 +292,103 @@ app.textContent = 'TFS browser consumer ready';
 	const bundle = await readFile(path.join(browserRoot, javascript), 'utf8');
 	assert.match(bundle, /TFS browser consumer ready/);
 	assert.doesNotMatch(bundle, /node:fs|fontkit|@inquirer|process\.cwd/);
+	const compressedBytes = gzipSync(bundle).byteLength;
+	assert.ok(
+		compressedBytes < 20_000,
+		`Browser consumer JavaScript unexpectedly grew to ${compressedBytes} gzip bytes`
+	);
+
+	if (browserProofRequested) {
+		await runBrowserProof(browserRoot);
+	}
+}
+
+const contentTypes = {
+	'.css': 'text/css; charset=utf-8',
+	'.html': 'text/html; charset=utf-8',
+	'.js': 'text/javascript; charset=utf-8',
+};
+
+async function startStaticServer(rootDirectory) {
+	const server = createServer(async (request, response) => {
+		try {
+			const requestUrl = new URL(request.url ?? '/', 'http://127.0.0.1');
+			const relativePath =
+				requestUrl.pathname === '/' ? 'index.html' : requestUrl.pathname.slice(1);
+			const filePath = path.resolve(rootDirectory, relativePath);
+			if (filePath !== rootDirectory && !filePath.startsWith(`${rootDirectory}${path.sep}`)) {
+				response.writeHead(403).end('Forbidden');
+				return;
+			}
+			const body = await readFile(filePath);
+			response.writeHead(200, {
+				'content-type': contentTypes[path.extname(filePath)] ?? 'application/octet-stream',
+			});
+			response.end(body);
+		} catch {
+			response.writeHead(404).end('Not found');
+		}
+	});
+
+	await new Promise((resolve, reject) => {
+		server.once('error', reject);
+		server.listen(0, '127.0.0.1', resolve);
+	});
+	const address = server.address();
+	assert.ok(address && typeof address === 'object');
+	return {
+		url: `http://127.0.0.1:${address.port}`,
+		close: () =>
+			new Promise((resolve, reject) =>
+				server.close((error) => (error ? reject(error) : resolve()))
+			),
+	};
+}
+
+async function runBrowserProof(browserRoot) {
+	const { chromium } = await import('@playwright/test');
+	const server = await startStaticServer(path.join(browserRoot, 'dist'));
+	const browser = await chromium.launch({ headless: true });
+	try {
+		const page = await browser.newPage();
+		const failures = [];
+		page.on('console', (message) => {
+			if (message.type() === 'error' || message.type() === 'warning') {
+				failures.push(`console.${message.type()}: ${message.text()}`);
+			}
+		});
+		page.on('pageerror', (error) => failures.push(`pageerror: ${error.message}`));
+		await page.goto(server.url, { waitUntil: 'networkidle' });
+
+		const evidence = await page.evaluate(() => {
+			const app = document.querySelector('#app');
+			if (!(app instanceof HTMLElement)) throw new Error('Missing rendered app');
+			const style = getComputedStyle(app);
+			return {
+				text: app.textContent,
+				fontSize: style.fontSize,
+				fontFamily: style.fontFamily,
+				runtimeValid: document.documentElement.dataset.runtimeValid,
+				nativeModeCount: document.documentElement.dataset.nativeModeCount,
+				hostilePayloadRejected: document.documentElement.dataset.hostilePayloadRejected,
+				canvas: document.documentElement.style.getPropertyValue('--clr-canvas'),
+				oklchSupported: CSS.supports('color', 'oklch(0.8 0.2 145)'),
+			};
+		});
+
+		assert.deepEqual(failures, []);
+		assert.equal(evidence.text, 'TFS browser consumer ready');
+		assert.equal(evidence.runtimeValid, 'true');
+		assert.equal(evidence.nativeModeCount, '1');
+		assert.equal(evidence.hostilePayloadRejected, 'true');
+		assert.equal(evidence.canvas, 'oklch(0.1200 0.0200 260.00)');
+		assert.equal(evidence.oklchSupported, true);
+		assert.notEqual(evidence.fontSize, '16px');
+		assert.ok(evidence.fontFamily.length > 0);
+	} finally {
+		await browser.close();
+		await server.close();
+	}
 }
 
 try {
@@ -282,7 +400,7 @@ try {
 	await buildBrowserConsumer(designSystemTarball, tarballs.core);
 
 	console.log(
-		'Real tarball installs, standalone/workspace scaffolds, generated-package packing and a production browser bundle all passed.'
+		`Real tarball installs, standalone/workspace scaffolds, generated-package packing and a production browser bundle${browserProofRequested ? ' executed in Chromium' : ''} all passed.`
 	);
 } finally {
 	await rm(temporaryRoot, { recursive: true, force: true });

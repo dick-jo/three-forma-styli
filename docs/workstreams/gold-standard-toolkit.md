@@ -82,9 +82,15 @@ remaining work so decisions do not depend on one chat transcript.
       keep the external tool pinned in dedicated regeneration CI.
 - [x] Publish a framework-neutral monorepo package/task/security contract without
       mutating host workspace or cache configuration.
-- [ ] Decide whether install-graph minimalism justifies a future dedicated
-      `@three-forma-styli/runtime` package. The current runtime subpath is
-      browser-bundle clean but installing `core` still installs Culori.
+- [x] Execute packed npm plus generated-package artifacts in a real Chromium
+      release job, including strict runtime input, native OKLCH, computed
+      typography, bundle-boundary, and console/page-error assertions.
+- [x] Decide whether install-graph minimalism justifies a dedicated runtime
+      package in this release. Defer it: the current runtime subpath bundles to
+      2.37 KB gzip without Culori, Node/font/CLI code, or interactive
+      dependencies. A fifth published package would add release and migration
+      surface for install-tree neatness rather than browser correctness. Revisit
+      only if a real consumer policy or vulnerability requires it.
 
 ## Active Scatter design-system work
 
@@ -218,3 +224,23 @@ remaining work so decisions do not depend on one chat transcript.
   destinations. Ordinary build/check only validate committed output; explicit
   generation and discarded drift checks remain separate. TFS documents task
   inputs/outputs but does not edit a host's workspace or cache policy.
+- **2026-07-23 — browser runtime evidence.** A production Vite/Chrome audit of
+  the strict runtime path produced a 6.08 KB raw / 2.37 KB gzip bundle, versus
+  78.61 KB raw / 25.01 KB gzip for the legacy `generate() + toCss()` path.
+  Culori and Node/compiler dependencies were absent; all 40 Scatter-like custom
+  properties matched build-time output and hostile payloads were rejected. This
+  evidence defers a standalone runtime package without weakening the public
+  browser boundary.
+- **2026-07-23 — exact Scatter persistence audit.** Read-only monorepo research
+  found that the stored collection theme is an outer JSON envelope containing
+  `themeData` plus app-owned logo fields, while the current server schema checks
+  optional `polarity`/`colors` at the wrong level. The application rollout must
+  repair both read and write boundaries, preserve existing records and cookie
+  precedence, and use generated native mode keys instead of copied built-in
+  palettes. The exact migration and regression matrix lives in
+  `tfs-scatter/SCATTER-INTEGRATION.md`.
+- **2026-07-23 — executable review boundary.** The release matrix now has a
+  separate Chromium job that installs real packed artifacts, scaffolds and packs
+  a design-system package, builds its Vite consumer, and executes that result.
+  Playwright is repository-only tooling and does not enter any published or
+  generated consumer package.

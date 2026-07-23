@@ -1,8 +1,10 @@
 # Three-Forma-Styli
 
-**TypeScript-first design token generator with OKLCH color support and luminance constraints**
+**TypeScript-first design-system generator with native OKLCH color support and explicit palette constraints**
 
-Generate CSS custom properties from TypeScript-defined design systems. Built for runtime theming, accessibility-aware color relationships, and ergonomic developer experience.
+Generate portable CSS, fonts, typed contracts, design-tool data, and review artifacts
+from compact TypeScript-defined design systems. Built for deterministic handoff,
+strict user-authored runtime themes, and ergonomic developer experience.
 
 ## Philosophy
 
@@ -250,22 +252,27 @@ Similar patterns for border radius/width and timing values.
 
 ## Luminance Constraints
 
-Validate color relationships for accessibility:
+Validate intentional perceptual separation between palette groups:
 
 ```typescript
 import { validateLuminance } from '@three-forma-styli/core';
 
 const result = validateLuminance(colors, {
-	polarity: 'dark', // dark background, light foreground
-	minDelta: 0.4, // minimum luminance difference
+	polarity: 'negative', // dark background, light foreground
+	minDelta: 0.4, // minimum OKLCH-L separation
 	backgroundColors: ['bg', 'ev'],
 	foregroundColors: ['primary', 'neutral', 'ink'],
 });
 
 // Returns per-color diagnostics
 // result.colors.bg.headroom = 0.15  (positive = safe margin)
-// result.colors.ink.headroom = -0.05 (negative = violation!)
+// result.colors.ink.headroom = -0.05 (negative = constraint violation)
 ```
+
+TFS preserves the established `luminance` product vocabulary, while every
+diagnostic identifies the actual metric as `oklch-l`. This is not WCAG relative
+luminance, a contrast ratio, or an accessibility-conformance result. A future
+WCAG diagnostic must remain separate rather than silently changing this model.
 
 ## Mode Categories
 
@@ -301,7 +308,8 @@ roles should tighten, grow, or become heavier.
 
 ## Programmatic Usage
 
-For apps that generate themes at runtime:
+For build tools and trusted authoring processes that need the complete design
+system IR:
 
 ```typescript
 import { generate, toCss, oklch } from '@three-forma-styli/core';
@@ -310,6 +318,21 @@ import type { DesignSystem } from '@three-forma-styli/core';
 const system: DesignSystem = {/* ... */};
 const css = toCss(generate(system));
 ```
+
+Do not ship that complete generator just to process saved end-user colours in a
+browser. Use the strict, tree-shakeable runtime boundary instead:
+
+```typescript
+import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
+
+const result = generateRuntimeColorTheme(untrustedThemeData, runtimePolicy);
+```
+
+It accepts one exact serializable shape, rejects hostile or malformed data, emits
+native OKLCH custom properties, and returns explicitly identified OKLCH-L
+diagnostics. The release gate executes this path from packed npm and generated
+package tarballs in Chromium; compiler, font, CLI, and Culori code must not enter
+that browser bundle.
 
 ### Partial Generation
 
@@ -370,6 +393,7 @@ Current implementation references:
 - [Typography foundation](docs/typography-foundation.md)
 - [Typography fallback metrics](docs/typography-fallback-metrics.md)
 - [Validation and failure policy](docs/validation.md)
+- [Industry workflow benchmark](docs/industry-workflow-benchmark.md)
 - [Scatter source reconciliation](docs/scatter-source-reconciliation.md)
 
 ## Design Decisions
