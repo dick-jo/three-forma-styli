@@ -39,6 +39,7 @@ import { generateProjectSystemTypescript } from './system-typescript.js';
 import { buildWorkspacePackageProject } from './workspace/build.js';
 import { validateHostPackage } from './workspace/host-package.js';
 import { planWorkspacePackage } from './workspace/plan.js';
+import { workspacePlanContext } from './workspace/context.js';
 import { assertGeneratedOutputCurrent } from './generated-check.js';
 import { fontAssetUrl, relativeUrl, validateFontAssetUrlPolicy } from './font-url.js';
 import { assertPortableConfiguredPath } from './portable-path.js';
@@ -460,7 +461,7 @@ async function buildLegacyProject(
 			}
 		}
 		// Validate the physical role selections before attempting fallback calibration.
-		generate({ ...project.system, typography });
+		generate({ ...project.system, typography }, project.generator);
 		let adjustedFallbacks: AdjustedFallbackBuildResult | undefined;
 		if (preparedFonts && typography && fontFacesMode !== 'none') {
 			adjustedFallbacks = await buildAdjustedFallbacks(
@@ -481,10 +482,14 @@ async function buildLegacyProject(
 			}
 		}
 		const system: PartialDesignSystem = { ...project.system, typography };
-		const ir = generate(system);
+		const ir = generate(system, project.generator);
 
 		if (plan.css)
-			await writeText(staging, plan.css, generateCss(system, tokenCssOptions(project.output)));
+			await writeText(
+				staging,
+				plan.css,
+				generateCss(system, { ...project.generator, ...tokenCssOptions(project.output) })
+			);
 		if (plan.typographyCss) {
 			const fontFaceCss =
 				preparedFonts && fontFacesMode === 'include'
@@ -842,15 +847,12 @@ export async function planProject(
 		outputDirectory = path.resolve(configDirectory, output.directory);
 		validateOutputRoot(outputDirectory, configDirectory);
 		validateFontSourcesOutsideOutput(project.fonts ?? {}, configDirectory, outputDirectory);
-		const sourceTypography = project.system.typography;
-		const workspacePlan = planWorkspacePackage(output, {
-			hasColors: Boolean(project.system.colors),
-			hasTypography: Boolean(
-				sourceTypography?.roles && Object.keys(sourceTypography.roles).length > 0
-			),
-			hasShadows: Boolean(project.system.shadows),
-			hasFonts: fontPlan.fonts.sources.length > 0,
-		});
+		const workspacePlan = planWorkspacePackage(
+			output,
+			workspacePlanContext(project, {
+				hasFonts: fontPlan.fonts.sources.length > 0,
+			})
+		);
 		const host = await validateHostPackage(configDirectory, outputDirectory, workspacePlan);
 		artifacts = workspacePlan.artifacts.map((artifact) => ({
 			path: artifact.path,

@@ -37,4 +37,12 @@ export const color: DesignSystem['colors'] = {
 		...mode,
 	})),
 	alphaSchedule: ALPHA_SCHEDULE,
+	luminance: {
+		minimumLuminanceDelta: 0.33,
+		backgroundColors: ['bg', 'ev', 'shadow'],
+		foregroundColors: ['pri', 'neu', 'ink', 'pos', 'neg'],
+	},
+	runtimeThemes: {
+		colorNames: ['bg', 'ev', 'shadow', 'pri', 'neu', 'ink', 'pos', 'neg'],
+	},
 };

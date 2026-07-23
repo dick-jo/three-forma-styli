@@ -1,20 +1,22 @@
 /**
- * Configuration for luminance constraint validation
- *
- * @property polarity - 'negative' means dark backgrounds (low L), light foregrounds (high L)
- *                      'positive' means light backgrounds (high L), dark foregrounds (low L)
- * @property minDelta - Minimum required luminance difference between groups
- * @property backgroundColors - Array of color keys to treat as background (e.g., ['bg', 'ev'])
- * @property foregroundColors - Array of color keys to treat as foreground (e.g., ['primary', 'ink'])
+ * Design-system separation policy shared by build-time and runtime themes.
  *
  * TFS currently evaluates this constraint using authored OKLCH L. It does not
  * calculate WCAG relative luminance or a contrast ratio.
  */
-export interface LuminanceConstraintConfig {
+export interface LuminancePolicy<ColorName extends string = string> {
+	/** Minimum required OKLCH-L difference between the two groups. */
+	readonly minimumLuminanceDelta: number;
+	/** Color keys treated as surfaces/backgrounds. */
+	readonly backgroundColors: readonly ColorName[];
+	/** Color keys treated as content/foregrounds. */
+	readonly foregroundColors: readonly ColorName[];
+}
+
+/** A separation policy paired with the polarity of one concrete color theme. */
+export interface LuminanceConstraintConfig extends LuminancePolicy {
+	/** `negative` has dark backgrounds; `positive` has light backgrounds. */
 	readonly polarity: 'negative' | 'positive';
-	readonly minDelta: number;
-	readonly backgroundColors: readonly string[];
-	readonly foregroundColors: readonly string[];
 }
 
 /**

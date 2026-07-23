@@ -60,6 +60,10 @@ defineTfsProject({
 
 defineTfsProject({
 	fonts,
+	generator: {
+		prefixes: { color: 'palette', typographyRole: 'copy' },
+		colorFormat: { alphaModifier: 'opacity' },
+	},
 	system: {
 		typography: {
 			modes: [mode],

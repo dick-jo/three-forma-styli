@@ -66,19 +66,10 @@ Use the dependency-light runtime entrypoint when a browser receives a saved or
 user-authored color theme as unknown data:
 
 ```typescript
+import { runtimeColorThemeConfig } from '@your-org/design-system/runtime-color-theme';
 import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
 
-const result = generateRuntimeColorTheme(untrustedJson, {
-	colorNames: ['canvas', 'ink', 'accent'],
-	alphaSchedule: { min: 0.07, lo: 0.25, hi: 0.68, max: 0.93 },
-	prefixes: { color: 'clr' },
-	colorFormat: { alphaModifier: 'a' },
-	luminance: {
-		minDelta: 0.4,
-		backgroundColors: ['canvas'],
-		foregroundColors: ['ink'],
-	},
-});
+const result = generateRuntimeColorTheme(untrustedJson, runtimeColorThemeConfig);
 
 if (!result.luminance.deltaValid) {
 	console.warn('Theme does not meet its OKLCH-L separation requirement');
@@ -92,6 +83,9 @@ The input must contain exactly `polarity` and the declared `{ l, c, h }` colors;
 missing fields, extra fields, unsafe names, non-finite numbers, and invalid ranges
 fail before CSS is emitted. CSS values stay in native `oklch()`, preserving
 Display-P3-capable chroma for the browser instead of clipping through sRGB.
+Workspace-package projects generate the policy from `colors.luminance` plus the
+explicit `colors.runtimeThemes.colorNames` subset; a hand-authored structural
+config remains available for non-compiler integrations.
 
 TFS retains its public `luminance` terminology. Shared and runtime validation
 results identify the current metric as `oklch-l`. Runtime diagnostics compare

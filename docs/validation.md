@@ -55,6 +55,12 @@ explicit role-local weight. Prepared fonts prove requested physical styles,
 weights, OpenType features, and variation axes. No unsupported cut is remapped or
 synthesized.
 
+Luminance groups reference declared colors in the default palette, are non-empty,
+unique and disjoint. Runtime-theme color names are an explicit non-empty subset
+of that same palette and must include every constrained color. Override modes may
+still add static mode-specific colors. TFS never infers that every palette token
+is editable by an untrusted runtime payload.
+
 ## Output collisions
 
 After every family is expanded, TFS checks the complete default set and every mode

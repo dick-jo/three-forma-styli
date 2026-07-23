@@ -1,4 +1,4 @@
-import type { LuminanceValidation } from '../constraints/types.js';
+import type { LuminancePolicy, LuminanceValidation } from '../constraints/types.js';
 
 /** Storage-friendly OKLCH color accepted by the browser runtime API. */
 export interface RuntimeOklchColor {
@@ -21,11 +21,7 @@ export interface RuntimeColorThemeSchema<ColorNames extends readonly string[] = 
 	readonly colorNames: ColorNames;
 }
 
-export interface RuntimeLuminanceConfig<ColorName extends string = string> {
-	readonly minDelta: number;
-	readonly backgroundColors: readonly ColorName[];
-	readonly foregroundColors: readonly ColorName[];
-}
+export type RuntimeLuminanceConfig<ColorName extends string = string> = LuminancePolicy<ColorName>;
 
 export interface RuntimeColorThemeConfig<
 	ColorNames extends readonly string[] = readonly string[],

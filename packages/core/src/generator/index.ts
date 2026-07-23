@@ -85,10 +85,8 @@ function validateConfig(config: GeneratorConfig): void {
 	}
 }
 
-/**
- * Merge user config with defaults
- */
-function mergeConfig(userConfig?: GeneratorOptions): GeneratorConfig {
+/** Resolve partial author options into the exact generator configuration used by every target. */
+export function resolveGeneratorConfig(userConfig?: GeneratorOptions): GeneratorConfig {
 	if (!userConfig) {
 		return defaultGeneratorConfig;
 	}
@@ -171,7 +169,7 @@ export function generate(
 	validatePartialDesignSystem(designSystem);
 
 	// Merge config
-	const config = mergeConfig(userConfig);
+	const config = resolveGeneratorConfig(userConfig);
 	validateConfig(config);
 
 	// Generate tokens for each family (if provided)

@@ -18,7 +18,7 @@ const config = {
 	colorNames: ['canvas', 'ink'],
 	alphaSchedule: { non: 0, lo: 0.125, max: 1 },
 	luminance: {
-		minDelta: 0.6,
+		minimumLuminanceDelta: 0.6,
 		backgroundColors: ['canvas'],
 		foregroundColors: ['ink'],
 	},
@@ -139,7 +139,7 @@ describe('parseRuntimeColorTheme', () => {
 			{
 				colorNames: ['canvas', 'constructor'],
 				luminance: {
-					minDelta: 0.5,
+					minimumLuminanceDelta: 0.5,
 					backgroundColors: ['canvas'],
 					foregroundColors: ['constructor'],
 				},
@@ -239,7 +239,7 @@ describe('generateRuntimeColorTheme', () => {
 			{
 				colorNames: ['canvas', 'ink'],
 				luminance: {
-					minDelta: 0.330005,
+					minimumLuminanceDelta: 0.330005,
 					backgroundColors: ['canvas'],
 					foregroundColors: ['ink'],
 				},
@@ -266,7 +266,7 @@ describe('generateRuntimeColorTheme', () => {
 			{
 				colorNames: ['canvas', 'ink'],
 				luminance: {
-					minDelta: 0.33,
+					minimumLuminanceDelta: 0.33,
 					backgroundColors: ['canvas'],
 					foregroundColors: ['ink'],
 				},
@@ -315,13 +315,13 @@ describe('generateRuntimeColorTheme', () => {
 		],
 		[
 			'a non-finite delta',
-			{ ...config, luminance: { ...config.luminance, minDelta: NaN } },
-			'config.luminance.minDelta must be a finite number',
+			{ ...config, luminance: { ...config.luminance, minimumLuminanceDelta: NaN } },
+			'config.luminance.minimumLuminanceDelta must be a finite number',
 		],
 		[
 			'an out-of-range delta',
-			{ ...config, luminance: { ...config.luminance, minDelta: 1.1 } },
-			'config.luminance.minDelta must be between 0 and 1',
+			{ ...config, luminance: { ...config.luminance, minimumLuminanceDelta: 1.1 } },
+			'config.luminance.minimumLuminanceDelta must be between 0 and 1',
 		],
 		[
 			'an empty color group',
@@ -356,7 +356,7 @@ describe('generateRuntimeColorTheme', () => {
 				colorNames: ['ink', 'ink-a-lo', 'canvas'],
 				alphaSchedule: { lo: 0.25 },
 				luminance: {
-					minDelta: 0.5,
+					minimumLuminanceDelta: 0.5,
 					backgroundColors: ['canvas'],
 					foregroundColors: ['ink'],
 				},

@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { generate, type PartialDesignSystem } from '@three-forma-styli/core';
+import {
+	generate,
+	resolveGeneratorConfig,
+	type PartialDesignSystem,
+} from '@three-forma-styli/core';
 import {
 	nativeColorModesContract,
 	renderNativeColorModesContract,
+	renderRuntimeColorThemeContract,
 	renderSystemContract,
 	renderTypographyContract,
+	runtimeColorThemeContract,
 } from './contracts.js';
 
 describe('workspace runtime contracts', () => {
@@ -149,5 +155,50 @@ describe('workspace runtime contracts', () => {
 		const contract = nativeColorModesContract(system);
 		expect(contract.defaultMode).toBe('first');
 		expect(contract.modes.map((mode) => mode.name)).toEqual(['first', 'second']);
+	});
+
+	it('emits a strict runtime-theme policy with literal color-name types and shared naming', () => {
+		const system = {
+			colors: {
+				alphaSchedule: { low: 0.2 },
+				luminance: {
+					minimumLuminanceDelta: 0.4,
+					backgroundColors: ['canvas'],
+					foregroundColors: ['ink'],
+				},
+				runtimeThemes: {
+					colorNames: ['canvas', 'ink'],
+				},
+				modes: [
+					{
+						name: 'night',
+						isDefault: true,
+						tokens: {
+							canvas: { mode: 'oklch', l: 0.1, c: 0, h: 0 },
+							ink: { mode: 'oklch', l: 0.9, c: 0, h: 0 },
+						},
+					},
+				],
+			},
+		} satisfies PartialDesignSystem;
+		const generator = resolveGeneratorConfig({
+			prefixes: { color: 'palette' },
+			colorFormat: { alphaModifier: 'opacity' },
+		});
+		expect(runtimeColorThemeContract(system, generator)).toEqual({
+			schemaVersion: 1,
+			colorNames: ['canvas', 'ink'],
+			alphaSchedule: { low: 0.2 },
+			luminance: system.colors.luminance,
+			prefixes: { color: 'palette' },
+			colorFormat: { alphaModifier: 'opacity' },
+		});
+
+		const rendered = renderRuntimeColorThemeContract(system, generator);
+		expect(rendered.javascript).toContain('export const runtimeColorThemeConfig');
+		expect(rendered.declaration).toContain('readonly colorNames: readonly [');
+		expect(rendered.declaration).toContain('readonly minimumLuminanceDelta: number;');
+		expect(rendered.declaration).toContain('export type RuntimeColorName =');
+		expect(rendered.declaration).toContain('export type RuntimeColorThemeInput =');
 	});
 });

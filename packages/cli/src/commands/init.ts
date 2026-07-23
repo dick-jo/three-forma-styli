@@ -347,6 +347,10 @@ function generatePackageJson(packageName: string, workspacePackage: boolean): st
 						types: './generated/runtime/native-color-modes.d.ts',
 						import: './generated/runtime/native-color-modes.js',
 					},
+					'./runtime-color-theme': {
+						types: './generated/runtime/runtime-color-theme.d.ts',
+						import: './generated/runtime/runtime-color-theme.js',
+					},
 					'./styles.css': './generated/runtime/styles/index.css',
 					'./tokens.css': './generated/runtime/styles/tokens.css',
 					'./typography.css': './generated/runtime/styles/typography.css',

@@ -109,6 +109,71 @@ describe('generator input validation', () => {
 		).not.toThrow();
 	});
 
+	it('validates an optional reusable luminance policy against the canonical default palette', () => {
+		const valid = {
+			alphaSchedule: { min: 0.1, max: 0.9 },
+			luminance: {
+				minimumLuminanceDelta: 0.4,
+				backgroundColors: ['canvas'],
+				foregroundColors: ['ink'],
+			},
+			runtimeThemes: { colorNames: ['canvas', 'ink'] },
+			modes: [
+				{
+					name: 'night',
+					isDefault: true,
+					tokens: { canvas: { ...color, l: 0.1 }, ink: { ...color, l: 0.9 } },
+				},
+				{ name: 'day', tokens: { canvas: { ...color, l: 0.95 } } },
+			],
+		} satisfies NonNullable<PartialDesignSystem['colors']>;
+		expect(() => generate({ colors: valid })).not.toThrow();
+
+		expect(() =>
+			generate({
+				colors: {
+					...valid,
+					modes: [...valid.modes, { name: 'brand', tokens: { accent: color } }],
+				},
+			})
+		).not.toThrow();
+		expect(() =>
+			generate({
+				colors: {
+					...valid,
+					luminance: { ...valid.luminance, foregroundColors: ['accent'] },
+				},
+			})
+		).toThrowError(/references undeclared default color "accent"/);
+		expect(() =>
+			generate({
+				colors: {
+					...valid,
+					luminance: {
+						...valid.luminance,
+						foregroundColors: ['canvas'],
+					},
+				},
+			})
+		).toThrowError(/assigns "canvas" to both color groups/);
+		expect(() =>
+			generate({
+				colors: {
+					...valid,
+					runtimeThemes: { colorNames: ['canvas'] },
+				},
+			})
+		).toThrowError(/must include luminance-group color "ink"/);
+		expect(() =>
+			generate({
+				colors: {
+					...valid,
+					runtimeThemes: { colorNames: ['canvas', 'ink', 'accent'] },
+				},
+			})
+		).toThrowError(/references undeclared default color "accent"/);
+	});
+
 	it('rejects NaN in numeric schedules and unsafe CSS units', () => {
 		expect(() =>
 			generate({

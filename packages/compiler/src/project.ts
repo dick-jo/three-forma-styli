@@ -1,5 +1,6 @@
 import type {
 	CssTransformerConfig,
+	GeneratorOptions,
 	PartialDesignSystem,
 	TypographyRole,
 	TypographySystem,
@@ -134,6 +135,8 @@ export interface WorkspaceRuntimeContractsOutput {
 	typography?: boolean;
 	/** Emit the compact authored native color-mode contract. Defaults to true for colors. */
 	nativeColorModes?: boolean;
+	/** Emit the strict runtime custom-theme policy when luminance and runtime-theme policies exist. */
+	runtimeColorTheme?: boolean;
 }
 
 export interface WorkspaceRuntimeOutput {
@@ -196,6 +199,8 @@ export type TfsProjectOutput = LegacyTfsProjectOutput | WorkspacePackageOutput;
 export interface TfsProjectInput<Fonts extends Record<string, ProjectFont>> {
 	fonts?: Fonts;
 	system: ProjectSystem<Fonts>;
+	/** Shared naming and color-format policy applied to every generated target. */
+	generator?: GeneratorOptions;
 	output: TfsProjectOutput;
 }
 

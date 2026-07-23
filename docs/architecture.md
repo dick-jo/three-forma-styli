@@ -626,14 +626,19 @@ components. Display-P3 output must match the target Figma file profile.
 
 ## Constraint Validation
 
-The `validateLuminance` function checks color relationships (optional, not part of generation):
+The `validateLuminance` function checks color relationships directly. Projects
+may also author reusable groups and a minimum once as `colors.luminance`. A
+separate `colors.runtimeThemes.colorNames` list identifies the exact
+user-editable subset; static palette members do not silently become runtime
+fields. When both policies exist, the workspace compiler emits their shared
+contract as `runtime-color-theme` for strict browser theme generation.
 
 ```typescript
 import { validateLuminance } from '@three-forma-styli/core';
 
 const result = validateLuminance(colors, {
 	polarity: 'negative', // dark bg, light fg
-	minDelta: 0.4,
+	minimumLuminanceDelta: 0.4,
 	backgroundColors: ['bg', 'ev'],
 	foregroundColors: ['primary', 'neutral', 'ink'],
 });

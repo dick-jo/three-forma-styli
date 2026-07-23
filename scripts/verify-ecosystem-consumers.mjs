@@ -194,6 +194,8 @@ async function packGeneratedDesignSystem(workspaceRoot) {
 	const inventory = run('tar', ['-tzf', tarball]).split('\n');
 
 	assert.ok(inventory.includes('package/generated/runtime/index.js'));
+	assert.ok(inventory.includes('package/generated/runtime/runtime-color-theme.js'));
+	assert.ok(inventory.includes('package/generated/runtime/runtime-color-theme.d.ts'));
 	assert.ok(inventory.includes('package/generated/runtime/styles/index.css'));
 	assert.ok(inventory.includes('package/generated/runtime/styles/typography.module.css.d.ts'));
 	assert.ok(inventory.every((file) => !file.includes('/review/')));
@@ -228,38 +230,21 @@ async function buildBrowserConsumer(designSystemTarball, coreTarball) {
 		`import 'workspace-system/styles.css';
 import typographyClasses from 'workspace-system/typography.module.css';
 import { nativeColorModes } from 'workspace-system/native-color-modes';
+import { runtimeColorThemeConfig } from 'workspace-system/runtime-color-theme';
 import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
 
 const storedTheme = JSON.parse(JSON.stringify({
   polarity: 'negative',
-  colors: {
-    canvas: { l: 0.12, c: 0.02, h: 260 },
-    ink: { l: 0.94, c: 0.25, h: 145 },
-  },
+  colors: nativeColorModes.modes.find((mode) => mode.isDefault)?.source.colors,
 }));
-const generated = generateRuntimeColorTheme(storedTheme, {
-  colorNames: ['canvas', 'ink'],
-  alphaSchedule: { lo: 0.125 },
-  luminance: {
-    minDelta: 0.6,
-    backgroundColors: ['canvas'],
-    foregroundColors: ['ink'],
-  },
-});
+const generated = generateRuntimeColorTheme(storedTheme, runtimeColorThemeConfig);
 
 let hostilePayloadRejected = false;
 try {
   generateRuntimeColorTheme({
     polarity: 'negative',
-    colors: { canvas: { l: 0.1, c: 0, h: 0 }, ink: { l: 0.9, c: 0, h: 0 }, extra: {} },
-  }, {
-    colorNames: ['canvas', 'ink'],
-    luminance: {
-      minDelta: 0.6,
-      backgroundColors: ['canvas'],
-      foregroundColors: ['ink'],
-    },
-  });
+    colors: { ...storedTheme.colors, extra: {} },
+  }, runtimeColorThemeConfig);
 } catch {
   hostilePayloadRejected = true;
 }
@@ -390,7 +375,7 @@ async function runBrowserProof(browserRoot) {
 				runtimeValid: document.documentElement.dataset.runtimeValid,
 				nativeModeCount: document.documentElement.dataset.nativeModeCount,
 				hostilePayloadRejected: document.documentElement.dataset.hostilePayloadRejected,
-				canvas: document.documentElement.style.getPropertyValue('--clr-canvas'),
+				canvas: document.documentElement.style.getPropertyValue('--clr-bg'),
 				oklchSupported: CSS.supports('color', 'oklch(0.8 0.2 145)'),
 			};
 		});
@@ -400,7 +385,7 @@ async function runBrowserProof(browserRoot) {
 		assert.equal(evidence.runtimeValid, 'true');
 		assert.equal(evidence.nativeModeCount, '1');
 		assert.equal(evidence.hostilePayloadRejected, 'true');
-		assert.equal(evidence.canvas, 'oklch(0.1200 0.0200 260.00)');
+		assert.equal(evidence.canvas, 'oklch(0.2603 0.0000 129.63)');
 		assert.equal(evidence.oklchSupported, true);
 		assert.notEqual(evidence.fontSize, '16px');
 		assert.ok(evidence.fontFamily.length > 0);

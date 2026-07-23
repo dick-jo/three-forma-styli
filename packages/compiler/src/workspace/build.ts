@@ -8,6 +8,7 @@ import { planWorkspacePackage } from './plan.js';
 import { renderWorkspacePackage, type WorkspaceProject } from './render.js';
 import { withWorkspaceTransaction, type WorkspaceTransactionHooks } from './transaction.js';
 import { assertGeneratedOutputCurrent } from '../generated-check.js';
+import { workspacePlanContext } from './context.js';
 
 export interface WorkspaceBuildHooks extends WorkspaceTransactionHooks {
 	/** Test-only synchronization point after rendering and before the host re-hash. */
@@ -69,16 +70,7 @@ export async function buildWorkspacePackageProject(
 	validateOutputRoot(outputDirectory, configDirectory);
 	validateFontSourcesOutsideOutput(project.fonts ?? {}, configDirectory, outputDirectory);
 
-	const sourceTypography = project.system.typography;
-	const context = {
-		hasColors: Boolean(project.system.colors),
-		hasTypography: Boolean(
-			sourceTypography?.roles && Object.keys(sourceTypography.roles).length > 0
-		),
-		hasShadows: Boolean(project.system.shadows),
-		hasFonts: Object.keys(project.fonts ?? {}).length > 0,
-	};
-	const plan = planWorkspacePackage(workspaceProject.output, context);
+	const plan = planWorkspacePackage(workspaceProject.output, workspacePlanContext(project));
 	const host = await validateHostPackage(configDirectory, outputDirectory, plan);
 
 	return withWorkspaceTransaction(

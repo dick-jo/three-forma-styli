@@ -41,9 +41,16 @@ Code consumes typed subpaths rather than reaching into `generated/`:
 
 ```ts
 import { nativeColorModes } from '@repo/design-system/native-color-modes';
+import { runtimeColorThemeConfig } from '@repo/design-system/runtime-color-theme';
 import type { TypographySelection } from '@repo/design-system/typography';
 import typography from '@repo/design-system/typography.module.css';
 ```
+
+When the authored color system includes `colors.luminance` and an explicit
+`colors.runtimeThemes.colorNames` subset, `runtimeColorThemeConfig` is the exact
+browser-safe policy consumed by `@three-forma-styli/core/runtime`. Applications
+do not repeat editable color names, alpha schedules, prefixes, or luminance
+groups. Static design-system colors remain outside the user-authored payload.
 
 This is the first-class answer to several applications needing the same output.
 There is one generated package and many consumers—not several configured copy

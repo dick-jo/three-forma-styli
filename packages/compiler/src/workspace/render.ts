@@ -9,6 +9,7 @@ import {
 	generateCss,
 	generateFigmaJson,
 	generateTypographySpecimen,
+	resolveGeneratorConfig,
 	toTypographyCss,
 	toTypographyCssModuleTypes,
 	toShadowCss,
@@ -38,6 +39,7 @@ import type {
 } from '../project.js';
 import {
 	renderNativeColorModesContract,
+	renderRuntimeColorThemeContract,
 	renderSystemContract,
 	renderTypographyContract,
 } from './contracts.js';
@@ -147,7 +149,7 @@ async function resolveSystem(
 		} else typography = sourceTypography as TypographySystem;
 	}
 
-	generate({ ...project.system, typography });
+	generate({ ...project.system, typography }, project.generator);
 	let adjustedFallbacks: AdjustedFallbackBuildResult | undefined;
 	if (preparedFonts && typography) {
 		adjustedFallbacks = await buildAdjustedFallbacks(
@@ -168,7 +170,7 @@ async function resolveSystem(
 		}
 	}
 	const system: PartialDesignSystem = { ...project.system, typography };
-	return { system, ir: generate(system), preparedFonts, adjustedFallbacks };
+	return { system, ir: generate(system, project.generator), preparedFonts, adjustedFallbacks };
 }
 
 /** Render the already-planned graph. No host-package or final-output paths are written here. */
@@ -186,7 +188,7 @@ export async function renderWorkspacePackage(
 		await writeText(
 			staging,
 			'runtime/styles/tokens.css',
-			generateCss(system, { selectors: plan.css.tokenSelectors })
+			generateCss(system, { ...project.generator, selectors: plan.css.tokenSelectors })
 		);
 	}
 
@@ -280,6 +282,12 @@ export async function renderWorkspacePackage(
 	if (plan.contracts.nativeColorModes) {
 		await writeContract('native-color-modes', renderNativeColorModesContract(system));
 	}
+	if (plan.contracts.runtimeColorTheme) {
+		await writeContract(
+			'runtime-color-theme',
+			renderRuntimeColorThemeContract(system, resolveGeneratorConfig(project.generator))
+		);
+	}
 	if (modules.length > 0 && plan.host.rootExport) {
 		const js = modules
 			.map(
@@ -323,6 +331,7 @@ export async function renderWorkspacePackage(
 	}
 	if (plan.review.workbench) {
 		const systemCss = generateCss(system, {
+			...project.generator,
 			selectors: plan.css.tokenSelectors,
 		});
 		const fingerprint = createHash('sha256').update(JSON.stringify(ir)).digest('hex');

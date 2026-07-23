@@ -168,9 +168,12 @@ export function generateRuntimeColorTheme<const ColorNames extends readonly stri
 		'config.colorFormat.alphaModifier'
 	);
 
-	const minDelta = requireFiniteNumber(config.luminance?.minDelta, 'config.luminance.minDelta');
-	if (minDelta < 0 || minDelta > 1) {
-		fail('config.luminance.minDelta', 'must be between 0 and 1');
+	const minimumLuminanceDelta = requireFiniteNumber(
+		config.luminance?.minimumLuminanceDelta,
+		'config.luminance.minimumLuminanceDelta'
+	);
+	if (minimumLuminanceDelta < 0 || minimumLuminanceDelta > 1) {
+		fail('config.luminance.minimumLuminanceDelta', 'must be between 0 and 1');
 	}
 	const backgroundColors = validateColorGroup(
 		config.luminance?.backgroundColors,
@@ -216,7 +219,7 @@ export function generateRuntimeColorTheme<const ColorNames extends readonly stri
 	}
 	const diagnostics = validateLuminance(emittedColors, {
 		polarity: theme.polarity,
-		minDelta,
+		minimumLuminanceDelta,
 		backgroundColors: [...backgroundColors],
 		foregroundColors: [...foregroundColors],
 	});

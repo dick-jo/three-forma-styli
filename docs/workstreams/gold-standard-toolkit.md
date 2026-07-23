@@ -317,3 +317,17 @@ reference evidence, not hardcoded policy.
   a design-system package, builds its Vite consumer, and executes that result.
   Playwright is repository-only tooling and does not enter any published or
   generated consumer package.
+- **2026-07-23 — universal consumer matrix.** The same neutral generated package
+  now passes a production Next 16 build, a pnpm/Turborepo build/check graph, a
+  Vite bundle, and Chromium runtime/Workbench interaction tests. Scatter is no
+  longer the only place where its framework and monorepo assumptions are
+  exercised.
+- **2026-07-23 — generated runtime-theme policy.** `colors.luminance` owns
+  reusable separation constraints while `colors.runtimeThemes.colorNames`
+  explicitly identifies the user-editable subset. Both receive exact
+  default-palette validation. The workspace compiler emits literal editable
+  names, alpha schedule, generator naming and separation groups as
+  `runtime-color-theme`; browser consumers pass that generated contract directly
+  to the strict runtime API instead of duplicating it. Static palette tokens do
+  not silently become part of the runtime schema. The public field is
+  `minimumLuminanceDelta`; diagnostics remain explicitly `oklch-l`.

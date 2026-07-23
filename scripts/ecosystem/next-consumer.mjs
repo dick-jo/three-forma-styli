@@ -70,6 +70,7 @@ export async function buildNextConsumer({ temporaryRoot, designSystemTarball }) 
 		[
 			"import type { TypographySelection } from 'workspace-system/typography';",
 			"import { nativeColorModes } from 'workspace-system/native-color-modes';",
+			"import { runtimeColorThemeConfig } from 'workspace-system/runtime-color-theme';",
 			"import { tfsSystem } from 'workspace-system/system';",
 			"import typography from 'workspace-system/typography.module.css';",
 			'',
@@ -83,7 +84,7 @@ export async function buildNextConsumer({ temporaryRoot, designSystemTarball }) 
 			'  const duration = tfsSystem.motion.recipes.hover.base.duration.seconds;',
 			'  return (',
 			'    <main className={typography[selection.role]}>',
-			"      {nativeColorModes.modes.map((mode) => mode.name).join(', ')} · {duration}s",
+			"      {nativeColorModes.modes.map((mode) => mode.name).join(', ')} · {runtimeColorThemeConfig.colorNames.length} colors · {duration}s",
 			'    </main>',
 			'  );',
 			'}',

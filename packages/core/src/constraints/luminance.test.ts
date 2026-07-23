@@ -16,7 +16,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
@@ -34,7 +34,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
@@ -51,7 +51,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
@@ -71,7 +71,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg', 'ev'],
 				foregroundColors: ['primary', 'ink'],
 			});
@@ -89,16 +89,16 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
 
-			// Background MAX = minFg - minDelta = 0.8 - 0.4 = 0.4
+			// Background MAX = minFg - minimumLuminanceDelta = 0.8 - 0.4 = 0.4
 			expect(result.backgroundConstraint).toBeCloseTo(0.4, 2);
 			expect(result.backgroundConstraintType).toBe('max');
 
-			// Foreground MIN = maxBg + minDelta = 0.2 + 0.4 = 0.6
+			// Foreground MIN = maxBg + minimumLuminanceDelta = 0.2 + 0.4 = 0.6
 			expect(result.foregroundConstraint).toBeCloseTo(0.6, 2);
 			expect(result.foregroundConstraintType).toBe('min');
 		});
@@ -117,7 +117,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'positive',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
@@ -134,7 +134,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'positive',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
@@ -153,7 +153,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'positive',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg', 'ev'],
 				foregroundColors: ['primary', 'ink'],
 			});
@@ -171,16 +171,16 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'positive',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
 
-			// Background MIN = maxFg + minDelta = 0.3 + 0.4 = 0.7
+			// Background MIN = maxFg + minimumLuminanceDelta = 0.3 + 0.4 = 0.7
 			expect(result.backgroundConstraint).toBeCloseTo(0.7, 2);
 			expect(result.backgroundConstraintType).toBe('min');
 
-			// Foreground MAX = minBg - minDelta = 0.9 - 0.4 = 0.5
+			// Foreground MAX = minBg - minimumLuminanceDelta = 0.9 - 0.4 = 0.5
 			expect(result.foregroundConstraint).toBeCloseTo(0.5, 2);
 			expect(result.foregroundConstraintType).toBe('max');
 		});
@@ -199,13 +199,13 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
 
-			// Background constraint (max) = minFg - minDelta = 0.8 - 0.4 = 0.4
-			// Foreground constraint (min) = maxBg + minDelta = 0.2 + 0.4 = 0.6
+			// Background constraint (max) = minFg - minimumLuminanceDelta = 0.8 - 0.4 = 0.4
+			// Foreground constraint (min) = maxBg + minimumLuminanceDelta = 0.2 + 0.4 = 0.6
 
 			expect(result.colors.bg.group).toBe('background');
 			expect(result.colors.bg.luminance).toBeCloseTo(0.2, 5);
@@ -224,13 +224,13 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'positive',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
 
-			// Background constraint (min) = maxFg + minDelta = 0.3 + 0.4 = 0.7
-			// Foreground constraint (max) = minBg - minDelta = 0.9 - 0.4 = 0.5
+			// Background constraint (min) = maxFg + minimumLuminanceDelta = 0.3 + 0.4 = 0.7
+			// Foreground constraint (max) = minBg - minimumLuminanceDelta = 0.9 - 0.4 = 0.5
 
 			expect(result.colors.bg.group).toBe('background');
 			expect(result.colors.bg.luminance).toBeCloseTo(0.9, 5);
@@ -251,13 +251,13 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg', 'ev'],
 				foregroundColors: ['primary', 'ink'],
 			});
 
-			// Background constraint (max) = minFg - minDelta = 0.7 - 0.4 = 0.3
-			// Foreground constraint (min) = maxBg + minDelta = 0.3 + 0.4 = 0.7
+			// Background constraint (max) = minFg - minimumLuminanceDelta = 0.7 - 0.4 = 0.3
+			// Foreground constraint (min) = maxBg + minimumLuminanceDelta = 0.3 + 0.4 = 0.7
 
 			expect(result.colors.bg.headroom).toBeCloseTo(0, 5); // at the max
 			expect(result.colors.ev.headroom).toBeCloseTo(0.15, 5); // 0.3 - 0.15 = 0.15
@@ -273,12 +273,12 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
 
-			// Background constraint (max) = minFg - minDelta = 0.7 - 0.4 = 0.3
+			// Background constraint (max) = minFg - minimumLuminanceDelta = 0.7 - 0.4 = 0.3
 			// bg luminance 0.5 is above max 0.3, so headroom is negative
 			expect(result.colors.bg.headroom).toBeCloseTo(-0.2, 5); // 0.3 - 0.5 = -0.2
 			expect(result.deltaValid).toBe(false);
@@ -295,7 +295,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg', 'ev'],
 				foregroundColors: ['primary', 'neutral', 'ink'],
 			});
@@ -320,7 +320,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: [],
 				foregroundColors: ['primary'],
 			});
@@ -336,7 +336,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'],
 			});
@@ -356,7 +356,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg', 'ev'],
 				foregroundColors: ['primary'],
 			});
@@ -381,7 +381,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: [],
 				foregroundColors: ['primary'],
 			});
@@ -397,7 +397,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: [],
 			});
@@ -414,7 +414,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg'],
 				foregroundColors: ['primary'], // references missing color
 			});
@@ -431,7 +431,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['bg', 'ev'],
 				foregroundColors: ['primary'],
 			});
@@ -449,7 +449,7 @@ describe('validateLuminance', () => {
 
 			const result = validateLuminance(colors, {
 				polarity: 'negative',
-				minDelta: 0.4,
+				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['myCustomBackground'],
 				foregroundColors: ['ethereumBlue'],
 			});

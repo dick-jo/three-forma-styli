@@ -1,5 +1,6 @@
 // Updated types.ts with consistent patterns for all token types
 import type { Oklch } from 'culori';
+import type { LuminancePolicy } from './constraints/types.js';
 
 // COLOURS ---------------------------------------------- //
 
@@ -65,6 +66,11 @@ export type ColorMode = DefaultColorMode | OverrideColorMode;
  */
 export interface AlphaSchedule {
 	[level: string]: number;
+}
+
+/** Deliberate subset accepted from user-authored runtime theme payloads. */
+export interface RuntimeColorThemesPolicy {
+	readonly colorNames: readonly string[];
 }
 
 // SPACING ---------------------------------------------- //
@@ -438,6 +444,8 @@ export interface DesignSystem {
 	colors: {
 		modes: Array<ColorMode & { name: string }>;
 		alphaSchedule: AlphaSchedule;
+		luminance?: LuminancePolicy;
+		runtimeThemes?: RuntimeColorThemesPolicy;
 	};
 	spacing: {
 		modes: Array<SpacingMode & { name: string }>;
@@ -475,6 +483,8 @@ export interface PartialDesignSystem {
 	colors?: {
 		modes: Array<ColorMode & { name: string }>;
 		alphaSchedule: AlphaSchedule;
+		luminance?: LuminancePolicy;
+		runtimeThemes?: RuntimeColorThemesPolicy;
 	};
 	spacing?: {
 		modes: Array<SpacingMode & { name: string }>;

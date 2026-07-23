@@ -1,4 +1,4 @@
-import type { IR, PartialDesignSystem } from '@three-forma-styli/core';
+import type { GeneratorConfig, IR, PartialDesignSystem } from '@three-forma-styli/core';
 import { typographyContractData, typographyContractTypes } from '@three-forma-styli/core';
 import { projectSystemContract } from '../system-typescript.js';
 
@@ -172,6 +172,49 @@ export function renderNativeColorModesContract(system: PartialDesignSystem) {
 					keys.includes('alphaSchedule') ||
 					(keys.includes('colors') && ['l', 'c', 'h'].includes(last ?? ''))
 				);
+			},
+		}
+	);
+}
+
+/** Strict runtime-theme policy derived from the same authored color system and generator config. */
+export function runtimeColorThemeContract(system: PartialDesignSystem, generator: GeneratorConfig) {
+	if (!system.colors?.luminance || !system.colors.runtimeThemes) {
+		throw new Error(
+			'colors.luminance and colors.runtimeThemes are required for runtime color themes.'
+		);
+	}
+	const defaultMode = system.colors.modes.find((mode) => mode.isDefault) ?? system.colors.modes[0];
+	if (!defaultMode) throw new Error('Runtime color themes require one default color mode.');
+	const alphaSchedule = defaultMode.alphaSchedule ?? system.colors.alphaSchedule;
+	return {
+		schemaVersion: 1,
+		colorNames: [...system.colors.runtimeThemes.colorNames],
+		...(alphaSchedule ? { alphaSchedule } : {}),
+		luminance: system.colors.luminance,
+		prefixes: { color: generator.prefixes.color },
+		colorFormat: { alphaModifier: generator.colorFormat.alphaModifier },
+	} as const;
+}
+
+export function renderRuntimeColorThemeContract(
+	system: PartialDesignSystem,
+	generator: GeneratorConfig
+) {
+	return renderLiteralModule(
+		'runtimeColorThemeConfig',
+		runtimeColorThemeContract(system, generator),
+		[
+			'export type RuntimeColorName = typeof runtimeColorThemeConfig.colorNames[number];',
+			'export type RuntimeColorThemeInput = {',
+			'  readonly polarity: "negative" | "positive";',
+			'  readonly colors: Readonly<Record<RuntimeColorName, { readonly l: number; readonly c: number; readonly h: number }>>;',
+			'};',
+		],
+		{
+			widenNumber: (path) => {
+				const keys = path.filter((part): part is string => typeof part === 'string');
+				return keys.includes('alphaSchedule') || keys.at(-1) === 'minimumLuminanceDelta';
 			},
 		}
 	);

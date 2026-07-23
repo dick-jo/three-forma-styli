@@ -16,7 +16,7 @@ function stableDiagnostic(value: number): number {
  * but it is not WCAG relative luminance or a contrast-ratio calculation.
  *
  * @param colors - Record of color keys to values containing an OKLCH L component
- * @param config - Constraint configuration (polarity, minDelta, color groups)
+ * @param config - Constraint configuration (polarity, minimumLuminanceDelta, color groups)
  * @returns Diagnostic information about constraint satisfaction
  *
  * @example
@@ -25,7 +25,7 @@ function stableDiagnostic(value: number): number {
  *   { bg: oklch(0.2, 0, 0), primary: oklch(0.8, 0.1, 250) },
  *   {
  *     polarity: 'negative',
- *     minDelta: 0.4,
+ *     minimumLuminanceDelta: 0.4,
  *     backgroundColors: ['bg'],
  *     foregroundColors: ['primary'],
  *   }
@@ -36,7 +36,7 @@ export function validateLuminance(
 	colors: Record<string, OklchLightness | undefined>,
 	config: LuminanceConstraintConfig
 ): LuminanceValidation {
-	const { polarity, minDelta, backgroundColors, foregroundColors } = config;
+	const { polarity, minimumLuminanceDelta, backgroundColors, foregroundColors } = config;
 
 	// Get luminance values for each group
 	const bgLuminances = backgroundColors
@@ -53,7 +53,7 @@ export function validateLuminance(
 			metric: 'oklch-l',
 			deltaValid: false,
 			actualDelta: 0,
-			requiredDelta: minDelta,
+			requiredDelta: minimumLuminanceDelta,
 			backgroundConstraint: 0,
 			backgroundConstraintType: polarity === 'negative' ? 'max' : 'min',
 			foregroundConstraint: 0,
@@ -74,17 +74,17 @@ export function validateLuminance(
 	const actualDelta = stableDiagnostic(polarity === 'negative' ? minFg - maxBg : minBg - maxFg);
 
 	// Check delta constraint
-	const deltaValid = actualDelta >= minDelta;
+	const deltaValid = actualDelta >= minimumLuminanceDelta;
 
 	// Calculate constraint boundaries for UI display
-	// Negative polarity: backgrounds can't exceed (minFg - minDelta), foregrounds can't go below (maxBg + minDelta)
-	// Positive polarity: backgrounds can't go below (maxFg + minDelta), foregrounds can't exceed (minBg - minDelta)
+	// Negative polarity: backgrounds can't exceed (minFg - minimumLuminanceDelta), foregrounds can't go below (maxBg + minimumLuminanceDelta)
+	// Positive polarity: backgrounds can't go below (maxFg + minimumLuminanceDelta), foregrounds can't exceed (minBg - minimumLuminanceDelta)
 	const backgroundConstraint = stableDiagnostic(
-		polarity === 'negative' ? minFg - minDelta : maxFg + minDelta
+		polarity === 'negative' ? minFg - minimumLuminanceDelta : maxFg + minimumLuminanceDelta
 	);
 
 	const foregroundConstraint = stableDiagnostic(
-		polarity === 'negative' ? maxBg + minDelta : minBg - minDelta
+		polarity === 'negative' ? maxBg + minimumLuminanceDelta : minBg - minimumLuminanceDelta
 	);
 
 	// Build per-color diagnostics
@@ -130,7 +130,7 @@ export function validateLuminance(
 		metric: 'oklch-l',
 		deltaValid,
 		actualDelta,
-		requiredDelta: minDelta,
+		requiredDelta: minimumLuminanceDelta,
 		backgroundConstraint,
 		backgroundConstraintType: polarity === 'negative' ? 'max' : 'min',
 		foregroundConstraint,

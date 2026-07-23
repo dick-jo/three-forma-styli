@@ -18,6 +18,7 @@ export interface WorkspaceArtifact {
 
 export interface WorkspacePlanContext {
 	hasColors: boolean;
+	hasRuntimeColorPolicy?: boolean;
 	hasTypography: boolean;
 	hasShadows: boolean;
 	hasFonts: boolean;
@@ -41,7 +42,12 @@ export interface WorkspacePlan {
 		shadowModule: boolean;
 		separateFonts: boolean;
 	};
-	contracts: { system: boolean; typography: boolean; nativeColorModes: boolean };
+	contracts: {
+		system: boolean;
+		typography: boolean;
+		nativeColorModes: boolean;
+		runtimeColorTheme: boolean;
+	};
 	review: {
 		workbench: boolean;
 		workbenchTitle?: string;
@@ -94,7 +100,10 @@ function add(
 	artifacts: WorkspaceArtifact[],
 	artifact: Omit<WorkspaceArtifact, 'dependencies'> & { dependencies?: string[] }
 ): void {
-	artifacts.push({ ...artifact, dependencies: artifact.dependencies ?? [] });
+	artifacts.push({
+		...artifact,
+		dependencies: [...new Set(artifact.dependencies ?? [])],
+	});
 }
 
 /** Normalize shorthands into a deterministic artifact graph before rendering begins. */
@@ -174,11 +183,21 @@ export function planWorkspacePackage(
 			? contracts.nativeColorModes
 			: allContracts && context.hasColors
 	);
+	const runtimeColorTheme = Boolean(
+		contracts && contracts.runtimeColorTheme !== undefined
+			? contracts.runtimeColorTheme
+			: allContracts && context.hasRuntimeColorPolicy
+	);
 	if (contracts && contracts.typography && !context.hasTypography) {
 		throw new Error('runtime.contracts.typography requires semantic typography roles.');
 	}
 	if (contracts && contracts.nativeColorModes && !context.hasColors) {
 		throw new Error('runtime.contracts.nativeColorModes requires a color system.');
+	}
+	if (contracts && contracts.runtimeColorTheme && !context.hasRuntimeColorPolicy) {
+		throw new Error(
+			'runtime.contracts.runtimeColorTheme requires colors.luminance and colors.runtimeThemes.'
+		);
 	}
 
 	const reviewTarget = output.targets.review;
@@ -288,6 +307,7 @@ export function planWorkspacePackage(
 		[systemContract, 'system'],
 		[typographyContract, 'typography'],
 		[nativeColorModes, 'native-color-modes'],
+		[runtimeColorTheme, 'runtime-color-theme'],
 	] as const) {
 		if (!enabled) continue;
 		add(artifacts, { path: `runtime/${name}.js`, kind: 'runtime-js', target: 'runtime' });
@@ -298,11 +318,15 @@ export function planWorkspacePackage(
 			dependencies: [`runtime/${name}.js`],
 		});
 	}
-	if (rootExport && (systemContract || typographyContract || nativeColorModes)) {
+	if (
+		rootExport &&
+		(systemContract || typographyContract || nativeColorModes || runtimeColorTheme)
+	) {
 		const modules = [
 			...(systemContract ? ['system'] : []),
 			...(typographyContract ? ['typography'] : []),
 			...(nativeColorModes ? ['native-color-modes'] : []),
+			...(runtimeColorTheme ? ['runtime-color-theme'] : []),
 		];
 		add(artifacts, {
 			path: 'runtime/index.js',
@@ -405,7 +429,12 @@ export function planWorkspacePackage(
 			shadowModule: shadowModuleRequested,
 			separateFonts,
 		},
-		contracts: { system: systemContract, typography: typographyContract, nativeColorModes },
+		contracts: {
+			system: systemContract,
+			typography: typographyContract,
+			nativeColorModes,
+			runtimeColorTheme,
+		},
 		review: {
 			workbench,
 			workbenchTitle: workbenchConfig.title,
@@ -445,11 +474,19 @@ export function requiredPackageExports(
 				import: packageTarget(generatedFromHost, `runtime/${name}.js`),
 			},
 		});
-	if (plan.contracts.system || plan.contracts.typography || plan.contracts.nativeColorModes) {
+	if (
+		plan.contracts.system ||
+		plan.contracts.typography ||
+		plan.contracts.nativeColorModes ||
+		plan.contracts.runtimeColorTheme
+	) {
 		if (plan.host.rootExport) contract('.', 'index');
 		if (plan.contracts.system) contract('./system', 'system');
 		if (plan.contracts.typography) contract('./typography', 'typography');
 		if (plan.contracts.nativeColorModes) contract('./native-color-modes', 'native-color-modes');
+		if (plan.contracts.runtimeColorTheme) {
+			contract('./runtime-color-theme', 'runtime-color-theme');
+		}
 	}
 	if (plan.css.entry) {
 		required.push({

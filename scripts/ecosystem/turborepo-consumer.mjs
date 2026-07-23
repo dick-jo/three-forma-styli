@@ -91,6 +91,7 @@ export async function buildTurborepoConsumer({ temporaryRoot, workspaceRoot, tar
 		path.join(contractsRoot, 'index.ts'),
 		[
 			"import { nativeColorModes } from 'workspace-system/native-color-modes';",
+			"import { runtimeColorThemeConfig } from 'workspace-system/runtime-color-theme';",
 			"import { tfsSystem } from 'workspace-system/system';",
 			"import type { TypographySelection } from 'workspace-system/typography';",
 			"import typography from 'workspace-system/typography.module.css';",
@@ -102,7 +103,8 @@ export async function buildTurborepoConsumer({ temporaryRoot, workspaceRoot, tar
 			'const className: string = typography[selection.role];',
 			'const firstMode: string | undefined = nativeColorModes.modes[0]?.name;',
 			'const duration: number = tfsSystem.motion.recipes.hover.base.duration.seconds;',
-			'void [className, firstMode, duration];',
+			'const minimumDelta: number = runtimeColorThemeConfig.luminance.minimumLuminanceDelta;',
+			'void [className, firstMode, duration, minimumDelta];',
 			'',
 		].join('\n')
 	);

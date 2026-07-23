@@ -68,6 +68,32 @@ function validateFiniteNumber(value: unknown, path: string): asserts value is nu
 	}
 }
 
+function validateColorNameList(
+	value: unknown,
+	path: string,
+	declaredColorNames: ReadonlySet<string>
+): string[] {
+	if (!Array.isArray(value) || value.length === 0) {
+		throw new ValidationError(`${path} must be a non-empty array`);
+	}
+	const names: string[] = [];
+	const seen = new Set<string>();
+	for (const colorName of value) {
+		if (typeof colorName !== 'string' || !tokenNamePattern.test(colorName)) {
+			throw new ValidationError(`${path} contains a non-token-safe color name`);
+		}
+		if (seen.has(colorName)) {
+			throw new ValidationError(`${path} must not contain duplicates`);
+		}
+		if (!declaredColorNames.has(colorName)) {
+			throw new ValidationError(`${path} references undeclared default color "${colorName}"`);
+		}
+		seen.add(colorName);
+		names.push(colorName);
+	}
+	return names;
+}
+
 /**
  * Validates a complete DesignSystem, throwing on any invalid input
  */
@@ -208,6 +234,51 @@ function validateColorsPartial(colors: NonNullable<PartialDesignSystem['colors']
 		throw new ValidationError(
 			`Default color mode "${defaultMode.name}" must define at least one token`
 		);
+	}
+	if (colors.luminance) {
+		const path = 'colors.luminance';
+		validateFiniteNumber(colors.luminance.minimumLuminanceDelta, `${path}.minimumLuminanceDelta`);
+		if (colors.luminance.minimumLuminanceDelta < 0 || colors.luminance.minimumLuminanceDelta > 1) {
+			throw new ValidationError(`${path}.minimumLuminanceDelta must be between 0 and 1`);
+		}
+		const defaultColorNames = new Set(Object.keys(defaultMode.tokens));
+		const groups = [
+			validateColorNameList(
+				colors.luminance.backgroundColors,
+				`${path}.backgroundColors`,
+				defaultColorNames
+			),
+			validateColorNameList(
+				colors.luminance.foregroundColors,
+				`${path}.foregroundColors`,
+				defaultColorNames
+			),
+		] as const;
+		for (const colorName of groups[0]) {
+			if (groups[1].includes(colorName)) {
+				throw new ValidationError(`${path} assigns "${colorName}" to both color groups`);
+			}
+		}
+		if (colors.runtimeThemes) {
+			const runtimePath = 'colors.runtimeThemes.colorNames';
+			const runtimeNames = validateColorNameList(
+				colors.runtimeThemes.colorNames,
+				runtimePath,
+				defaultColorNames
+			);
+			const runtimeSet = new Set(runtimeNames);
+			for (const names of groups) {
+				for (const colorName of names) {
+					if (!runtimeSet.has(colorName)) {
+						throw new ValidationError(
+							`${runtimePath} must include luminance-group color "${colorName}"`
+						);
+					}
+				}
+			}
+		}
+	} else if (colors.runtimeThemes) {
+		throw new ValidationError('colors.runtimeThemes requires colors.luminance');
 	}
 
 	if (colors.alphaSchedule) {

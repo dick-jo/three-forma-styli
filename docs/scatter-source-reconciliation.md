@@ -1,6 +1,13 @@
 # Scatter design-system source reconciliation
 
-Status: read-only audit on 2026-07-22. No Scatter repository was modified.
+Status: read-only audit begun on 2026-07-22 and refreshed on 2026-07-23. No
+Scatter repository was modified.
+
+Decision update: the approved destination is now a canonical private
+`packages/design-system` package inside the Scatter monorepo. The sibling
+`tfs-scatter` repository remains migration input and a disposable rehearsal
+environment; it is no longer the intended long-term authority. See
+[Scatter rollout handoff](scatter-rollout-handoff.md).
 
 ## Authority and provenance
 
@@ -102,7 +109,7 @@ fallback faces are compatibility input—not the target architecture.
 
 ## Source-of-truth location options
 
-### A. A tracked package inside Splinter
+### A. A tracked package inside Splinter (selected)
 
 Example: `packages/scatter-design-system` or `apps/main/design-system`.
 
@@ -117,7 +124,7 @@ Benefits:
 Trade-off: this source is app-local until intentionally extracted or published.
 That is appropriate while Scatter is the only consumer.
 
-### B. A new sibling `~/project-local/tfs-scatter` repository (selected)
+### B. A sibling `~/project-local/tfs-scatter` repository (superseded)
 
 This matches the selected physical layout and cleanly separates the project
 from application code. It must be a real Git repository, not another unversioned

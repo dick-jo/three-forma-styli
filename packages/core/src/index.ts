@@ -5,7 +5,7 @@
 // ===========================================
 
 // Generator - produces Intermediate Representation
-export { generate, ValidationError } from './generator/index.js';
+export { generate, resolveGeneratorConfig, ValidationError } from './generator/index.js';
 export type {
 	IR,
 	TokenValue,

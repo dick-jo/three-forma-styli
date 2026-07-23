@@ -6,6 +6,7 @@ import type { TfsProject, WorkspacePackageOutput } from './project.js';
 import { COMPILER_VERSION } from './version.js';
 import { validateHostPackage } from './workspace/host-package.js';
 import { planWorkspacePackage } from './workspace/plan.js';
+import { workspacePlanContext } from './workspace/context.js';
 
 interface ArtifactMetadata {
 	path: string;
@@ -179,13 +180,10 @@ export async function validateProjectOutput(
 		}
 	}
 	if (layout === 'workspace-package') {
-		const typography = project.system.typography;
-		const plan = planWorkspacePackage(project.output as WorkspacePackageOutput, {
-			hasColors: Boolean(project.system.colors),
-			hasTypography: Boolean(typography?.roles && Object.keys(typography.roles).length > 0),
-			hasShadows: Boolean(project.system.shadows),
-			hasFonts: Object.keys(project.fonts ?? {}).length > 0,
-		});
+		const plan = planWorkspacePackage(
+			project.output as WorkspacePackageOutput,
+			workspacePlanContext(project)
+		);
 		const host = await validateHostPackage(configDirectory, outputDirectory, plan);
 		if (manifest.hostPackage?.sha256 !== host.hash) {
 			throw new Error('Generated output records a stale host package manifest. Run `tfs build .`.');

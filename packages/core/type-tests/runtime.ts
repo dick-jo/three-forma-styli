@@ -8,7 +8,7 @@ import {
 const config = {
 	colorNames: ['canvas', 'ink'],
 	luminance: {
-		minDelta: 0.5,
+		minimumLuminanceDelta: 0.5,
 		backgroundColors: ['canvas'],
 		foregroundColors: ['ink'],
 	},
@@ -27,7 +27,7 @@ new RuntimeColorThemeValidationError('theme.colors', 'is invalid');
 generateRuntimeColorTheme(unknownTheme, {
 	colorNames: ['canvas', 'ink'] as const,
 	luminance: {
-		minDelta: 0.5,
+		minimumLuminanceDelta: 0.5,
 		backgroundColors: ['canvas'],
 		// @ts-expect-error luminance groups must reference a declared color name
 		foregroundColors: ['accent'],

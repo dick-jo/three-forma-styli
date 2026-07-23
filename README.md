@@ -348,7 +348,7 @@ import { validateLuminance } from '@three-forma-styli/core';
 
 const result = validateLuminance(colors, {
 	polarity: 'negative', // dark background, light foreground
-	minDelta: 0.4, // minimum OKLCH-L separation
+	minimumLuminanceDelta: 0.4, // minimum OKLCH-L separation
 	backgroundColors: ['bg', 'ev'],
 	foregroundColors: ['primary', 'neutral', 'ink'],
 });
@@ -362,6 +362,28 @@ TFS preserves the established `luminance` product vocabulary, while every
 diagnostic identifies the actual metric as `oklch-l`. This is not WCAG relative
 luminance, a contrast ratio, or an accessibility-conformance result. A future
 WCAG diagnostic must remain separate rather than silently changing this model.
+
+A color system can own that reusable policy once. If it also supports
+user-authored runtime themes, it separately declares the exact editable subset:
+
+```typescript
+colors: {
+	modes,
+	alphaSchedule,
+	luminance: {
+		minimumLuminanceDelta: 0.4,
+		backgroundColors: ['bg', 'ev'],
+		foregroundColors: ['primary', 'neutral', 'ink'],
+	},
+	runtimeThemes: {
+		colorNames: ['bg', 'ev', 'primary', 'neutral', 'ink'],
+	},
+}
+```
+
+Static colors may remain in the palette without becoming accepted runtime input.
+The workspace compiler validates both policies and generates a literal
+`runtime-color-theme` consumer contract.
 
 ## Mode Categories
 
@@ -416,16 +438,21 @@ Do not ship that complete generator just to process saved end-user colours in a
 browser. Use the strict, tree-shakeable runtime boundary instead:
 
 ```typescript
+import { runtimeColorThemeConfig } from '@your-org/design-system/runtime-color-theme';
 import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
 
-const result = generateRuntimeColorTheme(untrustedThemeData, runtimePolicy);
+const result = generateRuntimeColorTheme(untrustedThemeData, runtimeColorThemeConfig);
 ```
 
 It accepts one exact serializable shape, rejects hostile or malformed data, emits
 native OKLCH custom properties, and returns explicitly identified OKLCH-L
 diagnostics. The release gate executes this path from packed npm and generated
 package tarballs in Chromium; compiler, font, CLI, and Culori code must not enter
-that browser bundle.
+that browser bundle. Author `colors.luminance` once and explicitly declare the
+user-editable subset in `colors.runtimeThemes.colorNames`; the generated runtime
+policy preserves literal color names, alpha schedule, custom property naming,
+and separation groups without app-side duplication. Static palette tokens do
+not accidentally become runtime-editable.
 
 ### Partial Generation
 

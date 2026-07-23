@@ -236,6 +236,14 @@ describe('workspace-package build', () => {
 		expect(native.modes[1]!.source.alphaSchedule).toEqual({ min: 0.2, max: 0.8 });
 		const manifest = JSON.parse(secondManifest.toString('utf8'));
 		expect(manifest).toMatchObject({ schemaVersion: 2, layout: 'workspace-package' });
+		for (const [artifact, dependencies] of Object.entries(
+			manifest.dependencies as Record<string, string[]>
+		)) {
+			expect(
+				new Set(dependencies).size,
+				`${artifact} contains duplicate artifact dependencies`
+			).toBe(dependencies.length);
+		}
 		expect(manifest.targets.runtime.entrypoints).not.toHaveProperty('./design/dtcg');
 	});
 
