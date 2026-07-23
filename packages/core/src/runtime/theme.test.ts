@@ -48,21 +48,9 @@ describe('parseRuntimeColorTheme', () => {
 			Object.assign(Object.create({ inherited: true }), theme),
 			'theme must be a plain object',
 		],
-		[
-			'an unknown root field',
-			{ ...theme, mode: 'dark' },
-			'theme.mode is not allowed',
-		],
-		[
-			'a missing root field',
-			{ colors: theme.colors },
-			'theme.polarity is required',
-		],
-		[
-			'an invalid polarity',
-			{ ...theme, polarity: 'dark' },
-			'theme.polarity must be either',
-		],
+		['an unknown root field', { ...theme, mode: 'dark' }, 'theme.mode is not allowed'],
+		['a missing root field', { colors: theme.colors }, 'theme.polarity is required'],
+		['an invalid polarity', { ...theme, polarity: 'dark' }, 'theme.polarity must be either'],
 		[
 			'a missing declared color',
 			{ ...theme, colors: { canvas: theme.colors.canvas } },
@@ -118,6 +106,49 @@ describe('parseRuntimeColorTheme', () => {
 			expect(error).toBeInstanceOf(RuntimeColorThemeValidationError);
 			expect((error as RuntimeColorThemeValidationError).path).toBe('theme.polarity');
 		}
+	});
+
+	it('rejects prototype-pollution and CSS-injection payloads decoded from JSON', () => {
+		const rootPollution = JSON.parse(
+			'{"polarity":"negative","colors":{"canvas":{"l":0.18,"c":0,"h":0},"ink":{"l":0.91,"c":0,"h":0}},"__proto__":{"polluted":true}}'
+		);
+		const colorPollution = JSON.parse(
+			'{"polarity":"negative","colors":{"canvas":{"l":0.18,"c":0,"h":0,"__proto__":{"polluted":true}},"ink":{"l":0.91,"c":0,"h":0}}}'
+		);
+		const cssInjection = JSON.parse(
+			'{"polarity":"negative","colors":{"canvas":{"l":0.18,"c":0,"h":0},"ink":{"l":0.91,"c":0,"h":"0);color:red"}}}'
+		);
+
+		expect(() => parseRuntimeColorTheme(rootPollution, config)).toThrowError(
+			'theme.__proto__ is not allowed'
+		);
+		expect(() => parseRuntimeColorTheme(colorPollution, config)).toThrowError(
+			'theme.colors.canvas.__proto__ is not allowed'
+		);
+		expect(() => parseRuntimeColorTheme(cssInjection, config)).toThrowError(
+			'theme.colors.ink.h must be a finite number'
+		);
+		expect((Object.prototype as { polluted?: boolean }).polluted).toBeUndefined();
+	});
+
+	it('safely supports token names that collide with Object prototype members', () => {
+		const result = generateRuntimeColorTheme(
+			JSON.parse(
+				'{"polarity":"negative","colors":{"canvas":{"l":0.1,"c":0,"h":0},"constructor":{"l":0.9,"c":0,"h":0}}}'
+			),
+			{
+				colorNames: ['canvas', 'constructor'],
+				luminance: {
+					minDelta: 0.5,
+					backgroundColors: ['canvas'],
+					foregroundColors: ['constructor'],
+				},
+			}
+		);
+
+		expect(Object.getPrototypeOf(result.theme.colors)).toBeNull();
+		expect(Object.getPrototypeOf(result.customProperties)).toBeNull();
+		expect(result.customProperties['--clr-constructor']).toBe('oklch(0.9000 0.0000 0.00)');
 	});
 
 	it.each([
@@ -191,6 +222,58 @@ describe('generateRuntimeColorTheme', () => {
 				ink: { group: 'foreground', luminance: 0.91 },
 			},
 		});
+		expect(Object.isFrozen(result.luminance)).toBe(true);
+		expect(Object.isFrozen(result.luminance.colors)).toBe(true);
+		expect(Object.isFrozen(result.luminance.colors.canvas)).toBe(true);
+	});
+
+	it('validates the exact lightness precision emitted to CSS', () => {
+		const result = generateRuntimeColorTheme(
+			{
+				polarity: 'negative',
+				colors: {
+					canvas: { l: 0.100004, c: 0, h: 0 },
+					ink: { l: 0.430013, c: 0, h: 0 },
+				},
+			},
+			{
+				colorNames: ['canvas', 'ink'],
+				luminance: {
+					minDelta: 0.330005,
+					backgroundColors: ['canvas'],
+					foregroundColors: ['ink'],
+				},
+			}
+		);
+
+		expect(result.customProperties).toMatchObject({
+			'--clr-canvas': 'oklch(0.1000 0.0000 0.00)',
+			'--clr-ink': 'oklch(0.4300 0.0000 0.00)',
+		});
+		expect(result.luminance.actualDelta).toBe(0.33);
+		expect(result.luminance.deltaValid).toBe(false);
+	});
+
+	it('normalizes floating-point noise in public diagnostics', () => {
+		const result = generateRuntimeColorTheme(
+			{
+				polarity: 'positive',
+				colors: {
+					canvas: { l: 0.9535, c: 0, h: 0 },
+					ink: { l: 0.2, c: 0, h: 0 },
+				},
+			},
+			{
+				colorNames: ['canvas', 'ink'],
+				luminance: {
+					minDelta: 0.33,
+					backgroundColors: ['canvas'],
+					foregroundColors: ['ink'],
+				},
+			}
+		);
+
+		expect(result.luminance.foregroundConstraint).toBe(0.6235);
 	});
 
 	it('supports positive-polarity diagnostics', () => {

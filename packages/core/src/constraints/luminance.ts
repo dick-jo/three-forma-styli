@@ -1,11 +1,11 @@
-import type {
-	ColorDiagnostic,
-	LuminanceConstraintConfig,
-	LuminanceValidation,
-} from './types.js';
+import type { ColorDiagnostic, LuminanceConstraintConfig, LuminanceValidation } from './types.js';
 
 interface OklchLightness {
 	readonly l: number;
+}
+
+function stableDiagnostic(value: number): number {
+	return Number(value.toFixed(12));
 }
 
 /**
@@ -71,7 +71,7 @@ export function validateLuminance(
 	// Calculate actual delta based on polarity
 	// Negative polarity: foreground (bright) - background (dark)
 	// Positive polarity: background (bright) - foreground (dark)
-	const actualDelta = polarity === 'negative' ? minFg - maxBg : minBg - maxFg;
+	const actualDelta = stableDiagnostic(polarity === 'negative' ? minFg - maxBg : minBg - maxFg);
 
 	// Check delta constraint
 	const deltaValid = actualDelta >= minDelta;
@@ -79,11 +79,13 @@ export function validateLuminance(
 	// Calculate constraint boundaries for UI display
 	// Negative polarity: backgrounds can't exceed (minFg - minDelta), foregrounds can't go below (maxBg + minDelta)
 	// Positive polarity: backgrounds can't go below (maxFg + minDelta), foregrounds can't exceed (minBg - minDelta)
-	const backgroundConstraint =
-		polarity === 'negative' ? minFg - minDelta : maxFg + minDelta;
+	const backgroundConstraint = stableDiagnostic(
+		polarity === 'negative' ? minFg - minDelta : maxFg + minDelta
+	);
 
-	const foregroundConstraint =
-		polarity === 'negative' ? maxBg + minDelta : minBg - minDelta;
+	const foregroundConstraint = stableDiagnostic(
+		polarity === 'negative' ? maxBg + minDelta : minBg - minDelta
+	);
 
 	// Build per-color diagnostics
 	const colorDiagnostics: Record<string, ColorDiagnostic> = {};
@@ -94,10 +96,9 @@ export function validateLuminance(
 		if (color?.l !== undefined) {
 			// For negative polarity: headroom = constraint (max) - luminance
 			// For positive polarity: headroom = luminance - constraint (min)
-			const headroom =
-				polarity === 'negative'
-					? backgroundConstraint - color.l
-					: color.l - backgroundConstraint;
+			const headroom = stableDiagnostic(
+				polarity === 'negative' ? backgroundConstraint - color.l : color.l - backgroundConstraint
+			);
 
 			colorDiagnostics[key] = {
 				group: 'background',
@@ -113,10 +114,9 @@ export function validateLuminance(
 		if (color?.l !== undefined) {
 			// For negative polarity: headroom = luminance - constraint (min)
 			// For positive polarity: headroom = constraint (max) - luminance
-			const headroom =
-				polarity === 'negative'
-					? color.l - foregroundConstraint
-					: foregroundConstraint - color.l;
+			const headroom = stableDiagnostic(
+				polarity === 'negative' ? color.l - foregroundConstraint : foregroundConstraint - color.l
+			);
 
 			colorDiagnostics[key] = {
 				group: 'foreground',

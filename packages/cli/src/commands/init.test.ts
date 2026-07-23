@@ -33,15 +33,17 @@ describe('tfs init', () => {
 		const manifest = await fs.readJson(path.join(projectRoot, 'package.json'));
 
 		expect(manifest.version).toBeUndefined();
-		expect(manifest.dependencies['@three-forma-styli/core']).toBe('^0.2.0');
-		expect(manifest.devDependencies['@three-forma-styli/cli']).toBe('^0.2.0');
-		expect(manifest.devDependencies['@three-forma-styli/compiler']).toBe('^0.2.0');
+		expect(manifest.dependencies['@three-forma-styli/core']).toBe('0.2.0');
+		expect(manifest.devDependencies['@three-forma-styli/cli']).toBe('0.2.0');
+		expect(manifest.devDependencies['@three-forma-styli/compiler']).toBe('0.2.0');
 		expect(await fs.readFile(path.join(projectRoot, 'tfs.config.ts'), 'utf8')).toContain(
 			'from "@three-forma-styli/compiler"'
 		);
 		expect(manifest.scripts).toEqual({
-			build: 'tfs build .',
-			check: 'tsc --noEmit && tfs build .',
+			generate: 'tfs build .',
+			build: 'tfs validate .',
+			check: 'tsc --noEmit && tfs validate .',
+			'check:generated': 'tfs check .',
 			specimen: 'tfs specimen serve .',
 		});
 		expect(await fs.pathExists(path.join(projectRoot, 'config.ts'))).toBe(false);
@@ -85,15 +87,18 @@ describe('tfs init', () => {
 			theme: 'default',
 			skipInstall: true,
 			workspacePackage: true,
+			packageName: '@repo/design-system',
 		});
 		const projectRoot = path.join(temporaryRoot, 'workspace-system');
 		const manifest = await fs.readJson(path.join(projectRoot, 'package.json'));
 		const config = await fs.readFile(path.join(projectRoot, 'tfs.config.ts'), 'utf8');
 
+		expect(manifest.version).toBe('0.0.0');
+		expect(manifest.name).toBe('@repo/design-system');
 		expect(config).toContain('layout: "workspace-package"');
 		expect(config).toContain('directory: "./generated"');
 		expect(manifest.dependencies).toBeUndefined();
-		expect(manifest.devDependencies['@three-forma-styli/core']).toBe('^0.2.0');
+		expect(manifest.devDependencies['@three-forma-styli/core']).toBe('0.2.0');
 		expect(manifest.scripts).toEqual({
 			generate: 'tfs build .',
 			build: 'tfs validate .',
@@ -106,6 +111,10 @@ describe('tfs init', () => {
 			import: './generated/runtime/index.js',
 		});
 		expect(manifest.exports['./styles.css']).toBe('./generated/runtime/styles/index.css');
+		expect(manifest.exports['./typography.module.css']).toEqual({
+			types: './generated/runtime/styles/typography.module.css.d.ts',
+			default: './generated/runtime/styles/typography.module.css',
+		});
 		expect(manifest.files).toEqual(['generated/runtime', 'generated/assets', 'README.md']);
 		expect(manifest.sideEffects).toEqual(['./generated/runtime/styles/*.css']);
 
@@ -143,6 +152,28 @@ describe('tfs init', () => {
 		await expect(
 			initCommand('safe-project', { theme: '../default', skipInstall: true })
 		).rejects.toThrow(/Starter preset/);
+		expect(await fs.pathExists(path.join(temporaryRoot, 'safe-project'))).toBe(false);
+	});
+
+	it('rejects unsafe package names and unknown package managers before writing', async () => {
+		const temporaryRoot = await fs.mkdtemp(path.join(originalCwd, '.tfs-init-test-'));
+		temporaryRoots.push(temporaryRoot);
+		process.chdir(temporaryRoot);
+
+		await expect(
+			initCommand('safe-project', {
+				theme: 'default',
+				skipInstall: true,
+				packageName: '@repo/../escape',
+			})
+		).rejects.toThrow(/Package name/);
+		await expect(
+			initCommand('safe-project', {
+				theme: 'default',
+				skipInstall: true,
+				packageManager: 'bun',
+			})
+		).rejects.toThrow(/must be npm, pnpm, or yarn/);
 		expect(await fs.pathExists(path.join(temporaryRoot, 'safe-project'))).toBe(false);
 	});
 });

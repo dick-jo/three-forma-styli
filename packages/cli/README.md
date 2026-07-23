@@ -37,17 +37,24 @@ Options:
 - `-t, --theme <name>` - Choose the starter source preset (default: "default")
 - `--workspace-package` - Scaffold a private, monorepo-ready package whose
   generated runtime is consumed through explicit package exports
+- `--package-name <name>` - Set an independent npm package name such as
+  `@repo/design-system`; the directory name remains path-safe and unscoped
+- `--package-manager <manager>` - Explicitly use `npm`, `pnpm`, or `yarn`;
+  otherwise TFS respects the invoking user agent, nearest lockfile, then
+  available executables
 - `--skip-install` - Skip automatic dependency installation
 
 The default standalone scaffold writes a complete portable handoff to `dist/`.
 The workspace-package scaffold writes a generated package boundary to
 `generated/`: runtime CSS/contracts are exportable, while specimens and
-design-tool JSON remain local review artifacts. Its scripts deliberately keep
-routine `build`/`check` independent of FontTools:
+design-tool JSON remain local review artifacts. Both scaffold shapes use the
+same command contract: `generate` writes, `build`/`check` validate committed
+output, and `check:generated` performs the expensive private regeneration proof.
+Routine `build`/`check` stay independent of FontTools:
 
 ```bash
-npm run check             # fast types + committed package validation
 npm run generate          # explicit authoring operation
+npm run check             # fast types + committed package validation
 npm run check:generated   # dedicated CI drift proof
 ```
 
@@ -251,7 +258,8 @@ cd my-design-system
 # Edit your theme files
 # (full IntelliSense from @three-forma-styli/core)
 
-# Generate the complete dist/ handoff
+# Generate the complete dist/ handoff, then validate it without writing
+npm run generate
 npm run check
 ```
 

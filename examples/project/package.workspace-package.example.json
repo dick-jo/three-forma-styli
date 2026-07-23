@@ -24,7 +24,10 @@
 		"./styles.css": "./generated/runtime/styles/index.css",
 		"./tokens.css": "./generated/runtime/styles/tokens.css",
 		"./typography.css": "./generated/runtime/styles/typography.css",
-		"./typography.module.css": "./generated/runtime/styles/typography.module.css",
+		"./typography.module.css": {
+			"types": "./generated/runtime/styles/typography.module.css.d.ts",
+			"default": "./generated/runtime/styles/typography.module.css"
+		},
 		"./package.json": "./package.json"
 	}
 }

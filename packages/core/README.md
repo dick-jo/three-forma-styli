@@ -16,33 +16,19 @@ import type { DesignSystem, PartialDesignSystem } from '@three-forma-styli/core'
 
 // Full design system
 const system: DesignSystem = {
-	colors: {
-		/* ... */
-	},
-	spacing: {
-		/* ... */
-	},
-	gap: {
-		/* ... */
-	},
-	typography: {
-		/* ... */
-	},
-	border: {
-		/* ... */
-	},
-	time: {
-		/* ... */
-	},
+	colors: {/* ... */},
+	spacing: {/* ... */},
+	gap: {/* ... */},
+	typography: {/* ... */},
+	border: {/* ... */},
+	time: {/* ... */},
 };
 
 const css = toCss(generate(system));
 
 // Partial generation (e.g., just colors)
 const partial: PartialDesignSystem = {
-	colors: {
-		/* ... */
-	},
+	colors: {/* ... */},
 };
 
 const colorsCss = toCss(generate(partial));
@@ -108,9 +94,20 @@ fail before CSS is emitted. CSS values stay in native `oklch()`, preserving
 Display-P3-capable chroma for the browser instead of clipping through sRGB.
 
 TFS retains its public `luminance` terminology. Shared and runtime validation
-results identify the current metric as `oklch-l`: they compare the authored
-OKLCH L components. This palette-separation diagnostic is not WCAG relative
-luminance and is not a contrast-ratio or accessibility-conformance result.
+results identify the current metric as `oklch-l`. Runtime diagnostics compare
+the exact four-decimal OKLCH L values emitted to CSS, so a boundary result cannot
+disagree with the generated declarations. This palette-separation diagnostic is
+not WCAG relative luminance and is not a contrast-ratio or
+accessibility-conformance result.
+
+The runtime entry targets ES2022 and emits native `oklch()`. Its supported web
+baseline is therefore an evergreen browser with CSS OKLCH support. TFS does not
+silently inject an sRGB conversion that could dull wide-gamut colors. An app
+supporting older browsers should gate runtime theming with
+`CSS.supports('color', 'oklch(0.5 0 0)')` and own its fallback policy. Here,
+“untrusted JSON” means a value decoded from JSON or equivalent structured data;
+it does not claim to safely inspect an adversarial live JavaScript Proxy or
+getter object in the same realm.
 
 Display-P3 output uses profile-relative RGB components and must only be sent to
 a Display-P3 Figma file. CSS output should stay in native OKLCH; TFS rejects P3

@@ -59,6 +59,30 @@ remaining work so decisions do not depend on one chat transcript.
       audit, and deterministic legacy-output checks.
 - [x] Run the final P3, prepared-font, specimen-server, and real-browser
       regressions against the rebuilt Scatter design-system package.
+- [x] Install actual packed TFS tarballs through npm, scaffold both supported
+      project shapes, pack the generated design-system package, and build a
+      typed production Vite consumer. Keep this separate from the fast routine
+      check and run it in release CI.
+- [x] Make scaffolded checks non-mutating, pin the local TFS toolchain exactly,
+      support scoped workspace package names, and make package-manager choice
+      explicit/deterministic.
+- [x] Type the CSS Module package export, reject stale exports into removed
+      TFS-owned targets, and prove the packed package boundary externally.
+- [x] Harden generated asset URLs for spaces, `#`, Unicode and configured path
+      nesting; reject non-portable filesystem names and ambiguous public/CDN
+      prefixes.
+- [x] Preserve literal runtime color-name types, validate luminance against the
+      exact emitted CSS precision, normalize diagnostic arithmetic, deep-freeze
+      results, and add hostile persisted-JSON regressions.
+- [x] Add Windows Node 22 CI for build, package validation, packed installs and
+      ecosystem consumers. The first remote run remains release evidence.
+- [ ] Add a stable machine-readable CLI contract (`--json`, diagnostic IDs,
+      documented exit codes and `build --dry-run`) before declaring the CLI 1.0.
+- [ ] Record exact FontTools/Python provenance whenever byte conversion occurs;
+      keep the external tool pinned in dedicated regeneration CI.
+- [ ] Decide whether install-graph minimalism justifies a future dedicated
+      `@three-forma-styli/runtime` package. The current runtime subpath is
+      browser-bundle clean but installing `core` still installs Culori.
 
 ## Active Scatter design-system work
 
@@ -165,3 +189,15 @@ remaining work so decisions do not depend on one chat transcript.
   explicit ownership decision because core must not guess editable colours or
   polarity transforms. The alternatives are recorded in `tfs-scatter`'s
   `SCATTER-INTEGRATION.md`.
+- **2026-07-23 — mature-tool workflow benchmark.** TFS adopts the useful parts
+  of Prettier, Storybook and Style Dictionary without copying their entire
+  product surface: project-local exact tooling, deterministic owned output,
+  write-versus-check command clarity, isolated review artifacts, explicit
+  target planning and realistic packed/browser consumers. TFS deliberately
+  avoids global config, a generic hook free-for-all, partial managed-tree
+  cleaning, and an internal cache until every external input can be keyed.
+- **2026-07-23 — realistic consumers found real defects.** True tarball and
+  framework tests exposed an un-packable versionless workspace scaffold,
+  unresolved CSS Module declarations, stale exports after target removal, and
+  broken font URLs for reserved URL characters. Those are now permanent
+  regressions rather than one-off manual observations.

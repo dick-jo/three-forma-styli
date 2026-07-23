@@ -191,11 +191,15 @@ export default defineTfsProject({
 `
 	);
 
-	const help = run(path.join(consumerDirectory, 'node_modules', '.bin', 'tfs'), ['--help'], {
+	const cliEntry = path.join(
+		consumerDirectory,
+		'node_modules/@three-forma-styli/cli/dist/index.js'
+	);
+	const help = run(process.execPath, [cliEntry, '--help'], {
 		cwd: consumerDirectory,
 	});
 	assert.match(help, /Usage: tfs/);
-	run(path.join(consumerDirectory, 'node_modules', '.bin', 'tfs'), ['build', '.'], {
+	run(process.execPath, [cliEntry, 'build', '.'], {
 		cwd: consumerDirectory,
 	});
 	assert.match(await readFile(path.join(consumerDirectory, 'dist/tokens.css'), 'utf8'), /--sp-1/);

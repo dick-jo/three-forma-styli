@@ -29,4 +29,13 @@ describe('parseOutputFormat', () => {
 			)
 		).toBe('./fonts.css');
 	});
+
+	it('URL-encodes reserved and Unicode path segments', () => {
+		expect(
+			relativeStylesheetHref(
+				path.join('/project', 'review pages', 'specimen #1.html'),
+				path.join('/project', 'font assets', 'Supreme ü.css')
+			)
+		).toBe('../font%20assets/Supreme%20%C3%BC.css');
+	});
 });

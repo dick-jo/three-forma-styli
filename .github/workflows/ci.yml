@@ -37,4 +37,25 @@ jobs:
       - if: matrix.node == 22
         run: node scripts/verify-packed-release.mjs
       - if: matrix.node == 22
+        run: pnpm check:ecosystem
+      - if: matrix.node == 22
         run: pnpm audit --prod --audit-level=moderate
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.9.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm check:packages
+      - run: node scripts/verify-packed-release.mjs
+      - run: pnpm check:ecosystem

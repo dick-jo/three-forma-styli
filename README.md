@@ -19,7 +19,8 @@ npx @three-forma-styli/cli init my-design-system
 cd my-design-system
 
 # Edit your theme files (with full TypeScript IntelliSense)
-# Then generate the configured portable dist/ directory
+# Then generate the configured portable dist/ directory and prove it is current
+npm run generate
 npm run check
 
 # A targeted single-file build can emit one format

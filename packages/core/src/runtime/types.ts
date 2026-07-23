@@ -11,37 +11,39 @@ export interface RuntimeOklchColor {
 }
 
 /** The deliberately small, serializable shape accepted from an untrusted source. */
-export interface RuntimeColorTheme {
+export interface RuntimeColorTheme<ColorNames extends readonly string[] = readonly string[]> {
 	readonly polarity: 'negative' | 'positive';
-	readonly colors: Readonly<Record<string, RuntimeOklchColor>>;
+	readonly colors: Readonly<Record<ColorNames[number], RuntimeOklchColor>>;
 }
 
-export interface RuntimeColorThemeSchema {
+export interface RuntimeColorThemeSchema<ColorNames extends readonly string[] = readonly string[]> {
 	/** Exact color keys that the runtime payload must contain. */
-	readonly colorNames: readonly string[];
+	readonly colorNames: ColorNames;
 }
 
-export interface RuntimeLuminanceConfig {
+export interface RuntimeLuminanceConfig<ColorName extends string = string> {
 	readonly minDelta: number;
-	readonly backgroundColors: readonly string[];
-	readonly foregroundColors: readonly string[];
+	readonly backgroundColors: readonly ColorName[];
+	readonly foregroundColors: readonly ColorName[];
 }
 
-export interface RuntimeColorThemeConfig extends RuntimeColorThemeSchema {
+export interface RuntimeColorThemeConfig<
+	ColorNames extends readonly string[] = readonly string[],
+> extends RuntimeColorThemeSchema<ColorNames> {
 	/** Optional alpha variants. No variants are generated when omitted. */
 	readonly alphaSchedule?: Readonly<Record<string, number>>;
-	readonly luminance: RuntimeLuminanceConfig;
+	readonly luminance: RuntimeLuminanceConfig<NoInfer<ColorNames[number]>>;
 	/** Mirrors the color member of TFS's build-time generator prefixes. */
 	readonly prefixes?: Readonly<{ color?: string }>;
 	/** Native OKLCH is fixed; alpha naming mirrors the build-time generator option. */
 	readonly colorFormat?: Readonly<{ alphaModifier?: string }>;
 }
 
-export interface RuntimeColorThemeResult {
-	readonly theme: RuntimeColorTheme;
+export interface RuntimeColorThemeResult<ColorNames extends readonly string[] = readonly string[]> {
+	readonly theme: RuntimeColorTheme<ColorNames>;
 	/** Null-prototype, frozen record ready for DOM assignment. */
 	readonly customProperties: Readonly<Record<string, string>>;
-	/** Existing TFS palette-separation diagnostics, explicitly measured in OKLCH L. */
+	/** TFS palette-separation diagnostics measured from the emitted 4dp OKLCH L values. */
 	readonly luminance: LuminanceValidation;
 }
 

@@ -4,6 +4,7 @@ import type {
 	ProjectJsonOutput,
 	WorkspacePackageOutput,
 } from '../project.js';
+import { assertPortableConfiguredPath } from '../portable-path.js';
 
 export type WorkspaceArtifactKind =
 	'runtime-js' | 'runtime-types' | 'runtime-css' | 'review' | 'design' | 'font-asset' | 'evidence';
@@ -51,11 +52,12 @@ export interface WorkspacePlan {
 
 export interface RequiredPackageExport {
 	subpath: string;
-	target: string | { types: string; import: string };
+	target: string | Readonly<Record<string, string>>;
 }
 
 function portablePath(value: string, label: string): string {
 	if (!value || path.isAbsolute(value)) throw new Error(`${label} must be a relative path.`);
+	assertPortableConfiguredPath(value.split(path.sep).join('/'), label);
 	const normalized = path.normalize(value);
 	if (normalized === '..' || normalized.startsWith(`..${path.sep}`)) {
 		throw new Error(`${label} must stay inside the generated directory.`);
@@ -375,7 +377,10 @@ export function requiredPackageExports(
 	if (plan.css.module) {
 		required.push({
 			subpath: './typography.module.css',
-			target: packageTarget(generatedFromHost, 'runtime/styles/typography.module.css'),
+			target: {
+				types: packageTarget(generatedFromHost, 'runtime/styles/typography.module.css.d.ts'),
+				default: packageTarget(generatedFromHost, 'runtime/styles/typography.module.css'),
+			},
 		});
 	}
 	if (plan.css.separateFonts) {

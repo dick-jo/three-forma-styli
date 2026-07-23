@@ -30,6 +30,8 @@ program
 	.description('Create a new theme project')
 	.option('-t, --theme <name>', 'starter theme to use (skips prompt)')
 	.option('--workspace-package', 'scaffold a monorepo-ready generated package boundary')
+	.option('--package-name <name>', 'package.json name (for example @repo/design-system)')
+	.option('--package-manager <manager>', 'installer: npm, pnpm, or yarn')
 	.option('--skip-install', 'skip automatic npm install')
 	.action(async (projectName, options) => {
 		await initCommand(projectName, options);

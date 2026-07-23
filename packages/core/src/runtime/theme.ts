@@ -63,9 +63,7 @@ function validateColorNames(value: unknown): readonly string[] {
 		fail('config.colorNames', 'must be a non-empty array');
 	}
 
-	const names = value.map((name, index) =>
-		requireTokenName(name, `config.colorNames[${index}]`)
-	);
+	const names = value.map((name, index) => requireTokenName(name, `config.colorNames[${index}]`));
 	const uniqueNames = new Set(names);
 	if (uniqueNames.size !== names.length) fail('config.colorNames', 'must not contain duplicates');
 	return names;
@@ -95,11 +93,13 @@ function parsePolarity(value: unknown): RuntimeColorTheme['polarity'] {
 }
 
 /** Strictly parse an unknown JSON-compatible runtime color theme. */
-export function parseRuntimeColorTheme(
+export function parseRuntimeColorTheme<const ColorNames extends readonly string[]>(
 	input: unknown,
-	schema: RuntimeColorThemeSchema
-): RuntimeColorTheme {
-	const colorNames = validateColorNames((schema as RuntimeColorThemeSchema | undefined)?.colorNames);
+	schema: RuntimeColorThemeSchema<ColorNames>
+): RuntimeColorTheme<ColorNames> {
+	const colorNames = validateColorNames(
+		(schema as RuntimeColorThemeSchema | undefined)?.colorNames
+	);
 	const root = requirePlainRecord(input, 'theme');
 	requireExactKeys(root, rootKeys, 'theme');
 	const inputColors = requirePlainRecord(root.colors, 'theme.colors');
@@ -113,7 +113,7 @@ export function parseRuntimeColorTheme(
 	return Object.freeze({
 		polarity: parsePolarity(root.polarity),
 		colors: Object.freeze(colors),
-	});
+	}) as RuntimeColorTheme<ColorNames>;
 }
 
 function validateAlphaSchedule(
@@ -154,12 +154,12 @@ function validateColorGroup(
  * through sRGB, so authored Display-P3-capable colors retain their chroma until
  * the browser performs display-aware rendering.
  */
-export function generateRuntimeColorTheme(
+export function generateRuntimeColorTheme<const ColorNames extends readonly string[]>(
 	input: unknown,
-	config: RuntimeColorThemeConfig
-): RuntimeColorThemeResult {
+	config: RuntimeColorThemeConfig<ColorNames>
+): RuntimeColorThemeResult<ColorNames> {
 	const theme = parseRuntimeColorTheme(input, config);
-	const colorNames = Object.keys(theme.colors);
+	const colorNames = Object.keys(theme.colors) as Array<ColorNames[number]>;
 	const declaredColors = new Set(colorNames);
 	const alphaSchedule = validateAlphaSchedule(config.alphaSchedule);
 	const prefix = requireTokenName(config.prefixes?.color ?? 'clr', 'config.prefixes.color');
@@ -209,16 +209,33 @@ export function generateRuntimeColorTheme(
 		}
 	}
 
-	const diagnostics = validateLuminance(theme.colors, {
+	const emittedColors = Object.create(null) as Record<string, RuntimeOklchColor>;
+	for (const colorName of colorNames) {
+		const color = theme.colors[colorName]!;
+		emittedColors[colorName] = { ...color, l: Number(color.l.toFixed(4)) };
+	}
+	const diagnostics = validateLuminance(emittedColors, {
 		polarity: theme.polarity,
 		minDelta,
 		backgroundColors: [...backgroundColors],
 		foregroundColors: [...foregroundColors],
 	});
 
+	const diagnosticColors = Object.create(null) as Record<
+		string,
+		Readonly<{ group: 'background' | 'foreground'; luminance: number; headroom: number }>
+	>;
+	for (const [name, diagnostic] of Object.entries(diagnostics.colors)) {
+		diagnosticColors[name] = Object.freeze({ ...diagnostic });
+	}
+	const frozenDiagnostics = Object.freeze({
+		...diagnostics,
+		colors: Object.freeze(diagnosticColors),
+	});
+
 	return Object.freeze({
 		theme,
 		customProperties: Object.freeze(customProperties),
-		luminance: Object.freeze(diagnostics),
+		luminance: frozenDiagnostics,
 	});
 }

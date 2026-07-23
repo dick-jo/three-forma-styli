@@ -30,9 +30,20 @@ export function parseOutputFormat(value: string | undefined): OutputFormat {
 }
 
 export function relativeStylesheetHref(outputPath: string, stylesheetPath: string): string {
-	const relative = path
+	const relativePath = path
 		.relative(path.dirname(outputPath), stylesheetPath)
 		.split(path.sep)
+		.join('/');
+	const relative = relativePath
+		.split('/')
+		.map((segment) => {
+			if (segment === '' || segment === '.' || segment === '..') return segment;
+			try {
+				return encodeURIComponent(decodeURIComponent(segment));
+			} catch {
+				return encodeURIComponent(segment);
+			}
+		})
 		.join('/');
 	if (relative.startsWith('.') || relative.startsWith('/')) return relative;
 	return `./${relative}`;

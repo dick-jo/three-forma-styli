@@ -248,6 +248,14 @@ describe('portable project build', () => {
 		await expect(buildProject(project, path.join(directory, 'tfs.config.ts'))).rejects.toThrow(
 			'must stay inside the project output directory'
 		);
+
+		const nonPortable = defineTfsProject({
+			system: { typography: defaultTypography },
+			output: { directory: './dist', css: { file: 'tokens?.css' } },
+		});
+		await expect(buildProject(nonPortable, path.join(directory, 'tfs.config.ts'))).rejects.toThrow(
+			'must use portable path segments'
+		);
 	});
 
 	it('validates explicit font asset URL policies and keeps the asset subtree reserved', async () => {

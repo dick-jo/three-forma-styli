@@ -4,6 +4,7 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import {
 	commitPreparedFiles,
+	assertPortableFontOutputName,
 	assertNonOverlappingPreparedFaces,
 	assertWebEmbeddingAllowed,
 	prepareFonts,
@@ -12,6 +13,15 @@ import {
 } from './prepare.js';
 
 describe('renderFontFaceCss', () => {
+	it('accepts useful filenames and rejects cross-platform filesystem hazards', () => {
+		expect(() => assertPortableFontOutputName('Supreme #1 ü.woff2', 'font output')).not.toThrow();
+		for (const name of ['Supreme?.woff2', 'CON.woff2', 'font.woff2.', 'font\\name.woff2']) {
+			expect(() => assertPortableFontOutputName(name, 'font output')).toThrowError(
+				'must use portable path segments'
+			);
+		}
+	});
+
 	it('emits variable ranges and longhand face descriptors', () => {
 		const manifest: PreparedFontsManifest = {
 			schemaVersion: 2,

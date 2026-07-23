@@ -35,6 +35,7 @@ import {
 	renderTypographyContract,
 } from './contracts.js';
 import type { WorkspacePlan } from './plan.js';
+import { fontAssetUrl, relativeUrl, validateFontAssetUrlPolicy } from '../font-url.js';
 
 export type WorkspaceProject = TfsProject & { output: WorkspacePackageOutput };
 
@@ -43,10 +44,6 @@ export interface WorkspaceRenderResult {
 	ir: IR;
 	preparedFonts?: PrepareFontsResult;
 	adjustedFallbacks?: AdjustedFallbackBuildResult;
-}
-
-function posix(value: string): string {
-	return value.split(path.sep).join('/');
 }
 
 async function writeText(staging: string, relative: string, contents: string): Promise<void> {
@@ -68,28 +65,8 @@ function joinFontFaceCss(primary: string, adjusted?: string): string {
 	return adjusted ? `${primary.trimEnd()}\n\n${adjusted.trim()}\n` : primary;
 }
 
-function joinAssetUrl(prefix: string, file: string): string {
-	return `${prefix.replace(/\/$/, '')}/${file}`;
-}
-
 export function validateRuntimeFontUrlPolicy(policy: ProjectFontAssetUrlPolicy): void {
-	if (policy.mode === 'relative') return;
-	if (!policy.prefix.trim())
-		throw new Error(`runtime.css.fontUrls ${policy.mode} prefix is required.`);
-	if (policy.mode === 'public' && !policy.prefix.startsWith('/')) {
-		throw new Error('runtime.css.fontUrls public prefix must start with /.');
-	}
-	if (policy.mode === 'absolute') {
-		let url: URL;
-		try {
-			url = new URL(policy.prefix);
-		} catch {
-			throw new Error('runtime.css.fontUrls absolute prefix must be an absolute URL.');
-		}
-		if (!['http:', 'https:'].includes(url.protocol)) {
-			throw new Error('runtime.css.fontUrls absolute prefix must use http or https.');
-		}
-	}
+	validateFontAssetUrlPolicy(policy, 'runtime.css.fontUrls');
 }
 
 function fontFaceUrl(
@@ -98,21 +75,15 @@ function fontFaceUrl(
 	policy: ProjectFontAssetUrlPolicy,
 	face: PreparedFontFace
 ): string {
-	if (policy.mode !== 'relative') return joinAssetUrl(policy.prefix, face.file);
-	const relative = posix(
-		path.relative(path.dirname(stylesheet), path.join(fontDirectory, face.file))
-	);
-	return relative.startsWith('.') ? relative : `./${relative}`;
+	return fontAssetUrl(stylesheet, fontDirectory, policy, face.file);
 }
 
 function importLine(from: string, target: string): string {
-	const relative = posix(path.relative(path.dirname(from), target));
-	return `@import ${JSON.stringify(relative.startsWith('.') ? relative : `./${relative}`)};`;
+	return `@import ${JSON.stringify(relativeUrl(from, target))};`;
 }
 
 function moduleExport(from: string, target: string): string {
-	const relative = posix(path.relative(path.dirname(from), target));
-	return relative.startsWith('.') ? relative : `./${relative}`;
+	return relativeUrl(from, target);
 }
 
 function hasEmbeddedTypographyFonts(typography: unknown): boolean {

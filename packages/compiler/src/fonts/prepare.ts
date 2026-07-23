@@ -4,6 +4,8 @@ import path from 'node:path';
 import { promisify } from 'node:util';
 import fs from 'fs-extra';
 import { classifyFontStyle, inspectFontFiles, type FontInspection } from './inspect.js';
+import { joinUrlPath } from '../font-url.js';
+import { assertPortablePathSegment } from '../portable-path.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -186,10 +188,6 @@ function sourceStrategy(
 	return 'copy';
 }
 
-function joinUrl(prefix: string, filename: string): string {
-	return `${prefix.replace(/\/$/, '')}/${filename}`;
-}
-
 function outputFormat(extension: string): string {
 	switch (extension.toLowerCase()) {
 		case '.woff2':
@@ -260,6 +258,10 @@ function fontStretch(inspection: FontInspection): PreparedFontFace['stretch'] {
 	if (axis) return { min: axis.min, max: axis.max };
 	const percentage = widthClassPercentages[inspection.style.width];
 	return percentage && percentage !== 100 ? percentage : undefined;
+}
+
+export function assertPortableFontOutputName(value: string, label: string): void {
+	assertPortablePathSegment(value, label);
 }
 
 function formatRange(value: number | { min: number; max: number }): string {
@@ -633,6 +635,7 @@ export async function prepareFonts(
 				if (path.basename(outputName) !== outputName) {
 					throw new Error(`fonts.${id} output names must be filenames without directories.`);
 				}
+				assertPortableFontOutputName(outputName, `fonts.${id} output name`);
 				if (claimedOutputs.has(outputName.toLowerCase())) {
 					throw new Error(`Prepared font output collision: ${outputName}`);
 				}
@@ -691,7 +694,7 @@ export async function prepareFonts(
 						sha256: sourceInspection.source.sha256,
 					},
 					file: outputName,
-					url: joinUrl(publicPath, outputName),
+					url: joinUrlPath(publicPath, outputName),
 					format: outputFormat(path.extname(outputName)),
 					style: preparedStyle,
 					obliqueAngle: preparedObliqueAngle,

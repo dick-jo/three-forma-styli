@@ -37,6 +37,8 @@ import { COMPILER_VERSION } from './version.js';
 import { generateProjectSystemTypescript } from './system-typescript.js';
 import { buildWorkspacePackageProject } from './workspace/build.js';
 import { assertGeneratedOutputCurrent } from './generated-check.js';
+import { fontAssetUrl, relativeUrl, validateFontAssetUrlPolicy } from './font-url.js';
+import { assertPortableConfiguredPath } from './portable-path.js';
 
 interface OutputPlan {
 	css?: string;
@@ -83,28 +85,8 @@ function fontAssetsOptions(output: LegacyTfsProjectOutput) {
 	};
 }
 
-function joinAssetUrl(prefix: string, file: string): string {
-	return `${prefix.replace(/\/$/, '')}/${file}`;
-}
-
 function validateFontUrlPolicy(policy: ProjectFontAssetUrlPolicy): void {
-	if (policy.mode === 'relative') return;
-	if (!policy.prefix.trim())
-		throw new Error(`output.fontAssets.urls ${policy.mode} prefix is required.`);
-	if (policy.mode === 'public' && !policy.prefix.startsWith('/')) {
-		throw new Error('output.fontAssets.urls public prefix must start with /.');
-	}
-	if (policy.mode === 'absolute') {
-		let url: URL;
-		try {
-			url = new URL(policy.prefix);
-		} catch {
-			throw new Error('output.fontAssets.urls absolute prefix must be an absolute URL.');
-		}
-		if (!['http:', 'https:'].includes(url.protocol)) {
-			throw new Error('output.fontAssets.urls absolute prefix must use http or https.');
-		}
-	}
+	validateFontAssetUrlPolicy(policy, 'output.fontAssets.urls');
 }
 
 function fontFaceUrl(
@@ -113,12 +95,7 @@ function fontFaceUrl(
 	policy: ProjectFontAssetUrlPolicy,
 	face: PreparedFontFace
 ): string {
-	if (policy.mode !== 'relative') return joinAssetUrl(policy.prefix, face.file);
-	const relative = path
-		.relative(path.dirname(targetStylesheet), path.join(fontDirectory, face.file))
-		.split(path.sep)
-		.join('/');
-	return relative.startsWith('.') ? relative : `./${relative}`;
+	return fontAssetUrl(targetStylesheet, fontDirectory, policy, face.file);
 }
 
 function outputPlan(output: LegacyTfsProjectOutput): OutputPlan {
@@ -143,6 +120,7 @@ function outputPlan(output: LegacyTfsProjectOutput): OutputPlan {
 
 function assertPortableRelativePath(value: string, label: string): string {
 	if (!value || path.isAbsolute(value)) throw new Error(`${label} must be a relative output path.`);
+	assertPortableConfiguredPath(value.split(path.sep).join('/'), label);
 	const normalized = path.normalize(value);
 	if (normalized === '..' || normalized.startsWith(`..${path.sep}`)) {
 		throw new Error(`${label} must stay inside the project output directory.`);
@@ -459,20 +437,14 @@ async function buildLegacyProject(
 					: preparedFonts && fontFacesMode !== 'none'
 						? path.join(fontAssets.directory, 'fonts.css')
 						: undefined;
-			const fontHref = faceStylesheet
-				? path.relative(path.dirname(plan.specimen), faceStylesheet).split(path.sep).join('/')
-				: undefined;
+			const fontHref = faceStylesheet ? relativeUrl(plan.specimen, faceStylesheet) : undefined;
 			await writeText(
 				staging,
 				plan.specimen,
 				generateTypographySpecimen(system, {
 					specimen: {
 						title: specimenOption && specimenOption !== true ? specimenOption.title : undefined,
-						fontFaceHref: fontHref?.startsWith('.')
-							? fontHref
-							: fontHref
-								? `./${fontHref}`
-								: undefined,
+						fontFaceHref: fontHref,
 						interactive:
 							specimenOption && specimenOption !== true ? specimenOption.interactive : undefined,
 						adjustedFallbackFamilies: adjustedFallbacks
@@ -522,15 +494,11 @@ async function buildLegacyProject(
 				plan.css,
 				plan.typographyCss,
 			].filter((value): value is string => Boolean(value));
-			const from = path.dirname(plan.indexCss);
 			await writeText(
 				staging,
 				plan.indexCss,
 				`${imports
-					.map((target) => {
-						const relative = path.relative(from, target).split(path.sep).join('/');
-						return `@import ${JSON.stringify(relative.startsWith('.') ? relative : `./${relative}`)};`;
-					})
+					.map((target) => `@import ${JSON.stringify(relativeUrl(plan.indexCss!, target))};`)
 					.join('\n')}\n`
 			);
 		}

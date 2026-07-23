@@ -91,3 +91,20 @@ pnpm --filter @three-forma-styli/core test
 Project builds additionally validate output ownership, path containment, font
 licence attestations, prepared capabilities, URL policy, and artifact collisions
 before atomically replacing the previous generated directory.
+
+Generated projects use a strict write/check split:
+
+- `npm run generate` deliberately replaces the TFS-owned output;
+- `npm run build` and `npm run check` validate committed output and never write;
+- `npm run check:generated` performs a full private regeneration and fails on
+  byte drift without repairing it.
+
+The repository release gate then packs the actual npm tarballs, installs them
+through ordinary package-manager resolution, scaffolds standalone and workspace
+projects, packs the generated design-system package, type-checks its CSS Module
+export, and creates a production browser bundle. CI runs the matrix on Linux
+Node 22/24 and the path/install/package checks on Windows Node 22.
+
+URL-bearing generated paths are encoded segment-by-segment. Spaces, `#`, and
+Unicode remain valid filenames; ambiguous query/fragment prefixes and
+cross-platform filesystem-reserved names fail before generation.

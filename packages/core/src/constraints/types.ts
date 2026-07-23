@@ -11,21 +11,21 @@
  * calculate WCAG relative luminance or a contrast ratio.
  */
 export interface LuminanceConstraintConfig {
-	polarity: 'negative' | 'positive';
-	minDelta: number;
-	backgroundColors: string[];
-	foregroundColors: string[];
+	readonly polarity: 'negative' | 'positive';
+	readonly minDelta: number;
+	readonly backgroundColors: readonly string[];
+	readonly foregroundColors: readonly string[];
 }
 
 /**
  * Per-color diagnostic information
  */
 export interface ColorDiagnostic {
-	group: 'background' | 'foreground';
+	readonly group: 'background' | 'foreground';
 	/** Authored OKLCH L under the current TFS luminance metric. */
-	luminance: number;
+	readonly luminance: number;
 	/** Distance from the constraint boundary. Positive = safe, zero = at limit, negative = violation */
-	headroom: number;
+	readonly headroom: number;
 }
 
 /**
@@ -36,21 +36,21 @@ export interface ColorDiagnostic {
  */
 export interface LuminanceValidation {
 	/** The exact measurement used by this constraint. Not WCAG relative luminance. */
-	metric: 'oklch-l';
+	readonly metric: 'oklch-l';
 
 	// Delta validation (primary constraint)
-	deltaValid: boolean;
-	actualDelta: number;
-	requiredDelta: number;
+	readonly deltaValid: boolean;
+	readonly actualDelta: number;
+	readonly requiredDelta: number;
 
 	// Computed boundaries for UI display
 	// For negative polarity: background has MAX constraint, foreground has MIN
 	// For positive polarity: background has MIN constraint, foreground has MAX
-	backgroundConstraint: number;
-	backgroundConstraintType: 'min' | 'max';
-	foregroundConstraint: number;
-	foregroundConstraintType: 'min' | 'max';
+	readonly backgroundConstraint: number;
+	readonly backgroundConstraintType: 'min' | 'max';
+	readonly foregroundConstraint: number;
+	readonly foregroundConstraintType: 'min' | 'max';
 
 	// Per-color diagnostics
-	colors: Record<string, ColorDiagnostic>;
+	readonly colors: Readonly<Record<string, Readonly<ColorDiagnostic>>>;
 }

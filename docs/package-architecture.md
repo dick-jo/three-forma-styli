@@ -14,15 +14,21 @@ packages/
 ```
 
 This division prevents font parsing, prompts, filesystem code and esbuild from
-entering applications that only need the small programmatic core. The private
-Svelte application is an app—not a package—and is absent from every published
-tarball.
+entering applications that only need the small programmatic core. The
+`@three-forma-styli/core/runtime` browser bundle is dependency-free even though
+Culori remains an install-time dependency of the wider `core` package. A
+separate runtime package is only warranted if install-graph minimalism becomes a
+product requirement. The private Svelte application is an app—not a package—and
+is absent from every published tarball.
 
 All public packages currently share one version and release together. This is a
 fixed release train, not an assertion that every package changed equally. It
 prevents a packed CLI from resolving an older, API-incompatible core from npm.
 `pnpm check:release` proves the packed artifacts work together outside the
-workspace before anything is published.
+workspace before anything is published. Its ecosystem stage uses real tarball
+installs rather than extracting packages into a synthetic workspace, then
+proves both scaffold shapes and a packed generated package in a typed Vite
+production consumer.
 
 Project configs should use the import-safe compiler root:
 
