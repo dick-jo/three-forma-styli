@@ -1,4 +1,6 @@
 import {
+	formatNativeOklch,
+	formatNativeOklchWithAlpha,
 	generateRuntimeColorTheme,
 	parseRuntimeColorTheme,
 	type RuntimeColorThemeConfig,
@@ -17,6 +19,10 @@ const config = {
 const unknownTheme: unknown = JSON.parse('{}');
 const parsed = parseRuntimeColorTheme(unknownTheme, config);
 const result = generateRuntimeColorTheme(unknownTheme, config);
+const nativeCss: string = formatNativeOklch({ l: 0.7, c: 0.2, h: 310 });
+const nativeAlphaCss: string = formatNativeOklchWithAlpha({ l: 0.7, c: 0.2, h: 310 }, 0.5);
+void nativeCss;
+void nativeAlphaCss;
 
 parsed.polarity satisfies 'negative' | 'positive';
 result.luminance.metric satisfies 'oklch-l';
