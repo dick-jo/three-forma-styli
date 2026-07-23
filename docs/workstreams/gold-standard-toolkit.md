@@ -52,18 +52,18 @@ remaining work so decisions do not depend on one chat transcript.
       diagnostics suitable for CI.
 - [x] Run the complete release gate, packed-package consumer fixture, security
       audit, and deterministic legacy-output checks.
-- [ ] Run the final P3, prepared-font, specimen-server, and real-browser
+- [x] Run the final P3, prepared-font, specimen-server, and real-browser
       regressions against the rebuilt Scatter design-system package.
 
 ## Active Scatter design-system work
 
-- [ ] Rebuild `tfs-scatter` against the final reviewed TFS contracts.
-- [ ] Move production artifacts under a coherent runtime subtree; keep specimens,
+- [x] Rebuild `tfs-scatter` against the final reviewed TFS contracts.
+- [x] Move production artifacts under a coherent runtime subtree; keep specimens,
       manifests, and Figma artifacts outside the application export boundary.
-- [ ] Make routine package `build`/`check` independent of FontTools.
-- [ ] Preserve protected production token parity and the deliberate new modes,
+- [x] Make routine package `build`/`check` independent of FontTools.
+- [x] Preserve protected production token parity and the deliberate new modes,
       fonts, semantic typography, and native themes.
-- [ ] Verify packed-package exports and isolated Next.js consumption.
+- [x] Verify packed-package exports and isolated Next.js consumption.
 - [ ] Add the package to an isolated Scatter worktree in a package-only change.
       Do not import it from an application or change production behaviour in that
       adoption step.
@@ -119,3 +119,10 @@ remaining work so decisions do not depend on one chat transcript.
   isolated in `/Users/dickjones/project-local/tfs-scatter-mktgfx-tuning` from the
   committed `tfs-scatter` main line and its vendored TFS build. The canonical
   output migration must later reconcile that branch deliberately.
+- **2026-07-23 — canonical Scatter package proven.** `tfs-scatter` commit
+  `e71a470` packages runtime CSS, fonts, ESM, and declarations separately from
+  design-tool and review artifacts. Its complete CI gate proves production token
+  parity, reproducible generation, preserved P3 declarations, font conversion,
+  package boundaries, an isolated production Next.js build, and browser-loaded
+  primary and adjusted-fallback faces. Hands-on typography values remain subject
+  to the explicitly separate marketing calibration branch.
