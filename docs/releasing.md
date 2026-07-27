@@ -9,23 +9,28 @@ favours a predictable pre-1.0 toolchain over independently versioned packages.
 The production Scatter app currently consumes `@three-forma-styli/core`; it does
 not consume the CLI or themes package at runtime.
 
-## TODO: circle back before the next npm release
+## Current release state
 
-- [ ] Review this procedure with fresh eyes and confirm npm scope/account access.
-- [ ] Confirm the dedicated `font-conversion` CI job passed with the pinned
-      Python and FontTools requirements; compare its recorded provenance with
-      any project whose generated font bytes are release evidence.
-- [ ] Confirm the dedicated `browser-consumer` CI job passed against the exact
-      release commit; routine Node tests do not substitute for that Chromium
-      proof.
-- [ ] Add the appropriate Changeset for the post-`0.2.0` hardening, scoped
-      typography-mode fix, and any other unreleased public changes.
-- [ ] Publish an exact `next` canary, install it in Splinter, and run the full
-      application and visual-regression checks before promoting `latest`.
-- [ ] Replace temporary vendored TFS tarballs in downstream design-system
-      projects with the reviewed published version.
+`0.3.0` is published under both `latest` and `next`. The npm publisher is
+`three___`. The release added the standalone compiler, generated workspace
+package layout, runtime theme contract, semantic typography, fonts, motion,
+shadows, and unified Workbench.
 
-No npm publication was performed during the current toolkit/design-system work.
+The next release is `0.3.1`. It fixes the typed programmatic project boundary
+needed by monorepo-owned design-system authoring. Before publishing it:
+
+- [ ] Merge the reviewed toolkit pull request to `master`.
+- [ ] Confirm every Linux/Windows/FontTools/browser-consumer check is green for
+      the exact merge commit.
+- [ ] Run `pnpm release:version` from clean `master` and review the coordinated
+      package/changelog/lockfile diff.
+- [ ] Run the complete local release, packed-consumer, browser, font-conversion,
+      and production dependency audit gates.
+- [ ] Publish `0.3.1` under `next`, install that exact version in the Scatter
+      integration branch, and privately regenerate its design-system package.
+- [ ] Promote `0.3.1` to `latest` only after Scatter's automated integration
+      checks pass. Scatter's ordinary CI still observes its configured
+      minimum-release-age policy.
 
 ## Safe release sequence
 
@@ -69,7 +74,7 @@ npm dist-tag add @three-forma-styli/compiler@<version> latest
 npm dist-tag add @three-forma-styli/cli@<version> latest
 ```
 
-In Splinter, update the exact dependency and lockfile, run the app's checks, and
-regenerate `apps/main/src/css/system.tokens.css` only when the source theme is
-available and the diff has been reviewed. Never treat a successful package
-publish as proof that Scatter's generated CSS is visually unchanged.
+In Scatter, update the exact private `@repo/design-system` authoring dependency,
+privately regenerate its owned `generated/` tree, and run the package,
+application, browser, and final visual gates. Never treat a successful package
+publish as proof that generated CSS is visually unchanged.
