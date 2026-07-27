@@ -4,7 +4,6 @@ import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/pr
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { buildNextConsumer } from './ecosystem/next-consumer.mjs';
@@ -37,6 +36,10 @@ async function writeJson(file, value) {
 	await writeFile(file, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function fileDependency(file) {
+	return `file:${file.replaceAll('\\', '/')}`;
+}
+
 async function packTfsPackages() {
 	await mkdir(tarballDirectory, { recursive: true });
 	const tarballs = {};
@@ -62,7 +65,7 @@ async function installPackedToolchain(tarballs) {
 		dependencies: Object.fromEntries(
 			Object.entries(tarballs).map(([name, tarball]) => [
 				`@three-forma-styli/${name}`,
-				pathToFileURL(tarball).href,
+				fileDependency(tarball),
 			])
 		),
 		devDependencies: {
@@ -281,8 +284,8 @@ async function buildBrowserConsumer(designSystemTarball, coreTarball) {
 		type: 'module',
 		scripts: { build: 'vite build' },
 		dependencies: {
-			'@three-forma-styli/core': pathToFileURL(coreTarball).href,
-			'workspace-system': pathToFileURL(designSystemTarball).href,
+			'@three-forma-styli/core': fileDependency(coreTarball),
+			'workspace-system': fileDependency(designSystemTarball),
 		},
 		devDependencies: {
 			typescript: '5.9.3',
