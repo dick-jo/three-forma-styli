@@ -253,6 +253,61 @@ describe('workspace-package build', () => {
 		expect(manifest.targets.runtime.entrypoints).not.toHaveProperty('./design/dtcg');
 	});
 
+	it('names physical CSS facets with an optional ownership stem while keeping exports stable', async () => {
+		const manifest = hostManifest({
+			exports: {
+				'./styles.css': './generated/runtime/styles/design-system.css',
+				'./tokens.css': './generated/runtime/styles/design-system.tokens.css',
+				'./typography.css': './generated/runtime/styles/design-system.typography.css',
+				'./typography.module.css': {
+					types: './generated/runtime/styles/design-system.typography.module.css.d.ts',
+					default: './generated/runtime/styles/design-system.typography.module.css',
+				},
+				'./package.json': './package.json',
+				'./unrelated': './src/human.js',
+			},
+		});
+		const { directory, configPath } = await fixture(manifest);
+		const project = defineTfsProject({
+			system: { colors: colors(), typography: defaultTypography },
+			output: {
+				layout: 'workspace-package',
+				directory: './generated',
+				hostPackage: { rootExport: false },
+				targets: {
+					runtime: {
+						css: { fileStem: 'design-system' },
+						contracts: false,
+					},
+				},
+			},
+		});
+
+		const result = await buildProject(project, configPath);
+		expect(result.files).toEqual(
+			expect.arrayContaining([
+				'runtime/styles/design-system.css',
+				'runtime/styles/design-system.tokens.css',
+				'runtime/styles/design-system.typography.css',
+				'runtime/styles/design-system.typography.module.css',
+				'runtime/styles/design-system.typography.module.css.d.ts',
+			])
+		);
+		expect(result.files).not.toContain('runtime/styles/index.css');
+		expect(
+			await fs.readFile(path.join(directory, 'generated/runtime/styles/design-system.css'), 'utf8')
+		).toContain('@import "./design-system.tokens.css";');
+
+		const invalid = structuredClone(project);
+		invalid.output.targets.runtime = {
+			css: { fileStem: 'Design.System' },
+			contracts: false,
+		};
+		await expect(planProject(invalid, configPath)).rejects.toThrow(
+			'fileStem must be a lowercase kebab-case filename stem'
+		);
+	});
+
 	it('applies one generator policy across runtime, review and design targets', async () => {
 		const { directory, configPath } = await fixture();
 		const project = defineTfsProject({

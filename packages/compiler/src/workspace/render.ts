@@ -190,15 +190,15 @@ export async function renderWorkspacePackage<const Fonts extends Record<string, 
 	if (plan.css.tokens) {
 		await writeText(
 			staging,
-			'runtime/styles/tokens.css',
+			plan.css.files.tokens,
 			generateCss(system, { ...project.generator, selectors: plan.css.tokenSelectors })
 		);
 	}
 
 	const runtimeFaceTarget = plan.css.typography
-		? 'runtime/styles/typography.css'
+		? plan.css.files.typography
 		: plan.css.separateFonts
-			? 'runtime/styles/fonts.css'
+			? plan.css.files.fonts
 			: undefined;
 	const runtimeFontCss =
 		preparedFonts && runtimeFaceTarget
@@ -214,7 +214,7 @@ export async function renderWorkspacePackage<const Fonts extends Record<string, 
 	if (plan.css.typography) {
 		await writeText(
 			staging,
-			'runtime/styles/typography.css',
+			plan.css.files.typography,
 			toTypographyCss(ir, {
 				classPrefix: plan.css.typographyClassPrefix,
 				specificity: plan.css.typographySpecificity,
@@ -223,24 +223,16 @@ export async function renderWorkspacePackage<const Fonts extends Record<string, 
 		);
 	}
 	if (plan.css.separateFonts && runtimeFontCss) {
-		await writeText(staging, 'runtime/styles/fonts.css', runtimeFontCss);
+		await writeText(staging, plan.css.files.fonts, runtimeFontCss);
 	}
 	if (plan.css.module) {
-		await writeText(
-			staging,
-			'runtime/styles/typography.module.css',
-			toTypographyCss(ir, { scope: 'module' })
-		);
-		await writeText(
-			staging,
-			'runtime/styles/typography.module.css.d.ts',
-			toTypographyCssModuleTypes(ir)
-		);
+		await writeText(staging, plan.css.files.module, toTypographyCss(ir, { scope: 'module' }));
+		await writeText(staging, plan.css.files.moduleTypes, toTypographyCssModuleTypes(ir));
 	}
 	if (plan.css.shadows) {
 		await writeText(
 			staging,
-			'runtime/styles/shadows.css',
+			plan.css.files.shadows,
 			toShadowCss(ir, {
 				classPrefix: plan.css.shadowClassPrefix,
 				specificity: plan.css.shadowSpecificity,
@@ -248,24 +240,20 @@ export async function renderWorkspacePackage<const Fonts extends Record<string, 
 		);
 	}
 	if (plan.css.shadowModule) {
-		await writeText(
-			staging,
-			'runtime/styles/shadows.module.css',
-			toShadowCss(ir, { scope: 'module' })
-		);
-		await writeText(staging, 'runtime/styles/shadows.module.css.d.ts', toShadowCssModuleTypes(ir));
+		await writeText(staging, plan.css.files.shadowModule, toShadowCss(ir, { scope: 'module' }));
+		await writeText(staging, plan.css.files.shadowModuleTypes, toShadowCssModuleTypes(ir));
 	}
 	if (plan.css.entry) {
 		const imports = [
-			...(plan.css.separateFonts ? ['runtime/styles/fonts.css'] : []),
-			...(plan.css.tokens ? ['runtime/styles/tokens.css'] : []),
-			...(plan.css.typography ? ['runtime/styles/typography.css'] : []),
-			...(plan.css.shadows ? ['runtime/styles/shadows.css'] : []),
+			...(plan.css.separateFonts ? [plan.css.files.fonts] : []),
+			...(plan.css.tokens ? [plan.css.files.tokens] : []),
+			...(plan.css.typography ? [plan.css.files.typography] : []),
+			...(plan.css.shadows ? [plan.css.files.shadows] : []),
 		];
 		await writeText(
 			staging,
-			'runtime/styles/index.css',
-			`${imports.map((target) => importLine('runtime/styles/index.css', target)).join('\n')}\n`
+			plan.css.files.entry,
+			`${imports.map((target) => importLine(plan.css.files.entry, target)).join('\n')}\n`
 		);
 	}
 

@@ -38,7 +38,9 @@ try {
 		const tarballPath = path.resolve(tarballDirectory, tarballName);
 		tarballs.push(tarballPath);
 		if (packageDirectory === 'compiler') {
-			const inventory = run('tar', ['-tzf', tarballPath]).split('\n');
+			const inventory = run('tar', ['-tzf', tarballPath])
+				.split('\n')
+				.map((file) => file.replaceAll('\\', '/'));
 			for (const file of ['index.html', 'workbench.css', 'workbench.js']) {
 				assert.ok(
 					inventory.includes(`package/workbench-assets/${file}`),

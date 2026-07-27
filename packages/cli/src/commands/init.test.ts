@@ -98,6 +98,7 @@ describe('tfs init', () => {
 		expect(manifest.name).toBe('@repo/design-system');
 		expect(config).toContain('layout: "workspace-package"');
 		expect(config).toContain('directory: "./generated"');
+		expect(config).toContain('css: { fileStem: "design-system" }');
 		expect(manifest.dependencies).toBeUndefined();
 		expect(manifest.devDependencies['@three-forma-styli/core']).toBe('0.3.0');
 		expect(manifest.devDependencies.typescript).toBe('5.9.3');
@@ -112,14 +113,14 @@ describe('tfs init', () => {
 			types: './generated/runtime/index.d.ts',
 			import: './generated/runtime/index.js',
 		});
-		expect(manifest.exports['./styles.css']).toBe('./generated/runtime/styles/index.css');
+		expect(manifest.exports['./styles.css']).toBe('./generated/runtime/styles/design-system.css');
 		expect(manifest.exports['./typography.module.css']).toEqual({
-			types: './generated/runtime/styles/typography.module.css.d.ts',
-			default: './generated/runtime/styles/typography.module.css',
+			types: './generated/runtime/styles/design-system.typography.module.css.d.ts',
+			default: './generated/runtime/styles/design-system.typography.module.css',
 		});
 		expect(manifest.exports['./shadows.module.css']).toEqual({
-			types: './generated/runtime/styles/shadows.module.css.d.ts',
-			default: './generated/runtime/styles/shadows.module.css',
+			types: './generated/runtime/styles/design-system.shadows.module.css.d.ts',
+			default: './generated/runtime/styles/design-system.shadows.module.css',
 		});
 		expect(manifest.files).toEqual(['generated/runtime', 'generated/assets', 'README.md']);
 		expect(manifest.sideEffects).toEqual(['./generated/runtime/styles/*.css']);
@@ -140,7 +141,7 @@ describe('tfs init', () => {
 		});
 		expect(
 			dryRun.result.plan.artifacts.map((artifact: { path: string }) => artifact.path)
-		).toContain('runtime/styles/typography.module.css.d.ts');
+		).toContain('runtime/styles/design-system.typography.module.css.d.ts');
 		expect(
 			dryRun.result.plan.artifacts.map((artifact: { path: string }) => artifact.path)
 		).toContain('review/workbench.json');

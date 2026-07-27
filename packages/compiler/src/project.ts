@@ -112,6 +112,12 @@ export interface WorkspaceFontAssetsOutput {
 }
 
 export interface WorkspaceRuntimeCssOutput {
+	/**
+	 * Optional ownership stem for physical CSS filenames. For example,
+	 * "design-system" emits design-system.css, design-system.tokens.css, and
+	 * design-system.typography.module.css. Package export names stay stable.
+	 */
+	fileStem?: string;
 	/** Emit runtime/styles/index.css. Defaults to true. */
 	entry?: boolean;
 	/** Emit the generated token stylesheet. Defaults to true. */

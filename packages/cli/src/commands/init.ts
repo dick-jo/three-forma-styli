@@ -255,7 +255,10 @@ function generateProjectFile(moduleNames: string[], workspacePackage: boolean): 
 		? `    layout: "workspace-package",
     directory: "./generated",
     targets: {
-      runtime: true,
+      runtime: {
+        css: { fileStem: "design-system" },
+        contracts: true,
+      },
       review: true,
       design: true,
     },`
@@ -349,17 +352,17 @@ function generatePackageJson(packageName: string, workspacePackage: boolean): st
 						types: './generated/runtime/runtime-color-theme.d.ts',
 						import: './generated/runtime/runtime-color-theme.js',
 					},
-					'./styles.css': './generated/runtime/styles/index.css',
-					'./tokens.css': './generated/runtime/styles/tokens.css',
-					'./typography.css': './generated/runtime/styles/typography.css',
+					'./styles.css': './generated/runtime/styles/design-system.css',
+					'./tokens.css': './generated/runtime/styles/design-system.tokens.css',
+					'./typography.css': './generated/runtime/styles/design-system.typography.css',
 					'./typography.module.css': {
-						types: './generated/runtime/styles/typography.module.css.d.ts',
-						default: './generated/runtime/styles/typography.module.css',
+						types: './generated/runtime/styles/design-system.typography.module.css.d.ts',
+						default: './generated/runtime/styles/design-system.typography.module.css',
 					},
-					'./shadows.css': './generated/runtime/styles/shadows.css',
+					'./shadows.css': './generated/runtime/styles/design-system.shadows.css',
 					'./shadows.module.css': {
-						types: './generated/runtime/styles/shadows.module.css.d.ts',
-						default: './generated/runtime/styles/shadows.module.css',
+						types: './generated/runtime/styles/design-system.shadows.module.css.d.ts',
+						default: './generated/runtime/styles/design-system.shadows.module.css',
 					},
 					'./package.json': './package.json',
 				},

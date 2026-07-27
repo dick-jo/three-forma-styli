@@ -29,6 +29,17 @@ export interface WorkspacePlan {
 	fontDirectory: string;
 	runtimeFontUrls: ProjectFontAssetUrlPolicy;
 	css: {
+		files: {
+			entry: string;
+			tokens: string;
+			typography: string;
+			fonts: string;
+			module: string;
+			moduleTypes: string;
+			shadows: string;
+			shadowModule: string;
+			shadowModuleTypes: string;
+		};
 		entry: boolean;
 		tokens: boolean;
 		tokenSelectors?: import('@three-forma-styli/core').CssTransformerConfig['selectors'];
@@ -106,6 +117,30 @@ function add(
 	});
 }
 
+function runtimeCssFiles(fileStem: string | undefined): WorkspacePlan['css']['files'] {
+	if (fileStem !== undefined && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(fileStem)) {
+		throw new Error(
+			'output.targets.runtime.css.fileStem must be a lowercase kebab-case filename stem.'
+		);
+	}
+	const facet = (name: string) =>
+		`runtime/styles/${fileStem === undefined ? name : `${fileStem}.${name}`}.css`;
+	const entry = `runtime/styles/${fileStem === undefined ? 'index' : fileStem}.css`;
+	const module = facet('typography.module');
+	const shadowModule = facet('shadows.module');
+	return {
+		entry,
+		tokens: facet('tokens'),
+		typography: facet('typography'),
+		fonts: facet('fonts'),
+		module,
+		moduleTypes: `${module}.d.ts`,
+		shadows: facet('shadows'),
+		shadowModule,
+		shadowModuleTypes: `${shadowModule}.d.ts`,
+	};
+}
+
 /** Normalize shorthands into a deterministic artifact graph before rendering begins. */
 export function planWorkspacePackage(
 	output: WorkspacePackageOutput,
@@ -167,6 +202,7 @@ export function planWorkspacePackage(
 	const tokenConfig = css?.tokens && css.tokens !== true ? css.tokens : {};
 	const typographyConfig = css?.typography && css.typography !== true ? css.typography : {};
 	const shadowConfig = css?.shadows && css.shadows !== true ? css.shadows : {};
+	const cssFiles = runtimeCssFiles(css?.fileStem);
 	const runtimeFontUrls = css?.fontUrls ?? ({ mode: 'relative' } as const);
 	const separateFonts = context.hasFonts && moduleRequested && !typographyRequested;
 
@@ -229,21 +265,21 @@ export function planWorkspacePackage(
 
 	const artifacts: WorkspaceArtifact[] = [];
 	if (tokensRequested)
-		add(artifacts, { path: 'runtime/styles/tokens.css', kind: 'runtime-css', target: 'runtime' });
+		add(artifacts, { path: cssFiles.tokens, kind: 'runtime-css', target: 'runtime' });
 	if (typographyRequested) {
 		add(artifacts, {
-			path: 'runtime/styles/typography.css',
+			path: cssFiles.typography,
 			kind: 'runtime-css',
 			target: 'runtime',
 			dependencies: [
-				...(tokensRequested ? ['runtime/styles/tokens.css'] : []),
+				...(tokensRequested ? [cssFiles.tokens] : []),
 				...(context.hasFonts ? [`${fontDirectory}/*`] : []),
 			],
 		});
 	}
 	if (separateFonts) {
 		add(artifacts, {
-			path: 'runtime/styles/fonts.css',
+			path: cssFiles.fonts,
 			kind: 'runtime-css',
 			target: 'runtime',
 			dependencies: [`${fontDirectory}/*`],
@@ -251,52 +287,52 @@ export function planWorkspacePackage(
 	}
 	if (moduleRequested) {
 		add(artifacts, {
-			path: 'runtime/styles/typography.module.css',
+			path: cssFiles.module,
 			kind: 'runtime-css',
 			target: 'runtime',
-			dependencies: tokensRequested ? ['runtime/styles/tokens.css'] : [],
+			dependencies: tokensRequested ? [cssFiles.tokens] : [],
 		});
 		add(artifacts, {
-			path: 'runtime/styles/typography.module.css.d.ts',
+			path: cssFiles.moduleTypes,
 			kind: 'runtime-types',
 			target: 'runtime',
-			dependencies: ['runtime/styles/typography.module.css'],
+			dependencies: [cssFiles.module],
 		});
 	}
 	if (shadowsRequested) {
 		add(artifacts, {
-			path: 'runtime/styles/shadows.css',
+			path: cssFiles.shadows,
 			kind: 'runtime-css',
 			target: 'runtime',
-			dependencies: tokensRequested ? ['runtime/styles/tokens.css'] : [],
+			dependencies: tokensRequested ? [cssFiles.tokens] : [],
 		});
 	}
 	if (shadowModuleRequested) {
 		add(artifacts, {
-			path: 'runtime/styles/shadows.module.css',
+			path: cssFiles.shadowModule,
 			kind: 'runtime-css',
 			target: 'runtime',
-			dependencies: tokensRequested ? ['runtime/styles/tokens.css'] : [],
+			dependencies: tokensRequested ? [cssFiles.tokens] : [],
 		});
 		add(artifacts, {
-			path: 'runtime/styles/shadows.module.css.d.ts',
+			path: cssFiles.shadowModuleTypes,
 			kind: 'runtime-types',
 			target: 'runtime',
-			dependencies: ['runtime/styles/shadows.module.css'],
+			dependencies: [cssFiles.shadowModule],
 		});
 	}
 	if (entryRequested) {
 		const dependencies = [
-			...(separateFonts ? ['runtime/styles/fonts.css'] : []),
-			...(tokensRequested ? ['runtime/styles/tokens.css'] : []),
-			...(typographyRequested ? ['runtime/styles/typography.css'] : []),
-			...(shadowsRequested ? ['runtime/styles/shadows.css'] : []),
+			...(separateFonts ? [cssFiles.fonts] : []),
+			...(tokensRequested ? [cssFiles.tokens] : []),
+			...(typographyRequested ? [cssFiles.typography] : []),
+			...(shadowsRequested ? [cssFiles.shadows] : []),
 		];
 		if (dependencies.length === 0) {
 			throw new Error('runtime.css.entry requires at least one emitted stylesheet.');
 		}
 		add(artifacts, {
-			path: 'runtime/styles/index.css',
+			path: cssFiles.entry,
 			kind: 'runtime-css',
 			target: 'runtime',
 			dependencies,
@@ -417,6 +453,7 @@ export function planWorkspacePackage(
 		fontDirectory,
 		runtimeFontUrls,
 		css: {
+			files: cssFiles,
 			entry: entryRequested,
 			tokens: tokensRequested,
 			tokenSelectors: tokenConfig.selectors,
@@ -492,49 +529,49 @@ export function requiredPackageExports(
 	if (plan.css.entry) {
 		required.push({
 			subpath: './styles.css',
-			target: packageTarget(generatedFromHost, 'runtime/styles/index.css'),
+			target: packageTarget(generatedFromHost, plan.css.files.entry),
 		});
 	}
 	if (plan.css.tokens) {
 		required.push({
 			subpath: './tokens.css',
-			target: packageTarget(generatedFromHost, 'runtime/styles/tokens.css'),
+			target: packageTarget(generatedFromHost, plan.css.files.tokens),
 		});
 	}
 	if (plan.css.typography) {
 		required.push({
 			subpath: './typography.css',
-			target: packageTarget(generatedFromHost, 'runtime/styles/typography.css'),
+			target: packageTarget(generatedFromHost, plan.css.files.typography),
 		});
 	}
 	if (plan.css.module) {
 		required.push({
 			subpath: './typography.module.css',
 			target: {
-				types: packageTarget(generatedFromHost, 'runtime/styles/typography.module.css.d.ts'),
-				default: packageTarget(generatedFromHost, 'runtime/styles/typography.module.css'),
+				types: packageTarget(generatedFromHost, plan.css.files.moduleTypes),
+				default: packageTarget(generatedFromHost, plan.css.files.module),
 			},
 		});
 	}
 	if (plan.css.shadows) {
 		required.push({
 			subpath: './shadows.css',
-			target: packageTarget(generatedFromHost, 'runtime/styles/shadows.css'),
+			target: packageTarget(generatedFromHost, plan.css.files.shadows),
 		});
 	}
 	if (plan.css.shadowModule) {
 		required.push({
 			subpath: './shadows.module.css',
 			target: {
-				types: packageTarget(generatedFromHost, 'runtime/styles/shadows.module.css.d.ts'),
-				default: packageTarget(generatedFromHost, 'runtime/styles/shadows.module.css'),
+				types: packageTarget(generatedFromHost, plan.css.files.shadowModuleTypes),
+				default: packageTarget(generatedFromHost, plan.css.files.shadowModule),
 			},
 		});
 	}
 	if (plan.css.separateFonts) {
 		required.push({
 			subpath: './fonts.css',
-			target: packageTarget(generatedFromHost, 'runtime/styles/fonts.css'),
+			target: packageTarget(generatedFromHost, plan.css.files.fonts),
 		});
 	}
 	required.push({ subpath: './package.json', target: './package.json' });

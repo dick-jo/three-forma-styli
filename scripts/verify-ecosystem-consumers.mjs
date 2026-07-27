@@ -112,7 +112,7 @@ async function exerciseMachineCli(workspaceRoot) {
 	);
 	assert.ok(
 		dryRun.result.plan.artifacts.some(
-			(artifact) => artifact.path === 'runtime/styles/typography.module.css.d.ts'
+			(artifact) => artifact.path === 'runtime/styles/design-system.typography.module.css.d.ts'
 		)
 	);
 	assert.deepEqual(
@@ -166,7 +166,10 @@ async function exerciseScaffolds() {
 
 	assert.match(await readFile(path.join(standaloneRoot, 'dist/tokens.css'), 'utf8'), /--clr-/);
 	assert.match(
-		await readFile(path.join(workspaceRoot, 'generated/runtime/styles/typography.css'), 'utf8'),
+		await readFile(
+			path.join(workspaceRoot, 'generated/runtime/styles/design-system.typography.css'),
+			'utf8'
+		),
 		/\.text--prose/
 	);
 	const workbench = JSON.parse(
@@ -252,13 +255,17 @@ async function packGeneratedDesignSystem(workspaceRoot) {
 	const tarballName = output.split('\n').at(-1);
 	assert.ok(tarballName?.endsWith('.tgz'), 'Could not identify generated design-system tarball');
 	const tarball = path.resolve(tarballDirectory, tarballName);
-	const inventory = run('tar', ['-tzf', tarball]).split('\n');
+	const inventory = run('tar', ['-tzf', tarball])
+		.split('\n')
+		.map((file) => file.replaceAll('\\', '/'));
 
 	assert.ok(inventory.includes('package/generated/runtime/index.js'));
 	assert.ok(inventory.includes('package/generated/runtime/runtime-color-theme.js'));
 	assert.ok(inventory.includes('package/generated/runtime/runtime-color-theme.d.ts'));
-	assert.ok(inventory.includes('package/generated/runtime/styles/index.css'));
-	assert.ok(inventory.includes('package/generated/runtime/styles/typography.module.css.d.ts'));
+	assert.ok(inventory.includes('package/generated/runtime/styles/design-system.css'));
+	assert.ok(
+		inventory.includes('package/generated/runtime/styles/design-system.typography.module.css.d.ts')
+	);
 	assert.ok(inventory.every((file) => !file.includes('/review/')));
 	assert.ok(inventory.every((file) => !file.includes('/design/')));
 

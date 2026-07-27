@@ -86,6 +86,7 @@ export default defineTfsProject({
 		targets: {
 			runtime: {
 				css: {
+					fileStem: 'design-system',
 					fontUrls: { mode: 'relative' },
 					shadows: true,
 					shadowModule: true,
@@ -108,6 +109,12 @@ typography, and available native-color-mode contracts. Set individual fields to
 `design: true` are complete shorthands. The Workbench is one generated
 entrypoint with typed typography and shadow labs; the legacy standalone
 specimen fields remain migration-only.
+
+`css.fileStem: 'design-system'` keeps stable package export names such as
+`./styles.css` and `./tokens.css` while naming the physical files
+`design-system.css`, `design-system.tokens.css`,
+`design-system.typography.css`, and so on. Omit it for the compact legacy
+filenames. Stems are lowercase kebab-case and cannot contain paths or extensions.
 
 The generated tree is stable and target-oriented:
 

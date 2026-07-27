@@ -46,6 +46,11 @@ import type { TypographySelection } from '@repo/design-system/typography';
 import typography from '@repo/design-system/typography.module.css';
 ```
 
+The scaffold names physical styles `design-system.css`,
+`design-system.tokens.css`, `design-system.typography.css`, and related facet
+files. This makes generated ownership obvious in DevTools and mixed CSS
+codebases while package imports remain short and stable.
+
 When the authored color system includes `colors.luminance` and an explicit
 `colors.runtimeThemes.colorNames` subset, `runtimeColorThemeConfig` is the exact
 browser-safe policy consumed by `@three-forma-styli/core/runtime`. Applications

@@ -16,8 +16,9 @@ not consume the CLI or themes package at runtime.
 package layout, runtime theme contract, semantic typography, fonts, motion,
 shadows, and unified Workbench.
 
-The next release is `0.3.1`. It fixes the typed programmatic project boundary
-needed by monorepo-owned design-system authoring. Before publishing it:
+The next release is `0.4.0`. It fixes the typed programmatic project boundary
+needed by monorepo-owned design-system authoring and adds opt-in, namespaced
+physical CSS filenames. Before publishing it:
 
 - [ ] Merge the reviewed toolkit pull request to `master`.
 - [ ] Confirm every Linux/Windows/FontTools/browser-consumer check is green for
@@ -26,9 +27,9 @@ needed by monorepo-owned design-system authoring. Before publishing it:
       package/changelog/lockfile diff.
 - [ ] Run the complete local release, packed-consumer, browser, font-conversion,
       and production dependency audit gates.
-- [ ] Publish `0.3.1` under `next`, install that exact version in the Scatter
+- [ ] Publish `0.4.0` under `next`, install that exact version in the Scatter
       integration branch, and privately regenerate its design-system package.
-- [ ] Promote `0.3.1` to `latest` only after Scatter's automated integration
+- [ ] Promote `0.4.0` to `latest` only after Scatter's automated integration
       checks pass. Scatter's ordinary CI still observes its configured
       minimum-release-age policy.
 

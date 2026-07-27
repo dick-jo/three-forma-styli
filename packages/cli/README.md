@@ -52,6 +52,10 @@ same command contract: `generate` writes, `build`/`check` validate committed
 output, and `check:generated` performs the expensive private regeneration proof.
 Routine `build`/`check` stay independent of FontTools:
 
+Physical CSS files use the namespaced `design-system[.facet].css` convention;
+the package keeps concise consumer exports such as `./styles.css`,
+`./tokens.css`, and `./typography.css`.
+
 ```bash
 npm run generate          # explicit authoring operation
 npm run check             # fast types + committed package validation

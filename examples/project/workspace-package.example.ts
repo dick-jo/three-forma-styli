@@ -8,7 +8,7 @@ export default defineTfsProject({
 		layout: 'workspace-package',
 		directory: './generated',
 		targets: {
-			runtime: { css: {}, contracts: {} },
+			runtime: { css: { fileStem: 'design-system' }, contracts: {} },
 			review: { workbench: { title: 'TFS workspace package' } },
 			design: { dtcg: true, figmaVariables: true },
 		},
