@@ -28,6 +28,10 @@ function resolveSourceImport(fromFile: string, specifier: string): string {
 	return path.resolve(path.dirname(fromFile), specifier.replace(/\.js$/, '.ts'));
 }
 
+function portablePath(filePath: string): string {
+	return filePath.split(path.sep).join('/');
+}
+
 describe('runtime bundle boundary', () => {
 	it('has no external, Node-only, generator, transformer, typography or root imports', () => {
 		const entry = path.join(runtimeDirectory, 'index.ts');
@@ -50,7 +54,9 @@ describe('runtime bundle boundary', () => {
 
 		expect(externalImports).toEqual([]);
 		expect(
-			[...visited].map((file) => path.relative(path.resolve(runtimeDirectory, '..'), file)).sort()
+			[...visited]
+				.map((file) => portablePath(path.relative(path.resolve(runtimeDirectory, '..'), file)))
+				.sort()
 		).toEqual([
 			'color-css.ts',
 			'constraints/luminance.ts',
@@ -58,7 +64,7 @@ describe('runtime bundle boundary', () => {
 			'runtime/theme.ts',
 			'runtime/types.ts',
 		]);
-		expect([...visited].join('\n')).not.toMatch(
+		expect([...visited].map(portablePath).join('\n')).not.toMatch(
 			/(?:generator|transformers|typography|\/src\/index\.ts)/
 		);
 	});
