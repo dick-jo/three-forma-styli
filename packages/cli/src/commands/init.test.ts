@@ -9,6 +9,7 @@ import { buildCommand } from './build.js';
 import { figmaSyncCommand } from './figma-sync.js';
 import { checkCommand } from './check.js';
 import { validateCommand } from './validate.js';
+import { CLI_VERSION } from '../version.js';
 
 const originalCwd = process.cwd();
 const require = createRequire(import.meta.url);
@@ -33,9 +34,9 @@ describe('tfs init', () => {
 		const manifest = await fs.readJson(path.join(projectRoot, 'package.json'));
 
 		expect(manifest.version).toBeUndefined();
-		expect(manifest.dependencies['@three-forma-styli/core']).toBe('0.3.0');
-		expect(manifest.devDependencies['@three-forma-styli/cli']).toBe('0.3.0');
-		expect(manifest.devDependencies['@three-forma-styli/compiler']).toBe('0.3.0');
+		expect(manifest.dependencies['@three-forma-styli/core']).toBe(CLI_VERSION);
+		expect(manifest.devDependencies['@three-forma-styli/cli']).toBe(CLI_VERSION);
+		expect(manifest.devDependencies['@three-forma-styli/compiler']).toBe(CLI_VERSION);
 		expect(manifest.devDependencies.typescript).toBe('5.9.3');
 		expect(await fs.readFile(path.join(projectRoot, 'tfs.config.ts'), 'utf8')).toContain(
 			'from "@three-forma-styli/compiler"'
@@ -60,7 +61,7 @@ describe('tfs init', () => {
 
 		await buildCommand(projectRoot, {});
 		const buildManifest = await fs.readJson(path.join(projectRoot, 'dist/build.manifest.json'));
-		expect(buildManifest.tool.version).toBe('0.3.0');
+		expect(buildManifest.tool.version).toBe(CLI_VERSION);
 		expect(buildManifest.artifacts['tokens.css']).toBeDefined();
 		expect(buildManifest.artifacts['typography.specimen.html']).toBeDefined();
 		await expect(checkCommand(projectRoot)).resolves.toBeUndefined();
@@ -100,7 +101,7 @@ describe('tfs init', () => {
 		expect(config).toContain('directory: "./generated"');
 		expect(config).toContain('css: { fileStem: "design-system" }');
 		expect(manifest.dependencies).toBeUndefined();
-		expect(manifest.devDependencies['@three-forma-styli/core']).toBe('0.3.0');
+		expect(manifest.devDependencies['@three-forma-styli/core']).toBe(CLI_VERSION);
 		expect(manifest.devDependencies.typescript).toBe('5.9.3');
 		expect(manifest.scripts).toEqual({
 			generate: 'tfs build .',

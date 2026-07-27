@@ -1,5 +1,21 @@
 # @three-forma-styli/compiler
 
+## 0.4.0
+
+### Minor Changes
+
+- e530930: Add an optional workspace-package CSS filename stem so generated physical files
+  can visibly declare their design-system ownership while stable package exports
+  stay concise. New workspace-package scaffolds use the
+  `design-system[.facet].css` convention.
+
+### Patch Changes
+
+- da66a3c: Preserve literal project font registries through the programmatic build, check,
+  plan, and committed-output validation APIs. Strongly typed projects returned by
+  `defineTfsProject()` no longer require unsafe widening before compilation.
+  - @three-forma-styli/core@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
 	"name": "@three-forma-styli/themes",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"type": "module",
 	"sideEffects": false,
 	"description": "Typed starter and reference design-system source presets",

@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { buildProject, checkProject, planProject } from './project-build.js';
 import { defineTfsProject } from './project.js';
 import { validateProjectOutput } from './validate-output.js';
+import { COMPILER_VERSION } from './version.js';
 import { typography as defaultTypography } from '@three-forma-styli/themes/default';
 
 const temporaryDirectories: string[] = [];
@@ -122,6 +123,10 @@ describe('portable project build', () => {
 		);
 
 		expect(firstManifest).toEqual(secondManifest);
+		expect(JSON.parse(secondManifest.toString()).tool).toEqual({
+			name: 'three-forma-styli',
+			version: COMPILER_VERSION,
+		});
 		expect(await fs.readFile(path.join(second.outputDirectory, 'index.css'), 'utf8')).toBe(
 			'@import "./tokens.css";\n@import "./typography.css";\n'
 		);
@@ -141,19 +146,20 @@ describe('portable project build', () => {
 		expect(systemTypescript).toContain('export const tfsSystem =');
 		const legacyFixture = Object.fromEntries(
 			await Promise.all(
-				second.files.map(
-					async (file) =>
-						[
-							file,
-							createHash('sha256')
-								.update(await fs.readFile(path.join(second.outputDirectory, file)))
-								.digest('hex'),
-						] as const
-				)
+				second.files
+					.filter((file) => file !== 'build.manifest.json')
+					.map(
+						async (file) =>
+							[
+								file,
+								createHash('sha256')
+									.update(await fs.readFile(path.join(second.outputDirectory, file)))
+									.digest('hex'),
+							] as const
+					)
 			)
 		);
 		expect(legacyFixture).toEqual({
-			'build.manifest.json': '821b01fc2dca02ea278f7c49fb3562f0b14e7cb6a2c80ce8ac2702bd1dc0bb5e',
 			'index.css': '4cb2f483ae8a8ccca27250d862e726233646c40571ecfbb5e9a32e66ad79436a',
 			'system.generated.ts': 'ff16abd9f1075dae372cc332fe9b39818cb55482a429b0eb79f93f1f5cdcee0e',
 			'tokens.css': '580d6d89ce37cfc05e13e2e8e96742732f659570b760567c4fa3e5e24182a220',

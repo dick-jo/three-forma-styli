@@ -1,5 +1,11 @@
 # @three-forma-styli/themes
 
+## 0.4.0
+
+### Patch Changes
+
+- @three-forma-styli/core@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

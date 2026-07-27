@@ -1,5 +1,22 @@
 # @three-forma-styli/cli
 
+## 0.4.0
+
+### Minor Changes
+
+- e530930: Add an optional workspace-package CSS filename stem so generated physical files
+  can visibly declare their design-system ownership while stable package exports
+  stay concise. New workspace-package scaffolds use the
+  `design-system[.facet].css` convention.
+
+### Patch Changes
+
+- Updated dependencies [e530930]
+- Updated dependencies [da66a3c]
+  - @three-forma-styli/compiler@0.4.0
+  - @three-forma-styli/core@0.4.0
+  - @three-forma-styli/themes@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
