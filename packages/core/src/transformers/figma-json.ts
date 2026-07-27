@@ -1,7 +1,8 @@
 /**
  * JSON transformers for standards-based design-token interchange and Figma's
- * Variables REST API. Figma variables are currently limited to color tokens;
- * other token families remain available through the CSS transformer.
+ * Variables REST API. Figma variables are currently limited to colors. DTCG
+ * carries every TFS value that has a lossless 2025.10 representation, with
+ * namespaced extensions for TFS mode and CSS-specific metadata.
  */
 
 import type { IR, TokenValue } from '../generator/types.js';
@@ -102,22 +103,145 @@ function toDtcgColor(hex: string, colorSpace: 'srgb' | 'display-p3'): DtcgColor 
 }
 
 function getColorTokens(tokens: Record<string, TokenValue>): Record<string, TokenValue> {
-	return Object.fromEntries(
-		Object.entries(tokens).filter(([, token]) => token.family === 'color')
-	);
+	return Object.fromEntries(Object.entries(tokens).filter(([, token]) => token.family === 'color'));
 }
 
 function getColorModes(ir: IR): { defaultMode: string; allModes: string[] } {
 	const defaultMode = ir.modes.color.default;
 	if (!defaultMode) {
 		throw new Error(
-			'DTCG/Figma Variables JSON is currently color-only and requires a color token family'
+			'Design JSON requires a color token family (Figma Variables are color-only; DTCG shadows reference color tokens)'
 		);
 	}
 
 	return {
 		defaultMode,
 		allModes: [defaultMode, ...ir.modes.color.overrides],
+	};
+}
+
+type DtcgDimension = { value: number; unit: 'px' | 'rem' };
+type DtcgDuration = { value: number; unit: 'ms' | 's' };
+
+function dtcgDimension(value: number, unit: string, context: string): DtcgDimension {
+	if (unit !== 'px' && unit !== 'rem') {
+		throw new Error(
+			`${context} uses CSS unit "${unit}", but DTCG 2025.10 dimensions support only px and rem`
+		);
+	}
+	return { value, unit };
+}
+
+function dtcgDuration(value: number, unit: string, context: string): DtcgDuration {
+	if (unit !== 'ms' && unit !== 's') {
+		throw new Error(
+			`${context} uses time unit "${unit}", but DTCG 2025.10 durations support only ms and s`
+		);
+	}
+	return { value, unit };
+}
+
+function tokenModeValues(
+	ir: IR,
+	token: TokenValue,
+	map: (candidate: TokenValue) => unknown
+): Record<string, unknown> | undefined {
+	const values = Object.entries(ir.overrideTokens)
+		.filter(([, tokens]) => tokens[token.name])
+		.map(([modeName, tokens]) => [modeName, map(tokens[token.name]!)]);
+	if (values.length === 0) return undefined;
+	return Object.fromEntries([[ir.modes.size.default || 'default', map(token)], ...values]);
+}
+
+function tokenExtension(
+	ir: IR,
+	token: TokenValue,
+	map: (candidate: TokenValue) => unknown,
+	extra?: Record<string, unknown>
+): Record<string, unknown> | undefined {
+	const modes = tokenModeValues(ir, token, map);
+	if (!modes && !extra) return undefined;
+	return { [EXTENSION_KEY]: { ...(modes ? { modes } : {}), ...extra } };
+}
+
+function rawToken(ir: IR, name: string, mode?: string): TokenValue {
+	const token = (mode ? ir.overrideTokens[mode]?.[name] : undefined) ?? ir.tokens[name];
+	if (!token) throw new Error(`DTCG export could not resolve generated token "--${name}"`);
+	return token;
+}
+
+function referencedToken(ir: IR, token: TokenValue, mode?: string): TokenValue {
+	if (!token.reference) return token;
+	return rawToken(ir, token.reference, mode);
+}
+
+function typographyComposite(
+	ir: IR,
+	roleName: string,
+	variantName: string,
+	mode?: string
+): {
+	value: Record<string, unknown>;
+	extension: Record<string, unknown>;
+} {
+	const typography = ir.typography!;
+	const role = typography.roles[roleName]!;
+	const recipe = variantName === 'base' ? role.base : role.variants[variantName]!;
+	const fontSizeAlias = rawToken(ir, recipe.fontSizeToken, mode);
+	const fontSize = referencedToken(ir, fontSizeAlias, mode);
+	if (fontSize.rawValue === undefined || !fontSize.unit) {
+		throw new Error(
+			`DTCG typography export could not resolve a numeric font size for ${roleName}/${variantName}`
+		);
+	}
+	const weightAlias = rawToken(ir, recipe.fontWeightToken, mode);
+	const weight = referencedToken(ir, weightAlias, mode);
+	if (weight.rawValue === undefined) {
+		throw new Error(
+			`DTCG typography export could not resolve a numeric font weight for ${roleName}/${variantName}`
+		);
+	}
+	const lineHeight = rawToken(ir, recipe.lineHeightToken, mode);
+	const letterSpacing = rawToken(ir, recipe.letterSpacingToken, mode);
+	const letterSpacingEm = letterSpacing.rawValue ?? recipe.letterSpacingEm;
+	const fontStyle = referencedToken(ir, rawToken(ir, role.fontStyleToken, mode), mode).value;
+	const font = typography.fonts[role.font]!;
+	const optionalTokenValue = (name?: string): string | undefined =>
+		name ? rawToken(ir, name, mode).value : undefined;
+
+	return {
+		value: {
+			fontFamily: [font.family, ...font.fallbacks],
+			fontSize: dtcgDimension(fontSize.rawValue, fontSize.unit, `${roleName}/${variantName}`),
+			fontWeight: weight.rawValue,
+			letterSpacing: dtcgDimension(
+				fontSize.rawValue * letterSpacingEm,
+				fontSize.unit,
+				`${roleName}/${variantName} letter spacing`
+			),
+			lineHeight: lineHeight.rawValue ?? recipe.lineHeight,
+		},
+		extension: {
+			role: roleName,
+			variant: variantName,
+			fontStyle,
+			letterSpacingEm,
+			...(optionalTokenValue(recipe.textTransformToken)
+				? { textTransform: optionalTokenValue(recipe.textTransformToken) }
+				: {}),
+			...(optionalTokenValue(recipe.fontKerningToken)
+				? { fontKerning: optionalTokenValue(recipe.fontKerningToken) }
+				: {}),
+			...(optionalTokenValue(recipe.fontOpticalSizingToken)
+				? { fontOpticalSizing: optionalTokenValue(recipe.fontOpticalSizingToken) }
+				: {}),
+			...(optionalTokenValue(recipe.fontFeatureSettingsToken)
+				? { fontFeatureSettings: optionalTokenValue(recipe.fontFeatureSettingsToken) }
+				: {}),
+			...(optionalTokenValue(recipe.fontVariationSettingsToken)
+				? { fontVariationSettings: optionalTokenValue(recipe.fontVariationSettingsToken) }
+				: {}),
+		},
 	};
 }
 
@@ -149,11 +273,61 @@ function generateDtcg(
 	config: ResolvedFigmaJsonConfig,
 	metadata?: Record<string, string>
 ): Record<string, unknown> {
-	const tokens = getColorTokens(ir.tokens);
-	const { defaultMode, allModes } = getColorModes(ir);
-	const colorGroup: Record<string, unknown> = { $type: 'color' };
+	const directlyRepresentedDimensionFamilies = new Set([
+		'spacing',
+		'gap',
+		'borderRadius',
+		'borderWidth',
+	]);
+	for (const token of Object.values(ir.tokens)) {
+		if (
+			directlyRepresentedDimensionFamilies.has(token.family) &&
+			token.rawValue !== undefined &&
+			token.unit &&
+			token.unit !== 'px' &&
+			token.unit !== 'rem'
+		) {
+			throw new Error(
+				`Token --${token.name} uses CSS unit "${token.unit}", but DTCG 2025.10 dimensions support only px and rem`
+			);
+		}
+	}
+	const colorTokens = getColorTokens(ir.tokens);
+	const hasColors = Object.keys(colorTokens).length > 0;
+	const colorModes = hasColors ? getColorModes(ir) : undefined;
+	const colorGroup: Record<string, unknown> | undefined = hasColors
+		? { $type: 'color' }
+		: undefined;
+	const dimensionTokens = Object.values(ir.tokens).filter(
+		(token) =>
+			token.rawValue !== undefined &&
+			(token.unit === 'px' || token.unit === 'rem') &&
+			['spacing', 'gap', 'typography', 'borderRadius', 'borderWidth'].includes(token.family)
+	);
+	const durationTokens = Object.values(ir.tokens).filter(
+		(token) =>
+			token.family === 'time' &&
+			token.rawValue !== undefined &&
+			(token.unit === 'ms' || token.unit === 's')
+	);
+	const dimensionGroup: Record<string, unknown> | undefined =
+		dimensionTokens.length > 0 ? { $type: 'dimension' } : undefined;
+	const durationGroup: Record<string, unknown> | undefined =
+		durationTokens.length > 0 ? { $type: 'duration' } : undefined;
+	const shadowGroup: Record<string, unknown> | undefined = ir.shadows
+		? { $type: 'shadow' }
+		: undefined;
+	const easingGroup: Record<string, unknown> | undefined = ir.motion
+		? { $type: 'cubicBezier' }
+		: undefined;
+	const transitionGroup: Record<string, unknown> | undefined = ir.motion
+		? { $type: 'transition' }
+		: undefined;
+	const typographyGroup: Record<string, unknown> | undefined = ir.typography
+		? { $type: 'typography' }
+		: undefined;
 
-	for (const [name, token] of Object.entries(tokens)) {
+	for (const [name, token] of Object.entries(colorTokens)) {
 		const entry: Record<string, unknown> = {
 			$value: toDtcgColor(token.value, config.colorSpace),
 		};
@@ -162,27 +336,162 @@ function generateDtcg(
 			entry.$description = `${token.metadata.baseColor} (alpha: ${token.metadata.alphaLevel})`;
 		}
 
-		if (allModes.length > 1) {
+		if (colorModes && colorModes.allModes.length > 1) {
 			entry.$extensions = {
 				[EXTENSION_KEY]: {
 					collection: config.collectionName,
 					modes: Object.fromEntries(
-						allModes.map((modeName) => [
+						colorModes.allModes.map((modeName) => [
 							modeName,
-							toDtcgColor(getModeValue(ir, token, modeName, defaultMode), config.colorSpace),
+							toDtcgColor(
+								getModeValue(ir, token, modeName, colorModes.defaultMode),
+								config.colorSpace
+							),
 						])
 					),
 				},
 			};
 		}
 
-		colorGroup[name] = entry;
+		colorGroup![name] = entry;
+	}
+	for (const token of dimensionTokens) {
+		const map = (candidate: TokenValue) =>
+			dtcgDimension(candidate.rawValue!, candidate.unit!, `Token --${candidate.name}`);
+		const extension = tokenExtension(ir, token, map);
+		dimensionGroup![token.name] = {
+			$value: map(token),
+			...(extension ? { $extensions: extension } : {}),
+		};
+	}
+	for (const token of durationTokens) {
+		const map = (candidate: TokenValue) =>
+			dtcgDuration(candidate.rawValue!, candidate.unit!, `Token --${candidate.name}`);
+		durationGroup![token.name] = { $value: map(token) };
+	}
+	if (shadowGroup && ir.shadows) {
+		const dimension = (value: number) => dtcgDimension(value, ir.shadows!.unit, 'Shadow system');
+		for (const [kind, recipes] of [
+			['box', ir.shadows.box] as const,
+			['text', ir.shadows.text] as const,
+		]) {
+			for (const [recipeName, recipe] of Object.entries(recipes)) {
+				for (const [variantName, value] of [
+					['base', recipe.base] as const,
+					...Object.entries(recipe.variants),
+				]) {
+					const name =
+						variantName === 'base'
+							? `${kind}-${recipeName}`
+							: `${kind}-${recipeName}-${variantName}`;
+					const layers = value.layers.map((layer) => ({
+						color: `{color.${layer.color.token}}`,
+						offsetX: dimension(layer.x),
+						offsetY: dimension(layer.y),
+						blur: dimension(layer.blur),
+						spread: dimension(layer.spread ?? 0),
+					}));
+					shadowGroup[name] = {
+						$value: layers.length === 1 ? layers[0] : layers,
+						$extensions: {
+							[EXTENSION_KEY]: {
+								kind,
+								...(value.layers.some((layer) => layer.inset)
+									? { insetLayers: value.layers.map((layer) => Boolean(layer.inset)) }
+									: {}),
+							},
+						},
+					};
+				}
+			}
+		}
+	}
+	if (ir.motion && easingGroup && transitionGroup) {
+		for (const [name, easing] of Object.entries(ir.motion.easings)) {
+			easingGroup[name] = { $value: [...easing.value] };
+		}
+		for (const [recipeName, recipe] of Object.entries(ir.motion.recipes)) {
+			for (const [variantName, value] of [
+				['base', recipe.base] as const,
+				...Object.entries(recipe.variants),
+			]) {
+				const name = variantName === 'base' ? recipeName : `${recipeName}-${variantName}`;
+				const reduced =
+					variantName === 'base'
+						? recipe.reducedMotion.base
+						: recipe.reducedMotion.variants[variantName];
+				transitionGroup[name] = {
+					$value: {
+						duration: { value: value.duration.milliseconds, unit: 'ms' },
+						delay: { value: value.delay.milliseconds, unit: 'ms' },
+						timingFunction: [...value.easing.value],
+					},
+					$extensions: {
+						[EXTENSION_KEY]: {
+							recipe: recipeName,
+							variant: variantName,
+							reducedMotion: {
+								behavior: reduced.behavior,
+								value: {
+									duration: { value: reduced.duration.milliseconds, unit: 'ms' },
+									delay: { value: reduced.delay.milliseconds, unit: 'ms' },
+									timingFunction: [...reduced.easing.value],
+								},
+							},
+						},
+					},
+				};
+			}
+		}
+	}
+	if (ir.typography && typographyGroup) {
+		for (const [roleName, role] of Object.entries(ir.typography.roles)) {
+			for (const variantName of role.displayOrder) {
+				const composite = typographyComposite(ir, roleName, variantName);
+				const name = variantName === 'base' ? roleName : `${roleName}-${variantName}`;
+				const modes = Object.fromEntries(
+					ir.modes.size.overrides.map((modeName) => [
+						modeName,
+						typographyComposite(ir, roleName, variantName, modeName).value,
+					])
+				);
+				typographyGroup[name] = {
+					$value: composite.value,
+					$extensions: {
+						[EXTENSION_KEY]: {
+							...composite.extension,
+							...(Object.keys(modes).length > 0
+								? {
+										modes: {
+											[ir.modes.size.default]: composite.value,
+											...modes,
+										},
+									}
+								: {}),
+						},
+					},
+				};
+			}
+		}
+	}
+
+	const groups = {
+		...(colorGroup ? { color: colorGroup } : {}),
+		...(dimensionGroup ? { dimension: dimensionGroup } : {}),
+		...(durationGroup ? { duration: durationGroup } : {}),
+		...(easingGroup ? { easing: easingGroup } : {}),
+		...(transitionGroup ? { transition: transitionGroup } : {}),
+		...(typographyGroup ? { typography: typographyGroup } : {}),
+		...(shadowGroup ? { shadow: shadowGroup } : {}),
+	};
+	if (Object.keys(groups).length === 0) {
+		throw new Error('DTCG export requires at least one representable design-token family');
 	}
 
 	return {
 		$schema: DTCG_SCHEMA,
 		...(metadata ? { $extensions: { [EXTENSION_KEY]: metadata } } : {}),
-		color: colorGroup,
+		...groups,
 	};
 }
 
@@ -230,9 +539,10 @@ export function toFigmaJson(
 ): string {
 	const config = mergeConfig(userConfig);
 	const metadata = buildMetadata(userConfig?.fileHeader);
-	const output = format === 'figma-variables'
-		? generateFigmaVariables(ir, config, metadata)
-		: generateDtcg(ir, config, metadata);
+	const output =
+		format === 'figma-variables'
+			? generateFigmaVariables(ir, config, metadata)
+			: generateDtcg(ir, config, metadata);
 
 	return JSON.stringify(output, null, 2);
 }

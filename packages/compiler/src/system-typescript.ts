@@ -1,0 +1,183 @@
+import type { IR, PartialDesignSystem, TokenValue } from '@three-forma-styli/core';
+
+type ModeCategory = keyof IR['modes'];
+type TokenCategory = ModeCategory | 'time' | 'motion' | 'shadow';
+type SourceMode = { name: string; isDefault?: boolean; tokens: unknown; metadata?: unknown };
+type ProjectModeEntry = {
+	isDefault: boolean;
+	metadata?: unknown;
+	systems: Record<string, unknown>;
+	resolvedTokens: Record<string, string>;
+};
+type ProjectSystemContract = {
+	schemaVersion: 2;
+	modes: Record<
+		ModeCategory,
+		{
+			default: string;
+			entries: Record<string, ProjectModeEntry>;
+		}
+	>;
+	scales: {
+		time: {
+			default: string;
+			entries: Record<
+				string,
+				{
+					isDefault: boolean;
+					metadata?: unknown;
+					source: unknown;
+					resolvedTokens: Record<string, string>;
+				}
+			>;
+		};
+	};
+	motion?: IR['motion'];
+	shadows?: IR['shadows'];
+};
+
+const FAMILY_CATEGORIES: Record<TokenValue['family'], TokenCategory> = {
+	color: 'color',
+	spacing: 'size',
+	gap: 'size',
+	typography: 'size',
+	borderRadius: 'size',
+	borderWidth: 'size',
+	time: 'time',
+	motion: 'motion',
+	shadow: 'shadow',
+};
+
+function tokenValues(
+	tokens: Record<string, TokenValue>,
+	category: TokenCategory
+): Record<string, string> {
+	return Object.fromEntries(
+		Object.values(tokens)
+			.filter((token) => FAMILY_CATEGORIES[token.family] === category)
+			.sort((left, right) => left.name.localeCompare(right.name))
+			.map((token) => [token.name, token.value])
+	);
+}
+
+function sourceModes(
+	system: PartialDesignSystem,
+	category: ModeCategory
+): Array<{ system: string; modes: SourceMode[] }> {
+	if (category === 'color') {
+		return system.colors ? [{ system: 'colors', modes: system.colors.modes }] : [];
+	}
+	const sources: Array<{ system: string; modes: SourceMode[] }> = [];
+	if (system.spacing) sources.push({ system: 'spacing', modes: system.spacing.modes });
+	if (system.gap) sources.push({ system: 'gap', modes: system.gap.modes });
+	if (system.typography) sources.push({ system: 'typography', modes: system.typography.modes });
+	if (system.border?.radius) {
+		sources.push({ system: 'borderRadius', modes: system.border.radius.modes });
+	}
+	if (system.border?.width) {
+		sources.push({ system: 'borderWidth', modes: system.border.width.modes });
+	}
+	return sources;
+}
+
+function timeScaleTokenValues(
+	tokens: Record<string, TokenValue>,
+	scaleName: string
+): Record<string, string> {
+	return Object.fromEntries(
+		Object.values(tokens)
+			.filter((token) => token.family === 'time' && token.metadata?.timeScale === scaleName)
+			.sort((left, right) => left.name.localeCompare(right.name))
+			.map((token) => [token.name, token.value])
+	);
+}
+
+function entrySource(
+	system: PartialDesignSystem,
+	category: ModeCategory,
+	modeName: string
+): { metadata?: unknown; systems: Record<string, unknown> } {
+	let metadata: unknown;
+	const systems: Record<string, unknown> = {};
+	for (const source of sourceModes(system, category)) {
+		const mode = source.modes.find((candidate) => candidate.name === modeName);
+		if (!mode) continue;
+		systems[source.system] = mode.tokens;
+		if (mode.metadata !== undefined) {
+			if (metadata !== undefined && JSON.stringify(metadata) !== JSON.stringify(mode.metadata)) {
+				throw new Error(
+					`Mode ${modeName} has conflicting ${category} metadata across source systems.`
+				);
+			}
+			metadata = mode.metadata;
+		}
+	}
+	return { ...(metadata === undefined ? {} : { metadata }), systems };
+}
+
+/** Build a standalone, serializable contract for generated consumers. */
+export function projectSystemContract(system: PartialDesignSystem, ir: IR): ProjectSystemContract {
+	const modes = Object.fromEntries(
+		(['color', 'size'] as const).map((category) => {
+			const info = ir.modes[category];
+			const names = [info.default, ...info.overrides];
+			return [
+				category,
+				{
+					default: info.default,
+					entries: Object.fromEntries(
+						names.map((name) => [
+							name,
+							{
+								isDefault: name === info.default,
+								...entrySource(system, category, name),
+								resolvedTokens: tokenValues(
+									name === info.default ? ir.tokens : (ir.overrideTokens[name] ?? {}),
+									category
+								),
+							},
+						])
+					),
+				},
+			];
+		})
+	);
+	const scales = {
+		time: {
+			default: ir.scales.time.default,
+			entries: Object.fromEntries(
+				(system.time?.scales ?? []).map((scale) => [
+					scale.name,
+					{
+						isDefault: scale.name === ir.scales.time.default,
+						...(scale.metadata === undefined ? {} : { metadata: scale.metadata }),
+						source: scale.tokens,
+						resolvedTokens: timeScaleTokenValues(ir.tokens, scale.name),
+					},
+				])
+			),
+		},
+	};
+
+	return {
+		schemaVersion: 2,
+		modes: modes as ProjectSystemContract['modes'],
+		scales,
+		...(ir.motion ? { motion: ir.motion } : {}),
+		...(ir.shadows ? { shadows: ir.shadows } : {}),
+	} as const;
+}
+
+export function generateProjectSystemTypescript(system: PartialDesignSystem, ir: IR): string {
+	const contract = projectSystemContract(system, ir);
+	return [
+		'/** Generated by Three Forma Styli. Do not edit by hand. */',
+		`export const tfsSystem = ${JSON.stringify(contract, null, 2)} as const;`,
+		'',
+		'export type TfsSystem = typeof tfsSystem;',
+		'export type TfsColorMode = keyof typeof tfsSystem.modes.color.entries;',
+		'export type TfsSizeMode = keyof typeof tfsSystem.modes.size.entries;',
+		'export type TfsTimeScale = keyof typeof tfsSystem.scales.time.entries;',
+		'',
+	].join('\n');
+}

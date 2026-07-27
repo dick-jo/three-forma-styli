@@ -27,9 +27,16 @@ const system = {
 		roles: {
 			control: {
 				font: 'interface',
+				textTransform: 'uppercase' as const,
 				base: { fontSize: 2, weight: 'regular', lineHeight: 1.2, letterSpacing: 0 },
 				variants: {
-					compact: { fontSize: 1, weight: 'strong', lineHeight: 1.1, letterSpacing: 0.01 },
+					compact: {
+						fontSize: 1,
+						weight: 'strong',
+						lineHeight: 1.1,
+						letterSpacing: 0.01,
+						textTransform: 'lowercase' as const,
+					},
 				},
 				weights: { regular: 400, strong: 700 },
 				styles: {
@@ -50,6 +57,8 @@ describe('typography CSS recipes', () => {
 		expect(css).toContain('font-weight: var(--text-control-font-weight);');
 		expect(css).toContain('font-weight: var(--text-control-compact-font-weight);');
 		expect(css).toContain('font-synthesis: none;');
+		expect(css).toContain('text-transform: var(--text-control-text-transform);');
+		expect(css).toContain('text-transform: var(--text-control-compact-text-transform);');
 		expect(css).toContain('.text--control-style-normal-weight-strong {');
 		expect(css).not.toContain('.text--control-weight-strong)');
 		expect(css).toContain('.text--control-style-italic-weight-regular {');

@@ -5,6 +5,7 @@ import type {
 	FontSizeReference,
 	TypographyFeatureValue,
 	TypographyMode,
+	TypographyModeRecipeOverride,
 	TypographyRecipe,
 	TypographyRole,
 	TypographySettings,
@@ -16,7 +17,7 @@ import type {
 	TypographyContract,
 	TypographyContractRecipe,
 } from './types.js';
-import { getDefaultMode } from './utils.js';
+import { getDefaultEntry } from './utils.js';
 
 function formatNumber(value: number): string {
 	return value.toFixed(4).replace(/\.?0+$/, '');
@@ -62,6 +63,13 @@ function recipeFontSizeToken(
 	};
 }
 
+function applyModeOverride(
+	recipe: TypographyRecipe,
+	override: TypographyModeRecipeOverride
+): TypographyRecipe {
+	return { ...recipe, ...override };
+}
+
 function featureSettings(features: Record<string, TypographyFeatureValue>): string {
 	return Object.entries(features)
 		.sort(([left], [right]) => left.localeCompare(right))
@@ -99,6 +107,7 @@ function resolvedSettings(
 		variations: Object.keys(variations).length > 0 ? variations : undefined,
 		fontKerning: recipe.fontKerning ?? base.fontKerning ?? role.fontKerning,
 		fontOpticalSizing: recipe.fontOpticalSizing ?? base.fontOpticalSizing ?? role.fontOpticalSizing,
+		textTransform: recipe.textTransform ?? base.textTransform ?? role.textTransform,
 	};
 }
 
@@ -153,6 +162,15 @@ function recipeTokens(
 			family: 'typography',
 			name: contract.fontKerningToken,
 			value: settings.fontKerning,
+		});
+	}
+	if (settings.textTransform) {
+		contract.textTransformToken = `${recipePrefix}-text-transform`;
+		contract.textTransform = settings.textTransform;
+		tokens.push({
+			family: 'typography',
+			name: contract.textTransformToken,
+			value: settings.textTransform,
 		});
 	}
 	if (settings.fontOpticalSizing) {
@@ -308,16 +326,40 @@ function generateSemanticTokens(
  * the mode selector preserves the public semantic token contract and makes
  * descendant-scoped size modes work in real CSS.
  */
-function generateSemanticFontSizeTokens(
+function generateSemanticModeTokens(
 	typography: DesignSystem['typography'],
+	modeName: string,
 	config: GeneratorConfig
 ): TokenValue[] {
 	if (!typography.roles) return [];
 	const tokens: TokenValue[] = [];
 	for (const [roleName, role] of Object.entries(typography.roles)) {
-		tokens.push(recipeFontSizeToken(roleName, undefined, role.base, config));
+		const modeOverride = role.modeOverrides?.[modeName];
+		const baseOverride = modeOverride?.base;
+		tokens.push(
+			...(baseOverride
+				? recipeTokens(
+						roleName,
+						undefined,
+						applyModeOverride(role.base, baseOverride),
+						role,
+						config
+					).tokens
+				: [recipeFontSizeToken(roleName, undefined, role.base, config)])
+		);
 		for (const [variantName, recipe] of Object.entries(role.variants ?? {})) {
-			tokens.push(recipeFontSizeToken(roleName, variantName, recipe, config));
+			const variantOverride = modeOverride?.variants?.[variantName];
+			tokens.push(
+				...(variantOverride
+					? recipeTokens(
+							roleName,
+							variantName,
+							applyModeOverride(recipe, variantOverride),
+							role,
+							config
+						).tokens
+					: [recipeFontSizeToken(roleName, variantName, recipe, config)])
+			);
 		}
 	}
 	return tokens;
@@ -355,7 +397,7 @@ export function generateTypographyTokens(
 	typography: DesignSystem['typography'],
 	config: GeneratorConfig
 ): GeneratorResult {
-	const defaultMode = getDefaultMode(typography.modes);
+	const defaultMode = getDefaultEntry(typography.modes);
 	const overrideModes = typography.modes.filter((mode) => mode !== defaultMode);
 	const defaultTokens = [
 		...generateTokensForMode(defaultMode, config),
@@ -365,7 +407,7 @@ export function generateTypographyTokens(
 	for (const mode of overrideModes) {
 		overrideTokens[mode.name] = [
 			...generateTokensForMode(mode, config),
-			...generateSemanticFontSizeTokens(typography, config),
+			...generateSemanticModeTokens(typography, mode.name, config),
 		];
 	}
 	return {

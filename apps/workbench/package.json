@@ -1,0 +1,22 @@
+{
+	"name": "@three-forma-styli/workbench-source",
+	"private": true,
+	"description": "Source application for the generated TFS visual workbench",
+	"type": "module",
+	"scripts": {
+		"build": "vite build",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"sync:compiler": "pnpm build && node ../../scripts/sync-workbench-assets.mjs --write",
+		"check:compiler": "pnpm build && node ../../scripts/sync-workbench-assets.mjs"
+	},
+	"dependencies": {
+		"@three-forma-styli/core": "workspace:*"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "^5.1.1",
+		"svelte": "^5.56.7",
+		"svelte-check": "^4.7.3",
+		"typescript": "^5.8.2",
+		"vite": "^6.4.3"
+	}
+}

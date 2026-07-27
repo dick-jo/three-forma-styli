@@ -98,10 +98,10 @@ and let Scatter consume a canary before any `latest` promotion.
 The generated consumer contract represents the base as no variant:
 
 ```tsx
-<Text as="p" role="prose" />
-<Text as="h2" role="heading" variant="l" weight="max" />
-<Text as="span" role="label" variant="s" weight="lo" />
-<Text as="em" role="prose" fontStyle="italic" weight="lo" />
+<Text as="p" kind="prose" />
+<Text as="h2" kind="heading" variant="l" weight="max" />
+<Text as="span" kind="label" variant="s" weight="lo" />
+<Text as="em" kind="prose" fontStyle="italic" weight="lo" />
 ```
 
 TFS remains build-time only. Scatter's component would import the generated CSS

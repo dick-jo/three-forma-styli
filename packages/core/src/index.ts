@@ -5,7 +5,7 @@
 // ===========================================
 
 // Generator - produces Intermediate Representation
-export { generate, ValidationError } from './generator/index.js';
+export { generate, resolveGeneratorConfig, ValidationError } from './generator/index.js';
 export type {
 	IR,
 	TokenValue,
@@ -21,11 +21,21 @@ export { toCss, defaultCssConfig } from './transformers/index.js';
 export type { CssTransformerConfig, FileHeaderConfig } from './transformers/index.js';
 
 export { toFigmaJson } from './transformers/index.js';
-export { toTypographyTypescript } from './transformers/index.js';
+export {
+	toTypographyTypescript,
+	typographyClassResolverDeclaration,
+	typographyClassResolverJavascript,
+	typographyContractData,
+	typographyContractTypes,
+} from './transformers/index.js';
 export { toTypographySpecimen } from './transformers/index.js';
 export { toTypographyCss, toTypographyCssModuleTypes } from './transformers/index.js';
 export type { TypographySpecimenConfig } from './transformers/index.js';
 export type { TypographyCssConfig } from './transformers/index.js';
+export { toShadowCss, toShadowCssModuleTypes } from './transformers/index.js';
+export type { ShadowCssConfig } from './transformers/index.js';
+export { toShadowSpecimen } from './transformers/index.js';
+export type { ShadowSpecimenConfig } from './transformers/index.js';
 export type {
 	FigmaJsonTransformerConfig,
 	FigmaJsonFormat,
@@ -158,6 +168,35 @@ export function generateTypographySpecimen(
 
 export * from './types.js';
 export { defineTypography, deriveTypographyRange, fontFromManifest } from './typography/index.js';
+export { deriveShadowRange } from './shadows/index.js';
+export { createWorkbenchContract } from './review/contract.js';
+export { createReviewCapturePlan } from './review/capture.js';
+export type {
+	ReviewAssetContract,
+	ReviewCapturePolicy,
+	ReviewCaptureState,
+	ColorReviewCase,
+	ColorReviewLab,
+	MotionReviewCase,
+	MotionReviewLab,
+	FoundationReviewCase,
+	FoundationReviewLab,
+	ReviewCase,
+	ReviewControl,
+	ReviewDiagnostic,
+	ReviewLab,
+	ReviewLabId,
+	ReviewMode,
+	ReviewModeGroup,
+	ShadowReviewCase,
+	TfsAgentHandoff,
+	TfsReviewPatch,
+	TfsWorkbenchContract,
+	TfsReviewCapturePlan,
+	TypographyReviewCase,
+	WorkbenchContractOptions,
+	WorkbenchDraftOperation,
+} from './review/types.js';
 
 // ===========================================
 // UTILITIES

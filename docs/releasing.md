@@ -1,37 +1,49 @@
 # Releasing to npm
 
-The three public packages are published under the npm scope
+The four public packages are published under the npm scope
 `@three-forma-styli`. Changesets records release intent and maintains changelogs;
-its fixed group keeps the packages on one coordinated version because the CLI composes
-the exact core and themes APIs from the same source release. This deliberately
+its fixed group keeps the packages on one coordinated version because the compiler
+and CLI compose the exact core and source-preset APIs from the same release. This deliberately
 favours a predictable pre-1.0 toolchain over independently versioned packages.
 
 The production Scatter app currently consumes `@three-forma-styli/core`; it does
 not consume the CLI or themes package at runtime.
 
-## TODO: circle back before the next npm release
+## Current release state
 
-- [ ] Review this procedure with fresh eyes and confirm npm scope/account access.
-- [ ] Add the appropriate Changeset for the post-`0.2.0` hardening, scoped
-  typography-mode fix, and any other unreleased public changes.
-- [ ] Publish an exact `next` canary, install it in Splinter, and run the full
-  application and visual-regression checks before promoting `latest`.
-- [ ] Replace temporary vendored TFS tarballs in downstream design-system
-  projects with the reviewed published version.
+`0.3.0` is published under both `latest` and `next`. The npm publisher is
+`three___`. The release added the standalone compiler, generated workspace
+package layout, runtime theme contract, semantic typography, fonts, motion,
+shadows, and unified Workbench.
 
-No npm publication was performed during the current toolkit/design-system work.
+The next release is `0.4.0`. It fixes the typed programmatic project boundary
+needed by monorepo-owned design-system authoring and adds opt-in, namespaced
+physical CSS filenames. Before publishing it:
+
+- [ ] Merge the reviewed toolkit pull request to `master`.
+- [ ] Confirm every Linux/Windows/FontTools/browser-consumer check is green for
+      the exact merge commit.
+- [ ] Run `pnpm release:version` from clean `master` and review the coordinated
+      package/changelog/lockfile diff.
+- [ ] Run the complete local release, packed-consumer, browser, font-conversion,
+      and production dependency audit gates.
+- [ ] Publish `0.4.0` under `next`, install that exact version in the Scatter
+      integration branch, and privately regenerate its design-system package.
+- [ ] Promote `0.4.0` to `latest` only after Scatter's automated integration
+      checks pass. Scatter's ordinary CI still observes its configured
+      minimum-release-age policy.
 
 ## Safe release sequence
 
 1. Add `pnpm changeset` with every user-visible package change. Choose the
-   semver impact of the public API; the fixed group advances all three packages.
+   semver impact of the public API; the fixed group advances all four packages.
 2. When preparing a release, start from a clean `master`, run
    `pnpm release:version`, and review every version, changelog and lockfile change.
    Commit and merge that release-preparation diff before publishing.
 3. Run `npm whoami` and confirm the account can publish the scope.
-4. Run `pnpm install --frozen-lockfile`, `pnpm check:release`, and
-   `pnpm audit --prod --audit-level=moderate`.
-   `check:release` installs all three packed artifacts into a clean temporary
+4. Run `pnpm install --frozen-lockfile`, `pnpm check:release`,
+   `pnpm check:browser`, and `pnpm audit --prod --audit-level=moderate`.
+   `check:release` installs all four packed artifacts into a clean temporary
    consumer and checks the import API, public declarations through strict
    TypeScript compilation, and the executable.
 5. Review each package listed by `pnpm exec changeset status --verbose`. The
@@ -59,10 +71,11 @@ its checks and visual QA, and only then promote the version:
 pnpm exec changeset publish --tag next
 npm dist-tag add @three-forma-styli/core@<version> latest
 npm dist-tag add @three-forma-styli/themes@<version> latest
+npm dist-tag add @three-forma-styli/compiler@<version> latest
 npm dist-tag add @three-forma-styli/cli@<version> latest
 ```
 
-In Splinter, update the exact dependency and lockfile, run the app's checks, and
-regenerate `apps/main/src/css/system.tokens.css` only when the source theme is
-available and the diff has been reviewed. Never treat a successful package
-publish as proof that Scatter's generated CSS is visually unchanged.
+In Scatter, update the exact private `@repo/design-system` authoring dependency,
+privately regenerate its owned `generated/` tree, and run the package,
+application, browser, and final visual gates. Never treat a successful package
+publish as proof that generated CSS is visually unchanged.

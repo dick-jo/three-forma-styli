@@ -1,8 +1,8 @@
 // src/config/time.ts
-import { DesignSystem, TimeMode } from '@three-forma-styli/core';
+import { DesignSystem, TimeScale } from '@three-forma-styli/core';
 
-// Time modes - default gets unprefixed tokens (--t-1), others get prefixed (--t-anim-1)
-const TIME_MODES: Record<string, TimeMode> = {
+// Every time scale is emitted at once. The default is unprefixed; others are named.
+const TIME_SCALES: Record<string, TimeScale> = {
 	default: {
 		isDefault: true,
 		tokens: {
@@ -24,8 +24,8 @@ const TIME_MODES: Record<string, TimeMode> = {
 
 // Export combined time configuration
 export const time: DesignSystem['time'] = {
-	modes: Object.entries(TIME_MODES).map(([name, mode]) => ({
+	scales: Object.entries(TIME_SCALES).map(([name, scale]) => ({
 		name,
-		...mode,
+		...scale,
 	})),
 };

@@ -64,7 +64,7 @@ export const border: DesignSystem['border'] = {
 };
 
 export const time: DesignSystem['time'] = {
-	modes: [
+	scales: [
 		{ name: 'default', isDefault: true, tokens: { unit: 'ms', base: 100, min: 50, range: 10 } },
 		{ name: 'anim', tokens: { unit: 'ms', base: 1000, min: 500, range: 10 } },
 	],

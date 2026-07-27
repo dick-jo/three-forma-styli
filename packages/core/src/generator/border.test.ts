@@ -35,7 +35,11 @@ describe('generateBorderRadiusTokens', () => {
 	};
 
 	it('generates border radius tokens with resolved values', () => {
-		const result = generateBorderRadiusTokens(basicBorderRadius, basicSpacing, defaultGeneratorConfig);
+		const result = generateBorderRadiusTokens(
+			basicBorderRadius,
+			basicSpacing,
+			defaultGeneratorConfig
+		);
 
 		const bdrMin = result.defaultTokens.find((t) => t.name === 'bdr-min');
 		const bdrS = result.defaultTokens.find((t) => t.name === 'bdr-s');
@@ -49,7 +53,11 @@ describe('generateBorderRadiusTokens', () => {
 	});
 
 	it('resolves "min" reference to spacing min value', () => {
-		const result = generateBorderRadiusTokens(basicBorderRadius, basicSpacing, defaultGeneratorConfig);
+		const result = generateBorderRadiusTokens(
+			basicBorderRadius,
+			basicSpacing,
+			defaultGeneratorConfig
+		);
 
 		const bdrMin = result.defaultTokens.find((t) => t.name === 'bdr-min');
 		expect(bdrMin?.value).toBe('4px');
@@ -58,7 +66,11 @@ describe('generateBorderRadiusTokens', () => {
 	});
 
 	it('resolves numeric references using spacing base multiplier', () => {
-		const result = generateBorderRadiusTokens(basicBorderRadius, basicSpacing, defaultGeneratorConfig);
+		const result = generateBorderRadiusTokens(
+			basicBorderRadius,
+			basicSpacing,
+			defaultGeneratorConfig
+		);
 
 		const bdrS = result.defaultTokens.find((t) => t.name === 'bdr-s');
 		const bdrL = result.defaultTokens.find((t) => t.name === 'bdr-l');
@@ -71,7 +83,11 @@ describe('generateBorderRadiusTokens', () => {
 	});
 
 	it('sets correct family on all tokens', () => {
-		const result = generateBorderRadiusTokens(basicBorderRadius, basicSpacing, defaultGeneratorConfig);
+		const result = generateBorderRadiusTokens(
+			basicBorderRadius,
+			basicSpacing,
+			defaultGeneratorConfig
+		);
 
 		result.defaultTokens.forEach((token) => {
 			expect(token.family).toBe('borderRadius');

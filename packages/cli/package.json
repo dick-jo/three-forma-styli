@@ -1,6 +1,6 @@
 {
 	"name": "@three-forma-styli/cli",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"type": "module",
 	"sideEffects": false,
 	"description": "CLI tool for generating design tokens from TypeScript definitions",
@@ -52,17 +52,17 @@
 		"node": ">=22"
 	},
 	"dependencies": {
-		"@inquirer/prompts": "^7.2.0",
+		"@inquirer/input": "4.3.1",
+		"@inquirer/select": "4.4.2",
+		"@three-forma-styli/compiler": "workspace:^",
 		"@three-forma-styli/core": "workspace:^",
 		"@three-forma-styli/themes": "workspace:^",
 		"chalk": "4.1.2",
 		"commander": "^13.1.0",
 		"esbuild": "^0.28.1",
-		"fontkit": "2.0.4",
 		"fs-extra": "^11.3.0"
 	},
 	"devDependencies": {
-		"@types/fontkit": "2.0.9",
 		"@types/fs-extra": "^11.0.4",
 		"@types/node": "^22.13.9",
 		"nodemon": "^3.1.14",

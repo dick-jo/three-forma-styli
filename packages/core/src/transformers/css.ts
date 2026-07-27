@@ -34,7 +34,6 @@ export interface CssTransformerConfig {
 		root?: string;
 		colorMode?: string;
 		sizeMode?: string;
-		timeMode?: string;
 	};
 
 	/**
@@ -48,20 +47,19 @@ export interface CssTransformerConfig {
 /**
  * Default CSS transformer configuration (internal, with all values)
  */
-const defaultSelectors: ResolvedCssConfig['selectors'] = {
+const defaultSelectors = Object.freeze({
 	root: ':root',
 	colorMode: '[data-color-mode="{mode}"]',
 	sizeMode: '[data-size-mode="{mode}"]',
-	timeMode: '[data-time-mode="{mode}"]',
-};
+}) satisfies ResolvedCssConfig['selectors'];
 
 /**
  * Default CSS transformer configuration (exported for reference)
  */
-export const defaultCssConfig: CssTransformerConfig = {
+export const defaultCssConfig = Object.freeze({
 	selectors: defaultSelectors,
 	// fileHeader is undefined by default (no header unless caller provides config)
-};
+}) satisfies CssTransformerConfig;
 
 /**
  * Internal resolved config with all values present
@@ -71,7 +69,6 @@ interface ResolvedCssConfig {
 		root: string;
 		colorMode: string;
 		sizeMode: string;
-		timeMode: string;
 	};
 }
 
@@ -90,10 +87,7 @@ function mergeConfig(userConfig?: CssTransformerConfig): ResolvedCssConfig {
 /**
  * Determine which category a mode belongs to based on which tokens it contains
  */
-function getModeCategory(
-	modeName: string,
-	ir: IR
-): 'color' | 'size' | 'time' | null {
+function getModeCategory(modeName: string, ir: IR): 'color' | 'size' | null {
 	// Check color modes
 	if (ir.modes.color.overrides.includes(modeName)) {
 		return 'color';
@@ -104,11 +98,6 @@ function getModeCategory(
 		return 'size';
 	}
 
-	// Check time modes
-	if (ir.modes.time.overrides.includes(modeName)) {
-		return 'time';
-	}
-
 	return null;
 }
 
@@ -117,7 +106,7 @@ function getModeCategory(
  */
 function getSelectorForMode(
 	modeName: string,
-	category: 'color' | 'size' | 'time',
+	category: 'color' | 'size',
 	config: ResolvedCssConfig
 ): string {
 	switch (category) {
@@ -125,8 +114,6 @@ function getSelectorForMode(
 			return config.selectors.colorMode.replace('{mode}', modeName);
 		case 'size':
 			return config.selectors.sizeMode.replace('{mode}', modeName);
-		case 'time':
-			return config.selectors.timeMode.replace('{mode}', modeName);
 	}
 }
 
@@ -193,6 +180,17 @@ export function toCss(ir: IR, userConfig?: Partial<CssTransformerConfig>): strin
 
 		if (modeVars.length > 0) {
 			blocks.push(`${selector} {\n${modeVars.join('\n')}\n}`);
+		}
+	}
+
+	for (const [condition, tokens] of Object.entries(ir.mediaOverrides)) {
+		const mediaVars = formatTokensAsCss(tokens);
+		if (mediaVars.length > 0) {
+			blocks.push(
+				`@media ${condition} {\n  ${config.selectors.root} {\n${mediaVars
+					.map((line) => `  ${line}`)
+					.join('\n')}\n  }\n}`
+			);
 		}
 	}
 

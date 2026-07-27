@@ -50,9 +50,16 @@ const typography: DesignSystem['typography'] = {
 	roles: {
 		interface: {
 			font: 'ui',
+			textTransform: 'uppercase',
 			base: { fontSize: 2, weight: 'regular', lineHeight: 1.2, letterSpacing: 0 },
 			variants: {
-				compact: { fontSize: 1, weight: 'strong', lineHeight: 1.1, letterSpacing: 0.01 },
+				compact: {
+					fontSize: 1,
+					weight: 'strong',
+					lineHeight: 1.1,
+					letterSpacing: 0.01,
+					textTransform: 'lowercase',
+				},
 			},
 			weights: { regular: 400, strong: 700 },
 			styles: {
@@ -73,9 +80,18 @@ describe('toTypographyTypescript', () => {
 		expect(output).toContain('"fontSize": "var(--text-interface-compact-font-size)"');
 		expect(output).toContain('"fontWeight": "var(--text-interface-compact-font-weight)"');
 		expect(output).toContain('"weight": "strong"');
+		expect(output).toContain('"textTransform": "var(--text-interface-text-transform)"');
+		expect(output).toContain('"textTransformValue": "uppercase"');
+		expect(output).toContain('"textTransformValue": "lowercase"');
+		expect(output).toContain('"base": "interface"');
+		expect(output).toContain('"compact": "interface-compact"');
+		expect(output).toContain('"italic"');
+		expect(output).toContain('"regular": "interface-style-italic-weight-regular"');
 		expect(output).not.toContain('"defaultWeight"');
 		expect(output).not.toContain('"fonts":');
 		expect(output).toContain('export type TypographyVariant<R extends TypographyRole>');
+		expect(output).toContain('export type TypographyClassKey =');
+		expect(output).toContain('export function typographyClassName(');
 	});
 
 	it('uses configured token prefixes', () => {
@@ -90,7 +106,30 @@ describe('toTypographyTypescript', () => {
 		const output = toTypographyTypescript(generate({ typography }));
 		expect(
 			typecheck(
-				`${output}\nconst base: TypographySelection = { role: 'interface' };\nconst compact: TypographySelection = { role: 'interface', variant: 'compact' };\nconst italic: TypographySelection = { role: 'interface', fontStyle: 'italic', weight: 'regular' };\nvoid base; void compact; void italic;\n// @ts-expect-error unknown variant\nconst badVariant: TypographySelection = { role: 'interface', variant: 'display' };\n// @ts-expect-error italic does not expose strong\nconst badItalic: TypographySelection = { role: 'interface', fontStyle: 'italic', weight: 'strong' };\n// @ts-expect-error an explicit style requires an explicit valid pair weight\nconst missingItalicWeight: TypographySelection = { role: 'interface', fontStyle: 'italic' };\nvoid badVariant; void badItalic; void missingItalicWeight;\n`
+				`${output}
+const base: TypographySelection = { role: 'interface' };
+const explicitDefaultStyle: TypographySelection = { role: 'interface', fontStyle: 'normal' };
+const compact: TypographySelection = { role: 'interface', variant: 'compact' };
+const italic: TypographySelection = { role: 'interface', fontStyle: 'italic', weight: 'regular' };
+const classes: TypographyClassMap = {
+  interface: 'base',
+  'interface-compact': 'compact',
+  'interface-style-normal-weight-regular': 'normal-regular',
+  'interface-style-normal-weight-strong': 'normal-strong',
+  'interface-style-italic-weight-regular': 'italic-regular',
+};
+const className: string = typographyClassName(compact, classes);
+void base; void explicitDefaultStyle; void compact; void italic; void className;
+// @ts-expect-error unknown variant
+const badVariant: TypographySelection = { role: 'interface', variant: 'display' };
+// @ts-expect-error italic does not expose strong
+const badItalic: TypographySelection = { role: 'interface', fontStyle: 'italic', weight: 'strong' };
+// @ts-expect-error an explicit style requires an explicit valid pair weight
+const missingItalicWeight: TypographySelection = { role: 'interface', fontStyle: 'italic' };
+// @ts-expect-error class maps must contain every generated key
+const incompleteClasses: TypographyClassMap = { interface: 'base' };
+void badVariant; void badItalic; void missingItalicWeight; void incompleteClasses;
+`
 			)
 		).toEqual([]);
 	});

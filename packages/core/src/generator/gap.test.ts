@@ -215,7 +215,11 @@ describe('generateGapTokens', () => {
 				],
 			};
 
-			const result = generateGapTokens(gapWithExplicitSpacing, multiModeSpacing, defaultGeneratorConfig);
+			const result = generateGapTokens(
+				gapWithExplicitSpacing,
+				multiModeSpacing,
+				defaultGeneratorConfig
+			);
 
 			// compact mode explicitly references small spacing
 			const compactGapS = result.overrideTokens['compact'].find((t) => t.name === 'gap-s');

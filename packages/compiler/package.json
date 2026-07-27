@@ -1,0 +1,70 @@
+{
+	"name": "@three-forma-styli/compiler",
+	"version": "0.3.0",
+	"type": "module",
+	"sideEffects": false,
+	"description": "Node.js project and font compiler for Three-Forma-Styli",
+	"exports": {
+		".": {
+			"types": "./dist/api.d.ts",
+			"import": "./dist/api.js"
+		},
+		"./project": {
+			"types": "./dist/project.d.ts",
+			"import": "./dist/project.js"
+		},
+		"./build": {
+			"types": "./dist/build.d.ts",
+			"import": "./dist/build.js"
+		},
+		"./fonts": {
+			"types": "./dist/fonts/index.d.ts",
+			"import": "./dist/fonts/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist",
+		"workbench-assets",
+		"CHANGELOG.md"
+	],
+	"scripts": {
+		"build": "node ../../scripts/clean.mjs && tsc",
+		"dev": "tsc --watch",
+		"prepack": "pnpm build",
+		"test": "vitest run && pnpm test:types",
+		"test:types": "tsc -p tsconfig.type-tests.json"
+	},
+	"keywords": [
+		"design-tokens",
+		"compiler",
+		"web-fonts",
+		"css-variables"
+	],
+	"author": "three",
+	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/dick-jo/three-forma-styli.git",
+		"directory": "packages/compiler"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"dependencies": {
+		"@three-forma-styli/core": "workspace:^",
+		"fontkit": "2.0.4",
+		"fs-extra": "^11.3.0"
+	},
+	"devDependencies": {
+		"@three-forma-styli/themes": "workspace:^",
+		"@types/fontkit": "2.0.9",
+		"@types/fs-extra": "^11.0.4",
+		"@types/node": "^22.13.9",
+		"typescript": "^5.8.2",
+		"vitest": "^3.2.7"
+	}
+}

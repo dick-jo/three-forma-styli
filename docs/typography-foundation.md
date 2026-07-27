@@ -87,8 +87,36 @@ references an arbitrary alias in that role's intentional `weights` map; there is
 no hidden role-wide default alias. `fontSize` references the atomic scale, line
 height is unitless, and numeric `letterSpacing` is emitted
 in `em` so it follows the selected size. Roles deliberately exclude color,
-margin, layout, and text transform. Generated CSS uses font longhands because the
-`font` shorthand resets related properties that TFS does not necessarily own.
+margin, and layout. Presentational `textTransform` may be set on a role and
+overridden by its base or a particular variant; it never rewrites source text.
+Generated CSS uses font longhands because the `font` shorthand resets related
+properties that TFS does not necessarily own.
+
+## Optional mode-specific calibration
+
+Atomic typography modes normally change `--fs-*` while semantic recipes retain
+their authored tuple. A genuinely different context—such as fixed-canvas display
+graphics—can opt into explicit role-local tuple changes without creating another
+role vocabulary:
+
+```ts
+heading: {
+  // base, variants, weights, and font omitted here
+  modeOverrides: {
+    display: {
+      base: { fontSize: 6, lineHeight: 0.85, letterSpacing: -0.02 },
+      variants: {
+        max: { fontSize: 12, weight: 'max', lineHeight: 0.8 },
+      },
+    },
+  },
+}
+```
+
+The mode must exist in `typography.modes` and must not be the default mode.
+Variant and weight aliases must already exist on the role. Overrides may change
+only the four composite tuple fields; TFS preserves every omitted decision and
+does not derive an aesthetic calibration from font metrics.
 
 ## Optional anchor derivation
 
@@ -194,7 +222,15 @@ coverage, embedding metadata, and warnings.
 - verifies that conversion preserved style, ranges, axes, features, coverage,
   metrics, and embedding flags;
 - emits correct `@font-face` longhands, copied license text, and manifest schema 2;
+- records the exact FontTools version, Python implementation/version, and
+  executable command only when it actually converts TTF/OTF bytes;
 - stages and commits its managed output atomically.
+
+Copy-only WOFF/WOFF2 preparation does not resolve, execute, or mention
+FontTools. This keeps normal builds and committed-output validation independent
+of Python. Conversion provenance deliberately excludes absolute executable
+paths and timestamps, so otherwise identical output does not depend on a
+checkout or virtual-environment location.
 
 `fontFromManifest()` checks the schema and manifest consistency before converting
 raw face facts into the core validation shape. It does not derive semantic weight
@@ -248,7 +284,6 @@ output: {
 			root: ':root',
 			colorMode: '[data-color-mode="{mode}"]',
 			sizeMode: '[data-size-mode="{mode}"]',
-			timeMode: '[data-time-mode="{mode}"]',
 		},
 	},
 	typographyCss: {
@@ -294,8 +329,12 @@ dist/
 └── build.manifest.json
 ```
 
-DTCG and Figma JSON are currently color-only; the build manifest states that
-limitation. DTCG is the Design Tokens Community Group interchange format.
+DTCG 2025.10 output includes semantic typography composites. Because the
+standard typography type does not model CSS font style, transforms, kerning,
+optical sizing, feature settings, variation settings, or TFS modes, those facts
+are preserved in the `com.three-forma-styli` extension. Figma Variables output
+and network sync remain deliberately color-only. DTCG is the Design Tokens
+Community Group interchange format.
 
 ## Calibration specimen
 
@@ -326,9 +365,9 @@ A future Scatter `<Text>` component can consume the generated contract with
 `variant` optional:
 
 ```tsx
-<Text role="prose">Ordinary text</Text>
-<Text role="heading" variant="max">Display heading</Text>
-<Text role="label" fontStyle="italic" weight="lo">Status</Text>
+<Text kind="prose">Ordinary text</Text>
+<Text kind="heading" variant="max">Display heading</Text>
+<Text kind="label" fontStyle="italic" weight="lo">Status</Text>
 ```
 
 Components such as `Button` may own a default selection internally. Explicitly

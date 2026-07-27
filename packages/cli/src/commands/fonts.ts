@@ -1,13 +1,14 @@
 import fs from 'fs-extra';
 import path from 'node:path';
 import chalk from 'chalk';
-import { classifyFontStyle, inspectFontFiles } from '../fonts/inspect.js';
-import type { FontInspection } from '../fonts/inspect.js';
 import {
+	classifyFontStyle,
+	inspectFontFiles,
 	prepareFonts,
+	type FontInspection,
 	type FontsPreparationConfig,
 	type PreparedFontsManifest,
-} from '../fonts/prepare.js';
+} from '@three-forma-styli/compiler/fonts';
 import { loadConfigModule } from '../config/load-module.js';
 
 export interface InspectFontsOptions {

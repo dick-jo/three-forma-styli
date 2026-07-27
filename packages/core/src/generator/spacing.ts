@@ -6,7 +6,7 @@
 
 import type { DesignSystem, SpacingMode } from '../types.js';
 import type { TokenValue, GeneratorResult, GeneratorConfig } from './types.js';
-import { getDefaultMode } from './utils.js';
+import { getDefaultEntry } from './utils.js';
 
 /**
  * Generate tokens for a single spacing mode
@@ -50,7 +50,7 @@ export function generateSpacingTokens(
 	spacing: DesignSystem['spacing'],
 	config: GeneratorConfig
 ): GeneratorResult {
-	const defaultMode = getDefaultMode(spacing.modes);
+	const defaultMode = getDefaultEntry(spacing.modes);
 	const overrideModes = spacing.modes.filter((m) => m !== defaultMode);
 
 	const defaultTokens = generateTokensForMode(defaultMode, config);

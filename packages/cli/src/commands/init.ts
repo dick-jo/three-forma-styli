@@ -1,23 +1,32 @@
 import fs from 'fs-extra';
-import path from 'path';
+import path from 'node:path';
 import chalk from 'chalk';
-import { input, select } from '@inquirer/prompts';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { execFileSync } from 'child_process';
-import { createRequire } from 'module';
+import input from '@inquirer/input';
+import select from '@inquirer/select';
+import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { CLI_VERSION } from '../version.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 const require = createRequire(import.meta.url);
 
 export interface InitOptions {
 	theme?: string;
 	skipInstall?: boolean;
+	workspacePackage?: boolean;
+	packageName?: string;
+	packageManager?: string;
 }
 
 const projectNamePattern = /^[a-z0-9][a-z0-9-]*$/;
+const packageNamePartPattern = /^[a-z0-9][a-z0-9._-]*$/;
+type PackageManager = 'npm' | 'pnpm' | 'yarn';
+
+function packageManagerCommand(manager: PackageManager) {
+	return {
+		executable: process.platform === 'win32' ? `${manager}.cmd` : manager,
+		shell: process.platform === 'win32',
+	};
+}
 
 function projectNameError(value: string): string | undefined {
 	if (!value.trim()) return 'Project name is required';
@@ -25,6 +34,24 @@ function projectNameError(value: string): string | undefined {
 		return 'Project name must use lowercase letters, numbers, and hyphens, and must not contain a path';
 	}
 	return undefined;
+}
+
+function packageNameError(value: string): string | undefined {
+	if (!value || value.length > 214) return 'Package name must contain 1–214 characters';
+	const parts = value.startsWith('@') ? value.slice(1).split('/') : [value];
+	if (
+		parts.length !== (value.startsWith('@') ? 2 : 1) ||
+		parts.some((part) => !packageNamePartPattern.test(part))
+	) {
+		return 'Package name must be a lowercase npm name such as design-system or @repo/design-system';
+	}
+	return undefined;
+}
+
+function requestedPackageManager(value: string | undefined): PackageManager | undefined {
+	if (value === undefined) return undefined;
+	if (value === 'npm' || value === 'pnpm' || value === 'yarn') return value;
+	throw new Error('--package-manager must be npm, pnpm, or yarn');
 }
 
 export async function initCommand(projectName?: string, options: InitOptions = {}): Promise<void> {
@@ -39,8 +66,13 @@ export async function initCommand(projectName?: string, options: InitOptions = {
 			}));
 		const nameError = projectNameError(name);
 		if (nameError) throw new Error(nameError);
+		const packageName = options.packageName ?? name;
+		const namePackageError = packageNameError(packageName);
+		if (namePackageError) throw new Error(namePackageError);
+		const explicitPackageManager = requestedPackageManager(options.packageManager);
 
 		const targetDir = path.resolve(process.cwd(), name);
+		const packageManager = await detectPackageManager(targetDir, explicitPackageManager);
 
 		// Step 2: Check if directory already exists
 		if (await fs.pathExists(targetDir)) {
@@ -112,16 +144,22 @@ export async function initCommand(projectName?: string, options: InitOptions = {
 		const moduleNames = themeSourceFiles.map((f) => f.replace('.ts', ''));
 		const indexContent = generateIndexFile(moduleNames);
 		await fs.writeFile(path.join(targetDir, 'index.ts'), indexContent);
-		await fs.writeFile(path.join(targetDir, 'tfs.config.ts'), generateProjectFile(moduleNames));
+		await fs.writeFile(
+			path.join(targetDir, 'tfs.config.ts'),
+			generateProjectFile(moduleNames, options.workspacePackage === true)
+		);
 
 		// Step 8: Generate package metadata and local instructions
-		const packageJsonContent = generatePackageJson(name);
+		const packageJsonContent = generatePackageJson(packageName, options.workspacePackage === true);
 		await fs.writeFile(path.join(targetDir, 'package.json'), packageJsonContent);
 
 		// Step 9: Generate TypeScript config
 		const tsconfigContent = generateTsConfig();
 		await fs.writeFile(path.join(targetDir, 'tsconfig.json'), tsconfigContent);
-		await fs.writeFile(path.join(targetDir, 'README.md'), generateReadme(name));
+		await fs.writeFile(
+			path.join(targetDir, 'README.md'),
+			generateReadme(name, options.workspacePackage === true)
+		);
 
 		// Summary
 		const allFiles = [
@@ -141,10 +179,11 @@ export async function initCommand(projectName?: string, options: InitOptions = {
 			console.log(chalk.cyan('\nInstalling dependencies...'));
 
 			try {
-				const packageManager = detectPackageManager();
-				execFileSync(packageManager, ['install'], {
+				const command = packageManagerCommand(packageManager);
+				execFileSync(command.executable, ['install'], {
 					cwd: targetDir,
 					stdio: 'inherit',
+					shell: command.shell,
 				});
 				console.log(chalk.green(`\n✓ Dependencies installed`));
 			} catch {
@@ -156,11 +195,17 @@ export async function initCommand(projectName?: string, options: InitOptions = {
 		// Next steps
 		console.log(chalk.cyan('\nNext steps:'));
 		console.log(chalk.white(`  cd ${name}`));
-		if (options.skipInstall) console.log(chalk.white(`  npm install`));
+		if (options.skipInstall) console.log(chalk.white(`  ${packageManager} install`));
 		console.log(chalk.white(`  # Edit the authored TypeScript source`));
-		console.log(chalk.white(`  npm run build`));
+		console.log(chalk.white(`  npm run generate`));
+		const generatedDirectory = options.workspacePackage ? 'generated' : 'dist';
+		const specimen = options.workspacePackage
+			? 'review/typography.html'
+			: 'typography.specimen.html';
 		console.log(
-			chalk.white(`  # Inspect dist/build.manifest.json and dist/typography.specimen.html`)
+			chalk.white(
+				`  # Inspect ${generatedDirectory}/build.manifest.json and ${generatedDirectory}/${specimen}`
+			)
 		);
 	} catch (error: unknown) {
 		// Handle Ctrl+C gracefully
@@ -201,20 +246,23 @@ async function getAvailableThemes(
 	return themes.sort((left, right) => left.name.localeCompare(right.name));
 }
 
-function generateProjectFile(moduleNames: string[]): string {
+function generateProjectFile(moduleNames: string[], workspacePackage: boolean): string {
 	const imports = moduleNames.map((name) => `import { ${name} } from "./${name}.js";`).join('\n');
 	const properties = moduleNames
 		.map((name) => (name === 'color' ? '    colors: color,' : `    ${name},`))
 		.join('\n');
-	return `import { defineTfsProject } from "@three-forma-styli/cli";
-${imports}
-
-export default defineTfsProject({
-  system: {
-${properties}
-  },
-  output: {
-    directory: "./dist",
+	const output = workspacePackage
+		? `    layout: "workspace-package",
+    directory: "./generated",
+    targets: {
+      runtime: {
+        css: { fileStem: "design-system" },
+        contracts: true,
+      },
+      review: true,
+      design: true,
+    },`
+		: `    directory: "./dist",
     css: true,
     indexCss: true,
     typographyCss: true,
@@ -223,7 +271,16 @@ ${properties}
     systemTypescript: true,
     specimen: true,
     dtcg: true,
-    figmaVariables: true,
+    figmaVariables: true,`;
+	return `import { defineTfsProject } from "@three-forma-styli/compiler";
+${imports}
+
+export default defineTfsProject({
+  system: {
+${properties}
+  },
+  output: {
+${output}
   },
 });
 `;
@@ -262,24 +319,70 @@ export { ${exportList} };
 /**
  * Generate package.json
  */
-function generatePackageJson(projectName: string): string {
+function generatePackageJson(packageName: string, workspacePackage: boolean): string {
+	const scripts = {
+		generate: 'tfs build .',
+		build: 'tfs validate .',
+		check: 'tsc --noEmit && tfs validate .',
+		'check:generated': 'tfs check .',
+		review: 'tfs review serve .',
+	};
+	const workspaceFields = workspacePackage
+		? {
+				files: ['generated/runtime', 'generated/assets', 'README.md'],
+				sideEffects: ['./generated/runtime/styles/*.css'],
+				exports: {
+					'.': {
+						types: './generated/runtime/index.d.ts',
+						import: './generated/runtime/index.js',
+					},
+					'./system': {
+						types: './generated/runtime/system.d.ts',
+						import: './generated/runtime/system.js',
+					},
+					'./typography': {
+						types: './generated/runtime/typography.d.ts',
+						import: './generated/runtime/typography.js',
+					},
+					'./native-color-modes': {
+						types: './generated/runtime/native-color-modes.d.ts',
+						import: './generated/runtime/native-color-modes.js',
+					},
+					'./runtime-color-theme': {
+						types: './generated/runtime/runtime-color-theme.d.ts',
+						import: './generated/runtime/runtime-color-theme.js',
+					},
+					'./styles.css': './generated/runtime/styles/design-system.css',
+					'./tokens.css': './generated/runtime/styles/design-system.tokens.css',
+					'./typography.css': './generated/runtime/styles/design-system.typography.css',
+					'./typography.module.css': {
+						types: './generated/runtime/styles/design-system.typography.module.css.d.ts',
+						default: './generated/runtime/styles/design-system.typography.module.css',
+					},
+					'./shadows.css': './generated/runtime/styles/design-system.shadows.css',
+					'./shadows.module.css': {
+						types: './generated/runtime/styles/design-system.shadows.module.css.d.ts',
+						default: './generated/runtime/styles/design-system.shadows.module.css',
+					},
+					'./package.json': './package.json',
+				},
+			}
+		: {};
 	return (
 		JSON.stringify(
 			{
-				name: projectName,
+				name: packageName,
+				...(workspacePackage ? { version: '0.0.0' } : {}),
 				private: true,
 				type: 'module',
-				scripts: {
-					build: 'tfs build .',
-					check: 'tsc --noEmit && tfs build .',
-					specimen: 'tfs specimen serve .',
-				},
-				dependencies: {
-					'@three-forma-styli/core': `^${CLI_VERSION}`,
-				},
+				...workspaceFields,
+				scripts,
+				...(workspacePackage ? {} : { dependencies: { '@three-forma-styli/core': CLI_VERSION } }),
 				devDependencies: {
-					'@three-forma-styli/cli': `^${CLI_VERSION}`,
-					typescript: '^5.9.3',
+					'@three-forma-styli/cli': CLI_VERSION,
+					'@three-forma-styli/compiler': CLI_VERSION,
+					...(workspacePackage ? { '@three-forma-styli/core': CLI_VERSION } : {}),
+					typescript: '5.9.3',
 				},
 				engines: { node: '>=22' },
 			},
@@ -315,7 +418,27 @@ function generateTsConfig(): string {
 	);
 }
 
-function generateReadme(projectName: string): string {
+function generateReadme(projectName: string, workspacePackage: boolean): string {
+	if (workspacePackage) {
+		return `# ${projectName}
+
+Private, package-shaped design-system source generated by Three-Forma-Styli.
+
+## Commands
+
+\`\`\`sh
+npm run check             # fast type + committed-package validation; no FontTools
+npm run generate          # explicit authoring operation; replace generated/
+npm run check:generated   # CI proof; regenerate privately and reject drift
+npm run review            # serve the generated visual workbench
+\`\`\`
+
+Edit the root TypeScript source files and \`tfs.config.ts\`; do not hand-edit
+\`generated/\`. Applications consume the declared package exports, especially
+\`./styles.css\` and the generated TypeScript contracts. Review and design-tool
+artifacts stay outside the package export boundary.
+`;
+	}
 	return `# ${projectName}
 
 Portable design-system source generated by Three-Forma-Styli.
@@ -323,9 +446,11 @@ Portable design-system source generated by Three-Forma-Styli.
 ## Commands
 
 \`\`\`sh
-npm run check      # type-check and rebuild the complete handoff
-npm run build      # regenerate dist/
-npm run specimen   # serve the generated typography workbench
+npm run generate          # explicit authoring operation; replace dist/
+npm run build             # validate the committed handoff; never writes
+npm run check             # fast types + committed-output validation
+npm run check:generated   # CI proof; regenerate privately and reject drift
+npm run review            # serve the generated visual workbench
 \`\`\`
 
 Edit the root TypeScript source files and \`tfs.config.ts\`; do not hand-edit
@@ -337,13 +462,58 @@ the exact generated files and tool version.
 /**
  * Detect available package manager
  */
-function detectPackageManager(): string {
+async function nearestPackageManager(start: string): Promise<PackageManager | undefined> {
+	let current = path.resolve(start);
+	while (true) {
+		const manifest = path.join(current, 'package.json');
+		if (await fs.pathExists(manifest)) {
+			try {
+				const value = (await fs.readJson(manifest)).packageManager;
+				if (typeof value === 'string') {
+					const manager = value.split('@')[0];
+					if (manager === 'npm' || manager === 'pnpm' || manager === 'yarn') return manager;
+				}
+			} catch {
+				// The generated package remains authoritative; an invalid ancestor is ignored here.
+			}
+		}
+		for (const [file, manager] of [
+			['pnpm-lock.yaml', 'pnpm'],
+			['yarn.lock', 'yarn'],
+			['package-lock.json', 'npm'],
+			['npm-shrinkwrap.json', 'npm'],
+		] as const) {
+			if (await fs.pathExists(path.join(current, file))) return manager;
+		}
+		const parent = path.dirname(current);
+		if (parent === current) return undefined;
+		current = parent;
+	}
+}
+
+async function detectPackageManager(
+	start: string,
+	explicit?: PackageManager
+): Promise<PackageManager> {
+	if (explicit) return explicit;
+	const userAgent = process.env.npm_config_user_agent?.split('/')[0];
+	if (userAgent === 'npm' || userAgent === 'pnpm' || userAgent === 'yarn') return userAgent;
+	const nearest = await nearestPackageManager(start);
+	if (nearest) return nearest;
 	try {
-		execFileSync('pnpm', ['--version'], { stdio: 'ignore' });
+		const command = packageManagerCommand('pnpm');
+		execFileSync(command.executable, ['--version'], {
+			stdio: 'ignore',
+			shell: command.shell,
+		});
 		return 'pnpm';
 	} catch {
 		try {
-			execFileSync('yarn', ['--version'], { stdio: 'ignore' });
+			const command = packageManagerCommand('yarn');
+			execFileSync(command.executable, ['--version'], {
+				stdio: 'ignore',
+				shell: command.shell,
+			});
 			return 'yarn';
 		} catch {
 			return 'npm';

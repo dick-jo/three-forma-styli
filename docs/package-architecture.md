@@ -4,33 +4,46 @@
 
 ```text
 apps/
-└── preview/     private visual workbench; never published
+└── workbench/   private Svelte source; compiled to dependency-free review assets
 
 packages/
 ├── core/        public, browser-safe generator and programmatic runtime
-├── cli/         public, Node-only project compiler and `tfs` executable
+├── compiler/    public, Node-only project and font compiler
+├── cli/         public, interactive `tfs` command shell and compatibility API
 └── themes/      public starter/reference source systems
 ```
 
 This division prevents font parsing, prompts, filesystem code and esbuild from
-entering applications that only need the small programmatic core. The private
-Svelte application is an app—not a package—and is absent from every published
-tarball.
+entering applications that only need the small programmatic core. The
+`@three-forma-styli/core/runtime` browser bundle is dependency-free even though
+Culori remains an install-time dependency of the wider `core` package. A
+separate runtime package is only warranted if install-graph minimalism becomes a
+product requirement. The private Svelte application is source tooling—not a
+package. Only its dependency-free browser bundle enters the compiler tarball, and
+only projects requesting review output receive those assets.
 
 All public packages currently share one version and release together. This is a
 fixed release train, not an assertion that every package changed equally. It
 prevents a packed CLI from resolving an older, API-incompatible core from npm.
 `pnpm check:release` proves the packed artifacts work together outside the
-workspace before anything is published.
+workspace before anything is published. Its ecosystem stage uses real tarball
+installs rather than extracting packages into a synthetic workspace, then
+proves both scaffold shapes and a packed generated package in a typed Vite
+production consumer. A separate release job executes that packed result in
+Chromium; Playwright remains repository-only and is absent from every published
+tarball.
 
-Project configs should use the import-safe CLI root:
+Project configs should use the import-safe compiler root:
 
 ```ts
-import { defineTfsProject } from '@three-forma-styli/cli';
+import { defineTfsProject } from '@three-forma-styli/compiler';
 ```
 
-The existing `/project` and `/fonts` subpaths remain compatibility/advanced entry
-points. The executable has its own `bin` entry and is not evaluated by API imports.
+Programmatic compilation lives at `@three-forma-styli/compiler/build`, and font
+preparation/inspection lives at `@three-forma-styli/compiler/fonts`. The CLI
+retains its existing root, `/project`, and `/fonts` exports as compatibility
+re-exports. Only the CLI has a `bin`; importing either authoring root does not
+evaluate the command parser or heavy compiler graph.
 
 ## The one unresolved public-package decision
 
@@ -71,12 +84,35 @@ finished branded themes rather than source presets.
 
 ## Recommended release shape
 
-Long term there are still three public responsibilities, even if `themes` becomes
+Long term there are still four public responsibilities, even if `themes` becomes
 `presets`:
 
 1. `core` — stable, browser-safe programmatic API;
-2. `cli` — install as a dev dependency, author/build/inspect projects;
-3. `presets` — optional starting systems and derivation defaults.
+2. `compiler` — Node-only project/font compilation;
+3. `cli` — interactive config loading and command workflows;
+4. `presets` — optional starting systems and derivation defaults.
 
 Applications consume generated design-system packages, not the TFS preview app and
 not necessarily the CLI at runtime.
+
+## Measured package surface
+
+The 2026-07-23 packed artifacts are small: core is roughly 70 KB compressed,
+themes 9 KB, compiler 84 KB, and CLI 25 KB. The compiler's production graph is
+24 packages including font parsing. The CLI graph is larger because it also
+loads TypeScript configs and provides interactive initialization, but it is an
+authoring-only dependency and no longer installs the unused umbrella Inquirer
+prompt suite.
+
+These measurements do not justify another public package today. A separate
+non-interactive command package would add release/version resolution complexity
+while every production consumer already imports only generated output or the
+dependency-light runtime subpath. Reconsider the split if a real host requires a
+CLI-free install graph for generation itself; keep measuring packed artifacts
+and resolved dependency trees in that decision.
+
+See [monorepo integration](monorepo-integration.md) for the concrete package,
+task, cache, dependency, and staged-adoption contract.
+
+The non-negotiable consumer-neutrality and code-review rules live in
+[universal product invariants](universal-product-invariants.md).

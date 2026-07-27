@@ -1,10 +1,12 @@
 # CLI TypeScript Execution Issue (historical)
 
-> Archived note: this describes the removed pre-generator API. Current commands
-> bundle theme entry points with esbuild and call `generateCss()` or
-> `generateFigmaJson()`; examples below are retained only as debugging history.
+> **Superseded historical note.** The shell/`tsx --eval` implementation and the
+> APIs below no longer exist. Current project loading bundles local config with
+> esbuild, complete Node/font compilation lives in `@three-forma-styli/compiler`,
+> and untrusted browser colours use `@three-forma-styli/core/runtime`. Examples
+> below are retained only as debugging history and must not guide new consumers.
 
-> **Status:** Open issue requiring fix
+> **Status:** Resolved and regression-tested through packed npm scaffolds
 > **Date:** 2025-12-08
 > **Affects:** `@three-forma-styli/cli` package, specifically the `tfs build` command
 
@@ -14,10 +16,10 @@ The CLI has a fragile mechanism for executing user TypeScript theme files. This 
 
 ## The Two Use Cases That Must Work
 
-| Use Case | Description | Current Status |
-|----------|-------------|----------------|
-| **1. CLI Theme Generation** | User runs `npm i @three-forma-styli/cli` → `tfs init` → edits `.ts` files → `tfs build` | ⚠️ Fragile |
-| **2. Programmatic Use (e.g., Scatter)** | App runs `npm i @three-forma-styli/core` → imports functions → generates CSS at runtime from user input | ✅ Works well |
+| Use Case                                | Description                                                                                             | Current Status |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------- |
+| **1. CLI Theme Generation**             | User runs `npm i @three-forma-styli/cli` → `tfs init` → edits `.ts` files → `tfs build`                 | ⚠️ Fragile     |
+| **2. Programmatic Use (e.g., Scatter)** | App runs `npm i @three-forma-styli/core` → imports functions → generates CSS at runtime from user input | ✅ Works well  |
 
 ## Use Case 2 is Already Solid
 
@@ -34,13 +36,13 @@ import { generateCssVariables, oklch, type DesignSystem } from '@three-forma-sty
 
 // Build from user input
 const system: DesignSystem = {
-  colors: {
-    default: {
-      bg: oklch(userL, userC, userH),
-      // ...
-    }
-  },
-  // ...
+	colors: {
+		default: {
+			bg: oklch(userL, userC, userH),
+			// ...
+		},
+	},
+	// ...
 };
 
 const css = generateCssVariables(system);
@@ -68,8 +70,8 @@ const evalScript = `
 `;
 
 const result = execSync(`npx tsx --eval "${evalScript}"`, {
-  encoding: 'utf-8',
-  cwd: path.dirname(inputPath)
+	encoding: 'utf-8',
+	cwd: path.dirname(inputPath),
 });
 ```
 
@@ -99,12 +101,14 @@ tfs build .
 ```
 
 **Pros:**
+
 - Controlled compilation step
 - Standard Node imports (no dynamic import resolution issues)
 - esbuild is extremely fast
 - Works reliably across environments
 
 **Cons:**
+
 - Adds esbuild as dependency
 - Slightly more code
 
@@ -120,17 +124,20 @@ const designSystem = module.default || module.designSystem;
 ```
 
 **Pros:**
+
 - No shell escaping issues
 - Uses existing tsx dependency
 - May resolve modules more reliably
 
 **Cons:**
+
 - Still depends on tsx's module resolution
 - Less control than explicit compilation
 
 ## Recommendation
 
 **Option B (compile then import)** is likely the most robust solution. It separates concerns:
+
 1. Compilation (controlled, predictable)
 2. Import (standard Node, well-understood)
 
@@ -142,5 +149,6 @@ const designSystem = module.default || module.designSystem;
 ## Cleanup Note
 
 The file `packages/core/convert-colors.mjs` is development debris from converting Scatter's LCH colors to OKLCH. It doesn't belong in the core package and can be:
+
 - Deleted entirely, or
 - Moved to a `scripts/` folder at the repo root for reference

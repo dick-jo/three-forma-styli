@@ -55,6 +55,12 @@ explicit role-local weight. Prepared fonts prove requested physical styles,
 weights, OpenType features, and variation axes. No unsupported cut is remapped or
 synthesized.
 
+Luminance groups reference declared colors in the default palette, are non-empty,
+unique and disjoint. Runtime-theme color names are an explicit non-empty subset
+of that same palette and must include every constrained color. Override modes may
+still add static mode-specific colors. TFS never infers that every palette token
+is editable by an untrusted runtime payload.
+
 ## Output collisions
 
 After every family is expanded, TFS checks the complete default set and every mode
@@ -91,3 +97,24 @@ pnpm --filter @three-forma-styli/core test
 Project builds additionally validate output ownership, path containment, font
 licence attestations, prepared capabilities, URL policy, and artifact collisions
 before atomically replacing the previous generated directory.
+
+Generated projects use a strict write/check split:
+
+- `npm run generate` deliberately replaces the TFS-owned output;
+- `npm run build` and `npm run check` validate committed output and never write;
+- `npm run check:generated` performs a full private regeneration and fails on
+  byte drift without repairing it.
+
+The repository release gate then packs the actual npm tarballs, installs them
+through ordinary package-manager resolution, scaffolds standalone and workspace
+projects, packs the generated design-system package, type-checks its CSS Module
+export, and creates a production browser bundle. A separate browser gate serves
+that packed bundle and executes it in Chromium, proving native OKLCH support,
+computed typography, strict hostile-payload rejection, clean console/page state,
+and the browser-safe dependency boundary. CI runs the normal matrix on Linux
+Node 22/24, the path/install/package checks on Windows Node 22, and the real
+browser proof in its own job so routine package checks do not download browsers.
+
+URL-bearing generated paths are encoded segment-by-segment. Spaces, `#`, and
+Unicode remain valid filenames; ambiguous query/fragment prefixes and
+cross-platform filesystem-reserved names fail before generation.

@@ -6,30 +6,41 @@ const mode = {
 	tokens: { unit: 'rem', base: 1, min: 0.75, increment: 0.25, range: 12 },
 };
 
+const displayMode = {
+	name: 'display',
+	tokens: { unit: 'rem', base: 1.5, min: 1, increment: 0.5, range: 12 },
+};
+
 defineTypography({ modes: [mode] });
 
 const explicit = defineTypography({
-	modes: [mode],
+	modes: [mode, displayMode],
 	fonts: {
-		supreme: {
-			family: 'Supreme',
+		editorial: {
+			family: 'Editorial Sans',
 			fallbacks: ['sans-serif'],
 			verification: 'unavailable',
 		},
 		mono: {
-			family: 'JetBrains Mono',
+			family: 'Interface Mono',
 			fallbacks: ['monospace'],
 			verification: 'unavailable',
 		},
 	},
 	roles: {
 		reading: {
-			font: 'supreme',
+			font: 'editorial',
 			base: { fontSize: 2, weight: 'regular', lineHeight: 1.25, letterSpacing: 0 },
 			variants: {
 				compact: { fontSize: 1, weight: 'regular', lineHeight: 1.2, letterSpacing: 0.01 },
 			},
 			weights: { regular: 400, strong: 700 },
+			modeOverrides: {
+				display: {
+					base: { fontSize: 4, weight: 'strong', lineHeight: 0.85 },
+					variants: { compact: { letterSpacing: -0.01 } },
+				},
+			},
 		},
 	},
 });
@@ -39,10 +50,10 @@ explicit.roles.reading.variants.compact;
 // @ts-expect-error configured font IDs remain literal and typo-safe
 defineTypography({
 	modes: [mode],
-	fonts: { supreme: { family: 'Supreme', verification: 'unavailable' } },
+	fonts: { editorial: { family: 'Editorial Sans', verification: 'unavailable' } },
 	roles: {
 		reading: {
-			font: 'suprme',
+			font: 'editoriall',
 			base: { fontSize: 2, weight: 'regular', lineHeight: 1.25, letterSpacing: 0 },
 			weights: { regular: 400 },
 		},

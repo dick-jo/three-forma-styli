@@ -4,8 +4,8 @@ import { defaultGeneratorConfig } from './types.js';
 import type { DesignSystem } from '../types.js';
 
 describe('generateTimeTokens', () => {
-	const singleModeTime: DesignSystem['time'] = {
-		modes: [
+	const singleScaleTime: DesignSystem['time'] = {
+		scales: [
 			{
 				name: 'default',
 				isDefault: true,
@@ -19,8 +19,8 @@ describe('generateTimeTokens', () => {
 		],
 	};
 
-	it('generates min token for default mode', () => {
-		const result = generateTimeTokens(singleModeTime, defaultGeneratorConfig);
+	it('generates min token for the default scale', () => {
+		const result = generateTimeTokens(singleScaleTime, defaultGeneratorConfig);
 
 		const tMin = result.defaultTokens.find((t) => t.name === 't-min');
 		expect(tMin).toBeDefined();
@@ -31,7 +31,7 @@ describe('generateTimeTokens', () => {
 	});
 
 	it('generates numbered tokens using multiplicative formula', () => {
-		const result = generateTimeTokens(singleModeTime, defaultGeneratorConfig);
+		const result = generateTimeTokens(singleScaleTime, defaultGeneratorConfig);
 
 		const t1 = result.defaultTokens.find((t) => t.name === 't-1');
 		const t2 = result.defaultTokens.find((t) => t.name === 't-2');
@@ -43,22 +43,22 @@ describe('generateTimeTokens', () => {
 	});
 
 	it('generates correct number of tokens (min + range)', () => {
-		const result = generateTimeTokens(singleModeTime, defaultGeneratorConfig);
+		const result = generateTimeTokens(singleScaleTime, defaultGeneratorConfig);
 
 		// min + 5 range = 6 tokens
 		expect(result.defaultTokens).toHaveLength(6);
 	});
 
-	it('stores timeCategory in metadata', () => {
-		const result = generateTimeTokens(singleModeTime, defaultGeneratorConfig);
+	it('stores the owning scale in metadata', () => {
+		const result = generateTimeTokens(singleScaleTime, defaultGeneratorConfig);
 
 		const t1 = result.defaultTokens.find((t) => t.name === 't-1');
-		expect(t1?.metadata?.timeCategory).toBe('default');
+		expect(t1?.metadata?.timeScale).toBe('default');
 	});
 
-	describe('multiple modes', () => {
-		const multiModeTime: DesignSystem['time'] = {
-			modes: [
+	describe('multiple scales', () => {
+		const multiScaleTime: DesignSystem['time'] = {
+			scales: [
 				{
 					name: 'default',
 					isDefault: true,
@@ -81,8 +81,8 @@ describe('generateTimeTokens', () => {
 			],
 		};
 
-		it('default mode gets unprefixed tokens', () => {
-			const result = generateTimeTokens(multiModeTime, defaultGeneratorConfig);
+		it('default scale gets unprefixed tokens', () => {
+			const result = generateTimeTokens(multiScaleTime, defaultGeneratorConfig);
 
 			const t1 = result.defaultTokens.find((t) => t.name === 't-1');
 			const tMin = result.defaultTokens.find((t) => t.name === 't-min');
@@ -93,8 +93,8 @@ describe('generateTimeTokens', () => {
 			expect(tMin?.value).toBe('50ms');
 		});
 
-		it('non-default modes get their name as prefix', () => {
-			const result = generateTimeTokens(multiModeTime, defaultGeneratorConfig);
+		it('non-default scales get their name as prefix', () => {
+			const result = generateTimeTokens(multiScaleTime, defaultGeneratorConfig);
 
 			const tAnim1 = result.defaultTokens.find((t) => t.name === 't-anim-1');
 			const tAnimMin = result.defaultTokens.find((t) => t.name === 't-anim-min');
@@ -105,20 +105,22 @@ describe('generateTimeTokens', () => {
 			expect(tAnimMin?.value).toBe('500ms');
 		});
 
-		it('all modes output to defaultTokens (no overrideTokens)', () => {
-			const result = generateTimeTokens(multiModeTime, defaultGeneratorConfig);
+		it('emits every scale into the root token set', () => {
+			const result = generateTimeTokens(multiScaleTime, defaultGeneratorConfig);
 
 			// default: min + 3 = 4 tokens
 			// anim: min + 3 = 4 tokens
 			// Total: 8 tokens, all in defaultTokens
 			expect(result.defaultTokens).toHaveLength(8);
-			expect(result.overrideTokens).toEqual({});
-			expect(result.modeInfo.overrides).toEqual([]);
+			expect(result.scaleInfo).toEqual({
+				default: 'default',
+				names: ['default', 'anim'],
+			});
 		});
 
-		it('uses first mode as default when no isDefault specified', () => {
+		it('uses first scale as default when no isDefault specified', () => {
 			const timeNoDefault: DesignSystem['time'] = {
-				modes: [
+				scales: [
 					{
 						name: 'first',
 						tokens: {
@@ -151,14 +153,14 @@ describe('generateTimeTokens', () => {
 			expect(tSecond1?.value).toBe('200ms');
 		});
 
-		it('stores correct timeCategory for each mode', () => {
-			const result = generateTimeTokens(multiModeTime, defaultGeneratorConfig);
+		it('stores the correct owning scale for every token', () => {
+			const result = generateTimeTokens(multiScaleTime, defaultGeneratorConfig);
 
 			const t1 = result.defaultTokens.find((t) => t.name === 't-1');
 			const tAnim1 = result.defaultTokens.find((t) => t.name === 't-anim-1');
 
-			expect(t1?.metadata?.timeCategory).toBe('default');
-			expect(tAnim1?.metadata?.timeCategory).toBe('anim');
+			expect(t1?.metadata?.timeScale).toBe('default');
+			expect(tAnim1?.metadata?.timeScale).toBe('anim');
 		});
 	});
 
@@ -172,13 +174,13 @@ describe('generateTimeTokens', () => {
 				},
 			};
 
-			const result = generateTimeTokens(singleModeTime, customConfig);
+			const result = generateTimeTokens(singleScaleTime, customConfig);
 
 			const time1 = result.defaultTokens.find((t) => t.name === 'time-1');
 			expect(time1).toBeDefined();
 		});
 
-		it('applies custom prefix to non-default modes too', () => {
+		it('applies custom prefix to non-default scales too', () => {
 			const customConfig = {
 				...defaultGeneratorConfig,
 				prefixes: {
@@ -187,8 +189,8 @@ describe('generateTimeTokens', () => {
 				},
 			};
 
-			const multiModeTime: DesignSystem['time'] = {
-				modes: [
+			const multiScaleTime: DesignSystem['time'] = {
+				scales: [
 					{
 						name: 'default',
 						isDefault: true,
@@ -201,7 +203,7 @@ describe('generateTimeTokens', () => {
 				],
 			};
 
-			const result = generateTimeTokens(multiModeTime, customConfig);
+			const result = generateTimeTokens(multiScaleTime, customConfig);
 
 			const dur1 = result.defaultTokens.find((t) => t.name === 'dur-1');
 			const durSlow1 = result.defaultTokens.find((t) => t.name === 'dur-slow-1');
@@ -214,7 +216,7 @@ describe('generateTimeTokens', () => {
 	describe('edge cases', () => {
 		it('handles base of 0 (for reduced-motion scenarios)', () => {
 			const zeroBaseTime: DesignSystem['time'] = {
-				modes: [
+				scales: [
 					{
 						name: 'default',
 						isDefault: true,
@@ -239,7 +241,7 @@ describe('generateTimeTokens', () => {
 
 		it('handles seconds unit', () => {
 			const secondsTime: DesignSystem['time'] = {
-				modes: [
+				scales: [
 					{
 						name: 'default',
 						isDefault: true,

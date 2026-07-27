@@ -10,6 +10,10 @@ const typography: DesignSystem['typography'] = {
 			isDefault: true,
 			tokens: { unit: 'rem', base: 1, min: 0.75, increment: 0.25, range: 8 },
 		},
+		{
+			name: 'display',
+			tokens: { unit: 'rem', base: 1.5, min: 1, increment: 0.5, range: 10 },
+		},
 	],
 	fonts: {
 		editorial: {
@@ -24,6 +28,11 @@ const typography: DesignSystem['typography'] = {
 			base: { fontSize: 2, weight: 'regular', lineHeight: 1.3, letterSpacing: 0 },
 			variants: {
 				legal: { fontSize: 'min', weight: 'strong', lineHeight: 1.4, letterSpacing: 0.01 },
+			},
+			modeOverrides: {
+				display: {
+					base: { fontSize: 6, weight: 'strong', lineHeight: 0.9, letterSpacing: -0.02 },
+				},
 			},
 			displayOrder: ['legal', 'base'],
 			weights: { regular: 400, strong: 700 },
@@ -42,7 +51,17 @@ describe('toTypographySpecimen', () => {
 		expect(html).toContain('font-size: var(--text-reading-legal-font-size)');
 		expect(html).toContain('Draft configuration patch');
 		expect(html).toContain('data-control="lineHeight"');
+		expect(html.match(/step="any"/g)).toHaveLength(4);
 		expect(html).toContain('data-control="weight"');
+		expect(html).toContain('<select id="size-mode">');
+		expect(html).toContain('<option value="display">display</option>');
+		expect(html).toContain('body[data-size-mode="display"]');
+		expect(html).toContain('--text-reading-line-height: 0.9;');
+		expect(html).toContain('const defaultSizeMode="default"');
+		expect(html).toContain('"display":{"reading":{"base":{"fontSize":6');
+		expect(html).toContain('roles[role].modeOverrides[mode]');
+		expect(html).toContain('sizeModeSelect?.addEventListener');
+		expect(html).toContain("querySelectorAll('.sample-preview,.sample-copy')");
 		expect(html).toContain('weight strong · 700');
 		expect(html).toContain('weight:controls.weight.value');
 		expect(html.indexOf('<strong>legal</strong>')).toBeLessThan(

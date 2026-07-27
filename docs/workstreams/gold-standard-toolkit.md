@@ -1,0 +1,390 @@
+# Gold-standard toolkit workstream
+
+This is the persistent checklist for the July 2026 TFS, Scatter design-system,
+and eventual Scatter application rollout. It records approved direction and
+remaining work so decisions do not depend on one chat transcript.
+
+## Approved direction
+
+- Preserve TFS's opinionated, minimal-input design-system philosophy. Scatter is
+  a demanding reference integration, not a source of hardcoded core policy.
+- Preserve `--fs-*` as permanent atomic primitives and build explicit semantic
+  typography recipes above them.
+- Typography recipe weights are explicit and role-local. Core defines neither a
+  hidden middle weight nor a fixed alias schedule.
+- Keep typography and font preparation build-time. A future Scatter `<Text />`
+  consumes generated contracts locally.
+- Use normal and genuine italic font faces where the physical font supports
+  them. Do not invent oblique faces or silently synthesize missing capability in
+  generated helpers.
+- Preserve native OKLCH CSS values so capable browsers and displays retain wide
+  gamut colour. Restrictive formats perform their own explicit gamut mapping.
+- Preserve the TFS `luminance` feature vocabulary. Before adding WCAG alongside
+  it, explicitly document and expose which metric a constraint uses; the current
+  implementation compares OKLCH `L`.
+- Adopt one canonical private `@repo/design-system` workspace package in the
+  Scatter monorepo. Applications import package CSS and contracts instead of
+  receiving copied files.
+- Keep native Scatter themes as static generated colour modes. Only genuinely
+  user-authored collection themes use the browser runtime compiler.
+- Keep normal monorepo `build` and `check` fast. Font conversion, fallback
+  measurement, regeneration, and drift verification belong to explicit
+  authoring/dedicated CI commands.
+- Do not use monorepo-wide package overrides to bridge an unreleased TFS build.
+  Publish and pin an exact reviewed release, respecting Scatter's package-age
+  policy.
+
+## Active TFS work
+
+- [x] Audit the existing output, runtime, compiler, CLI, and package boundaries.
+- [x] Research the current OKLCH-L delta model versus relative-luminance/WCAG
+      diagnostics and present explicit product/API options before broadening it.
+- [x] Add a compact, strict, browser-safe runtime colour-theme API.
+- [x] Generate compact native-theme/runtime contracts without forcing the full
+      system manifest into a client bundle.
+- [x] Add a canonical output layout separating runtime, review, and design-tool
+      artifacts while retaining a simple sensible default.
+- [x] Generate browser-ready ESM and declarations without a downstream ad hoc
+      TypeScript compilation step.
+- [x] Separate Node compilation/font tooling from interactive CLI dependencies
+      where that materially reduces downstream workspace surface area.
+- [x] Add non-mutating generated-output drift verification and prerequisite
+      diagnostics suitable for CI.
+- [x] Promote drift verification to the generic compiler/CLI contract and add a
+      monorepo-ready scaffold whose routine checks remain independent of font
+      tooling.
+- [x] Add lightweight committed-output/package validation so ordinary monorepo
+      build and check paths prove generated contracts without regeneration.
+- [x] Run the complete release gate, packed-package consumer fixture, security
+      audit, and deterministic legacy-output checks.
+- [x] Run the final P3, prepared-font, specimen-server, and real-browser
+      regressions against the rebuilt Scatter design-system package.
+- [x] Install actual packed TFS tarballs through npm, scaffold both supported
+      project shapes, pack the generated design-system package, and build a
+      typed production Vite consumer. Keep this separate from the fast routine
+      check and run it in release CI.
+- [x] Make scaffolded checks non-mutating, pin the local TFS toolchain exactly,
+      support scoped workspace package names, and make package-manager choice
+      explicit/deterministic.
+- [x] Type the CSS Module package export, reject stale exports into removed
+      TFS-owned targets, and prove the packed package boundary externally.
+- [x] Harden generated asset URLs for spaces, `#`, Unicode and configured path
+      nesting; reject non-portable filesystem names and ambiguous public/CDN
+      prefixes.
+- [x] Preserve literal runtime color-name types, validate luminance against the
+      exact emitted CSS precision, normalize diagnostic arithmetic, deep-freeze
+      results, and add hostile persisted-JSON regressions.
+- [x] Add Windows Node 22 CI for build, package validation, packed installs and
+      ecosystem consumers. The first remote run remains release evidence.
+- [x] Add a stable machine-readable CLI contract (`--json`, diagnostic IDs,
+      documented exit codes and `build --dry-run`) before declaring the CLI 1.0.
+- [x] Record exact FontTools/Python provenance whenever byte conversion occurs;
+      keep the external tool pinned in dedicated regeneration CI.
+- [x] Publish a framework-neutral monorepo package/task/security contract without
+      mutating host workspace or cache configuration.
+- [x] Execute packed npm plus generated-package artifacts in a real Chromium
+      release job, including strict runtime input, native OKLCH, computed
+      typography, bundle-boundary, and console/page-error assertions.
+- [x] Decide whether install-graph minimalism justifies a dedicated runtime
+      package in this release. Defer it: the current runtime subpath bundles to
+      2.37 KB gzip without Culori, Node/font/CLI code, or interactive
+      dependencies. A fifth published package would add release and migration
+      surface for install-tree neatness rather than browser correctness. Revisit
+      only if a real consumer policy or vulnerability requires it.
+- [x] Commission an independent hostile due-diligence audit and close its P0
+      findings: mode-scoped Workbench patches, immutable defaults, complete
+      FontTools planning/provenance, inspectable recoverable build locks, and a
+      mandatory Browser/Next/Turborepo release matrix. See
+      `docs/audit-2026-07-23-independent.md`.
+- [x] Make Figma sync semantics explicit: safe merge by default, separately
+      named authoritative reconciliation, exact token-backed remote dry run,
+      ambiguity/type checks, and confirmation-gated deletion.
+- [x] Expand DTCG 2025.10 output across dimensions, duration, easing,
+      transitions, semantic typography, colors, and shadows while namespacing
+      modes and CSS-only facts.
+- [x] Finish the behavior-preserving structural split. Compiler output
+      ownership, legacy planning, and project/font planning are separated;
+      time/motion/shadow validation and semantic typography validation are
+      separated behind coherent domain modules.
+- [x] Add strict Workbench patch import with fingerprint, baseline, case,
+      path, type, range, option, duplicate, schema, and size validation; prove
+      successful and foreign imports in Chromium.
+
+## Active Scatter design-system work
+
+- [x] Rebuild `tfs-scatter` against the final reviewed TFS contracts.
+- [x] Move production artifacts under a coherent runtime subtree; keep specimens,
+      manifests, and Figma artifacts outside the application export boundary.
+- [x] Make routine package `build`/`check` independent of FontTools.
+- [x] Preserve protected production token parity and the deliberate new modes,
+      fonts, semantic typography, and native themes.
+- [x] Verify packed-package exports and isolated Next.js consumption.
+- [x] Add the package to an isolated Scatter worktree in a package-only change.
+      Do not import it from an application or change production behaviour in that
+      adoption step.
+- [x] Reconcile the separate `claude/mktgfx-typography-tuning` worktree after its
+      hands-on marketing calibration. Treat its authored values as proposals;
+      do not overwrite or silently absorb them during the output-layout migration.
+
+## Candidate system expansions
+
+These are active design investigations, not approved core contracts. Resolve the
+author-facing vocabulary and derivation rules before implementation; Scatter is
+reference evidence, not hardcoded policy.
+
+- [x] Add typography-role text-transform decisions, resolved into every complete
+      recipe and available to generated CSS/TypeScript consumers. Preserve source
+      text and keep role names and transform values author-defined.
+- [x] Add first-class composite shadow tokens with ordered multi-layer values,
+      explicit semantic colour references, safe interpolation rules, and review
+      specimens for elevation, glow, clipping, banding, and light/dark surfaces.
+- [ ] Deferred: recalibrate Scatter's shimmer palette per native colour mode as
+      an authored colour/theme concern. Do not couple it to the motion system.
+- [x] Correct the under-specified time model: simultaneously emitted duration
+      namespaces are now authored and exported as `time.scales`, not switchable
+      modes.
+- [x] Preserve atomic duration primitives, add arbitrary author-named cubic-bezier
+      easing primitives, and add arbitrary author-named semantic motion recipes.
+      Each recipe has an unsuffixed base plus any author-named variants and resolves
+      only duration, easing, and delay—never a list of CSS properties.
+- [x] Generate equivalent CSS and typed JavaScript motion contracts so CSS
+      transitions and application animation libraries do not maintain separate
+      timing values.
+- [x] Make reduced-motion behavior explicit per semantic recipe and generate a
+      `prefers-reduced-motion` contract. Do not globally erase essential feedback
+      or assume every motion should degrade in the same way.
+- [x] Keep component state/selectors and arbitrary keyframes outside the initial
+      core motion model. Investigate optional higher-level interaction recipes
+      only after the transition contract works across real consumers.
+
+## First-class visual workbench
+
+- [x] Replace the private color-only preview and independent specimen shells with
+      one generated, portable workbench driven by a versioned review contract.
+      Follow `docs/workbench-architecture.md`.
+- [x] Give every review lab and case stable IDs/permalinks. The same enumerated
+      cases must drive human calibration, browser inspection, and CI.
+- [x] Keep workbench chrome visually neutral and render the target design system
+      only inside its canvas so broken themes cannot break their own editor.
+- [x] Add non-destructive typed draft overlays, transaction-safe undo/redo,
+      scoped resets, patch export, and a source-aware agent handoff. Automatic
+      TypeScript source mutation remains deliberately outside the browser.
+- [x] Add exact-case baseline/draft comparison on top of the immutable draft
+      foundation. The comparison is stacked at the same available width so
+      typography wrapping is not distorted by a narrower side-by-side canvas.
+      Strict contract-bound patch import is complete.
+- [x] Migrate color, typography and shadow interactions into domain labs without
+      iframe-composing the current generated HTML documents.
+- [x] Add a whole-system proof sheet plus domain matrices so authors and browser
+      tests can compare broad visual rhythm and then drill into the exact same
+      stable focused cases.
+- [x] Correct the build manifest so review is a collection with one workbench
+      entrypoint and explicit labs/artifacts, not a singular typography specimen.
+- [x] Add packed-package Chromium smoke/interaction verification for loading,
+      modes, calibration edits, scoped reset and undo.
+- [ ] Add optional
+      project-owned screenshots in a pinned rendering environment. The
+      framework-neutral `review/captures.json` state plan and real Chromium
+      consumption are complete; a checked-in consumer baseline remains opt-in.
+
+## Universal product boundary
+
+- [x] Record the consumer-neutral architecture and review rules in
+      `docs/universal-product-invariants.md`.
+- [x] Prove Workbench case IDs remain deterministic, URL/CSS-safe and
+      collision-free under hostile author-owned names.
+- [x] Split the Workbench shell from domain rendering, typography measurement
+      and calibration controls so application orchestration does not become a
+      domain-logic monolith.
+- [x] Add maintained minimal, editorial, display, Vite, Next.js, workspace and
+      runtime-theme fixtures to the release matrix. Scatter may exercise them,
+      but is not their only implementation.
+- [x] Add explicit framework-neutral review-runner output so pinned screenshot
+      projects can enumerate the same versioned cases without importing the
+      Workbench source application.
+- [x] Make fallback evidence fail closed unless both the authored primary and
+      adjusted fallback resolve to matching loaded browser faces. Cover a
+      deliberately nonexistent primary face in the packed Chromium gate.
+- [x] Ensure every generated capture policy owns independent mutable arrays;
+      prove isolation across sibling cases and separately generated contracts.
+
+## Deferred application rollout
+
+- [ ] Replace Scatter's legacy generated CSS boundary with the workspace package.
+- [ ] Re-home application-owned logo URLs outside generated token CSS.
+- [ ] Upgrade the runtime custom-theme path, including strict persisted-data
+      validation and native OKLCH/P3 output.
+- [ ] Decide whether fixed per-polarity runtime overlays become a generic,
+      explicitly authored TFS project policy or a generated Scatter-local
+      manifest. Do not leave the existing duplicated application constants by
+      accident.
+- [ ] Represent built-in themes by generated keys/metadata and static selectors;
+      preserve runtime collection-owner themes.
+- [ ] Test real-page cold-cache font loading, fallback reflow, CLS, P3 colour,
+      native/custom themes, and independent size modes.
+- [x] Build and trial Scatter's local `<Text />` primitive from generated CSS
+      Module and TypeScript contracts.
+- [ ] Perform the broader typography migration only after representative visual
+      approval.
+
+## Release boundary
+
+- [ ] Complete the separate checklist in `docs/releasing.md` before publishing.
+- [ ] Publish an exact canary, test it in Scatter, then promote it deliberately.
+- [ ] Remove all temporary vendored package tarballs after the reviewed release is
+      available and old enough for Scatter's dependency policy.
+- [ ] Decide whether the public `themes` source-preset package should become
+      `presets`; do not rename it incidentally inside the current runtime/output
+      release.
+
+## Decision log
+
+- **2026-07-23 — luminance terminology and metric.** Keep the established public
+  `luminance` vocabulary. The current constraint compares perceptual OKLCH `L`,
+  so common, runtime, generated diagnostics, and manifests must identify the
+  metric as `oklch-l`.
+  A future WCAG contrast feature must use relative luminance and remain a
+  separate diagnostic rather than silently changing the existing constraint.
+- **2026-07-23 — package adoption boundary.** The canonical Scatter source is one
+  co-located private workspace package. TFS owns only its generated subtree;
+  the host `package.json`, authored sources, and font inputs remain human-owned.
+- **2026-07-23 — release safety.** Do not solve local unpublished integration by
+  overriding every Scatter consumer of `@three-forma-styli/core`. Package-only
+  adoption waits for an exact reviewed release or another equally isolated,
+  explicitly reviewed bridge.
+- **2026-07-23 — package responsibility split.** `core` remains framework- and
+  browser-safe; `compiler` owns Node project/font compilation; `cli` owns config
+  loading and interactive commands. Compatibility CLI exports remain during the
+  transition, but new authored projects import compiler APIs directly.
+- **2026-07-23 — reduced motion is semantic.** Every motion recipe explicitly
+  preserves essential motion or resolves an authored reduced alternative. TFS
+  rebinds the same semantic variables under the platform preference and exposes
+  both tuples to JavaScript, DTCG and Workbench consumers; it never applies a
+  global duration multiplier or blanket animation kill switch.
+- **2026-07-23 — concurrent visual calibration.** Marketing typography tuning is
+  isolated in `/Users/dickjones/project-local/tfs-scatter-mktgfx-tuning` from the
+  committed `tfs-scatter` main line and its vendored TFS build. The canonical
+  output migration must later reconcile that branch deliberately.
+- **2026-07-23 — canonical Scatter package proven.** `tfs-scatter` commit
+  `e71a470` packages runtime CSS, fonts, ESM, and declarations separately from
+  design-tool and review artifacts. Its complete CI gate proves production token
+  parity, reproducible generation, preserved P3 declarations, font conversion,
+  package boundaries, an isolated production Next.js build, and browser-loaded
+  primary and adjusted-fallback faces. Hands-on typography values were kept
+  separate until the later explicit marketing-calibration reconciliation.
+- **2026-07-23 — mode-aware typography calibration.** TFS commits `25d8ea3`
+  and `c056036` add strict, role-local tuple overrides for non-default typography
+  modes and make the generated specimen a real multi-mode editor. Browser proof
+  against Scatter verified all four size modes, resolved controls and metadata,
+  mode-scoped draft output, double-click reset, primary/adjusted font availability,
+  and a clean console.
+- **2026-07-23 — marketing tuning reconciled.** Canonical `tfs-scatter` commit
+  `838e93e` applies the five source values from Claude's clean tuning branch after
+  confirming its weight concern was withdrawn. The tighter Supreme leading is
+  global because the author confirmed Scatter headings are always all-caps; no
+  obsolete generated layout or dist artifact was imported.
+- **2026-07-23 — generated output is a checked contract.** TFS now provides a
+  first-class non-mutating check for both flat and workspace-package projects.
+  It fully renders to a locked sibling stage and reports byte-level drift rather
+  than silently repairing it. The opt-in workspace-package scaffold separates
+  fast routine checks, explicit generation, and dedicated CI regeneration.
+  Routine builds use a separate manifest/hash/package validator and therefore
+  remain independent of FontTools.
+- **2026-07-23 — canonical package adopts the generic contract.** `tfs-scatter`
+  commit `3f4f61d` uses the generic lightweight validator in its ordinary check
+  path and the generic staged drift checker in dedicated CI. The fast path
+  validates all 24 committed files, exact package wiring, production parity,
+  and P3 without font preparation; the heavy path still proves regeneration,
+  conversion, packing, and an isolated Next.js consumer.
+- **2026-07-23 — runtime theme boundary mapped.** Built-in modes use generated
+  static selectors; only genuinely user-authored themes use the strict browser
+  runtime API. Scatter's positive-polarity sentiment/network overlay remains an
+  explicit ownership decision because core must not guess editable colours or
+  polarity transforms. The alternatives are recorded in `tfs-scatter`'s
+  `SCATTER-INTEGRATION.md`.
+- **2026-07-23 — mature-tool workflow benchmark.** TFS adopts the useful parts
+  of Prettier, Storybook and Style Dictionary without copying their entire
+  product surface: project-local exact tooling, deterministic owned output,
+  write-versus-check command clarity, isolated review artifacts, explicit
+  target planning and realistic packed/browser consumers. TFS deliberately
+  avoids global config, a generic hook free-for-all, partial managed-tree
+  cleaning, and an internal cache until every external input can be keyed.
+- **2026-07-23 — realistic consumers found real defects.** True tarball and
+  framework tests exposed an un-packable versionless workspace scaffold,
+  unresolved CSS Module declarations, stale exports after target removal, and
+  broken font URLs for reserved URL characters. Those are now permanent
+  regressions rather than one-off manual observations.
+- **2026-07-23 — inspectable CLI contract.** Project planning is now a public,
+  read-only compiler operation shared with `tfs build --dry-run`. Build, check,
+  and validate emit versioned JSON envelopes on request; operation and usage
+  failures have stable diagnostic IDs and exit codes. The packed ecosystem gate
+  verifies stdout purity and the no-write guarantee through the real executable.
+- **2026-07-23 — external font compiler provenance.** Copy-only font projects do
+  not resolve or mention FontTools. Actual TTF/OTF conversion records the exact
+  FontTools version and Python implementation/version without leaking machine
+  paths or timestamps. A dedicated pinned CI job performs a real conversion and
+  proves inspected semantics survive.
+- **2026-07-23 — monorepo integration boundary.** TFS recommends one private
+  generated design-system package with many package consumers, not multiple copy
+  destinations. Ordinary build/check only validate committed output; explicit
+  generation and discarded drift checks remain separate. TFS documents task
+  inputs/outputs but does not edit a host's workspace or cache policy.
+- **2026-07-23 — browser runtime evidence.** A production Vite/Chrome audit of
+  the strict runtime path produced a 6.08 KB raw / 2.37 KB gzip bundle, versus
+  78.61 KB raw / 25.01 KB gzip for the legacy `generate() + toCss()` path.
+  Culori and Node/compiler dependencies were absent; all 40 Scatter-like custom
+  properties matched build-time output and hostile payloads were rejected. This
+  evidence defers a standalone runtime package without weakening the public
+  browser boundary.
+- **2026-07-23 — exact Scatter persistence audit.** Read-only monorepo research
+  found that the stored collection theme is an outer JSON envelope containing
+  `themeData` plus app-owned logo fields, while the current server schema checks
+  optional `polarity`/`colors` at the wrong level. The application rollout must
+  repair both read and write boundaries, preserve existing records and cookie
+  precedence, and use generated native mode keys instead of copied built-in
+  palettes. The exact migration and regression matrix lives in
+  `tfs-scatter/SCATTER-INTEGRATION.md`.
+- **2026-07-23 — executable review boundary.** The release matrix now has a
+  separate Chromium job that installs real packed artifacts, scaffolds and packs
+  a design-system package, builds its Vite consumer, and executes that result.
+  Playwright is repository-only tooling and does not enter any published or
+  generated consumer package.
+- **2026-07-23 — universal consumer matrix.** The same neutral generated package
+  now passes a production Next 16 build, a pnpm/Turborepo build/check graph, a
+  Vite bundle, and Chromium runtime/Workbench interaction tests. Scatter is no
+  longer the only place where its framework and monorepo assumptions are
+  exercised.
+- **2026-07-23 — generated runtime-theme policy.** `colors.luminance` owns
+  reusable separation constraints while `colors.runtimeThemes.colorNames`
+  explicitly identifies the user-editable subset. Both receive exact
+  default-palette validation. The workspace compiler emits literal editable
+  names, alpha schedule, generator naming and separation groups as
+  `runtime-color-theme`; browser consumers pass that generated contract directly
+  to the strict runtime API instead of duplicating it. Static palette tokens do
+  not silently become part of the runtime schema. Measurement and enforcement
+  are separate named APIs; constraint failure is not confused with malformed
+  input. The public field is `minimumLuminanceDelta`; diagnostics remain
+  explicitly `oklch-l`.
+- **2026-07-23 — typography component boundary.** TFS emits one exact,
+  framework-neutral CSS Module class resolver alongside the literal typography
+  contract. React/Next and Svelte components remain host-owned because element
+  semantics, refs, class merging and client boundaries are application
+  decisions. A future `tfs add text` command may copy editable framework starter
+  source only after real React and Svelte consumers prove a common contract; it
+  will not become continuously regenerated output. See
+  `docs/typography-component-boundary.md`.
+- **2026-07-23 — real Scatter package and Text trial.** The isolated
+  `codex/tfs-integration` worktree adopts the canonical private package without
+  switching production CSS, links it through the normal pnpm workspace graph,
+  and validates the package host hash plus every generated artifact. Its
+  host-owned React 19 `Text` trial uses `kind` for visual typography so native
+  ARIA `role` remains available, keeps a finite semantic `as` surface, has no
+  client boundary, and is proven by exact type tests, server rendering, a
+  production Storybook bundle, and Chromium-computed Supreme/JetBrains styles.
+  Broader typography migration remains gated on representative visual approval.
+- **2026-07-23 — independent framework proof.** The packed release matrix now
+  builds genuinely host-owned `Text` adapters in fresh React 19/Next 16 and
+  Svelte 5 projects. The React adapter is exercised from Server and Client
+  Component trees; the Svelte adapter deliberately owns a different, smaller
+  element surface. Their only shared implementation dependency is TFS's typed,
+  framework-neutral resolver and CSS Module contract.

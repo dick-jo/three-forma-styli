@@ -1,0 +1,7 @@
+.claude/
+**/dist/
+**/generated/
+node_modules/
+packages/compiler/workbench-assets/
+packages/core/test/fixtures/dtcg-2025.10/format.schema.json
+pnpm-lock.yaml

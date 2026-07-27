@@ -12,7 +12,7 @@ import type {
 	GeneratorConfig,
 	GeneratorOptions,
 	GeneratorResult,
-	ModeInfo,
+	TimeGeneratorResult,
 } from './types.js';
 import { defaultGeneratorConfig } from './types.js';
 import { validatePartialDesignSystem, ValidationError } from './validate.js';
@@ -22,6 +22,8 @@ import { generateGapTokens } from './gap.js';
 import { generateTypographyContract, generateTypographyTokens } from './typography.js';
 import { generateBorderRadiusTokens, generateBorderWidthTokens } from './border.js';
 import { generateTimeTokens } from './time.js';
+import { generateMotionTokens } from './motion.js';
+import { generateShadowTokens } from './shadows.js';
 
 export { ValidationError };
 export type {
@@ -31,6 +33,12 @@ export type {
 	GeneratorOptions,
 	GeneratorResult,
 	ModeInfo,
+	ScaleInfo,
+	TimeGeneratorResult,
+	MotionGeneratorResult,
+	MotionContract,
+	ShadowGeneratorResult,
+	ShadowContract,
 	TypographyContract,
 } from './types.js';
 
@@ -41,6 +49,11 @@ const emptyResult: GeneratorResult = {
 	defaultTokens: [],
 	overrideTokens: {},
 	modeInfo: { default: '', overrides: [] },
+};
+
+const emptyTimeResult: TimeGeneratorResult = {
+	defaultTokens: [],
+	scaleInfo: { default: '', names: [] },
 };
 
 const cssNamespacePattern = /^[a-z][a-z0-9-]*$/i;
@@ -68,22 +81,16 @@ function validateConfig(config: GeneratorConfig): void {
 	}
 }
 
-/**
- * Merge user config with defaults
- */
-function mergeConfig(userConfig?: GeneratorOptions): GeneratorConfig {
-	if (!userConfig) {
-		return defaultGeneratorConfig;
-	}
-
+/** Resolve partial author options into the exact generator configuration used by every target. */
+export function resolveGeneratorConfig(userConfig?: GeneratorOptions): GeneratorConfig {
 	return {
 		prefixes: {
 			...defaultGeneratorConfig.prefixes,
-			...userConfig.prefixes,
+			...userConfig?.prefixes,
 		},
 		colorFormat: {
 			...defaultGeneratorConfig.colorFormat,
-			...userConfig.colorFormat,
+			...userConfig?.colorFormat,
 		},
 	};
 }
@@ -154,7 +161,7 @@ export function generate(
 	validatePartialDesignSystem(designSystem);
 
 	// Merge config
-	const config = mergeConfig(userConfig);
+	const config = resolveGeneratorConfig(userConfig);
 	validateConfig(config);
 
 	// Generate tokens for each family (if provided)
@@ -187,7 +194,14 @@ export function generate(
 
 	const timeResult = designSystem.time
 		? generateTimeTokens(designSystem.time, config)
-		: emptyResult;
+		: emptyTimeResult;
+	const motionResult =
+		designSystem.motion && designSystem.time
+			? generateMotionTokens(designSystem.motion, designSystem.time, config)
+			: undefined;
+	const shadowResult = designSystem.shadows
+		? generateShadowTokens(designSystem.shadows, config)
+		: undefined;
 
 	const results = {
 		colors: colorResult,
@@ -196,7 +210,6 @@ export function generate(
 		typography: typographyResult,
 		borderRadius: borderRadiusResult,
 		borderWidth: borderWidthResult,
-		time: timeResult,
 	};
 
 	// Combine all default tokens
@@ -208,6 +221,8 @@ export function generate(
 		...borderRadiusResult.defaultTokens,
 		...borderWidthResult.defaultTokens,
 		...timeResult.defaultTokens,
+		...(motionResult?.defaultTokens ?? []),
+		...(shadowResult?.defaultTokens ?? []),
 	];
 
 	// Collect all override mode names
@@ -241,10 +256,6 @@ export function generate(
 		if (borderWidthResult.overrideTokens[modeName]) {
 			modeTokens.push(...borderWidthResult.overrideTokens[modeName]);
 		}
-		if (timeResult.overrideTokens[modeName]) {
-			modeTokens.push(...timeResult.overrideTokens[modeName]);
-		}
-
 		if (modeTokens.length > 0) {
 			overrideTokens[modeName] = tokensToRecord(modeTokens, `mode "${modeName}"`);
 		}
@@ -252,8 +263,6 @@ export function generate(
 
 	// Build mode info
 	const colorOverrides = colorResult.modeInfo.overrides;
-	const timeOverrides = timeResult.modeInfo.overrides;
-
 	// Size overrides: union of all size family overrides
 	const sizeOverridesSet = new Set<string>();
 	[spacingResult, gapResult, typographyResult, borderRadiusResult, borderWidthResult].forEach(
@@ -273,6 +282,8 @@ export function generate(
 		typography: designSystem.typography
 			? generateTypographyContract(designSystem.typography, config)
 			: undefined,
+		motion: motionResult?.contract,
+		shadows: shadowResult?.contract,
 		modes: {
 			color: {
 				default: colorResult.modeInfo.default,
@@ -282,11 +293,19 @@ export function generate(
 				default: sizeDefault,
 				overrides: sizeOverrides,
 			},
-			time: {
-				default: timeResult.modeInfo.default,
-				overrides: timeOverrides,
-			},
+		},
+		scales: {
+			time: timeResult.scaleInfo,
 		},
 		overrideTokens,
+		mediaOverrides:
+			motionResult && motionResult.reducedMotionTokens.length > 0
+				? {
+						'(prefers-reduced-motion: reduce)': tokensToRecord(
+							motionResult.reducedMotionTokens,
+							'the reduced-motion media override'
+						),
+					}
+				: {},
 	};
 }

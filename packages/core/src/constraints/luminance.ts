@@ -1,18 +1,22 @@
-import type { Oklch } from 'culori';
-import type {
-	ColorDiagnostic,
-	LuminanceConstraintConfig,
-	LuminanceValidation,
-} from './types.js';
+import type { ColorDiagnostic, LuminanceConstraintConfig, LuminanceValidation } from './types.js';
+
+interface OklchLightness {
+	readonly l: number;
+}
+
+function stableDiagnostic(value: number): number {
+	return Number(value.toFixed(12));
+}
 
 /**
- * Validates luminance constraints for a set of colors
+ * Validates luminance constraints for a set of colors.
  *
- * Checks that the luminance delta between background and foreground color groups
- * meets the minimum requirement for readability.
+ * TFS's current public `luminance` metric is the authored OKLCH L component. It
+ * is useful for controlling the perceptual lightness separation of a palette,
+ * but it is not WCAG relative luminance or a contrast-ratio calculation.
  *
- * @param colors - Record of color keys to Oklch colors to validate
- * @param config - Constraint configuration (polarity, minDelta, color groups)
+ * @param colors - Record of color keys to values containing an OKLCH L component
+ * @param config - Constraint configuration (polarity, minimumLuminanceDelta, color groups)
  * @returns Diagnostic information about constraint satisfaction
  *
  * @example
@@ -21,7 +25,7 @@ import type {
  *   { bg: oklch(0.2, 0, 0), primary: oklch(0.8, 0.1, 250) },
  *   {
  *     polarity: 'negative',
- *     minDelta: 0.4,
+ *     minimumLuminanceDelta: 0.4,
  *     backgroundColors: ['bg'],
  *     foregroundColors: ['primary'],
  *   }
@@ -29,10 +33,10 @@ import type {
  * ```
  */
 export function validateLuminance(
-	colors: Record<string, Oklch | undefined>,
+	colors: Record<string, OklchLightness | undefined>,
 	config: LuminanceConstraintConfig
 ): LuminanceValidation {
-	const { polarity, minDelta, backgroundColors, foregroundColors } = config;
+	const { polarity, minimumLuminanceDelta, backgroundColors, foregroundColors } = config;
 
 	// Get luminance values for each group
 	const bgLuminances = backgroundColors
@@ -46,9 +50,10 @@ export function validateLuminance(
 	// Handle empty groups
 	if (bgLuminances.length === 0 || fgLuminances.length === 0) {
 		return {
+			metric: 'oklch-l',
 			deltaValid: false,
 			actualDelta: 0,
-			requiredDelta: minDelta,
+			requiredDelta: minimumLuminanceDelta,
 			backgroundConstraint: 0,
 			backgroundConstraintType: polarity === 'negative' ? 'max' : 'min',
 			foregroundConstraint: 0,
@@ -66,19 +71,21 @@ export function validateLuminance(
 	// Calculate actual delta based on polarity
 	// Negative polarity: foreground (bright) - background (dark)
 	// Positive polarity: background (bright) - foreground (dark)
-	const actualDelta = polarity === 'negative' ? minFg - maxBg : minBg - maxFg;
+	const actualDelta = stableDiagnostic(polarity === 'negative' ? minFg - maxBg : minBg - maxFg);
 
 	// Check delta constraint
-	const deltaValid = actualDelta >= minDelta;
+	const deltaValid = actualDelta >= minimumLuminanceDelta;
 
 	// Calculate constraint boundaries for UI display
-	// Negative polarity: backgrounds can't exceed (minFg - minDelta), foregrounds can't go below (maxBg + minDelta)
-	// Positive polarity: backgrounds can't go below (maxFg + minDelta), foregrounds can't exceed (minBg - minDelta)
-	const backgroundConstraint =
-		polarity === 'negative' ? minFg - minDelta : maxFg + minDelta;
+	// Negative polarity: backgrounds can't exceed (minFg - minimumLuminanceDelta), foregrounds can't go below (maxBg + minimumLuminanceDelta)
+	// Positive polarity: backgrounds can't go below (maxFg + minimumLuminanceDelta), foregrounds can't exceed (minBg - minimumLuminanceDelta)
+	const backgroundConstraint = stableDiagnostic(
+		polarity === 'negative' ? minFg - minimumLuminanceDelta : maxFg + minimumLuminanceDelta
+	);
 
-	const foregroundConstraint =
-		polarity === 'negative' ? maxBg + minDelta : minBg - minDelta;
+	const foregroundConstraint = stableDiagnostic(
+		polarity === 'negative' ? maxBg + minimumLuminanceDelta : minBg - minimumLuminanceDelta
+	);
 
 	// Build per-color diagnostics
 	const colorDiagnostics: Record<string, ColorDiagnostic> = {};
@@ -89,10 +96,9 @@ export function validateLuminance(
 		if (color?.l !== undefined) {
 			// For negative polarity: headroom = constraint (max) - luminance
 			// For positive polarity: headroom = luminance - constraint (min)
-			const headroom =
-				polarity === 'negative'
-					? backgroundConstraint - color.l
-					: color.l - backgroundConstraint;
+			const headroom = stableDiagnostic(
+				polarity === 'negative' ? backgroundConstraint - color.l : color.l - backgroundConstraint
+			);
 
 			colorDiagnostics[key] = {
 				group: 'background',
@@ -108,10 +114,9 @@ export function validateLuminance(
 		if (color?.l !== undefined) {
 			// For negative polarity: headroom = luminance - constraint (min)
 			// For positive polarity: headroom = constraint (max) - luminance
-			const headroom =
-				polarity === 'negative'
-					? color.l - foregroundConstraint
-					: foregroundConstraint - color.l;
+			const headroom = stableDiagnostic(
+				polarity === 'negative' ? color.l - foregroundConstraint : foregroundConstraint - color.l
+			);
 
 			colorDiagnostics[key] = {
 				group: 'foreground',
@@ -122,9 +127,10 @@ export function validateLuminance(
 	}
 
 	return {
+		metric: 'oklch-l',
 		deltaValid,
 		actualDelta,
-		requiredDelta: minDelta,
+		requiredDelta: minimumLuminanceDelta,
 		backgroundConstraint,
 		backgroundConstraintType: polarity === 'negative' ? 'max' : 'min',
 		foregroundConstraint,

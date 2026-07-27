@@ -1,4 +1,4 @@
-import { defineTfsProject } from '@three-forma-styli/cli';
+import { defineTfsProject } from '@three-forma-styli/compiler';
 import { deriveTypographyRange, type FontSizeSystem } from '@three-forma-styli/core';
 
 /**

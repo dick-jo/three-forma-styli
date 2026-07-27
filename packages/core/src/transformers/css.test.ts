@@ -21,10 +21,18 @@ describe('toCss', () => {
 		modes: {
 			color: { default: 'light', overrides: [] },
 			size: { default: 'default', overrides: [] },
-			time: { default: 'default', overrides: [] },
 		},
+		scales: { time: { default: '', names: [] } },
 		overrideTokens: {},
+		mediaOverrides: {},
 	};
+
+	it('publishes deeply immutable defaults', () => {
+		expect(Object.isFrozen(defaultCssConfig)).toBe(true);
+		expect(Object.isFrozen(defaultCssConfig.selectors)).toBe(true);
+		expect(Reflect.set(defaultCssConfig.selectors!, 'root', '.mutated-default')).toBe(false);
+		expect(toCss(minimalIR)).toContain(':root {');
+	});
 
 	it('generates :root block with tokens', () => {
 		const css = toCss(minimalIR);
@@ -53,8 +61,8 @@ describe('toCss', () => {
 			modes: {
 				color: { default: 'light', overrides: ['dark'] },
 				size: { default: 'default', overrides: ['small', 'large'] },
-				time: { default: 'default', overrides: ['reduced-motion'] },
 			},
+			scales: { time: { default: 'default', names: ['default'] } },
 			overrideTokens: {
 				dark: {
 					'clr-bg': { family: 'color', name: 'clr-bg', value: 'oklch(0.15 0 180)' },
@@ -65,10 +73,8 @@ describe('toCss', () => {
 				large: {
 					'sp-1': { family: 'spacing', name: 'sp-1', value: '16px' },
 				},
-				'reduced-motion': {
-					't-1': { family: 'time', name: 't-1', value: '0ms' },
-				},
 			},
+			mediaOverrides: {},
 		};
 
 		it('generates color mode overrides with data-color-mode selector', () => {
@@ -85,24 +91,16 @@ describe('toCss', () => {
 			expect(css).toContain('[data-size-mode="large"]');
 		});
 
-		it('generates time mode overrides with data-time-mode selector', () => {
-			const css = toCss(irWithModes);
-
-			expect(css).toContain('[data-time-mode="reduced-motion"]');
-		});
-
 		it('allows custom mode selectors', () => {
 			const css = toCss(irWithModes, {
 				selectors: {
 					colorMode: '.theme-{mode}',
 					sizeMode: '.size-{mode}',
-					timeMode: '.motion-{mode}',
 				},
 			});
 
 			expect(css).toContain('.theme-dark');
 			expect(css).toContain('.size-small');
-			expect(css).toContain('.motion-reduced-motion');
 		});
 	});
 
@@ -125,13 +123,14 @@ describe('toCss', () => {
 				modes: {
 					color: { default: 'default', overrides: [] },
 					size: { default: 'default', overrides: ['small'] },
-					time: { default: 'default', overrides: [] },
 				},
+				scales: { time: { default: '', names: [] } },
 				overrideTokens: {
 					small: {
 						'sp-1': { family: 'spacing', name: 'sp-1', value: '4px' },
 					},
 				},
+				mediaOverrides: {},
 			};
 
 			const css = toCss(irWithOverride);
@@ -218,11 +217,12 @@ describe('toCss', () => {
 				modes: {
 					color: { default: 'default', overrides: [] },
 					size: { default: 'default', overrides: ['small'] },
-					time: { default: 'default', overrides: [] },
 				},
+				scales: { time: { default: '', names: [] } },
 				overrideTokens: {
 					small: {}, // Empty override
 				},
+				mediaOverrides: {},
 			};
 
 			const css = toCss(irWithEmptyOverride);
@@ -237,18 +237,41 @@ describe('toCss', () => {
 				modes: {
 					color: { default: 'default', overrides: [] },
 					size: { default: 'default', overrides: [] },
-					time: { default: 'default', overrides: [] },
 				},
+				scales: { time: { default: '', names: [] } },
 				overrideTokens: {
 					'mystery-mode': {
 						'sp-1': { family: 'spacing', name: 'sp-1', value: '4px' },
 					},
 				},
+				mediaOverrides: {},
 			};
 
 			// Should not throw, just skip the unknown mode
 			const css = toCss(irWithUnknownMode);
 			expect(css).not.toContain('mystery-mode');
+		});
+
+		it('emits conditional token overrides under their media query and root selector', () => {
+			const css = toCss(
+				{
+					...minimalIR,
+					mediaOverrides: {
+						'(prefers-reduced-motion: reduce)': {
+							'motion-hover-duration': {
+								family: 'motion',
+								name: 'motion-hover-duration',
+								value: '0ms',
+							},
+						},
+					},
+				},
+				{ selectors: { root: 'html' } }
+			);
+
+			expect(css).toContain(
+				'@media (prefers-reduced-motion: reduce) {\n  html {\n    --motion-hover-duration: 0ms;\n  }\n}'
+			);
 		});
 	});
 });

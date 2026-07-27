@@ -16,33 +16,19 @@ import type { DesignSystem, PartialDesignSystem } from '@three-forma-styli/core'
 
 // Full design system
 const system: DesignSystem = {
-	colors: {
-		/* ... */
-	},
-	spacing: {
-		/* ... */
-	},
-	gap: {
-		/* ... */
-	},
-	typography: {
-		/* ... */
-	},
-	border: {
-		/* ... */
-	},
-	time: {
-		/* ... */
-	},
+	colors: {/* ... */},
+	spacing: {/* ... */},
+	gap: {/* ... */},
+	typography: {/* ... */},
+	border: {/* ... */},
+	time: {/* ... */},
 };
 
 const css = toCss(generate(system));
 
 // Partial generation (e.g., just colors)
 const partial: PartialDesignSystem = {
-	colors: {
-		/* ... */
-	},
+	colors: {/* ... */},
 };
 
 const colorsCss = toCss(generate(partial));
@@ -54,7 +40,9 @@ const colorsCss = toCss(generate(partial));
 - `toCss(ir, config?)` - Transform IR to CSS string
 - `oklch(l, c, h)` - Create OKLCH color object
 - `generateCss(designSystem, config?)` - Convenience function combining generate + toCss
-- `generateFigmaJson(designSystem, config?, format?)` - Generate color-only DTCG or Figma Variables JSON
+- `generateFigmaJson(designSystem, config?, format?)` - Generate DTCG 2025.10 interchange
+  (color, dimension, duration, easing, transition, typography, and shadow) or
+  color-only Figma Variables JSON
 - `toFigmaJson(ir, config?, format?)` - Transform a hex/profile-aware IR to JSON
 - `defineTypography(system)` - Preserve literal font/role/variant names for an explicit typography system; adds no hidden defaults
 - `deriveTypographyRange(input)` - Optionally derive caller-named role variants from explicit anchors
@@ -73,6 +61,49 @@ const colorsCss = toCss(generate(partial));
 - `GeneratorConfig` - Configuration for token generation
 - `GeneratorOptions` - Deeply optional user-facing generator configuration
 - `CssTransformerConfig` - Configuration for CSS output
+
+## Browser runtime color themes
+
+Use the dependency-light runtime entrypoint when a browser receives a saved or
+user-authored color theme as unknown data:
+
+```typescript
+import { runtimeColorThemeConfig } from '@your-org/design-system/runtime-color-theme';
+import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
+
+const result = generateRuntimeColorTheme(untrustedJson, runtimeColorThemeConfig);
+
+if (!result.luminance.deltaValid) {
+	console.warn('Theme does not meet its OKLCH-L separation requirement');
+}
+for (const [property, value] of Object.entries(result.customProperties)) {
+	element.style.setProperty(property, value);
+}
+```
+
+The input must contain exactly `polarity` and the declared `{ l, c, h }` colors;
+missing fields, extra fields, unsafe names, non-finite numbers, and invalid ranges
+fail before CSS is emitted. CSS values stay in native `oklch()`, preserving
+Display-P3-capable chroma for the browser instead of clipping through sRGB.
+Workspace-package projects generate the policy from `colors.luminance` plus the
+explicit `colors.runtimeThemes.colorNames` subset; a hand-authored structural
+config remains available for non-compiler integrations.
+
+TFS retains its public `luminance` terminology. Shared and runtime validation
+results identify the current metric as `oklch-l`. Runtime diagnostics compare
+the exact four-decimal OKLCH L values emitted to CSS, so a boundary result cannot
+disagree with the generated declarations. This palette-separation diagnostic is
+not WCAG relative luminance and is not a contrast-ratio or
+accessibility-conformance result.
+
+The runtime entry targets ES2022 and emits native `oklch()`. Its supported web
+baseline is therefore an evergreen browser with CSS OKLCH support. TFS does not
+silently inject an sRGB conversion that could dull wide-gamut colors. An app
+supporting older browsers should gate runtime theming with
+`CSS.supports('color', 'oklch(0.5 0 0)')` and own its fallback policy. Here,
+“untrusted JSON” means a value decoded from JSON or equivalent structured data;
+it does not claim to safely inspect an adversarial live JavaScript Proxy or
+getter object in the same realm.
 
 Display-P3 output uses profile-relative RGB components and must only be sent to
 a Display-P3 Figma file. CSS output should stay in native OKLCH; TFS rejects P3

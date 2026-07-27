@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { PartialDesignSystem } from '../types.js';
-import { generate, ValidationError } from './index.js';
+import { generate, resolveGeneratorConfig, ValidationError } from './index.js';
+import { defaultGeneratorConfig } from './types.js';
 
 const alphaSchedule = { min: 0.1, max: 0.9 };
 
@@ -119,5 +120,26 @@ describe('generate mode identity', () => {
 		expect(
 			Object.values(result.overrideTokens.display).every(({ family }) => family === 'typography')
 		).toBe(true);
+	});
+});
+
+describe('generator configuration isolation', () => {
+	it('publishes immutable defaults and returns a fresh resolved object for every generation', () => {
+		expect(Object.isFrozen(defaultGeneratorConfig)).toBe(true);
+		expect(Object.isFrozen(defaultGeneratorConfig.prefixes)).toBe(true);
+		expect(Object.isFrozen(defaultGeneratorConfig.colorFormat)).toBe(true);
+
+		const first = resolveGeneratorConfig();
+		const second = resolveGeneratorConfig();
+		expect(first).not.toBe(second);
+		expect(first.prefixes).not.toBe(second.prefixes);
+		expect(first.colorFormat).not.toBe(second.colorFormat);
+
+		first.prefixes.color = 'mutated';
+		first.colorFormat.base = 'hex';
+		expect(resolveGeneratorConfig()).toMatchObject({
+			prefixes: { color: 'clr' },
+			colorFormat: { base: 'oklch' },
+		});
 	});
 });

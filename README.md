@@ -1,12 +1,14 @@
 # Three-Forma-Styli
 
-**TypeScript-first design token generator with OKLCH color support and luminance constraints**
+**TypeScript-first design-system generator with native OKLCH color support and explicit palette constraints**
 
-Generate CSS custom properties from TypeScript-defined design systems. Built for runtime theming, accessibility-aware color relationships, and ergonomic developer experience.
+Generate portable CSS, fonts, typed contracts, design-tool data, and review artifacts
+from compact TypeScript-defined design systems. Built for deterministic handoff,
+strict user-authored runtime themes, and ergonomic developer experience.
 
 ## Philosophy
 
-1. **Luminance-First Design** - Lightness relationships determine readability. When luminance is correct, hue choices become flexible.
+1. **Luminance-First Design** - Explicit OKLCH-L separation controls palette hierarchy while hue and chroma remain flexible.
 2. **Alpha-Based Variations** - Instead of generating solid color variants (blue-100, blue-200...), use alpha/transparency variants of base colors.
 3. **Ergonomic Abstraction** - Limit choices to enforce consistency. Spacing scales, gap shortcuts, and semantic naming reduce decision fatigue.
 4. **Runtime Theming** - CSS custom properties enable theme switching without page reload.
@@ -19,11 +21,22 @@ npx @three-forma-styli/cli init my-design-system
 cd my-design-system
 
 # Edit your theme files (with full TypeScript IntelliSense)
-# Then generate the configured portable dist/ directory
+# Then generate the configured portable dist/ directory and prove it is current
+npm run generate
 npm run check
 
 # A targeted single-file build can emit one format
 tfs build ./index.ts --format dtcg --output tokens.json
+```
+
+For a co-located monorepo package instead of a standalone handoff:
+
+```bash
+npx @three-forma-styli/cli init design-system --workspace-package
+cd design-system
+npm run generate          # explicit authoring operation
+npm run check             # fast types + committed package validation
+npm run check:generated   # dedicated byte-for-byte CI proof
 ```
 
 Display-P3 Figma files are supported explicitly. The selected color space must
@@ -37,23 +50,29 @@ tfs figma-sync . --file-key "$FIGMA_FILE_KEY" --color-space display-p3
 The sync command uses Figma's Variables REST API, which currently requires an
 Enterprise organization, an eligible full seat, edit access, and a token with
 both `file_variables:read` and `file_variables:write` scopes. Run with
-`--dry-run` to inspect the atomic payload without a token or network write.
+`--dry-run` and a token for an exact remote diff. Tokenless dry runs preview
+creation against an empty file. Sync defaults to non-destructive `merge`;
+`--policy authoritative` can remove stale local modes/variables only after a
+dry run is reviewed and live execution is explicitly confirmed with `--yes`.
 
 ## Packages
 
-| Package                     | Description                               |
-| --------------------------- | ----------------------------------------- |
-| `@three-forma-styli/core`   | Core library for generating design tokens |
-| `@three-forma-styli/cli`    | CLI tool (`tfs` command)                  |
-| `@three-forma-styli/themes` | Starter/reference themes                  |
+| Package                       | Description                               |
+| ----------------------------- | ----------------------------------------- |
+| `@three-forma-styli/core`     | Core library for generating design tokens |
+| `@three-forma-styli/compiler` | Node project and font compiler            |
+| `@three-forma-styli/cli`      | CLI tool (`tfs` command)                  |
+| `@three-forma-styli/themes`   | Starter/reference themes                  |
 
-The private Svelte review application lives under `apps/preview`; it is repository
-tooling, not a published package or consumer dependency. Installing the CLI/core
-does not install or bundle Svelte.
+The private Svelte 5 workbench source lives under `apps/workbench`. Its compiled,
+dependency-free browser assets are included only in the Node compiler so projects
+can request a portable review artifact. Generated application runtime packages do
+not install or bundle Svelte, Vite, or workbench code.
 
 The public packages share a coordinated release version and are verified as
 packed artifacts—including an external TypeScript consumer—before publishing.
 See [the package architecture](docs/package-architecture.md),
+[monorepo integration](docs/monorepo-integration.md),
 [validation policy](docs/validation.md), and [release procedure](docs/releasing.md).
 
 ## Architecture
@@ -164,6 +183,10 @@ const typography = {
 			isDefault: true,
 			tokens: { unit: 'rem', base: 0.75, min: 0.625, increment: 0.125, range: 12 },
 		},
+		{
+			name: 'display',
+			tokens: { unit: 'rem', base: 1.5, min: 1, increment: 0.5, range: 12 },
+		},
 	],
 	fonts: {
 		sans: { family: 'system-ui', fallbacks: ['sans-serif'], verification: 'unavailable' },
@@ -171,10 +194,17 @@ const typography = {
 	roles: {
 		prose: {
 			font: 'sans',
+			textTransform: 'none',
 			base: { fontSize: 2, weight: 'lo', lineHeight: 1.25, letterSpacing: 0 },
 			variants: {
 				s: { fontSize: 1, weight: 'min', lineHeight: 1.3, letterSpacing: 0.005 },
 				l: { fontSize: 3, weight: 'lo', lineHeight: 1.225, letterSpacing: -0.0025 },
+			},
+			modeOverrides: {
+				display: {
+					base: { fontSize: 4, weight: 'hi', lineHeight: 0.9 },
+					variants: { l: { fontSize: 7, lineHeight: 0.85, letterSpacing: -0.01 } },
+				},
 			},
 			weights: { min: 300, lo: 400, hi: 500, max: 700 },
 		},
@@ -195,13 +225,34 @@ visible `base`/`variants` data and it never invents font roles or weight aliases
 
 For a complete movable handoff, define a project and run `tfs build .`. Project
 mode prepares licensed local fonts, resolves their real capabilities, then stages
-CSS, typed system/mode and typography contracts, helper classes, a specimen,
+CSS, typed system/mode and typography contracts, helper classes, a Workbench,
 JSON interchange, and a hashed ownership manifest before replacing the output directory once. See
 `examples/project/tfs.config.ts`.
 
-Review that generated specimen over localhost with `tfs specimen serve .`.
+The typography contract includes a framework-neutral `typographyClassName()`
+resolver whose exact class map is the generated CSS Module. A local React,
+Next.js, or Svelte `Text` component can consume that pair without duplicating
+valid role/variant/style/weight combinations. TFS does not overwrite
+framework-component source; see the
+[typography component boundary](docs/typography-component-boundary.md).
+
+Run `tfs check .` in dedicated CI to perform that same complete build in a
+private sibling stage and reject missing, changed, or unexpected committed
+artifacts without modifying them. `tfs init --workspace-package` scaffolds the
+package exports and separates this heavier regeneration proof from routine
+monorepo checks. `tfs validate .` is the lightweight routine path: it verifies
+the committed manifest, artifact bytes, and package wiring without FontTools or
+regeneration.
+
+Review the generated design system over localhost with `tfs review serve .`.
 Pass `--open` only when the CLI should launch the browser; use `--port 4400`
 when a fixed review port is required.
+
+The generated Workbench unifies color, typography, shadow, motion and foundation
+review behind stable cases and source-aligned draft patches. Its architecture
+and browser evidence are documented in
+[Workbench architecture](docs/workbench-architecture.md) and
+[Workbench validation](docs/workbench-validation.md).
 
 Prepared `sans` and `mono` project fonts can also receive automatic
 per-style/per-weight adjusted fallback faces for physical upright and italic
@@ -213,28 +264,146 @@ Prepared custom fonts provide authoritative face capabilities. Roles explicitly
 choose supported weights and styles; unavailable cuts fail instead of being
 silently remapped. See [the typography foundation](docs/typography-foundation.md).
 
-### Border & Time
+### Time & Motion
 
-Similar patterns for border radius/width and timing values.
+Time defines one or more simultaneously available atomic duration scales.
+Motion recipes turn those primitives into author-named, property-agnostic
+duration/easing/delay fragments:
+
+```typescript
+time: {
+  scales: [{
+    name: 'default',
+    isDefault: true,
+    tokens: { unit: 'ms', base: 100, min: 50, range: 10 },
+  }],
+},
+motion: {
+  easings: { standard: [0.2, 0, 0.38, 0.9] },
+  recipes: {
+    hover: {
+      base: { duration: 2, easing: 'standard' },
+      variants: {
+        min: { duration: 'min' },
+        lo: { duration: 1 },
+        hi: { duration: 3 },
+        max: { duration: 4 },
+      },
+      reducedMotion: {
+        base: { duration: 0, delay: 0 },
+      },
+    },
+  },
+}
+```
+
+```css
+.control {
+	transition:
+		color var(--motion-hover),
+		box-shadow var(--motion-hover);
+}
+```
+
+The generated TypeScript contract exposes the same easing tuple and resolved
+millisecond/second values for JavaScript animation libraries. TFS deliberately
+does not attach CSS property names to recipes.
+
+Every recipe must make one explicit reduced-motion decision. Use
+`reducedMotion: "preserve"` only when the motion itself is essential, or author
+a base reduced override inherited by its variants. Any variant can override
+that reduced value or use `"preserve"` independently. TFS emits the resolved
+semantic variables under `@media (prefers-reduced-motion: reduce)` and exposes
+the same standard/reduced values to JavaScript consumers.
+
+### Border
+
+Border radius derives semantic choices from spacing; border width remains a
+small explicit system.
+
+### Shadows
+
+Box and text shadows are separate author-owned recipe families because their CSS
+grammars differ. Values are ordered layer arrays, so a tight contact shadow plus
+a broad ambient shadow is a normal value:
+
+```typescript
+shadows: {
+  unit: 'px',
+  box: {
+    elevation: {
+      base: [
+        { x: 0, y: 1, blur: 2, color: { color: 'shadow', alpha: 'lo' } },
+        { x: 0, y: 8, blur: 24, spread: -4, color: { color: 'shadow', alpha: 'min' } },
+      ],
+      variants: {
+        max: [/* another complete ordered layer stack */],
+      },
+    },
+  },
+  text: {
+    glow: {
+      base: [
+        { x: 0, y: 0, blur: 3, color: { color: 'pri', alpha: 'lo' } },
+        { x: 0, y: 0, blur: 16, color: { color: 'pri', alpha: 'min' } },
+      ],
+    },
+  },
+}
+```
+
+Semantic color references resolve to existing `--clr-*` alpha tokens, so the
+shadow follows color modes without copying colors into the effect. Generated
+outputs include CSS custom properties, optional global helpers, kebab-case CSS
+Modules, a typed contract, DTCG shadow composites, and an interactive specimen.
+`deriveShadowRange()` may interpolate matching geometry, but refuses to invent
+layer pairing, inset state, or color identity.
 
 ## Luminance Constraints
 
-Validate color relationships for accessibility:
+Validate intentional perceptual separation between palette groups:
 
 ```typescript
 import { validateLuminance } from '@three-forma-styli/core';
 
 const result = validateLuminance(colors, {
-	polarity: 'dark', // dark background, light foreground
-	minDelta: 0.4, // minimum luminance difference
+	polarity: 'negative', // dark background, light foreground
+	minimumLuminanceDelta: 0.4, // minimum OKLCH-L separation
 	backgroundColors: ['bg', 'ev'],
 	foregroundColors: ['primary', 'neutral', 'ink'],
 });
 
 // Returns per-color diagnostics
 // result.colors.bg.headroom = 0.15  (positive = safe margin)
-// result.colors.ink.headroom = -0.05 (negative = violation!)
+// result.colors.ink.headroom = -0.05 (negative = constraint violation)
 ```
+
+TFS preserves the established `luminance` product vocabulary, while every
+diagnostic identifies the actual metric as `oklch-l`. This is not WCAG relative
+luminance, a contrast ratio, or an accessibility-conformance result. A future
+WCAG diagnostic must remain separate rather than silently changing this model.
+
+A color system can own that reusable policy once. If it also supports
+user-authored runtime themes, it separately declares the exact editable subset:
+
+```typescript
+colors: {
+	modes,
+	alphaSchedule,
+	luminance: {
+		minimumLuminanceDelta: 0.4,
+		backgroundColors: ['bg', 'ev'],
+		foregroundColors: ['primary', 'neutral', 'ink'],
+	},
+	runtimeThemes: {
+		colorNames: ['bg', 'ev', 'primary', 'neutral', 'ink'],
+	},
+}
+```
+
+Static colors may remain in the palette without becoming accepted runtime input.
+The workspace compiler validates both policies and generates a literal
+`runtime-color-theme` consumer contract.
 
 ## Mode Categories
 
@@ -244,7 +413,6 @@ Modes are grouped into categories with separate CSS selectors:
 | -------- | -------------------------------- | ------------------------- |
 | `color`  | colors                           | `[data-color-mode="..."]` |
 | `size`   | spacing, gap, typography, border | `[data-size-mode="..."]`  |
-| `time`   | time                             | `[data-time-mode="..."]`  |
 
 Typography may define multiple atomic size modes just like spacing. Semantic roles
 continue to reference the stable `--fs-*` names, so a compact mode can alter the
@@ -261,9 +429,22 @@ their `--text-*-font-size` aliases within the mode selector. This is required by
 CSS custom-property inheritance: overriding only `--fs-*` on a descendant does
 not retarget an alias that was inherited after resolving in `:root`.
 
+When scaling the atomic ramp is insufficient, a role may explicitly author
+`modeOverrides` for any non-default typography mode. Each override is a partial
+tuple: omitted fields retain the role recipe, while authored `fontSize`,
+`weight`, `lineHeight`, or `letterSpacing` values are emitted only inside that
+mode selector. Mode and variant names are validated; TFS never guesses which
+roles should tighten, grow, or become heavier.
+
+Time values are scales, not modes. Every authored scale is emitted into `:root`
+at once: the default scale produces `--t-*`, while an additional `ambient`
+scale produces `--t-ambient-*`. They never create a selector or compete for one
+active state.
+
 ## Programmatic Usage
 
-For apps that generate themes at runtime:
+For build tools and trusted authoring processes that need the complete design
+system IR:
 
 ```typescript
 import { generate, toCss, oklch } from '@three-forma-styli/core';
@@ -272,6 +453,26 @@ import type { DesignSystem } from '@three-forma-styli/core';
 const system: DesignSystem = {/* ... */};
 const css = toCss(generate(system));
 ```
+
+Do not ship that complete generator just to process saved end-user colours in a
+browser. Use the strict, tree-shakeable runtime boundary instead:
+
+```typescript
+import { runtimeColorThemeConfig } from '@your-org/design-system/runtime-color-theme';
+import { generateRuntimeColorTheme } from '@three-forma-styli/core/runtime';
+
+const result = generateRuntimeColorTheme(untrustedThemeData, runtimeColorThemeConfig);
+```
+
+It accepts one exact serializable shape, rejects hostile or malformed data, emits
+native OKLCH custom properties, and returns explicitly identified OKLCH-L
+diagnostics. The release gate executes this path from packed npm and generated
+package tarballs in Chromium; compiler, font, CLI, and Culori code must not enter
+that browser bundle. Author `colors.luminance` once and explicitly declare the
+user-editable subset in `colors.runtimeThemes.colorNames`; the generated runtime
+policy preserves literal color names, alpha schedule, custom property naming,
+and separation groups without app-side duplication. Static palette tokens do
+not accidentally become runtime-editable.
 
 ### Partial Generation
 
@@ -332,6 +533,7 @@ Current implementation references:
 - [Typography foundation](docs/typography-foundation.md)
 - [Typography fallback metrics](docs/typography-fallback-metrics.md)
 - [Validation and failure policy](docs/validation.md)
+- [Industry workflow benchmark](docs/industry-workflow-benchmark.md)
 - [Scatter source reconciliation](docs/scatter-source-reconciliation.md)
 
 ## Design Decisions

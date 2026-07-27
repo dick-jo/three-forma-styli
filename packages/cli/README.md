@@ -1,15 +1,15 @@
 # @three-forma-styli/cli
 
 CLI tool for generating CSS, typed design-system and typography contracts,
-color-only DTCG/Figma Variables JSON, and typography specimens from TypeScript definitions.
+DTCG 2025.10/Figma Variables JSON, and visual Workbench artifacts from TypeScript definitions.
 
 ## Installation
 
-Install it in the design-system project so `tfs.config.ts`, the executable and
-the lockfile always use the same release:
+Install the compiler and CLI in the design-system project so `tfs.config.ts`,
+the executable and the lockfile always use the same release:
 
 ```bash
-npm install --save-dev @three-forma-styli/cli
+npm install --save-dev @three-forma-styli/compiler @three-forma-styli/cli
 npx tfs --help
 ```
 
@@ -29,13 +29,38 @@ tfs init
 
 Creates authored system files, `tfs.config.ts`, a programmatic `index.ts`, local
 build/check/specimen scripts, package metadata, TypeScript configuration, and a
-project README. The scaffold pins core and CLI to the same compatible release;
-it never writes independent `latest` ranges.
+project README. The scaffold pins core, compiler and CLI to the same compatible
+release; it never writes independent `latest` ranges.
 
 Options:
 
 - `-t, --theme <name>` - Choose the starter source preset (default: "default")
+- `--workspace-package` - Scaffold a private, monorepo-ready package whose
+  generated runtime is consumed through explicit package exports
+- `--package-name <name>` - Set an independent npm package name such as
+  `@repo/design-system`; the directory name remains path-safe and unscoped
+- `--package-manager <manager>` - Explicitly use `npm`, `pnpm`, or `yarn`;
+  otherwise TFS respects the invoking user agent, nearest lockfile, then
+  available executables
 - `--skip-install` - Skip automatic dependency installation
+
+The default standalone scaffold writes a complete portable handoff to `dist/`.
+The workspace-package scaffold writes a generated package boundary to
+`generated/`: runtime CSS/contracts are exportable, while specimens and
+design-tool JSON remain local review artifacts. Both scaffold shapes use the
+same command contract: `generate` writes, `build`/`check` validate committed
+output, and `check:generated` performs the expensive private regeneration proof.
+Routine `build`/`check` stay independent of FontTools:
+
+Physical CSS files use the namespaced `design-system[.facet].css` convention;
+the package keeps concise consumer exports such as `./styles.css`,
+`./tokens.css`, and `./typography.css`.
+
+```bash
+npm run generate          # explicit authoring operation
+npm run check             # fast types + committed package validation
+npm run check:generated   # dedicated CI drift proof
+```
 
 ### `tfs build`
 
@@ -50,6 +75,57 @@ fonts, validates explicit typography against the in-memory font manifest, writes
 to a sibling stage, hashes the result, and replaces only a TFS-owned output
 directory. No separate font/build command order is required.
 
+Inspect that exact plan before writing anything:
+
+```bash
+tfs build . --dry-run
+tfs build . --dry-run --json
+```
+
+The dry run validates the output layout and host package, reports the atomic
+ownership root, planned artifact/dependency graph, exact package exports, font
+inputs, and external conversion prerequisites. It neither prepares fonts nor
+creates the generated directory. Artifacts whose identities depend on physical
+font inspection are called out separately rather than guessed.
+
+The project contract comes from the import-safe compiler root:
+
+```ts
+import { defineTfsProject } from '@three-forma-styli/compiler';
+```
+
+Existing imports from `@three-forma-styli/cli`, `/project`, and `/fonts` remain
+supported compatibility paths.
+
+### `tfs check`
+
+Prove that committed output exactly matches its authored project without
+changing either one:
+
+```bash
+tfs check .
+```
+
+TFS performs the complete build—including font preparation and fallback
+measurement—in a locked sibling stage. It compares every byte and reports
+missing, changed, and unexpected files. The staged candidate is then removed;
+TFS never repairs drift during a check. Run `tfs build .` deliberately to accept
+and review regenerated output.
+
+### `tfs validate`
+
+Validate the already-committed output without rebuilding it:
+
+```bash
+tfs validate .
+```
+
+This is the fast routine build/check path for a co-located package. TFS verifies
+the owning manifest and compiler version, exact artifact inventory, byte counts
+and hashes, plus workspace exports, CSS side-effects coverage, published-file
+coverage, and the recorded host-package hash. It does not run FontTools, prepare
+fonts, or write files.
+
 The legacy single-file workflow remains available:
 
 ```bash
@@ -59,35 +135,68 @@ tfs build ./theme.ts --output tokens.css
 Options:
 
 - `--output, -o <path>` - Output file path (prints to stdout if omitted)
-- `--format, -f <format>` - `css`, `dtcg` (color-only), `figma-variables`
-  (color-only), `typescript` (typography), or `specimen` (typography)
+- `--format, -f <format>` - `css`, `dtcg` (standards-based colors, dimensions,
+  durations, easing curves, transitions, typography, and shadows),
+  `figma-variables` (color-only), `typescript` (typography), or `specimen`
+  (typography)
 - `--collection <name>` - Figma collection name
 - `--color-space <space>` - `srgb` or `display-p3`; must match the Figma file profile
 - `--font-css <path>` - Link prepared font CSS from specimen output (requires `--output`)
 
-Generate the configured typography calibration workbench in project mode:
+Generate the configured visual Workbench in project mode:
 
 ```bash
 tfs build .
 ```
 
-Set `output.specimen` in `tfs.config.ts`; prepared font CSS is linked
-automatically. The `--format`, `--output`, and `--font-css` flags belong to the
-targeted single-file workflow, not project builds.
+For workspace-package output, enable `output.targets.review.workbench`; prepared
+font CSS is linked automatically. Legacy flat projects can continue to use
+`output.specimen` during migration. The `--format`, `--output`, and `--font-css`
+flags belong to the targeted single-file workflow, not project builds.
 
-### `tfs specimen serve`
+### Machine-readable operation
+
+`build`, `build --dry-run`, `check`, and `validate` accept the `--json`
+flag. Successful commands write one versioned JSON envelope to stdout and keep
+stderr empty. Targeted single-format generation requires `--output` when JSON
+reporting is enabled so generated bytes and the command envelope never compete
+for stdout.
+
+Machine failures also write one JSON envelope with a stable diagnostic ID:
+
+```json
+{
+	"schemaVersion": 1,
+	"command": "check",
+	"status": "error",
+	"exitCode": 1,
+	"diagnostic": {
+		"id": "TFS_CHECK_FAILED",
+		"message": "..."
+	}
+}
+```
+
+Exit codes are intentionally small and stable: `0` means success, `1` means the
+requested TFS operation failed (including validation or generated drift), and
+`2` means invalid CLI usage. `--no-color` disables ANSI output for human mode;
+JSON mode always disables it.
+
+### `tfs review serve`
 
 Serve the generated workbench over localhost so fonts and browser measurements
 run in a normal HTTP document rather than `file://`:
 
 ```bash
-tfs specimen serve .
-tfs specimen serve ./generated/typography.specimen.html --open
-tfs specimen serve . --port 4400
+tfs review serve .
+tfs review serve ./generated/review/index.html --open
+tfs review serve . --port 4400
 ```
 
-A project path reads `output.directory` and the configured `output.specimen.file`.
-Run `tfs build .` first. The default bind is `127.0.0.1`; TFS starts at port 4173
+A project path reads `output.directory` and the configured Workbench target.
+The server deliberately exposes the generated root—not only `review/`—so the
+Workbench can load prepared font assets without copying or rewriting them. Run
+`tfs build .` first. The default bind is `127.0.0.1`; TFS starts at port 4173
 and tries the next available port. An explicit `--port` is strict and reports a
 conflict instead of silently changing. The browser opens only with `--open`.
 
@@ -97,12 +206,18 @@ Create or update color variables through Figma's Variables REST API:
 
 ```bash
 FIGMA_TOKEN=... tfs figma-sync . --file-key ... --color-space display-p3
-tfs figma-sync . --file-key dry-run --dry-run
+FIGMA_TOKEN=... tfs figma-sync . --file-key ... --dry-run
+tfs figma-sync . --file-key empty-preview --dry-run
+FIGMA_TOKEN=... tfs figma-sync . --file-key ... --policy authoritative --dry-run
+FIGMA_TOKEN=... tfs figma-sync . --file-key ... --policy authoritative --yes
 ```
 
 Live sync requires Figma Enterprise access and both `file_variables:read` and
-`file_variables:write` token scopes. The command does not delete variables or
-modes that are absent from the source.
+`file_variables:write` token scopes. `merge` is the default and never removes
+variables or modes absent from the source. `authoritative` computes those
+deletions, but live execution refuses them without `--yes`. A token-backed dry
+run fetches the file and prints the exact atomic diff; a tokenless dry run is
+clearly labelled as a creation preview against an empty file.
 
 ### `tfs fonts inspect`
 
@@ -156,7 +271,6 @@ output: {
 			root: ':root',
 			colorMode: '[data-color-mode="{mode}"]',
 			sizeMode: '[data-size-mode="{mode}"]',
-			timeMode: '[data-time-mode="{mode}"]',
 		},
 	},
 		typographyCss: {
@@ -199,7 +313,8 @@ cd my-design-system
 # Edit your theme files
 # (full IntelliSense from @three-forma-styli/core)
 
-# Generate the complete dist/ handoff
+# Generate the complete dist/ handoff, then validate it without writing
+npm run generate
 npm run check
 ```
 
