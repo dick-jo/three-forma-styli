@@ -21,6 +21,13 @@ const projectNamePattern = /^[a-z0-9][a-z0-9-]*$/;
 const packageNamePartPattern = /^[a-z0-9][a-z0-9._-]*$/;
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 
+function packageManagerCommand(manager: PackageManager) {
+	return {
+		executable: process.platform === 'win32' ? `${manager}.cmd` : manager,
+		shell: process.platform === 'win32',
+	};
+}
+
 function projectNameError(value: string): string | undefined {
 	if (!value.trim()) return 'Project name is required';
 	if (!projectNamePattern.test(value)) {
@@ -172,9 +179,11 @@ export async function initCommand(projectName?: string, options: InitOptions = {
 			console.log(chalk.cyan('\nInstalling dependencies...'));
 
 			try {
-				execFileSync(packageManager, ['install'], {
+				const command = packageManagerCommand(packageManager);
+				execFileSync(command.executable, ['install'], {
 					cwd: targetDir,
 					stdio: 'inherit',
+					shell: command.shell,
 				});
 				console.log(chalk.green(`\n✓ Dependencies installed`));
 			} catch {
@@ -489,16 +498,18 @@ async function detectPackageManager(
 	const nearest = await nearestPackageManager(start);
 	if (nearest) return nearest;
 	try {
-		execFileSync(process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm', ['--version'], {
+		const command = packageManagerCommand('pnpm');
+		execFileSync(command.executable, ['--version'], {
 			stdio: 'ignore',
-			shell: process.platform === 'win32',
+			shell: command.shell,
 		});
 		return 'pnpm';
 	} catch {
 		try {
-			execFileSync(process.platform === 'win32' ? 'yarn.cmd' : 'yarn', ['--version'], {
+			const command = packageManagerCommand('yarn');
+			execFileSync(command.executable, ['--version'], {
 				stdio: 'ignore',
-				shell: process.platform === 'win32',
+				shell: command.shell,
 			});
 			return 'yarn';
 		} catch {
