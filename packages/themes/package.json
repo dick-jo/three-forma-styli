@@ -27,7 +27,7 @@
 	"scripts": {
 		"build": "node ../../scripts/clean.mjs && tsc",
 		"dev": "tsc --watch",
-		"prepack": "pnpm build"
+		"prepack": "node ../../scripts/verify-package-ready.mjs"
 	},
 	"keywords": [
 		"design-tokens",

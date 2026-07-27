@@ -29,7 +29,7 @@
 		"build": "node ../../scripts/clean.mjs && tsc",
 		"dev": "nodemon --watch 'src/**' --ext 'ts' --exec 'ts-node src/index.ts'",
 		"start": "node dist/index.js",
-		"prepack": "pnpm build",
+		"prepack": "node ../../scripts/verify-package-ready.mjs",
 		"test": "vitest run && pnpm test:types",
 		"test:types": "tsc -p tsconfig.type-tests.json"
 	},

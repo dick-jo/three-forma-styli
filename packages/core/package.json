@@ -21,7 +21,7 @@
 	"scripts": {
 		"build": "node ../../scripts/clean.mjs && tsc",
 		"dev": "tsc --watch",
-		"prepack": "pnpm build",
+		"prepack": "node ../../scripts/verify-package-ready.mjs",
 		"test": "vitest run && pnpm test:types",
 		"test:types": "tsc -p tsconfig.type-tests.json",
 		"test:watch": "vitest"

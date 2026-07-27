@@ -49,8 +49,11 @@ physical CSS filenames. Before publishing it:
 5. Review each package listed by `pnpm exec changeset status --verbose`. The
    release gate already packs every package and rejects leaked `workspace:`
    protocols or incompatible public APIs.
-6. Publish the fixed release through Changesets, which handles the workspace in
-   dependency order:
+6. Publish the fixed release through Changesets. The release gate builds the
+   complete workspace once; each package's `prepack` lifecycle then verifies
+   those immutable entrypoints without rebuilding or cleaning shared output.
+   This is deliberately safe when Changesets invokes package publishes
+   concurrently:
 
    ```bash
    pnpm release:publish
