@@ -40,7 +40,7 @@ try {
 		if (packageDirectory === 'compiler') {
 			const inventory = run('tar', ['-tzf', tarballPath])
 				.split('\n')
-				.map((file) => file.replaceAll('\\', '/'));
+				.map((file) => file.trim().replaceAll('\\', '/').replace(/^\.\//, ''));
 			for (const file of ['index.html', 'workbench.css', 'workbench.js']) {
 				assert.ok(
 					inventory.includes(`package/workbench-assets/${file}`),
