@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseTarInventory } from './ecosystem/archive.mjs';
 import { run as runCommand } from './ecosystem/process.mjs';
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -38,9 +39,7 @@ try {
 		const tarballPath = path.resolve(tarballDirectory, tarballName);
 		tarballs.push(tarballPath);
 		if (packageDirectory === 'compiler') {
-			const inventory = run('tar', ['-tzf', tarballPath])
-				.split('\n')
-				.map((file) => file.trim().replaceAll('\\', '/').replace(/^\.\//, ''));
+			const inventory = parseTarInventory(run('tar', ['-tzf', tarballPath]));
 			for (const file of ['index.html', 'workbench.css', 'workbench.js']) {
 				assert.ok(
 					inventory.includes(`package/workbench-assets/${file}`),

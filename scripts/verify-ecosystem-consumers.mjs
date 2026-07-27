@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
+import { parseTarInventory } from './ecosystem/archive.mjs';
 import { buildNextConsumer } from './ecosystem/next-consumer.mjs';
 import { run as runCommand } from './ecosystem/process.mjs';
 import { buildSvelteConsumer } from './ecosystem/svelte-consumer.mjs';
@@ -258,9 +259,7 @@ async function packGeneratedDesignSystem(workspaceRoot) {
 	const tarballName = output.split('\n').at(-1);
 	assert.ok(tarballName?.endsWith('.tgz'), 'Could not identify generated design-system tarball');
 	const tarball = path.resolve(tarballDirectory, tarballName);
-	const inventory = run('tar', ['-tzf', tarball])
-		.split('\n')
-		.map((file) => file.replaceAll('\\', '/'));
+	const inventory = parseTarInventory(run('tar', ['-tzf', tarball]));
 
 	assert.ok(inventory.includes('package/generated/runtime/index.js'));
 	assert.ok(inventory.includes('package/generated/runtime/runtime-color-theme.js'));
