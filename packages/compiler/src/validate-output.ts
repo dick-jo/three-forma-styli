@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'fs-extra';
-import type { TfsProject, WorkspacePackageOutput } from './project.js';
+import type { ProjectFont, TfsProject, WorkspacePackageOutput } from './project.js';
 import { COMPILER_VERSION } from './version.js';
 import { validateHostPackage } from './workspace/host-package.js';
 import { planWorkspacePackage } from './workspace/plan.js';
@@ -45,7 +45,9 @@ async function files(directory: string, root = directory): Promise<string[]> {
 	).flat();
 }
 
-function outputLayout(project: TfsProject): 'flat' | 'workspace-package' {
+function outputLayout<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>
+): 'flat' | 'workspace-package' {
 	const output = project.output as unknown as Record<string, unknown>;
 	const layout = output.layout;
 	if (layout !== undefined && layout !== 'flat' && layout !== 'workspace-package') {
@@ -130,8 +132,8 @@ async function readManifest(outputDirectory: string): Promise<OutputManifest> {
 }
 
 /** Validate committed generated artifacts and package wiring without running the compiler pipeline. */
-export async function validateProjectOutput(
-	project: TfsProject,
+export async function validateProjectOutput<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>,
 	configPath: string
 ): Promise<{ outputDirectory: string; files: string[] }> {
 	if (project.kind !== 'three-forma-styli/project' || project.schemaVersion !== 1) {

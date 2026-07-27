@@ -97,24 +97,25 @@ function joinFontFaceCss(primary: string, adjusted?: string): string {
 	return adjusted ? `${primary.trimEnd()}\n\n${adjusted.trim()}\n` : primary;
 }
 
-type LegacyProject = TfsProject & { output: LegacyTfsProjectOutput };
+type LegacyProject<Fonts extends Record<string, ProjectFont> = Record<string, ProjectFont>> =
+	TfsProject<Fonts> & { output: LegacyTfsProjectOutput };
 
-interface LegacyProjectContext {
+interface LegacyProjectContext<Fonts extends Record<string, ProjectFont>> {
 	configDirectory: string;
 	outputDirectory: string;
 	plan: LegacyOutputPlan;
 	typographyOutput: ReturnType<typeof typographyCssOptions>;
 	fontFacesMode: 'include' | 'separate' | 'none';
 	fontAssets: ReturnType<typeof fontAssetsOptions>;
-	sourceTypography: LegacyProject['system']['typography'];
+	sourceTypography: LegacyProject<Fonts>['system']['typography'];
 	hasEmbeddedTypographyFonts: boolean;
 }
 
 /** One validation path shared by writing builds and read-only plan inspection. */
-async function legacyProjectContext(
-	project: LegacyProject,
+async function legacyProjectContext<const Fonts extends Record<string, ProjectFont>>(
+	project: LegacyProject<Fonts>,
 	configPath: string
-): Promise<LegacyProjectContext> {
+): Promise<LegacyProjectContext<Fonts>> {
 	if (project.schemaVersion !== 1) throw new Error('Unsupported TFS project schemaVersion.');
 	const configDirectory = path.dirname(configPath);
 	const outputDirectory = path.resolve(configDirectory, project.output.directory);
@@ -172,8 +173,8 @@ async function legacyProjectContext(
 	};
 }
 
-async function buildLegacyProject(
-	project: LegacyProject,
+async function buildLegacyProject<const Fonts extends Record<string, ProjectFont>>(
+	project: LegacyProject<Fonts>,
 	configPath: string,
 	mode: 'build' | 'check'
 ): Promise<{ outputDirectory: string; files: string[] }> {
@@ -193,7 +194,7 @@ async function buildLegacyProject(
 	const staging = await fs.mkdtemp(path.join(path.dirname(outputDirectory), '.tfs-build-stage-'));
 	try {
 		let preparedFonts: Awaited<ReturnType<typeof prepareFonts>> | undefined;
-		const projectFonts = project.fonts ?? {};
+		const projectFonts: Record<string, ProjectFont> = project.fonts ?? {};
 		if (Object.keys(projectFonts).length > 0) {
 			const fontCssPublicPath = fontAssets.urls.mode === 'relative' ? '.' : fontAssets.urls.prefix;
 			const fontConfig: FontsPreparationConfig = {
@@ -475,8 +476,8 @@ async function buildLegacyProject(
 }
 
 /** Resolve and validate the complete output graph without preparing fonts or writing output. */
-export async function planProject(
-	project: TfsProject,
+export async function planProject<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>,
 	configPath: string
 ): Promise<ProjectBuildPlan> {
 	if (project.schemaVersion !== 1) throw new Error('Unsupported TFS project schemaVersion.');
@@ -512,7 +513,7 @@ export async function planProject(
 			requiredExports: host.requiredExports,
 		};
 	} else {
-		const context = await legacyProjectContext(project as LegacyProject, resolvedConfig);
+		const context = await legacyProjectContext(project as LegacyProject<Fonts>, resolvedConfig);
 		outputDirectory = context.outputDirectory;
 		const kindFor = (name: keyof LegacyOutputPlan): ProjectPlanArtifact['kind'] =>
 			name === 'specimen'
@@ -598,8 +599,8 @@ export async function planProject(
 	};
 }
 
-async function runProject(
-	project: TfsProject,
+async function runProject<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>,
 	configPath: string,
 	mode: 'build' | 'check'
 ): Promise<{ outputDirectory: string; files: string[] }> {
@@ -607,24 +608,20 @@ async function runProject(
 	if (layout === 'workspace-package') {
 		return buildWorkspacePackageProject(project, configPath, {}, mode);
 	}
-	return buildLegacyProject(
-		project as TfsProject & { output: LegacyTfsProjectOutput },
-		configPath,
-		mode
-	);
+	return buildLegacyProject(project as LegacyProject<Fonts>, configPath, mode);
 }
 
 /** Generate and atomically replace the configured TFS-owned output directory. */
-export async function buildProject(
-	project: TfsProject,
+export async function buildProject<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>,
 	configPath: string
 ): Promise<{ outputDirectory: string; files: string[] }> {
 	return runProject(project, configPath, 'build');
 }
 
 /** Fully regenerate in a sibling stage and fail on byte-level drift without mutating output. */
-export async function checkProject(
-	project: TfsProject,
+export async function checkProject<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>,
 	configPath: string
 ): Promise<{ outputDirectory: string; files: string[] }> {
 	return runProject(project, configPath, 'check');

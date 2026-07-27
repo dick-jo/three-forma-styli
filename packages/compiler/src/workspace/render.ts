@@ -47,7 +47,9 @@ import {
 import type { WorkspacePlan } from './plan.js';
 import { fontAssetUrl, relativeUrl, validateFontAssetUrlPolicy } from '../font-url.js';
 
-export type WorkspaceProject = TfsProject & { output: WorkspacePackageOutput };
+export type WorkspaceProject<
+	Fonts extends Record<string, ProjectFont> = Record<string, ProjectFont>,
+> = TfsProject<Fonts> & { output: WorkspacePackageOutput };
 
 export interface WorkspaceRenderResult {
 	system: PartialDesignSystem;
@@ -111,13 +113,13 @@ function hasEmbeddedTypographyFonts(typography: unknown): boolean {
 	);
 }
 
-async function resolveSystem(
-	project: WorkspaceProject,
+async function resolveSystem<const Fonts extends Record<string, ProjectFont>>(
+	project: WorkspaceProject<Fonts>,
 	configDirectory: string,
 	staging: string,
 	plan: WorkspacePlan
 ): Promise<WorkspaceRenderResult> {
-	const projectFonts = project.fonts ?? {};
+	const projectFonts: Record<string, ProjectFont> = project.fonts ?? {};
 	const sourceTypography = project.system.typography;
 	const embeddedFonts = hasEmbeddedTypographyFonts(sourceTypography);
 	if (Object.keys(projectFonts).length > 0 && embeddedFonts) {
@@ -175,8 +177,8 @@ async function resolveSystem(
 }
 
 /** Render the already-planned graph. No host-package or final-output paths are written here. */
-export async function renderWorkspacePackage(
-	project: WorkspaceProject,
+export async function renderWorkspacePackage<const Fonts extends Record<string, ProjectFont>>(
+	project: WorkspaceProject<Fonts>,
 	configDirectory: string,
 	staging: string,
 	plan: WorkspacePlan

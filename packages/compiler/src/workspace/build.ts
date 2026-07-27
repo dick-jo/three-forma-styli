@@ -54,8 +54,8 @@ function validateFontSourcesOutsideOutput(
 }
 
 /** Build a package-shaped generated subtree without ever writing the host package.json. */
-export async function buildWorkspacePackageProject(
-	project: TfsProject,
+export async function buildWorkspacePackageProject<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>,
 	configPath: string,
 	hooks: WorkspaceBuildHooks = {},
 	mode: 'build' | 'check' = 'build'
@@ -64,7 +64,7 @@ export async function buildWorkspacePackageProject(
 	if (project.output.layout !== 'workspace-package') {
 		throw new Error('buildWorkspacePackageProject requires layout: "workspace-package".');
 	}
-	const workspaceProject = project as WorkspaceProject;
+	const workspaceProject = project as WorkspaceProject<Fonts>;
 	const configDirectory = path.dirname(configPath);
 	const outputDirectory = path.resolve(configDirectory, workspaceProject.output.directory);
 	validateOutputRoot(outputDirectory, configDirectory);

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'fs-extra';
-import type { TfsProject } from './project.js';
+import type { ProjectFont, TfsProject } from './project.js';
 import { inspectFontFiles } from './fonts/inspect.js';
 
 export interface ProjectPlanArtifact {
@@ -48,7 +48,9 @@ export interface ProjectBuildPlan {
 	};
 }
 
-export function projectLayout(project: TfsProject): 'flat' | 'workspace-package' {
+export function projectLayout<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>
+): 'flat' | 'workspace-package' {
 	const output = project.output as unknown as Record<string, unknown>;
 	const layout = output.layout;
 	if (layout !== undefined && layout !== 'flat' && layout !== 'workspace-package') {
@@ -88,8 +90,8 @@ function normalizedFontSource(value: string | { path: string; output?: string })
 	return typeof value === 'string' ? { path: value } : value;
 }
 
-export async function plannedFontInputs(
-	project: TfsProject,
+export async function plannedFontInputs<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>,
 	configDirectory: string
 ): Promise<Pick<ProjectBuildPlan, 'fonts' | 'prerequisites'>> {
 	const sources: ProjectPlanFontSource[] = [];

@@ -1,3 +1,4 @@
+import { buildProject, checkProject, planProject, validateProjectOutput } from '../src/build.js';
 import { defineTfsProject } from '../src/api.js';
 import type {
 	LegacyTfsProjectOutput,
@@ -52,11 +53,16 @@ const splitSystem = {
 	},
 } satisfies ProjectSystem<typeof splitFonts>;
 
-defineTfsProject({
+const splitProject = defineTfsProject({
 	fonts: splitFonts,
 	system: splitSystem,
 	output: { directory: './generated' },
 });
+
+void buildProject(splitProject, '/project/tfs.config.ts');
+void checkProject(splitProject, '/project/tfs.config.ts');
+void planProject(splitProject, '/project/tfs.config.ts');
+void validateProjectOutput(splitProject, '/project/tfs.config.ts');
 
 defineTfsProject({
 	fonts,

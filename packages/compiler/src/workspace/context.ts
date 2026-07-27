@@ -1,9 +1,9 @@
-import type { TfsProject } from '../project.js';
+import type { ProjectFont, TfsProject } from '../project.js';
 import type { WorkspacePlanContext } from './plan.js';
 
 /** Derive compiler capabilities once so planning, building and drift checks cannot disagree. */
-export function workspacePlanContext(
-	project: TfsProject,
+export function workspacePlanContext<const Fonts extends Record<string, ProjectFont>>(
+	project: TfsProject<Fonts>,
 	overrides: Partial<WorkspacePlanContext> = {}
 ): WorkspacePlanContext {
 	const typography = project.system.typography;
