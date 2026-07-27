@@ -16,7 +16,7 @@
 		"check:frameworks": "node scripts/verify-ecosystem-consumers.mjs --frameworks",
 		"check:monorepo": "node scripts/verify-ecosystem-consumers.mjs --monorepo",
 		"check:integration": "node scripts/verify-ecosystem-consumers.mjs --browser --frameworks --monorepo",
-		"check:fonttools": "pnpm --filter @three-forma-styli/compiler build && node scripts/verify-fonttools-provenance.mjs",
+		"check:fonttools": "pnpm --filter @three-forma-styli/core build && pnpm --filter @three-forma-styli/compiler build && node scripts/verify-fonttools-provenance.mjs",
 		"workbench:sync": "pnpm --filter @three-forma-styli/workbench-source sync:compiler",
 		"check:workbench": "pnpm --filter @three-forma-styli/workbench-source check && pnpm --filter @three-forma-styli/workbench-source check:compiler",
 		"check": "pnpm check:format && pnpm check:versions && pnpm build:all && pnpm check:split && pnpm test && pnpm check:workbench",

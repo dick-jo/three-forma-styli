@@ -1,3 +1,8 @@
+# Keep the repository byte-stable on every supported host. In particular,
+# Prettier checks the checked-out files on Windows, so Git must not rewrite
+# authored LF files to CRLF before verification.
+* text=auto eol=lf
+
 # Vite's minified Workbench bundle embeds a JavaScript whitespace-character
 # template literal. The first physical line therefore intentionally ends in a
 # tab; source files and every other generated artifact retain normal checks.
