@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import os from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import fs from 'fs-extra';
 import { afterEach, describe, expect, it } from 'vitest';
 import { typography as defaultTypography } from '@three-forma-styli/themes/default';
@@ -12,6 +13,9 @@ import { validateProjectOutput } from '../validate-output.js';
 
 const execFileAsync = promisify(execFile);
 const temporaryDirectories: string[] = [];
+const packageExecutable = (name: 'npm' | 'pnpm') =>
+	process.platform === 'win32' ? `${name}.cmd` : name;
+const packageExecOptions = { shell: process.platform === 'win32' };
 
 // Tiny synthetic regular TTF covering the compiler's versioned calibration corpus.
 const TEST_FONT_BASE64 = [
@@ -215,7 +219,7 @@ describe('workspace-package build', () => {
 			'--input-type=module',
 			'--eval',
 			'import(process.argv[1]).then((module) => process.stdout.write(JSON.stringify(module)))',
-			runtimePath,
+			pathToFileURL(runtimePath).href,
 		]);
 		const runtime = JSON.parse(imported.stdout) as Record<string, unknown>;
 		expect(runtime).toHaveProperty('tfsSystem');
@@ -931,9 +935,11 @@ describe('workspace-package build', () => {
 	it('packs only the configured runtime surface while keeping review and design local', async () => {
 		const { configPath, directory } = await fixture();
 		await buildProject(fullProject(), configPath);
-		const { stdout } = await execFileAsync('npm', ['pack', '--dry-run', '--json'], {
-			cwd: directory,
-		});
+		const { stdout } = await execFileAsync(
+			packageExecutable('npm'),
+			['pack', '--dry-run', '--json'],
+			{ cwd: directory, ...packageExecOptions }
+		);
 		const packed = JSON.parse(stdout) as Array<{ files: Array<{ path: string }> }>;
 		const files = packed[0]!.files.map((entry) => entry.path);
 		expect(files).toContain('generated/runtime/index.js');
@@ -949,9 +955,9 @@ describe('workspace-package build', () => {
 		const tarballs = path.join(directory, 'tarballs');
 		await fs.ensureDir(tarballs);
 		const packedResult = await execFileAsync(
-			'npm',
+			packageExecutable('npm'),
 			['pack', '--json', '--pack-destination', tarballs],
-			{ cwd: directory }
+			{ cwd: directory, ...packageExecOptions }
 		);
 		const packed = JSON.parse(packedResult.stdout) as Array<{ filename: string }>;
 		const tarball = path.join(tarballs, packed[0]!.filename);
@@ -961,9 +967,9 @@ describe('workspace-package build', () => {
 			`${JSON.stringify({ name: 'isolated-consumer', private: true, type: 'module' }, null, 2)}\n`
 		);
 		await execFileAsync(
-			'npm',
+			packageExecutable('npm'),
 			['install', '--ignore-scripts', '--no-audit', '--no-fund', tarball],
-			{ cwd: consumer }
+			{ cwd: consumer, ...packageExecOptions }
 		);
 		await fs.writeFile(
 			path.join(consumer, 'tsconfig.json'),
@@ -1001,9 +1007,11 @@ describe('workspace-package build', () => {
 			].join('\n')
 		);
 		await expect(
-			execFileAsync('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')], {
-				cwd: process.cwd(),
-			})
+			execFileAsync(
+				packageExecutable('pnpm'),
+				['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')],
+				{ cwd: process.cwd(), ...packageExecOptions }
+			)
 		).resolves.toBeDefined();
 		const resolved = await execFileAsync(
 			process.execPath,

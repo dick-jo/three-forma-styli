@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { TypographySystem } from '@three-forma-styli/core';
 import type { Font, Glyph } from 'fontkit';
@@ -186,10 +187,9 @@ describe('buildAdjustedFallbacks', () => {
 		);
 
 		expect(decompress).toHaveBeenCalledTimes(1);
-		expect(decompress).toHaveBeenCalledWith(
-			'/prepared/example.woff2',
-			expect.stringMatching(/font\.ttf$/)
-		);
+		const [decompressedSource, decompressedDestination] = decompress.mock.calls[0]!;
+		expect(path.normalize(decompressedSource)).toBe(path.normalize('/prepared/example.woff2'));
+		expect(path.basename(decompressedDestination)).toBe('font.ttf');
 		expect(result!.manifest).toMatchObject({
 			schemaVersion: 3,
 			tools: { fontTools: provenance },
