@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
@@ -8,6 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { buildNextConsumer } from './ecosystem/next-consumer.mjs';
+import { run as runCommand } from './ecosystem/process.mjs';
 import { buildSvelteConsumer } from './ecosystem/svelte-consumer.mjs';
 import { buildTurborepoConsumer } from './ecosystem/turborepo-consumer.mjs';
 
@@ -26,12 +27,10 @@ const svelteProofRequested = process.argv.includes('--svelte') || frameworkProof
 const monorepoProofRequested = process.argv.includes('--monorepo');
 
 function run(command, args, options = {}) {
-	return execFileSync(command, args, {
+	return runCommand(command, args, {
 		cwd: repositoryRoot,
-		encoding: 'utf8',
-		stdio: ['ignore', 'pipe', 'pipe'],
 		...options,
-	}).trim();
+	});
 }
 
 async function writeJson(file, value) {

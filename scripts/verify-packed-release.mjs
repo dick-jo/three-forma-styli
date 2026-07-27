@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { run as runCommand } from './ecosystem/process.mjs';
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const require = createRequire(import.meta.url);
@@ -15,12 +15,10 @@ const consumerDirectory = path.join(temporaryRoot, 'consumer');
 const packageDirectory = path.join(temporaryRoot, 'packages');
 
 const run = (command, args, options = {}) =>
-	execFileSync(command, args, {
+	runCommand(command, args, {
 		cwd: repositoryRoot,
-		encoding: 'utf8',
-		stdio: ['ignore', 'pipe', 'pipe'],
 		...options,
-	}).trim();
+	});
 
 try {
 	await mkdir(tarballDirectory, { recursive: true });

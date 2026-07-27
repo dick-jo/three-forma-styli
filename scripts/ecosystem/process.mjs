@@ -1,11 +1,22 @@
 import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 
+const packageManagerCommands = new Set(['npm', 'pnpm', 'yarn']);
+
+function portableCommand(command) {
+	if (process.platform === 'win32' && packageManagerCommands.has(command)) {
+		return `${command}.cmd`;
+	}
+	return command;
+}
+
 /** Run one fixture command with quiet output and actionable failure details. */
-export function run(command, args, options) {
-	return execFileSync(command, args, {
+export function run(command, args, options = {}) {
+	const executable = portableCommand(command);
+	return execFileSync(executable, args, {
 		encoding: 'utf8',
 		stdio: ['ignore', 'pipe', 'pipe'],
+		shell: process.platform === 'win32' && executable.endsWith('.cmd'),
 		...options,
 	}).trim();
 }

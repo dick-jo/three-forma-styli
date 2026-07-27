@@ -489,11 +489,17 @@ async function detectPackageManager(
 	const nearest = await nearestPackageManager(start);
 	if (nearest) return nearest;
 	try {
-		execFileSync('pnpm', ['--version'], { stdio: 'ignore' });
+		execFileSync(process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm', ['--version'], {
+			stdio: 'ignore',
+			shell: process.platform === 'win32',
+		});
 		return 'pnpm';
 	} catch {
 		try {
-			execFileSync('yarn', ['--version'], { stdio: 'ignore' });
+			execFileSync(process.platform === 'win32' ? 'yarn.cmd' : 'yarn', ['--version'], {
+				stdio: 'ignore',
+				shell: process.platform === 'win32',
+			});
 			return 'yarn';
 		} catch {
 			return 'npm';
