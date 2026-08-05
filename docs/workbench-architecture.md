@@ -112,7 +112,7 @@ handling, and capture mode. Each domain supplies purpose-built visual reasoning:
 - **Overview:** build identity, diagnostics, modes, assets, and changed drafts.
 - **Color:** solids/alpha ramps, semantic relationships, gamut diagnostics,
   theme matrices, and luminance constraints.
-- **Typography:** role recipes, editable tuples, weight/style capability,
+- **Typography:** role composites, editable tuples, weight/style capability,
   metrics, fallback comparison, wrapping, glyph stress, and dense UI contexts.
 - **Shadow:** ordered layers, clipping, banding, surface polarity, and text
   rasterization.

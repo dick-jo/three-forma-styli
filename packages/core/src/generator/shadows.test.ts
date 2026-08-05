@@ -4,6 +4,14 @@ import { generate, ValidationError } from './index.js';
 
 function system(): PartialDesignSystem {
 	return {
+		alpha: {
+			defaultScale: 'standard',
+			scales: {
+				standard: {
+					values: { min: 0.08, 'lo-x': 0.125, lo: 0.2, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+				},
+			},
+		},
 		colors: {
 			modes: [
 				{
@@ -15,7 +23,6 @@ function system(): PartialDesignSystem {
 					},
 				},
 			],
-			alphaSchedule: { min: 0.08, lo: 0.2, hi: 0.6, max: 0.9 },
 		},
 		shadows: {
 			unit: 'px',
@@ -94,11 +101,11 @@ describe('shadow generation', () => {
 	it('rejects unknown semantic colors and alpha levels', () => {
 		const badColor = system();
 		badColor.shadows!.box!.elevation!.base[0]!.color.color = 'bg';
-		expect(() => generate(badColor)).toThrow(/unknown default color "bg"/);
+		expect(() => generate(badColor)).toThrow(/unknown default color identity "bg"/);
 
 		const badAlpha = system();
 		badAlpha.shadows!.text!.glow!.base[0]!.color.alpha = 'ghost';
-		expect(() => generate(badAlpha)).toThrow(/unknown alpha level "ghost"/);
+		expect(() => generate(badAlpha)).toThrow(/unknown alpha identity "ghost"/);
 	});
 
 	it('rejects text-only grammar violations and invalid geometry', () => {

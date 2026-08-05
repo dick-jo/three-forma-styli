@@ -58,6 +58,7 @@ describe('runtime bundle boundary', () => {
 				.map((file) => portablePath(path.relative(path.resolve(runtimeDirectory, '..'), file)))
 				.sort()
 		).toEqual([
+			'alpha/grammar.ts',
 			'color-css.ts',
 			'constraints/luminance.ts',
 			'runtime/index.ts',

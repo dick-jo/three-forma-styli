@@ -10,6 +10,14 @@ import { COMPILER_VERSION } from './version.js';
 import { typography as defaultTypography } from '@three-forma-styli/themes/default';
 
 const temporaryDirectories: string[] = [];
+const testAlpha = {
+	defaultScale: 'standard',
+	scales: {
+		standard: {
+			values: { min: 0.08, 'lo-x': 0.125, lo: 0.2, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+		},
+	},
+} as const;
 
 // Tiny synthetic regular TTF covering the versioned Latin calibration corpus.
 const TEST_FONT_BASE64 = [
@@ -161,16 +169,16 @@ describe('portable project build', () => {
 		);
 		expect(legacyFixture).toEqual({
 			'index.css': '4cb2f483ae8a8ccca27250d862e726233646c40571ecfbb5e9a32e66ad79436a',
-			'system.generated.ts': 'ff16abd9f1075dae372cc332fe9b39818cb55482a429b0eb79f93f1f5cdcee0e',
-			'tokens.css': '580d6d89ce37cfc05e13e2e8e96742732f659570b760567c4fa3e5e24182a220',
-			'typography.css': '7acb1ed4300ee678f8a80b1e346331ff414d9eb81e9aa0ef0b64fd916c8e4924',
+			'system.generated.ts': '228af9fa4a5b30928ad093a732d221b24d9b422c4450043080034982d4519f93',
+			'tokens.css': '6df20335e82d9c592601faf1198aba21f337ef9f1ae77bd809de3d66ebbe81c3',
+			'typography.css': '0f003d46eb572ec01acc21f39cd3443e825d2898aa4e721400d89255bb8dd8c0',
 			'typography.generated.module.css':
-				'd6fd0ee579f4028e9e067bef8e03d86c67292059c11827b702f1621c16753f22',
+				'4f8fed586baf3dd0702443ce67a44f0987a11cb763c3fb86420748e4e7138fc2',
 			'typography.generated.module.css.d.ts':
-				'c0d5b47824c3b1196fa61c19bbb9960fca2ef26165a59f07d8894b622c973fce',
-			'typography.generated.ts': '459029e85f13c5b7cc7fee01e32ed77f951c1aae71871e188077fb97dc4e4d1e',
+				'030c88646729b256f2ab7205b02bb022afc8118f19f31f75a597538a2e223a74',
+			'typography.generated.ts': '9d7e74047f0080641a561800195422130e54d4e91350442ef40495d90905160f',
 			'typography.specimen.html':
-				'aac66436a9adc6d88431420d859aa81931fbd930a1dce12c46e47bdeb2b28f2e',
+				'400c1a5198854da7acbe4c52286a458fb345fe4e6d8c75e13bc17f795069888d',
 		});
 	});
 
@@ -214,6 +222,7 @@ describe('portable project build', () => {
 		const directory = await fixtureDirectory();
 		const project = defineTfsProject({
 			system: {
+				alpha: testAlpha,
 				colors: {
 					modes: [
 						{
@@ -250,9 +259,9 @@ describe('portable project build', () => {
 		const project = defineTfsProject({
 			generator: {
 				prefixes: { color: 'palette', typographyRole: 'copy' },
-				colorFormat: { alphaModifier: 'opacity' },
 			},
 			system: {
+				alpha: testAlpha,
 				colors: {
 					modes: [
 						{
@@ -261,7 +270,6 @@ describe('portable project build', () => {
 							tokens: { accent: { mode: 'oklch', l: 0.7, c: 0.2, h: 30 } },
 						},
 					],
-					alphaSchedule: { half: 0.5 },
 				},
 				typography: defaultTypography,
 			},
@@ -280,11 +288,11 @@ describe('portable project build', () => {
 		const specimen = await read('typography.specimen.html');
 		const dtcg = JSON.parse(await read('figma/colors.dtcg.json'));
 
-		expect(tokens).toContain('--palette-accent-opacity-half:');
+		expect(tokens).toContain('--palette-accent-a-max:');
 		expect(tokens).toContain('--copy-prose-font-size:');
 		expect(typography).toContain('--copy-prose-font-size');
 		expect(specimen).toContain('--copy-prose-font-size');
-		expect(dtcg.color).toHaveProperty('palette-accent-opacity-half');
+		expect(dtcg.color).toHaveProperty('palette-accent-a-max');
 	});
 
 	it('refuses to overwrite an unowned non-empty directory', async () => {
@@ -316,7 +324,7 @@ describe('portable project build', () => {
 		);
 		const previousCss = await fs.readFile(path.join(result.outputDirectory, 'tokens.css'));
 		const invalidTypography = structuredClone(defaultTypography);
-		invalidTypography.roles!.heading.base.weight = 'does-not-exist';
+		invalidTypography.roles!.heading.sizes.base.weight = 'does-not-exist';
 		const invalid = defineTfsProject({
 			system: {
 				typography: invalidTypography,
@@ -453,6 +461,7 @@ describe('portable project build', () => {
 		const directory = await fixtureDirectory();
 		const project = defineTfsProject({
 			system: {
+				alpha: testAlpha,
 				colors: {
 					modes: [
 						{
@@ -461,7 +470,6 @@ describe('portable project build', () => {
 							tokens: { pri: { mode: 'oklch', l: 0.7, c: 0.2, h: 30 } },
 						},
 					],
-					alphaSchedule: { half: 0.5 },
 				},
 			},
 			output: {
@@ -517,8 +525,8 @@ describe('portable project build', () => {
 					roles: {
 						text: {
 							font: 'example',
-							base: { fontSize: 2, weight: 'lo', lineHeight: 1.25, letterSpacing: 0 },
-							weights: { lo: 400 },
+							weights: 400,
+							sizes: { base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0 } },
 						},
 					},
 				},

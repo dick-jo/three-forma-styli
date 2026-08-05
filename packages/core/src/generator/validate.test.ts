@@ -3,6 +3,14 @@ import type { PartialDesignSystem } from '../types.js';
 import { generate, ValidationError } from './index.js';
 
 const color = { mode: 'oklch' as const, l: 0.5, c: 0.1, h: 260 };
+const alpha: NonNullable<PartialDesignSystem['alpha']> = {
+	defaultScale: 'standard',
+	scales: {
+		standard: {
+			values: { min: 0.1, 'lo-x': 0.2, lo: 0.3, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+		},
+	},
+};
 const spacing: NonNullable<PartialDesignSystem['spacing']> = {
 	modes: [
 		{
@@ -16,7 +24,7 @@ const spacing: NonNullable<PartialDesignSystem['spacing']> = {
 function colors(
 	modes: NonNullable<PartialDesignSystem['colors']>['modes']
 ): NonNullable<PartialDesignSystem['colors']> {
-	return { alphaSchedule: { min: 0.1, max: 0.9 }, modes };
+	return { modes };
 }
 
 describe('generator input validation', () => {
@@ -52,28 +60,33 @@ describe('generator input validation', () => {
 
 	it('rejects mode, color token, and alpha names that cannot safely enter CSS identifiers', () => {
 		expect(() =>
-			generate({ colors: colors([{ name: 'dark mode', isDefault: true, tokens: { bg: color } }]) })
+			generate({
+				alpha,
+				colors: colors([{ name: 'dark mode', isDefault: true, tokens: { bg: color } }]),
+			})
 		).toThrowError(/not CSS-token safe/);
 
 		expect(() =>
 			generate({
+				alpha,
 				colors: colors([{ name: 'default', isDefault: true, tokens: { 'brand primary': color } }]),
 			})
 		).toThrowError(/not CSS-token safe/);
 
 		expect(() =>
 			generate({
-				colors: {
-					alphaSchedule: { 'low opacity': 0.2 },
-					modes: [{ name: 'default', isDefault: true, tokens: { bg: color } }],
+				alpha: {
+					defaultScale: 'low opacity',
+					scales: { 'low opacity': alpha.scales.standard! },
 				},
 			})
-		).toThrowError(/alpha level.*not CSS-token safe/);
+		).toThrowError(/CSS-token-safe scale identity/);
 	});
 
 	it('rejects non-finite and out-of-range color values without altering wide-gamut chroma', () => {
 		expect(() =>
 			generate({
+				alpha,
 				colors: colors([
 					{
 						name: 'default',
@@ -86,6 +99,7 @@ describe('generator input validation', () => {
 
 		expect(() =>
 			generate({
+				alpha,
 				colors: colors([
 					{ name: 'default', isDefault: true, tokens: { bg: { ...color, l: 1.1 } } },
 				]),
@@ -94,14 +108,16 @@ describe('generator input validation', () => {
 
 		expect(() =>
 			generate({
+				alpha,
 				colors: colors([
 					{ name: 'default', isDefault: true, tokens: { bg: { ...color, alpha: 0.5 } } },
 				]),
 			})
-		).toThrowError(/define transparency through colors\.alphaSchedule/);
+		).toThrowError(/define transparency through the top-level alpha system/);
 
 		expect(() =>
 			generate({
+				alpha,
 				colors: colors([
 					{ name: 'default', isDefault: true, tokens: { vivid: { ...color, c: 0.45 } } },
 				]),
@@ -111,13 +127,11 @@ describe('generator input validation', () => {
 
 	it('validates an optional reusable luminance policy against the canonical default palette', () => {
 		const valid = {
-			alphaSchedule: { min: 0.1, max: 0.9 },
 			luminance: {
 				minimumLuminanceDelta: 0.4,
 				backgroundColors: ['canvas'],
 				foregroundColors: ['ink'],
 			},
-			runtimeThemes: { colorNames: ['canvas', 'ink'] },
 			modes: [
 				{
 					name: 'night',
@@ -127,26 +141,29 @@ describe('generator input validation', () => {
 				{ name: 'day', tokens: { canvas: { ...color, l: 0.95 } } },
 			],
 		} satisfies NonNullable<PartialDesignSystem['colors']>;
-		expect(() => generate({ colors: valid })).not.toThrow();
+		expect(() => generate({ alpha, colors: valid })).not.toThrow();
 
 		expect(() =>
 			generate({
+				alpha,
 				colors: {
 					...valid,
 					modes: [...valid.modes, { name: 'brand', tokens: { accent: color } }],
 				},
 			})
-		).not.toThrow();
+		).toThrowError(/introduces "accent".*not declared by default mode "night"/);
 		expect(() =>
 			generate({
+				alpha,
 				colors: {
 					...valid,
 					luminance: { ...valid.luminance, foregroundColors: ['accent'] },
 				},
 			})
-		).toThrowError(/references undeclared default color "accent"/);
+		).toThrowError(/references undeclared default color identity "accent"/);
 		expect(() =>
 			generate({
+				alpha,
 				colors: {
 					...valid,
 					luminance: {
@@ -156,22 +173,41 @@ describe('generator input validation', () => {
 				},
 			})
 		).toThrowError(/assigns "canvas" to both color groups/);
+	});
+
+	it('validates and expands only declared color identity groups', () => {
 		expect(() =>
 			generate({
+				alpha,
 				colors: {
-					...valid,
-					runtimeThemes: { colorNames: ['canvas'] },
+					...colors([
+						{ name: 'default', isDefault: true, tokens: { bg: color, 'network-base': color } },
+					]),
+					groups: {
+						core: { identities: ['bg'] },
+						network: { match: { prefix: 'network-' } },
+					},
 				},
 			})
-		).toThrowError(/must include luminance-group color "ink"/);
+		).not.toThrow();
 		expect(() =>
 			generate({
+				alpha,
 				colors: {
-					...valid,
-					runtimeThemes: { colorNames: ['canvas', 'ink', 'accent'] },
+					...colors([{ name: 'default', isDefault: true, tokens: { bg: color } }]),
+					groups: { missing: { identities: ['nope'] } },
 				},
 			})
-		).toThrowError(/references undeclared default color "accent"/);
+		).toThrow(/unknown color/);
+		expect(() =>
+			generate({
+				alpha,
+				colors: {
+					...colors([{ name: 'default', isDefault: true, tokens: { bg: color } }]),
+					groups: { empty: { match: { prefix: 'network-' } } },
+				},
+			})
+		).toThrow(/does not match/);
 	});
 
 	it('rejects NaN in numeric schedules and unsafe CSS units', () => {
@@ -240,6 +276,7 @@ describe('generator input validation', () => {
 		expect(() =>
 			generate(
 				{
+					alpha,
 					colors: colors([{ name: 'default', isDefault: true, tokens: { min: color } }]),
 					spacing,
 				},
@@ -272,6 +309,6 @@ describe('generator input validation', () => {
 		} as unknown as NonNullable<PartialDesignSystem['typography']>;
 
 		expect(() => generate({ typography: invalid })).toThrowError(ValidationError);
-		expect(() => generate({ typography: invalid })).toThrowError(/must define base/);
+		expect(() => generate({ typography: invalid })).toThrowError(/must define size base/);
 	});
 });

@@ -1,8 +1,6 @@
 // Public API for @three-forma-styli/core
 
-// ===========================================
-// NEW API (Generator + Transformers)
-// ===========================================
+// Generator + transformer API
 
 // Generator - produces Intermediate Representation
 export { generate, resolveGeneratorConfig, ValidationError } from './generator/index.js';
@@ -48,9 +46,7 @@ export type {
 export { getHeaderLines, formatHeaderComment } from './transformers/index.js';
 export type { FileHeaderInfo, CommentStyle } from './transformers/index.js';
 
-// ===========================================
-// CONVENIENCE FUNCTION
-// ===========================================
+// Convenience API
 
 import type { DesignSystem, PartialDesignSystem } from './types.js';
 import type { GeneratorOptions } from './generator/index.js';
@@ -155,22 +151,30 @@ export function generateTypographySpecimen(
 	return toTypographySpecimen(generate(designSystem, config?.generator), config?.specimen);
 }
 
-// ===========================================
-// LEGACY API (removed)
-// ===========================================
-
-// generateCssVariables has been replaced by generateCss()
-// Use: import { generateCss } from '@three-forma-styli/core';
-
-// ===========================================
-// TYPES
-// ===========================================
+// Types and authoring grammar
 
 export * from './types.js';
-export { defineTypography, deriveTypographyRange, fontFromManifest } from './typography/index.js';
+export {
+	ALPHA_POSITIONS,
+	ALPHA_POSITIONS_WITH_NON,
+	defineAlpha,
+	deriveAlphaScale,
+} from './alpha/index.js';
+export type { LinearAlphaScaleInput } from './alpha/index.js';
+export { defineTypography, deriveTypographySizes, fontFromManifest } from './typography/index.js';
+export type {
+	AuthoredTypographyRole,
+	AuthoredTypographySize,
+	AuthoredTypographySizes,
+	AuthoredTypographySystem,
+	AuthoredTypographyWeights,
+	DeriveTypographySizesInput,
+	DerivedTypographySize,
+} from './typography/authoring.js';
 export { deriveShadowRange } from './shadows/index.js';
 export { createWorkbenchContract } from './review/contract.js';
 export { createReviewCapturePlan } from './review/capture.js';
+export { resolveIdentityGroups } from './groups.js';
 export type {
 	ReviewAssetContract,
 	ReviewCapturePolicy,
@@ -198,10 +202,6 @@ export type {
 	WorkbenchDraftOperation,
 } from './review/types.js';
 
-// ===========================================
-// UTILITIES
-// ===========================================
-
 // Color utilities
 export {
 	oklch,
@@ -212,12 +212,5 @@ export {
 	formatColor,
 	formatColorWithAlpha,
 } from './utils.js';
-
-// Re-export Oklch type from culori for TypeScript consumers
-export type { Oklch } from 'culori';
-
-// ===========================================
-// CONSTRAINT VALIDATION
-// ===========================================
 
 export * from './constraints/index.js';

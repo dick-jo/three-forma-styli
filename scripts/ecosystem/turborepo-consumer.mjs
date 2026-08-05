@@ -15,7 +15,8 @@ export async function buildTurborepoConsumer({ temporaryRoot, workspaceRoot, tar
 
 	const designSystemPackagePath = path.join(designSystemRoot, 'package.json');
 	const designSystemPackage = JSON.parse(await readFile(designSystemPackagePath, 'utf8'));
-	for (const packageName of ['core', 'compiler', 'cli']) {
+	designSystemPackage.devDependencies ??= {};
+	for (const packageName of ['core', 'themes', 'compiler', 'cli']) {
 		designSystemPackage.devDependencies[`@three-forma-styli/${packageName}`] = pathToFileURL(
 			tarballs[packageName]
 		).href;
@@ -91,20 +92,19 @@ export async function buildTurborepoConsumer({ temporaryRoot, workspaceRoot, tar
 		path.join(contractsRoot, 'index.ts'),
 		[
 			"import { nativeColorModes } from 'workspace-system/native-color-modes';",
-			"import { runtimeColorThemeConfig } from 'workspace-system/runtime-color-theme';",
-			"import { tfsSystem } from 'workspace-system/system';",
+			"import { colorIdentities, motionCompositeIdentities } from 'workspace-system/tokens';",
 			"import type { TypographySelection } from 'workspace-system/typography';",
 			"import typography from 'workspace-system/typography.module.css';",
 			'',
 			'const selection = {',
 			"  role: 'prose',",
-			"  variant: 's',",
+			"  size: 's',",
 			'} satisfies TypographySelection;',
 			'const className: string = typography[selection.role];',
 			'const firstMode: string | undefined = nativeColorModes.modes[0]?.name;',
-			'const duration: number = tfsSystem.motion.recipes.hover.base.duration.seconds;',
-			'const minimumDelta: number = runtimeColorThemeConfig.luminance.minimumLuminanceDelta;',
-			'void [className, firstMode, duration, minimumDelta];',
+			'const colorCount: number = colorIdentities.length;',
+			'const motionCount: number = motionCompositeIdentities.length;',
+			'void [className, firstMode, colorCount, motionCount];',
 			'',
 		].join('\n')
 	);

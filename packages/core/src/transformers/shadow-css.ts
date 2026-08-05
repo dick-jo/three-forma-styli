@@ -1,4 +1,4 @@
-import type { IR, ShadowContractRecipe } from '../generator/types.js';
+import type { IR, ShadowContractComposite } from '../generator/types.js';
 
 export interface ShadowCssConfig {
 	/** Global helper prefix. Defaults to shadow; TFS adds `--`. */
@@ -13,11 +13,11 @@ const cssNamespacePattern = /^[a-z][a-z0-9-]*$/i;
 
 function selector(
 	kind: 'box' | 'text',
-	recipe: string,
+	composite: string,
 	variant: string,
 	config: Required<ShadowCssConfig>
 ): string {
-	const local = variant === 'base' ? `${kind}-${recipe}` : `${kind}-${recipe}-${variant}`;
+	const local = variant === 'base' ? `${kind}-${composite}` : `${kind}-${composite}-${variant}`;
 	const className = config.scope === 'module' ? local : `${config.classPrefix}--${local}`;
 	const ordinary = `.${className}`;
 	return config.scope === 'global' && config.specificity === 'zero'
@@ -28,20 +28,20 @@ function selector(
 function recipeBlocks(
 	kind: 'box' | 'text',
 	name: string,
-	recipe: ShadowContractRecipe,
+	composite: ShadowContractComposite,
 	config: Required<ShadowCssConfig>
 ): string[] {
 	const property = kind === 'box' ? 'box-shadow' : 'text-shadow';
 	return [
-		[selector(kind, name, 'base', config), recipe.base.token],
-		...Object.entries(recipe.variants).map(([variant, value]) => [
+		[selector(kind, name, 'base', config), composite.base.token],
+		...Object.entries(composite.variants).map(([variant, value]) => [
 			selector(kind, name, variant, config),
 			value.token,
 		]),
 	].map(([currentSelector, token]) => `${currentSelector} {\n  ${property}: var(--${token});\n}`);
 }
 
-/** Emit optional low-complexity helper classes for generated shadow recipes. */
+/** Emit optional low-complexity helper classes for generated shadow composites. */
 export function toShadowCss(ir: IR, options: ShadowCssConfig = {}): string {
 	if (!ir.shadows) return '';
 	const config: Required<ShadowCssConfig> = {
@@ -53,11 +53,11 @@ export function toShadowCss(ir: IR, options: ShadowCssConfig = {}): string {
 		throw new Error('Shadow classPrefix must be a CSS-safe namespace beginning with a letter');
 	}
 	const blocks = [
-		...Object.entries(ir.shadows.box).flatMap(([name, recipe]) =>
-			recipeBlocks('box', name, recipe, config)
+		...Object.entries(ir.shadows.box).flatMap(([name, composite]) =>
+			recipeBlocks('box', name, composite, config)
 		),
-		...Object.entries(ir.shadows.text).flatMap(([name, recipe]) =>
-			recipeBlocks('text', name, recipe, config)
+		...Object.entries(ir.shadows.text).flatMap(([name, composite]) =>
+			recipeBlocks('text', name, composite, config)
 		),
 	];
 	return blocks.length ? `${blocks.join('\n\n')}\n` : '';
@@ -67,13 +67,13 @@ export function toShadowCss(ir: IR, options: ShadowCssConfig = {}): string {
 export function toShadowCssModuleTypes(ir: IR): string {
 	if (!ir.shadows) return '';
 	const names = [
-		...Object.entries(ir.shadows.box).flatMap(([name, recipe]) => [
+		...Object.entries(ir.shadows.box).flatMap(([name, composite]) => [
 			`box-${name}`,
-			...Object.keys(recipe.variants).map((variant) => `box-${name}-${variant}`),
+			...Object.keys(composite.variants).map((variant) => `box-${name}-${variant}`),
 		]),
-		...Object.entries(ir.shadows.text).flatMap(([name, recipe]) => [
+		...Object.entries(ir.shadows.text).flatMap(([name, composite]) => [
 			`text-${name}`,
-			...Object.keys(recipe.variants).map((variant) => `text-${name}-${variant}`),
+			...Object.keys(composite.variants).map((variant) => `text-${name}-${variant}`),
 		]),
 	];
 	return [

@@ -59,14 +59,22 @@ canonical color input must state both facts independently:
 ```ts
 colors: {
   modes,
-  alphaSchedule,
   luminance: {
     minimumLuminanceDelta: 0.33,
     backgroundColors: ["bg", "ev"],
     foregroundColors: ["pri", "neu", "ink"],
   },
-  runtimeThemes: {
-    colorNames: ["bg", "ev", "pri", "neu", "ink"],
+}
+
+alpha: defineAlpha({
+  defaultScale: "standard",
+  scales: { standard: { values: alphaValues } },
+}),
+
+runtime: {
+  colorThemes: {
+    colors: { include: ["bg", "ev", "pri", "neu", "ink"] },
+    enforce: ["luminance"],
   },
 }
 ```

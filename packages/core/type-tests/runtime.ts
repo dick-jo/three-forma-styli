@@ -8,7 +8,7 @@ import {
 } from '../src/runtime/index.js';
 
 const config = {
-	colorNames: ['canvas', 'ink'],
+	colorIdentities: ['canvas', 'ink'],
 	luminance: {
 		minimumLuminanceDelta: 0.5,
 		backgroundColors: ['canvas'],
@@ -31,7 +31,7 @@ result.theme.colors.canvas.l satisfies number;
 new RuntimeColorThemeValidationError('theme.colors', 'is invalid');
 
 generateRuntimeColorTheme(unknownTheme, {
-	colorNames: ['canvas', 'ink'] as const,
+	colorIdentities: ['canvas', 'ink'] as const,
 	luminance: {
 		minimumLuminanceDelta: 0.5,
 		backgroundColors: ['canvas'],
@@ -44,5 +44,5 @@ generateRuntimeColorTheme(unknownTheme, {
 result.luminance.metric satisfies 'wcag-relative-luminance';
 
 // @ts-expect-error luminance configuration is required
-const invalidConfig: RuntimeColorThemeConfig = { colorNames: ['canvas', 'ink'] };
+const invalidConfig: RuntimeColorThemeConfig = { colorIdentities: ['canvas', 'ink'] };
 void invalidConfig;

@@ -208,6 +208,19 @@ async function exerciseScaffolds() {
 	return workspaceRoot;
 }
 
+async function exerciseReferenceProject() {
+	const projectRoot = path.join(projectsDirectory, 'reference-system');
+	await cp(path.join(repositoryRoot, 'examples/project'), projectRoot, { recursive: true });
+	const manifestPath = path.join(projectRoot, 'package.json');
+	const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+	manifest.name = 'workspace-system';
+	await writeJson(manifestPath, manifest);
+	tfs(projectRoot, ['build', '.']);
+	tfs(projectRoot, ['validate', '.']);
+	tfs(projectRoot, ['check', '.']);
+	return projectRoot;
+}
+
 async function exerciseAuthoredShapeFixtures() {
 	const sourceRoot = path.join(repositoryRoot, 'scripts/ecosystem/fixtures');
 	const entries = await readdir(sourceRoot, { withFileTypes: true });
@@ -495,7 +508,8 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 	const workbench = JSON.parse(await readFile(workbenchPath, 'utf8'));
 	const typographyLab = workbench.labs.find((lab) => lab.kind === 'typography');
 	const typographyCase = typographyLab?.cases.find(
-		(reviewCase) => reviewCase.role === 'prose' && reviewCase.variant === null
+		(reviewCase) =>
+			reviewCase.role === 'prose' && reviewCase.size === null && reviewCase.variant === null
 	);
 	const motionCase = workbench.labs.find((lab) => lab.kind === 'motion')?.cases[0];
 	assert.ok(typographyCase, 'Generated Workbench omitted the prose base typography case');
@@ -583,7 +597,7 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 		assert.equal(patch.operations.length, 1);
 		assert.equal(
 			patch.operations[0].path,
-			'/typography/roles/prose/modeOverrides/large/base/lineHeight'
+			'/typography/roles/prose/modeOverrides/large/sizes/base/lineHeight'
 		);
 		await page.getByRole('button', { name: 'discard all edits' }).click();
 		await page.getByText('0 edits', { exact: true }).waitFor();
@@ -678,7 +692,7 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 		});
 
 		assert.deepEqual(failures, []);
-		assert.equal(evidence.title, 'TFS workbench');
+		assert.equal(evidence.title, 'TFS v0.5 reference system');
 		assert.equal(evidence.lab, 'typography');
 		assert.equal(evidence.caseId, 'typography--large--prose--base');
 		assert.equal(evidence.sizeMode, 'large');
@@ -712,7 +726,8 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 try {
 	const tarballs = await packTfsPackages();
 	await installPackedToolchain(tarballs);
-	const workspaceRoot = await exerciseScaffolds();
+	await exerciseScaffolds();
+	const workspaceRoot = await exerciseReferenceProject();
 	await exerciseAuthoredShapeFixtures();
 	await exerciseMachineCli(workspaceRoot);
 	const designSystemTarball = await packGeneratedDesignSystem(workspaceRoot);

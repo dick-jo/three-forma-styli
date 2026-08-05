@@ -199,9 +199,7 @@ export async function initCommand(projectName?: string, options: InitOptions = {
 		console.log(chalk.white(`  # Edit the authored TypeScript source`));
 		console.log(chalk.white(`  npm run generate`));
 		const generatedDirectory = options.workspacePackage ? 'generated' : 'dist';
-		const specimen = options.workspacePackage
-			? 'review/typography.html'
-			: 'typography.specimen.html';
+		const specimen = options.workspacePackage ? 'review/index.html' : 'typography.specimen.html';
 		console.log(
 			chalk.white(
 				`  # Inspect ${generatedDirectory}/build.manifest.json and ${generatedDirectory}/${specimen}`
@@ -247,9 +245,15 @@ async function getAvailableThemes(
 }
 
 function generateProjectFile(moduleNames: string[], workspacePackage: boolean): string {
-	const imports = moduleNames.map((name) => `import { ${name} } from "./${name}.js";`).join('\n');
+	const imports = moduleNames
+		.map((name) =>
+			name === 'color'
+				? 'import { alpha, color } from "./color.js";'
+				: `import { ${name} } from "./${name}.js";`
+		)
+		.join('\n');
 	const properties = moduleNames
-		.map((name) => (name === 'color' ? '    colors: color,' : `    ${name},`))
+		.flatMap((name) => (name === 'color' ? ['    alpha,', '    colors: color,'] : [`    ${name},`]))
 		.join('\n');
 	const output = workspacePackage
 		? `    layout: "workspace-package",
@@ -257,7 +261,7 @@ function generateProjectFile(moduleNames: string[], workspacePackage: boolean): 
     targets: {
       runtime: {
         css: { fileStem: "design-system" },
-        contracts: true,
+        contracts: { tokens: true, system: false, runtimeColorTheme: false },
       },
       review: true,
       design: true,
@@ -291,17 +295,20 @@ ${output}
  */
 function generateIndexFile(moduleNames: string[]): string {
 	const moduleImports = moduleNames
-		.map((name) => `import { ${name} } from "./${name}.js";`)
+		.map((name) =>
+			name === 'color'
+				? 'import { alpha, color } from "./color.js";'
+				: `import { ${name} } from "./${name}.js";`
+		)
 		.join('\n');
 
 	const systemProperties = moduleNames
-		.map((name) => {
-			if (name === 'color') return '  colors: color,';
-			return `  ${name},`;
-		})
+		.flatMap((name) => (name === 'color' ? ['  alpha,', '  colors: color,'] : [`  ${name},`]))
 		.join('\n');
 
-	const exportList = moduleNames.join(', ');
+	const exportList = moduleNames
+		.flatMap((name) => (name === 'color' ? ['alpha', 'color'] : [name]))
+		.join(', ');
 
 	return `import type { DesignSystem } from "@three-forma-styli/core";
 ${moduleImports}
@@ -336,9 +343,9 @@ function generatePackageJson(packageName: string, workspacePackage: boolean): st
 						types: './generated/runtime/index.d.ts',
 						import: './generated/runtime/index.js',
 					},
-					'./system': {
-						types: './generated/runtime/system.d.ts',
-						import: './generated/runtime/system.js',
+					'./tokens': {
+						types: './generated/runtime/tokens.d.ts',
+						import: './generated/runtime/tokens.js',
 					},
 					'./typography': {
 						types: './generated/runtime/typography.d.ts',
@@ -347,10 +354,6 @@ function generatePackageJson(packageName: string, workspacePackage: boolean): st
 					'./native-color-modes': {
 						types: './generated/runtime/native-color-modes.d.ts',
 						import: './generated/runtime/native-color-modes.js',
-					},
-					'./runtime-color-theme': {
-						types: './generated/runtime/runtime-color-theme.d.ts',
-						import: './generated/runtime/runtime-color-theme.js',
 					},
 					'./styles.css': './generated/runtime/styles/design-system.css',
 					'./tokens.css': './generated/runtime/styles/design-system.tokens.css',

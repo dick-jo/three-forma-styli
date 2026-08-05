@@ -10,7 +10,7 @@ export function workspacePlanContext<const Fonts extends Record<string, ProjectF
 	return {
 		hasColors: Boolean(project.system.colors),
 		hasRuntimeColorPolicy: Boolean(
-			project.system.colors?.luminance && project.system.colors.runtimeThemes
+			project.system.colors?.luminance && project.runtime?.colorThemes
 		),
 		hasTypography: Boolean(typography?.roles && Object.keys(typography.roles).length > 0),
 		hasShadows: Boolean(project.system.shadows),

@@ -46,8 +46,8 @@ function requireTypography(ir: IR): TypographyContract {
 }
 
 /**
- * Generate composable typography recipes using longhand declarations.
- * Recipe classes apply the role defaults. Selection helpers set a complete,
+ * Generate composable typography composites using longhand declarations.
+ * Composite classes apply the role defaults. Selection helpers set a complete,
  * validated style/weight pair so CSS cannot advertise impossible combinations.
  */
 export function toTypographyCss(ir: IR, options: TypographyCssConfig = {}): string {
@@ -64,37 +64,63 @@ export function toTypographyCss(ir: IR, options: TypographyCssConfig = {}): stri
 	const roleClassKeys = typographyRoleClassKeys(contract);
 	const rules = Object.entries(contract.roles).flatMap(([roleName, role]) => {
 		const classes = roleClassKeys[roleName]!;
-		const recipeProperties = (recipe: typeof role.base) => [
+		const recipeProperties = (composite: (typeof role.sizes)[string]) => [
 			`font-family: ${variable(role.fontFamilyToken)};`,
-			`font-size: ${variable(recipe.fontSizeToken)};`,
-			`font-weight: ${variable(recipe.fontWeightToken)};`,
+			`font-size: ${variable(composite.fontSizeToken)};`,
+			`font-weight: ${variable(composite.fontWeightToken)};`,
 			`font-style: ${variable(role.fontStyleToken)};`,
 			`font-synthesis: none;`,
-			`line-height: ${variable(recipe.lineHeightToken)};`,
-			`letter-spacing: ${variable(recipe.letterSpacingToken)};`,
-			...(recipe.textTransformToken
-				? [`text-transform: ${variable(recipe.textTransformToken)};`]
+			`line-height: ${variable(composite.lineHeightToken)};`,
+			`letter-spacing: ${variable(composite.letterSpacingToken)};`,
+			...(composite.textTransformToken
+				? [`text-transform: ${variable(composite.textTransformToken)};`]
 				: []),
-			...(recipe.fontKerningToken ? [`font-kerning: ${variable(recipe.fontKerningToken)};`] : []),
-			...(recipe.fontOpticalSizingToken
-				? [`font-optical-sizing: ${variable(recipe.fontOpticalSizingToken)};`]
+			...(composite.fontKerningToken
+				? [`font-kerning: ${variable(composite.fontKerningToken)};`]
 				: []),
-			...(recipe.fontFeatureSettingsToken
-				? [`font-feature-settings: ${variable(recipe.fontFeatureSettingsToken)};`]
+			...(composite.fontOpticalSizingToken
+				? [`font-optical-sizing: ${variable(composite.fontOpticalSizingToken)};`]
 				: []),
-			...(recipe.fontVariationSettingsToken
-				? [`font-variation-settings: ${variable(recipe.fontVariationSettingsToken)};`]
+			...(composite.fontFeatureSettingsToken
+				? [`font-feature-settings: ${variable(composite.fontFeatureSettingsToken)};`]
+				: []),
+			...(composite.fontVariationSettingsToken
+				? [`font-variation-settings: ${variable(composite.fontVariationSettingsToken)};`]
 				: []),
 		];
-		const baseRule = declaration(
-			className(classes.base, config),
-			recipeProperties(role.base),
-			config
+		const sizeRules = Object.entries(role.sizes).map(([sizeName, composite]) =>
+			declaration(className(classes.sizes[sizeName]!, config), recipeProperties(composite), config)
 		);
-		const variantRules = Object.entries(role.variants).map(([variantName, recipe]) =>
+		const variantRules = Object.entries(role.variants).map(([variantName, variant]) =>
 			declaration(
 				className(classes.variants[variantName]!, config),
-				recipeProperties(recipe),
+				[
+					...(variant.fontWeightToken
+						? [`font-weight: ${variable(variant.fontWeightToken)};`]
+						: []),
+					...(variant.fontStyleToken ? [`font-style: ${variable(variant.fontStyleToken)};`] : []),
+					...(variant.lineHeightToken
+						? [`line-height: ${variable(variant.lineHeightToken)};`]
+						: []),
+					...(variant.letterSpacingToken
+						? [`letter-spacing: ${variable(variant.letterSpacingToken)};`]
+						: []),
+					...(variant.textTransformToken
+						? [`text-transform: ${variable(variant.textTransformToken)};`]
+						: []),
+					...(variant.fontKerningToken
+						? [`font-kerning: ${variable(variant.fontKerningToken)};`]
+						: []),
+					...(variant.fontOpticalSizingToken
+						? [`font-optical-sizing: ${variable(variant.fontOpticalSizingToken)};`]
+						: []),
+					...(variant.fontFeatureSettingsToken
+						? [`font-feature-settings: ${variable(variant.fontFeatureSettingsToken)};`]
+						: []),
+					...(variant.fontVariationSettingsToken
+						? [`font-variation-settings: ${variable(variant.fontVariationSettingsToken)};`]
+						: []),
+				],
 				config
 			)
 		);
@@ -110,7 +136,7 @@ export function toTypographyCss(ir: IR, options: TypographyCssConfig = {}): stri
 				)
 			)
 		);
-		return [baseRule, ...variantRules, ...selectionRules];
+		return [...sizeRules, ...variantRules, ...selectionRules];
 	});
 
 	const fontFaces =

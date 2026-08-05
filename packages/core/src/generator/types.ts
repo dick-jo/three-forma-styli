@@ -12,6 +12,7 @@ export interface TokenValue {
 	/** Token family (color, spacing, gap, etc.) */
 	family:
 		| 'color'
+		| 'alpha'
 		| 'spacing'
 		| 'gap'
 		| 'typography'
@@ -56,15 +57,15 @@ export interface TokenMetadata {
 	/** For time tokens: which simultaneously emitted scale owns this token. */
 	timeScale?: string;
 
-	/** For motion tokens: which semantic recipe owns this token. */
-	motionRecipe?: string;
+	/** For motion tokens: which semantic composite owns this token. */
+	motionComposite?: string;
 
 	/** For motion tokens: base or an authored variant name. */
 	motionVariant?: string;
 
-	/** For shadow tokens: grammar, author recipe, and base/variant identity. */
+	/** For shadow tokens: grammar, author composite, and base/variant identity. */
 	shadowKind?: 'box' | 'text';
-	shadowRecipe?: string;
+	shadowComposite?: string;
 	shadowVariant?: string;
 }
 
@@ -86,7 +87,24 @@ export interface ScaleInfo {
 	names: string[];
 }
 
-export interface TypographyContractRecipe {
+export interface AlphaContractValue {
+	value: number;
+	token: string;
+	css: string;
+}
+
+export interface AlphaContract {
+	defaultScale: string;
+	positions: import('../types.js').AlphaPosition[];
+	scales: Record<
+		string,
+		{
+			values: Record<'non' | import('../types.js').AlphaPosition, AlphaContractValue>;
+		}
+	>;
+}
+
+export interface TypographyContractComposite {
 	fontSizeToken: string;
 	fontWeightToken: string;
 	weight: string;
@@ -98,6 +116,20 @@ export interface TypographyContractRecipe {
 	letterSpacingEm: number;
 	textTransformToken?: string;
 	textTransform?: import('../types.js').TypographyTextTransform;
+	fontKerningToken?: string;
+	fontOpticalSizingToken?: string;
+	fontFeatureSettingsToken?: string;
+	fontVariationSettingsToken?: string;
+}
+
+export interface TypographyContractSemanticVariant {
+	weight?: string;
+	fontStyle?: import('../types.js').TypographyFontStyle;
+	fontWeightToken?: string;
+	fontStyleToken?: string;
+	lineHeightToken?: string;
+	letterSpacingToken?: string;
+	textTransformToken?: string;
 	fontKerningToken?: string;
 	fontOpticalSizingToken?: string;
 	fontFeatureSettingsToken?: string;
@@ -134,8 +166,8 @@ export interface TypographyContract {
 					}
 				>
 			>;
-			base: TypographyContractRecipe;
-			variants: Record<string, TypographyContractRecipe>;
+			sizes: Record<string, TypographyContractComposite>;
+			variants: Record<string, TypographyContractSemanticVariant>;
 			displayOrder: string[];
 		}
 	>;
@@ -176,7 +208,7 @@ export interface MotionContract {
 			value: import('../types.js').MotionEasing;
 		}
 	>;
-	recipes: Record<
+	composites: Record<
 		string,
 		{
 			base: MotionContractValue;
@@ -210,7 +242,7 @@ export interface ShadowContractValue {
 	layers: ShadowContractLayer[];
 }
 
-export interface ShadowContractRecipe {
+export interface ShadowContractComposite {
 	base: ShadowContractValue;
 	variants: Record<string, ShadowContractValue>;
 	displayOrder: string[];
@@ -219,8 +251,8 @@ export interface ShadowContractRecipe {
 export interface ShadowContract {
 	namespace: string;
 	unit: string;
-	box: Record<string, ShadowContractRecipe>;
-	text: Record<string, ShadowContractRecipe>;
+	box: Record<string, ShadowContractComposite>;
+	text: Record<string, ShadowContractComposite>;
 }
 
 /**
@@ -247,13 +279,16 @@ export interface IR {
 	/** Conditional token overrides keyed by their complete CSS media condition. */
 	mediaOverrides: Record<string, Record<string, TokenValue>>;
 
+	/** Property-agnostic named alpha scales and their physical token references. */
+	alpha?: AlphaContract;
+
 	/** Structured typography decisions for typed and non-CSS transformers. */
 	typography?: TypographyContract;
 
 	/** Structured semantic motion decisions for CSS and JavaScript consumers. */
 	motion?: MotionContract;
 
-	/** Structured, mode-aware box/text shadow recipes. */
+	/** Structured, mode-aware box/text shadow composites. */
 	shadows?: ShadowContract;
 }
 
@@ -267,7 +302,7 @@ export interface GeneratorConfig {
 		spacing: string;
 		gap: string;
 		typography: string;
-		/** Semantic typography recipe prefix. */
+		/** Semantic typography composite prefix. */
 		typographyRole: string;
 		borderRadius: string;
 		borderWidth: string;
@@ -333,14 +368,14 @@ export interface TimeGeneratorResult {
 	scaleInfo: ScaleInfo;
 }
 
-/** Motion recipes are root fragments and do not participate in CSS modes. */
+/** Motion composites are root fragments and do not participate in CSS modes. */
 export interface MotionGeneratorResult {
 	defaultTokens: TokenValue[];
 	reducedMotionTokens: TokenValue[];
 	contract: MotionContract;
 }
 
-/** Shadow recipes are root composites whose color references follow color modes. */
+/** Shadow composites are root composites whose color references follow color modes. */
 export interface ShadowGeneratorResult {
 	defaultTokens: TokenValue[];
 	contract: ShadowContract;

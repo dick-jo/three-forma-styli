@@ -1,12 +1,17 @@
 import { defineTfsProject } from '@three-forma-styli/compiler';
+import { defineAlpha, defineTypography } from '@three-forma-styli/core';
 
 export default defineTfsProject({
 	system: {
-		colors: {
-			alphaSchedule: {
-				soft: 0.18,
-				strong: 0.64,
+		alpha: defineAlpha({
+			defaultScale: 'display',
+			scales: {
+				display: {
+					values: { min: 0.08, 'lo-x': 0.18, lo: 0.3, hi: 0.5, 'hi-x': 0.64, max: 0.84 },
+				},
 			},
+		}),
+		colors: {
 			modes: [
 				{
 					name: 'gallery',
@@ -32,7 +37,7 @@ export default defineTfsProject({
 				},
 			],
 		},
-		typography: {
+		typography: defineTypography({
 			modes: [
 				{
 					name: 'screen',
@@ -71,66 +76,57 @@ export default defineTfsProject({
 			roles: {
 				poster: {
 					font: 'display',
-					weights: {
-						quiet: 400,
-						loud: 700,
-						maximum: 900,
-					},
+					weights: { min: 400, hi: 700, max: 900 },
+					weight: 'hi',
 					textTransform: 'uppercase',
-					base: {
-						fontSize: 5,
-						weight: 'loud',
-						lineHeight: 0.95,
-						letterSpacing: -0.025,
-					},
-					variants: {
-						micro: {
+					sizes: {
+						min: {
 							fontSize: 2,
-							weight: 'quiet',
+							weight: 'min',
 							lineHeight: 1.05,
 							letterSpacing: 0.01,
 						},
-						hero: {
+						base: {
+							fontSize: 5,
+							lineHeight: 0.95,
+							letterSpacing: -0.025,
+						},
+						max: {
 							fontSize: 8,
-							weight: 'maximum',
+							weight: 'max',
 							lineHeight: 0.86,
 							letterSpacing: -0.045,
 						},
 					},
 					modeOverrides: {
 						stage: {
-							base: { lineHeight: 0.9 },
-							variants: {
-								hero: { lineHeight: 0.82, letterSpacing: -0.055 },
+							sizes: {
+								base: { lineHeight: 0.9 },
+								max: { lineHeight: 0.82, letterSpacing: -0.055 },
 							},
 						},
 					},
-					displayOrder: ['micro', 'base', 'hero'],
 				},
 				technical: {
 					font: 'technical',
-					weights: {
-						plain: 400,
-						strong: 700,
-					},
-					base: {
-						fontSize: 1,
-						weight: 'plain',
-						lineHeight: 1.2,
-						letterSpacing: 0.04,
-					},
-					variants: {
-						loud: {
+					weights: { min: 400, max: 700 },
+					weight: 'min',
+					sizes: {
+						base: {
+							fontSize: 1,
+							lineHeight: 1.2,
+							letterSpacing: 0.04,
+						},
+						max: {
 							fontSize: 3,
-							weight: 'strong',
+							weight: 'max',
 							lineHeight: 1.1,
 							letterSpacing: 0.02,
 						},
 					},
-					displayOrder: ['base', 'loud'],
 				},
 			},
-		},
+		}),
 		time: {
 			scales: [
 				{
@@ -145,7 +141,7 @@ export default defineTfsProject({
 				crisp: [0.2, 0, 0.2, 1],
 				reveal: [0.1, 0.7, 0.2, 1],
 			},
-			recipes: {
+			composites: {
 				respond: {
 					base: { duration: 1, easing: 'crisp' },
 					variants: {
@@ -163,16 +159,16 @@ export default defineTfsProject({
 			box: {
 				float: {
 					base: [
-						{ x: 0, y: 2, blur: 4, color: { color: 'ink', alpha: 'soft' } },
-						{ x: 0, y: 18, blur: 56, spread: -12, color: { color: 'signal', alpha: 'soft' } },
+						{ x: 0, y: 2, blur: 4, color: { color: 'ink', alpha: 'lo-x' } },
+						{ x: 0, y: 18, blur: 56, spread: -12, color: { color: 'signal', alpha: 'lo-x' } },
 					],
 				},
 			},
 			text: {
 				signal: {
 					base: [
-						{ x: 0, y: 0, blur: 3, color: { color: 'signal', alpha: 'strong' } },
-						{ x: 0, y: 0, blur: 24, color: { color: 'signal', alpha: 'soft' } },
+						{ x: 0, y: 0, blur: 3, color: { color: 'signal', alpha: 'hi-x' } },
+						{ x: 0, y: 0, blur: 24, color: { color: 'signal', alpha: 'lo-x' } },
 					],
 				},
 			},

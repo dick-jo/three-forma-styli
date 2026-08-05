@@ -16,6 +16,14 @@ const temporaryDirectories: string[] = [];
 const packageExecutable = (name: 'npm' | 'pnpm') =>
 	process.platform === 'win32' ? `${name}.cmd` : name;
 const packageExecOptions = { shell: process.platform === 'win32' };
+const alpha = {
+	defaultScale: 'standard',
+	scales: {
+		standard: {
+			values: { min: 0.1, 'lo-x': 0.2, lo: 0.3, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+		},
+	},
+} as const;
 
 // Tiny synthetic regular TTF covering the compiler's versioned calibration corpus.
 const TEST_FONT_BASE64 = [
@@ -46,7 +54,6 @@ const TEST_FONT_BASE64 = [
 
 function colors() {
 	return {
-		alphaSchedule: { min: 0.1, max: 0.9 },
 		modes: [
 			{
 				name: 'night',
@@ -61,7 +68,6 @@ function colors() {
 				name: 'paper',
 				metadata: { label: 'Paper', polarity: 'positive' },
 				tokens: { ink: { mode: 'oklch' as const, l: 0.1, c: 0, h: 0 } },
-				alphaSchedule: { min: 0.2, max: 0.8 },
 			},
 		],
 	};
@@ -123,7 +129,7 @@ async function fixture(manifest = hostManifest()): Promise<{
 
 function fullProject() {
 	return defineTfsProject({
-		system: { colors: colors(), typography: defaultTypography },
+		system: { alpha, colors: colors(), typography: defaultTypography },
 		output: {
 			layout: 'workspace-package',
 			directory: './generated',
@@ -227,19 +233,27 @@ describe('workspace-package build', () => {
 		expect(runtime).toHaveProperty('nativeColorModes');
 		const native = runtime.nativeColorModes as {
 			defaultMode: string;
-			colorNames: string[];
+			colorIdentities: string[];
 			alphaSchedule: unknown;
 			modes: Array<{
 				name: string;
-				source: { colors: Record<string, unknown>; alphaSchedule: unknown };
+				source: { colors: Record<string, unknown> };
 			}>;
 		};
 		expect(native.defaultMode).toBe('night');
-		expect(native.colorNames).toEqual(['pri', 'ink']);
+		expect(native.colorIdentities).toEqual(['pri', 'ink']);
 		expect(native.modes.map((mode) => mode.name)).toEqual(['night', 'paper']);
 		expect(Object.keys(native.modes[0]!.source.colors)).toEqual(['pri', 'ink']);
 		expect(Object.keys(native.modes[1]!.source.colors)).toEqual(['ink']);
-		expect(native.modes[1]!.source.alphaSchedule).toEqual({ min: 0.2, max: 0.8 });
+		expect(native.alphaSchedule).toEqual({
+			non: 0,
+			min: 0.1,
+			'lo-x': 0.2,
+			lo: 0.3,
+			hi: 0.6,
+			'hi-x': 0.8,
+			max: 0.9,
+		});
 		const manifest = JSON.parse(secondManifest.toString('utf8'));
 		expect(manifest).toMatchObject({ schemaVersion: 2, layout: 'workspace-package' });
 		for (const [artifact, dependencies] of Object.entries(
@@ -313,9 +327,8 @@ describe('workspace-package build', () => {
 		const project = defineTfsProject({
 			generator: {
 				prefixes: { color: 'palette', typographyRole: 'copy' },
-				colorFormat: { alphaModifier: 'opacity' },
 			},
-			system: { colors: colors(), typography: defaultTypography },
+			system: { alpha, colors: colors(), typography: defaultTypography },
 			output: {
 				layout: 'workspace-package',
 				directory: './generated',
@@ -330,10 +343,10 @@ describe('workspace-package build', () => {
 		const dtcg = JSON.parse(await read('design/tokens.dtcg.json'));
 
 		for (const css of [runtime, review]) {
-			expect(css).toContain('--palette-pri-opacity-min:');
+			expect(css).toContain('--palette-pri-a-min:');
 			expect(css).toContain('--copy-prose-font-size:');
 		}
-		expect(dtcg.color).toHaveProperty('palette-pri-opacity-min');
+		expect(dtcg.color).toHaveProperty('palette-pri-a-min');
 	});
 
 	it('emits global and module shadow helpers as explicit package surfaces', async () => {
@@ -353,6 +366,7 @@ describe('workspace-package build', () => {
 		const { directory, configPath } = await fixture(manifest);
 		const project = defineTfsProject({
 			system: {
+				alpha,
 				colors: colors(),
 				shadows: {
 					unit: 'px',
@@ -680,7 +694,7 @@ describe('workspace-package build', () => {
 		expect(await fs.pathExists(path.join(output, 'legacy.txt'))).toBe(false);
 		const previous = await fs.readFile(path.join(output, 'build.manifest.json'));
 		const invalidTypography = structuredClone(defaultTypography);
-		invalidTypography.roles!.heading.base.weight = 'not-a-weight';
+		invalidTypography.roles!.heading.sizes.base.weight = 'not-a-weight';
 		const invalid = defineTfsProject({
 			system: { colors: colors(), typography: invalidTypography },
 			output: {
@@ -834,8 +848,8 @@ describe('workspace-package build', () => {
 					roles: {
 						prose: {
 							font: 'example',
-							base: { fontSize: 1, weight: 'base', lineHeight: 1.25, letterSpacing: 0 },
-							weights: { base: 400 },
+							weights: 400,
+							sizes: { base: { fontSize: 1, lineHeight: 1.25, letterSpacing: 0 } },
 						},
 					},
 				},

@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import {
+	defineTypography,
 	fontFromManifest,
 	generate,
 	generateCss,
@@ -10,6 +11,7 @@ import {
 	toTypographyCss,
 	toTypographyCssModuleTypes,
 	type PartialDesignSystem,
+	type AuthoredTypographySystem,
 	type TypographySystem,
 } from '@three-forma-styli/core';
 import {
@@ -215,7 +217,7 @@ async function buildLegacyProject<const Fonts extends Record<string, ProjectFont
 						fontFromManifest(preparedFonts!.manifest, id, fontFallback(configured)),
 					])
 				);
-				typography = { ...sourceTypography, fonts } as TypographySystem;
+				typography = defineTypography({ ...sourceTypography, fonts } as AuthoredTypographySystem);
 			} else {
 				typography = sourceTypography as TypographySystem;
 			}

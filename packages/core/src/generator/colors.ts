@@ -4,7 +4,7 @@
  * Generates color tokens with alpha variants based on schedule
  */
 
-import type { DesignSystem, ColorMode, AlphaSchedule } from '../types.js';
+import type { DesignSystem, ColorMode } from '../types.js';
 import type { TokenValue, GeneratorResult, GeneratorConfig } from './types.js';
 import { formatColor, formatColorWithAlpha } from '../utils.js';
 import { getDefaultEntry } from './utils.js';
@@ -14,7 +14,7 @@ import { getDefaultEntry } from './utils.js';
  */
 function generateTokensForMode(
 	mode: ColorMode & { name: string },
-	alphaSchedule: AlphaSchedule | undefined,
+	alphaSchedule: Readonly<Record<string, number>>,
 	config: GeneratorConfig
 ): TokenValue[] {
 	const prefix = config.prefixes.color;
@@ -35,8 +35,6 @@ function generateTokensForMode(
 			},
 		});
 
-		// Alpha variants (skip if no schedule provided)
-		if (!alphaSchedule) return;
 		Object.entries(alphaSchedule).forEach(([level, alpha]) => {
 			tokens.push({
 				family: 'color',
@@ -56,16 +54,6 @@ function generateTokensForMode(
 }
 
 /**
- * Get the alpha schedule for a mode, falling back to system default
- */
-function getAlphaSchedule(
-	mode: ColorMode & { name: string },
-	systemAlphaSchedule: AlphaSchedule | undefined
-): AlphaSchedule | undefined {
-	return mode.alphaSchedule || systemAlphaSchedule;
-}
-
-/**
  * Generate all color tokens from a DesignSystem
  *
  * Default mode generates all tokens (placed in :root).
@@ -74,19 +62,18 @@ function getAlphaSchedule(
  */
 export function generateColorTokens(
 	colors: DesignSystem['colors'],
-	config: GeneratorConfig
+	config: GeneratorConfig,
+	resolvedAlphaSchedule: Readonly<Record<string, number>> = {}
 ): GeneratorResult {
 	const defaultMode = getDefaultEntry(colors.modes);
 	const overrideModes = colors.modes.filter((m) => m !== defaultMode);
 
-	const defaultAlphaSchedule = getAlphaSchedule(defaultMode, colors.alphaSchedule);
-	const defaultTokens = generateTokensForMode(defaultMode, defaultAlphaSchedule, config);
+	const defaultTokens = generateTokensForMode(defaultMode, resolvedAlphaSchedule, config);
 
 	const overrideTokens: Record<string, TokenValue[]> = {};
 	for (const mode of overrideModes) {
 		if (Object.keys(mode.tokens).length > 0) {
-			const modeAlphaSchedule = getAlphaSchedule(mode, defaultAlphaSchedule);
-			overrideTokens[mode.name] = generateTokensForMode(mode, modeAlphaSchedule, config);
+			overrideTokens[mode.name] = generateTokensForMode(mode, resolvedAlphaSchedule, config);
 		}
 	}
 

@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 import {
 	createWorkbenchContract,
 	createReviewCapturePlan,
+	defineTypography,
 	fontFromManifest,
 	generate,
 	generateCss,
@@ -18,6 +19,7 @@ import {
 	toShadowSpecimen,
 	type IR,
 	type PartialDesignSystem,
+	type AuthoredTypographySystem,
 	type TypographySystem,
 } from '@three-forma-styli/core';
 import { COMPILER_VERSION } from '../version.js';
@@ -42,6 +44,7 @@ import {
 	renderNativeColorModesContract,
 	renderRuntimeColorThemeContract,
 	renderSystemContract,
+	renderTokensContract,
 	renderTypographyContract,
 } from './contracts.js';
 import type { WorkspacePlan } from './plan.js';
@@ -148,7 +151,7 @@ async function resolveSystem<const Fonts extends Record<string, ProjectFont>>(
 					fontFromManifest(preparedFonts!.manifest, id, fontFallback(configured)),
 				])
 			);
-			typography = { ...sourceTypography, fonts } as TypographySystem;
+			typography = defineTypography({ ...sourceTypography, fonts } as AuthoredTypographySystem);
 		} else typography = sourceTypography as TypographySystem;
 	}
 
@@ -266,6 +269,12 @@ export async function renderWorkspacePackage<const Fonts extends Record<string, 
 		await writeText(staging, `runtime/${name}.js`, contract.javascript);
 		await writeText(staging, `runtime/${name}.d.ts`, contract.declaration);
 	};
+	if (plan.contracts.tokens) {
+		await writeContract(
+			'tokens',
+			renderTokensContract(system, ir, resolveGeneratorConfig(project.generator))
+		);
+	}
 	if (plan.contracts.system) await writeContract('system', renderSystemContract(system, ir));
 	if (plan.contracts.typography) {
 		await writeContract('typography', renderTypographyContract(ir));
@@ -276,7 +285,11 @@ export async function renderWorkspacePackage<const Fonts extends Record<string, 
 	if (plan.contracts.runtimeColorTheme) {
 		await writeContract(
 			'runtime-color-theme',
-			renderRuntimeColorThemeContract(system, resolveGeneratorConfig(project.generator))
+			renderRuntimeColorThemeContract(
+				system,
+				resolveGeneratorConfig(project.generator),
+				project.runtime?.colorThemes
+			)
 		);
 	}
 	if (modules.length > 0 && plan.host.rootExport) {

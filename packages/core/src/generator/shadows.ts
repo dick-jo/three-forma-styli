@@ -1,14 +1,14 @@
 import type {
 	BoxShadowLayer,
 	ShadowColorReference,
-	ShadowRecipe,
+	ShadowComposite,
 	ShadowSystem,
 	TextShadowLayer,
 } from '../types.js';
 import type {
 	GeneratorConfig,
 	ShadowContractLayer,
-	ShadowContractRecipe,
+	ShadowContractComposite,
 	ShadowContractValue,
 	ShadowGeneratorResult,
 	TokenValue,
@@ -65,7 +65,7 @@ function layerValue(
 
 function shadowValue(
 	kind: 'box' | 'text',
-	recipeName: string,
+	compositeName: string,
 	variantName: string,
 	layers: readonly (BoxShadowLayer | TextShadowLayer)[],
 	system: ShadowSystem,
@@ -74,8 +74,8 @@ function shadowValue(
 	const namespace = config.prefixes.shadow;
 	const name =
 		variantName === 'base'
-			? `${namespace}-${kind}-${recipeName}`
-			: `${namespace}-${kind}-${recipeName}-${variantName}`;
+			? `${namespace}-${kind}-${compositeName}`
+			: `${namespace}-${kind}-${compositeName}-${variantName}`;
 	const resolved = layers.map((layer) => layerValue(layer, kind, system.unit, config));
 	const css = resolved.map((layer) => layer.css).join(', ');
 
@@ -86,7 +86,7 @@ function shadowValue(
 			value: css,
 			metadata: {
 				shadowKind: kind,
-				shadowRecipe: recipeName,
+				shadowComposite: compositeName,
 				shadowVariant: variantName,
 			},
 		},
@@ -98,27 +98,27 @@ function shadowValue(
 	};
 }
 
-function shadowRecipes<Layer extends BoxShadowLayer | TextShadowLayer>(
+function shadowComposites<Layer extends BoxShadowLayer | TextShadowLayer>(
 	kind: 'box' | 'text',
-	recipes: Record<string, ShadowRecipe<Layer>> | undefined,
+	composites: Record<string, ShadowComposite<Layer>> | undefined,
 	system: ShadowSystem,
 	config: GeneratorConfig,
 	tokens: TokenValue[]
-): Record<string, ShadowContractRecipe> {
-	const contract: Record<string, ShadowContractRecipe> = {};
-	for (const [recipeName, recipe] of Object.entries(recipes ?? {})) {
-		const base = shadowValue(kind, recipeName, 'base', recipe.base, system, config);
+): Record<string, ShadowContractComposite> {
+	const contract: Record<string, ShadowContractComposite> = {};
+	for (const [compositeName, composite] of Object.entries(composites ?? {})) {
+		const base = shadowValue(kind, compositeName, 'base', composite.base, system, config);
 		tokens.push(base.token);
 		const variants: Record<string, ShadowContractValue> = {};
-		for (const [variantName, layers] of Object.entries(recipe.variants ?? {})) {
-			const variant = shadowValue(kind, recipeName, variantName, layers, system, config);
+		for (const [variantName, layers] of Object.entries(composite.variants ?? {})) {
+			const variant = shadowValue(kind, compositeName, variantName, layers, system, config);
 			tokens.push(variant.token);
 			variants[variantName] = variant.contract;
 		}
-		contract[recipeName] = {
+		contract[compositeName] = {
 			base: base.contract,
 			variants,
-			displayOrder: recipe.displayOrder ?? ['base', ...Object.keys(variants)],
+			displayOrder: composite.displayOrder ?? ['base', ...Object.keys(variants)],
 		};
 	}
 	return contract;
@@ -135,8 +135,8 @@ export function generateShadowTokens(
 		contract: {
 			namespace: config.prefixes.shadow,
 			unit: system.unit,
-			box: shadowRecipes('box', system.box, system, config, defaultTokens),
-			text: shadowRecipes('text', system.text, system, config, defaultTokens),
+			box: shadowComposites('box', system.box, system, config, defaultTokens),
+			text: shadowComposites('text', system.text, system, config, defaultTokens),
 		},
 	};
 }

@@ -1,4 +1,4 @@
-import { defineTypography, deriveTypographyRange } from '../src/index.js';
+import { defineTypography, deriveTypographySizes } from '../src/index.js';
 
 const mode = {
 	name: 'default',
@@ -30,22 +30,27 @@ const explicit = defineTypography({
 	roles: {
 		reading: {
 			font: 'editorial',
-			base: { fontSize: 2, weight: 'regular', lineHeight: 1.25, letterSpacing: 0 },
-			variants: {
-				compact: { fontSize: 1, weight: 'regular', lineHeight: 1.2, letterSpacing: 0.01 },
+			weight: 'min',
+			weights: { min: 400, max: 700 },
+			sizes: {
+				base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0 },
+				min: { fontSize: 1, lineHeight: 1.2, letterSpacing: 0.01 },
 			},
-			weights: { regular: 400, strong: 700 },
+			variants: { emphatic: { weight: 'max' } },
 			modeOverrides: {
 				display: {
-					base: { fontSize: 4, weight: 'strong', lineHeight: 0.85 },
-					variants: { compact: { letterSpacing: -0.01 } },
+					sizes: {
+						base: { fontSize: 4, weight: 'max', lineHeight: 0.85 },
+						min: { letterSpacing: -0.01 },
+					},
 				},
 			},
 		},
 	},
 });
 
-explicit.roles.reading.variants.compact;
+explicit.roles.reading.sizes.min;
+explicit.roles.reading.variants!.emphatic;
 
 // @ts-expect-error configured font IDs remain literal and typo-safe
 defineTypography({
@@ -54,23 +59,22 @@ defineTypography({
 	roles: {
 		reading: {
 			font: 'editoriall',
-			base: { fontSize: 2, weight: 'regular', lineHeight: 1.25, letterSpacing: 0 },
-			weights: { regular: 400 },
+			weights: 400,
+			sizes: { base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0 } },
 		},
 	},
 });
 
-const range = deriveTypographyRange({
+const range = deriveTypographySizes({
 	scale: mode.tokens,
-	order: ['small', 'base', 'large'],
 	anchors: {
-		base: { fontSize: 2, weight: 'regular', lineHeight: 1.25, letterSpacing: 0 },
-		large: { fontSize: 4, weight: 'regular', lineHeight: 1.1, letterSpacing: -0.01 },
+		base: { fontSize: 2, weight: 'min', lineHeight: 1.25, letterSpacing: 0 },
+		max: { fontSize: 4, weight: 'min', lineHeight: 1.1, letterSpacing: -0.01 },
 	},
-	derived: { small: { between: ['base', 'large'], at: 0.25 } },
+	derived: { l: { between: ['base', 'max'], at: 0.25 } },
 });
 
-range.variants.small;
-range.variants.large;
-// @ts-expect-error arbitrary caller vocabulary remains literal
-range.variants.medium;
+range.l;
+range.max;
+// @ts-expect-error TFS owns the fixed size vocabulary
+range.medium;

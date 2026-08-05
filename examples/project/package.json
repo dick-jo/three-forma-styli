@@ -1,0 +1,56 @@
+{
+	"name": "@three-forma-styli/reference-project",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"files": [
+		"generated/runtime",
+		"generated/assets",
+		"README.md"
+	],
+	"scripts": {
+		"generate": "tfs build .",
+		"build": "tfs validate .",
+		"check": "tfs validate .",
+		"check:generated": "tfs check .",
+		"review": "tfs review serve ."
+	},
+	"sideEffects": [
+		"./generated/runtime/styles/*.css"
+	],
+	"exports": {
+		".": {
+			"types": "./generated/runtime/index.d.ts",
+			"import": "./generated/runtime/index.js"
+		},
+		"./tokens": {
+			"types": "./generated/runtime/tokens.d.ts",
+			"import": "./generated/runtime/tokens.js"
+		},
+		"./typography": {
+			"types": "./generated/runtime/typography.d.ts",
+			"import": "./generated/runtime/typography.js"
+		},
+		"./native-color-modes": {
+			"types": "./generated/runtime/native-color-modes.d.ts",
+			"import": "./generated/runtime/native-color-modes.js"
+		},
+		"./runtime-color-theme": {
+			"types": "./generated/runtime/runtime-color-theme.d.ts",
+			"import": "./generated/runtime/runtime-color-theme.js"
+		},
+		"./styles.css": "./generated/runtime/styles/design-system.css",
+		"./tokens.css": "./generated/runtime/styles/design-system.tokens.css",
+		"./typography.css": "./generated/runtime/styles/design-system.typography.css",
+		"./typography.module.css": {
+			"types": "./generated/runtime/styles/design-system.typography.module.css.d.ts",
+			"default": "./generated/runtime/styles/design-system.typography.module.css"
+		},
+		"./shadows.css": "./generated/runtime/styles/design-system.shadows.css",
+		"./shadows.module.css": {
+			"types": "./generated/runtime/styles/design-system.shadows.module.css.d.ts",
+			"default": "./generated/runtime/styles/design-system.shadows.module.css"
+		},
+		"./package.json": "./package.json"
+	}
+}

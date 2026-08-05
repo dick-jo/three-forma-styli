@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import ts from 'typescript';
 import {
 	generate,
 	resolveGeneratorConfig,
@@ -9,15 +13,119 @@ import {
 	renderNativeColorModesContract,
 	renderRuntimeColorThemeContract,
 	renderSystemContract,
+	renderTokensContract,
 	renderTypographyContract,
 	runtimeColorThemeContract,
 } from './contracts.js';
 
+function typecheck(source: string): string[] {
+	const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tfs-contract-types-'));
+	const fixture = path.join(directory, 'fixture.ts');
+	try {
+		fs.writeFileSync(fixture, source);
+		const program = ts.createProgram([fixture], {
+			strict: true,
+			noEmit: true,
+			target: ts.ScriptTarget.ES2022,
+			skipLibCheck: true,
+		});
+		return ts
+			.getPreEmitDiagnostics(program)
+			.map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'));
+	} finally {
+		fs.rmSync(directory, { recursive: true, force: true });
+	}
+}
+
 describe('workspace runtime contracts', () => {
+	it('emits compact typed identities, groups, and CSS-variable helpers', async () => {
+		const system: PartialDesignSystem = {
+			alpha: {
+				defaultScale: 'standard',
+				scales: {
+					standard: {
+						values: { min: 0.1, 'lo-x': 0.2, lo: 0.3, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+					},
+				},
+			},
+			colors: {
+				modes: [
+					{
+						name: 'dark',
+						isDefault: true,
+						tokens: {
+							bg: { mode: 'oklch', l: 0.2 },
+							'network-base': { mode: 'oklch', l: 0.7, c: 0.2, h: 250 },
+						},
+					},
+				],
+				groups: {
+					core: { identities: ['bg'] },
+					network: { match: { prefix: 'network-' } },
+				},
+			},
+			border: {
+				radius: {
+					modes: [{ name: 'default', isDefault: true, tokens: { min: 'min', s: 1, l: 2, max: 3 } }],
+				},
+				width: { modes: [{ name: 'default', isDefault: true, tokens: { unit: 'px', value: 1 } }] },
+			},
+			spacing: {
+				modes: [
+					{ name: 'default', isDefault: true, tokens: { unit: 'px', base: 8, min: 4, range: 3 } },
+				],
+			},
+		};
+		const rendered = renderTokensContract(system, generate(system), resolveGeneratorConfig());
+		expect(rendered.declaration).toContain('export type ColorIdentity =');
+		expect(rendered.declaration).toContain('export type AlphaScaleIdentity =');
+		expect(rendered.declaration).toContain('export type ColorIdentityIn<');
+		expect(rendered.declaration).toContain('export declare function colorRampStyle');
+		const encoded = Buffer.from(rendered.javascript).toString('base64');
+		const runtime = (await import(`data:text/javascript;base64,${encoded}`)) as {
+			alphaScaleIdentities: readonly string[];
+			colorGroups: Record<string, readonly string[]>;
+			colorVariable: (color: string, alpha?: string) => string;
+			colorRampStyle: (color: string, local: string) => Record<string, string>;
+		};
+		expect(runtime.alphaScaleIdentities).toEqual(['standard']);
+		expect(runtime.colorGroups.network).toEqual(['network-base']);
+		expect(runtime.colorVariable('network-base', 'lo-x')).toBe('--clr-network-base-a-lo-x');
+		expect(runtime.colorRampStyle('bg', '--loc-color')).toMatchObject({
+			'--loc-color': 'var(--clr-bg)',
+			'--loc-color-a-non': 'var(--clr-bg-a-non)',
+			'--loc-color-a-max': 'var(--clr-bg-a-max)',
+		});
+		expect(() => runtime.colorVariable('missing')).toThrow('Unknown color identity');
+		expect(
+			typecheck(`${rendered.declaration}
+const color: ColorIdentity = 'network-base';
+const network: ColorIdentityIn<'network'> = 'network-base';
+const variable: '--clr-network-base-a-hi' = colorVariable('network-base', 'hi');
+const reference: 'var(--clr-bg)' = colorReference('bg');
+const radius: BorderRadiusIdentity = 's';
+const alphaScale: AlphaScaleIdentity = 'standard';
+const style: ColorRampStyle<'--loc-color'> = colorRampStyle('bg', '--loc-color');
+// @ts-expect-error unknown authored color
+const badColor: ColorIdentity = 'missing';
+// @ts-expect-error a component subset cannot select an unknown color
+const subset = ['bg', 'missing'] as const satisfies readonly ColorIdentity[];
+void color; void network; void variable; void reference; void radius; void alphaScale; void style; void badColor; void subset;
+`)
+		).toEqual([]);
+	});
+
 	it('represents absent system mode categories as null plus empty entries', () => {
 		const system: PartialDesignSystem = {
+			alpha: {
+				defaultScale: 'standard',
+				scales: {
+					standard: {
+						values: { min: 0.1, 'lo-x': 0.2, lo: 0.3, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+					},
+				},
+			},
 			colors: {
-				alphaSchedule: { max: 0.9 },
 				modes: [
 					{
 						name: 'only',
@@ -60,11 +168,13 @@ describe('workspace runtime contracts', () => {
 				roles: {
 					prose: {
 						font: 'ui',
-						base: { fontSize: 2, weight: 'regular', lineHeight: 1.4, letterSpacing: 0 },
-						weights: { regular: 400, strong: 700 },
+						sizes: {
+							base: { fontSize: 2, weight: 'min', lineHeight: 1.4, letterSpacing: 0 },
+						},
+						weights: { min: 400, max: 700 },
 						styles: {
-							normal: { weights: ['regular', 'strong'] },
-							italic: { weights: ['regular'] },
+							normal: { weights: ['min', 'max'] },
+							italic: { weights: ['min'] },
 						},
 					},
 				},
@@ -88,31 +198,33 @@ describe('workspace runtime contracts', () => {
 		};
 		const classes = {
 			prose: 'recipe_base',
-			'prose-style-normal-weight-regular': 'normal_regular',
-			'prose-style-normal-weight-strong': 'normal_strong',
-			'prose-style-italic-weight-regular': 'italic_regular',
+			'prose-style-normal-weight-min': 'normal_min',
+			'prose-style-normal-weight-max': 'normal_max',
+			'prose-style-italic-weight-min': 'italic_min',
 		};
-		expect(runtime.typographyClassName({ role: 'prose' }, classes)).toBe(
-			'recipe_base normal_regular'
-		);
+		expect(runtime.typographyClassName({ role: 'prose' }, classes)).toBe('recipe_base normal_min');
 		expect(
-			runtime.typographyClassName(
-				{ role: 'prose', fontStyle: 'italic', weight: 'regular' },
-				classes
-			)
-		).toBe('recipe_base italic_regular');
+			runtime.typographyClassName({ role: 'prose', fontStyle: 'italic', weight: 'min' }, classes)
+		).toBe('recipe_base italic_min');
 		expect(() => runtime.typographyClassName({ role: 'missing' }, classes)).toThrow(
 			'Unknown typography role "missing"'
 		);
 		expect(() =>
-			runtime.typographyClassName({ role: 'prose', fontStyle: 'italic', weight: 'strong' }, classes)
-		).toThrow('does not expose style "italic" at weight "strong"');
+			runtime.typographyClassName({ role: 'prose', fontStyle: 'italic', weight: 'max' }, classes)
+		).toThrow('does not expose style "italic" at weight "max"');
 	});
 
 	it('keeps default colors complete, override colors authored, and inheritance explicit', () => {
 		const system: PartialDesignSystem = {
+			alpha: {
+				defaultScale: 'standard',
+				scales: {
+					standard: {
+						values: { min: 0.1, 'lo-x': 0.2, lo: 0.3, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+					},
+				},
+			},
 			colors: {
-				alphaSchedule: { min: 0.1, max: 0.9 },
 				modes: [
 					{
 						name: 'dark',
@@ -120,6 +232,7 @@ describe('workspace runtime contracts', () => {
 						tokens: {
 							neutral: { mode: 'oklch', l: 0.2 },
 							brand: { mode: 'oklch', l: 0.7, c: 0.2, h: 30 },
+							accent: { mode: 'oklch', l: 0.65, c: 0.1, h: 110 },
 						},
 					},
 					{
@@ -133,35 +246,43 @@ describe('workspace runtime contracts', () => {
 							brand: { mode: 'oklch', l: 0.8, c: 0.15, h: 70 },
 							accent: { mode: 'oklch', l: 0.75, c: 0.1, h: 110 },
 						},
-						alphaSchedule: { min: 0.2, max: 0.8 },
 					},
 				],
 			},
 		};
 		const contract = nativeColorModesContract(system);
 		expect(contract.defaultMode).toBe('dark');
-		expect(contract.colorNames).toEqual(['neutral', 'brand', 'accent']);
-		expect(contract.alphaSchedule).toEqual({ min: 0.1, max: 0.9 });
+		expect(contract.colorIdentities).toEqual(['neutral', 'brand', 'accent']);
+		expect(contract.alphaSchedule).toEqual({
+			non: 0,
+			min: 0.1,
+			'lo-x': 0.2,
+			lo: 0.3,
+			hi: 0.6,
+			'hi-x': 0.8,
+			max: 0.9,
+		});
 		expect(contract.modes.map((mode) => mode.name)).toEqual(['dark', 'light', 'warm']);
 		expect(contract.modes[0]!.metadata).toBeNull();
 		expect(contract.modes[0]!.source.colors.neutral).toEqual({ l: 0.2, c: 0, h: 0 });
 		expect(contract.modes[1]!.source.colors).toEqual({ neutral: { l: 0.95, c: 0, h: 0 } });
-		expect(contract.modes[1]!.source.alphaSchedule).toBeNull();
-		expect(contract.modes[2]!.source.alphaSchedule).toEqual({ min: 0.2, max: 0.8 });
+		expect(contract.modes[1]!.source).toEqual({
+			colors: { neutral: { l: 0.95, c: 0, h: 0 } },
+		});
 
 		const declaration = renderNativeColorModesContract(system).declaration;
 		expect(declaration).toContain('readonly defaultMode: "dark";');
-		expect(declaration).toContain('readonly colorNames: readonly [');
+		expect(declaration).toContain('readonly colorIdentities: readonly [');
 		expect(declaration).toContain('readonly l: number;');
+		expect(declaration).toContain('readonly non: 0;');
 		expect(declaration).toContain('readonly min: number;');
 		expect(declaration).not.toContain('readonly l: 0.2;');
-		expect(declaration).toContain('readonly schemaVersion: 1;');
+		expect(declaration).toContain('readonly schemaVersion: 2;');
 	});
 
 	it('uses null for a schedule-less valid runtime contract', () => {
 		const system = {
 			colors: {
-				alphaSchedule: undefined,
 				modes: [
 					{
 						name: 'default',
@@ -178,7 +299,6 @@ describe('workspace runtime contracts', () => {
 	it('uses the first authored mode when no explicit default marker exists', () => {
 		const system = {
 			colors: {
-				alphaSchedule: { max: 1 },
 				modes: [
 					{ name: 'first', tokens: { ink: { mode: 'oklch', l: 0.2 } } },
 					{ name: 'second', tokens: { ink: { mode: 'oklch', l: 0.8 } } },
@@ -190,17 +310,21 @@ describe('workspace runtime contracts', () => {
 		expect(contract.modes.map((mode) => mode.name)).toEqual(['first', 'second']);
 	});
 
-	it('emits a strict runtime-theme policy with literal color-name types and shared naming', () => {
+	it('emits a strict runtime-theme policy with literal color-identity types and shared naming', () => {
 		const system = {
+			alpha: {
+				defaultScale: 'standard',
+				scales: {
+					standard: {
+						values: { min: 0.1, 'lo-x': 0.2, lo: 0.3, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+					},
+				},
+			},
 			colors: {
-				alphaSchedule: { low: 0.2 },
 				luminance: {
 					minimumLuminanceDelta: 0.4,
 					backgroundColors: ['canvas'],
 					foregroundColors: ['ink'],
-				},
-				runtimeThemes: {
-					colorNames: ['canvas', 'ink'],
 				},
 				modes: [
 					{
@@ -216,22 +340,35 @@ describe('workspace runtime contracts', () => {
 		} satisfies PartialDesignSystem;
 		const generator = resolveGeneratorConfig({
 			prefixes: { color: 'palette' },
-			colorFormat: { alphaModifier: 'opacity' },
 		});
-		expect(runtimeColorThemeContract(system, generator)).toEqual({
-			schemaVersion: 1,
-			colorNames: ['canvas', 'ink'],
-			alphaSchedule: { low: 0.2 },
+		const runtimePolicy = {
+			colors: { include: ['canvas', 'ink'] },
+			enforce: ['luminance'],
+		} as const;
+		expect(runtimeColorThemeContract(system, generator, runtimePolicy)).toEqual({
+			schemaVersion: 2,
+			colorIdentities: ['canvas', 'ink'],
+			enforce: ['luminance'],
+			alphaSchedule: {
+				non: 0,
+				min: 0.1,
+				'lo-x': 0.2,
+				lo: 0.3,
+				hi: 0.6,
+				'hi-x': 0.8,
+				max: 0.9,
+			},
 			luminance: system.colors.luminance,
 			prefixes: { color: 'palette' },
-			colorFormat: { alphaModifier: 'opacity' },
+			colorFormat: { alphaModifier: 'a' },
 		});
 
-		const rendered = renderRuntimeColorThemeContract(system, generator);
+		const rendered = renderRuntimeColorThemeContract(system, generator, runtimePolicy);
 		expect(rendered.javascript).toContain('export const runtimeColorThemeConfig');
-		expect(rendered.declaration).toContain('readonly colorNames: readonly [');
+		expect(rendered.declaration).toContain('readonly colorIdentities: readonly [');
+		expect(rendered.declaration).toContain('readonly non: 0;');
 		expect(rendered.declaration).toContain('readonly minimumLuminanceDelta: number;');
-		expect(rendered.declaration).toContain('export type RuntimeColorName =');
+		expect(rendered.declaration).toContain('export type RuntimeColorIdentity =');
 		expect(rendered.declaration).toContain('export type RuntimeColorThemeInput =');
 	});
 });

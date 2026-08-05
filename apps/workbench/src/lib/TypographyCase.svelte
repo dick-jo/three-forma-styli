@@ -168,7 +168,11 @@
 		{/if}
 	</div>
 	<div class="type-stage-body">
-		<p class="eyebrow">{reviewCase.role} · {reviewCase.variant ?? 'base'}</p>
+		<p class="eyebrow">
+			{reviewCase.role} · {reviewCase.size ?? 'base'}{reviewCase.variant
+				? ` · ${reviewCase.variant}`
+				: ''}
+		</p>
 		<div class="metric-sample" class:diagnostics={lineDiagnostics}>
 			<p
 				class="type-short"

@@ -99,26 +99,44 @@ See [the package architecture](docs/package-architecture.md),
 
 ## Token Families
 
-### Colors
+### Alpha and colors
 
-Define root colors, get alpha variants automatically:
+Define one reusable Alpha scale and root colors; TFS emits the atomic scale and
+derives a complete alpha ramp for every color identity:
 
 ```typescript
+const alpha = defineAlpha({
+	defaultScale: 'standard',
+	scales: {
+		standard: {
+			values: {
+				min: 0.07,
+				'lo-x': 0.125,
+				lo: 0.25,
+				hi: 0.68,
+				'hi-x': 0.85,
+				max: 0.93,
+			},
+		},
+	},
+});
+
 colors: {
-  modes: [{
-    name: 'dark',
-    isDefault: true,
-    tokens: {
-      bg: oklch(0.15, 0, 0),        // Page background
-      ev: oklch(0.20, 0.01, 285),   // Elevated surfaces
-      primary: oklch(0.70, 0.15, 250),
-      neutral: oklch(0.60, 0.02, 270),
-      ink: oklch(0.90, 0.02, 270),  // Text/icons
-      positive: oklch(0.70, 0.18, 145),
-      negative: oklch(0.65, 0.20, 15)
-    }
-  }],
-  alphaSchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 }
+	modes: [
+		{
+			name: 'dark',
+			isDefault: true,
+			tokens: {
+				bg: oklch(0.15, 0, 0), // Page background
+				ev: oklch(0.2, 0.01, 285), // Elevated surfaces
+				primary: oklch(0.7, 0.15, 250),
+				neutral: oklch(0.6, 0.02, 270),
+				ink: oklch(0.9, 0.02, 270), // Text/icons
+				positive: oklch(0.7, 0.18, 145),
+				negative: oklch(0.65, 0.2, 15),
+			},
+		},
+	],
 }
 ```
 
@@ -126,9 +144,10 @@ colors: {
 
 ```css
 --clr-bg: oklch(0.15 0 0);
+--a-min: 0.07;
 --clr-bg-a-min: oklch(0.15 0 0 / 0.07);
 --clr-bg-a-lo: oklch(0.15 0 0 / 0.25);
---clr-bg-a-hi: oklch(0.15 0 0 / 0.75);
+--clr-bg-a-hi: oklch(0.15 0 0 / 0.68);
 --clr-bg-a-max: oklch(0.15 0 0 / 0.93);
 /* ... same for all colors */
 ```
@@ -173,10 +192,11 @@ gap: {
 
 Typography has an atomic foundation and a semantic layer. Atomic modes generate
 the permanent `--fs-*` scale. Arbitrarily named roles then define one unsuffixed
-base recipe and any role-local variants the project actually needs:
+base size, a fixed semantic size range, and any categorical variants the project
+actually needs:
 
 ```typescript
-const typography = {
+const typography = defineTypography({
 	modes: [
 		{
 			name: 'default',
@@ -195,33 +215,42 @@ const typography = {
 		prose: {
 			font: 'sans',
 			textTransform: 'none',
-			base: { fontSize: 2, weight: 'lo', lineHeight: 1.25, letterSpacing: 0 },
+			weights: { min: 300, lo: 400, hi: 500, max: 700 },
+			weight: 'lo',
+			sizes: {
+				min: { fontSize: 'min', lineHeight: 1.35, letterSpacing: 0.01 },
+				s: { fontSize: 1, lineHeight: 1.3, letterSpacing: 0.005, weight: 'min' },
+				base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0 },
+				l: { fontSize: 3, lineHeight: 1.225, letterSpacing: -0.0025 },
+				max: { fontSize: 4, lineHeight: 1.2, letterSpacing: -0.005 },
+			},
 			variants: {
-				s: { fontSize: 1, weight: 'min', lineHeight: 1.3, letterSpacing: 0.005 },
-				l: { fontSize: 3, weight: 'lo', lineHeight: 1.225, letterSpacing: -0.0025 },
+				emphatic: { weight: 'max', letterSpacing: -0.01 },
 			},
 			modeOverrides: {
 				display: {
-					base: { fontSize: 4, weight: 'hi', lineHeight: 0.9 },
-					variants: { l: { fontSize: 7, lineHeight: 0.85, letterSpacing: -0.01 } },
+					sizes: {
+						base: { fontSize: 4, weight: 'hi', lineHeight: 0.9 },
+						l: { fontSize: 7, lineHeight: 0.85, letterSpacing: -0.01 },
+					},
 				},
 			},
-			weights: { min: 300, lo: 400, hi: 500, max: 700 },
 		},
 	},
-};
+});
 ```
 
 **Output:** atomic sizes such as `--fs-min` and `--fs-1` through `--fs-12`,
 plus an unsuffixed semantic tuple such as `--text-prose-font-size` and
-`--text-prose-font-weight`, and optional
-variant tuples such as `--text-prose-s-line-height`.
+`--text-prose-font-weight`, and optional size tuples such as
+`--text-prose-s-line-height`.
 
 The default theme contains inspectable `prose`, `heading`, and `label` opinions.
-Core does not know those names. `deriveTypographyRange()` can interpolate repetitive
-size/line-height/tracking points from explicit anchors. Weight is a required,
-non-interpolable choice on every recipe. The helper's result is the same
-visible `base`/`variants` data and it never invents font roles or weight aliases.
+Core does not know those names. `deriveTypographySizes()` can interpolate the fixed
+`min / s / base / l / max` size range from explicit anchors. Every resolved size owns
+its final weight; inheritance removes repetition, but the helper never guesses a
+disputed weight. Categorical `variants` are separate and cannot change font family
+or size.
 
 For a complete movable handoff, define a project and run `tfs build .`. Project
 mode prepares licensed local fonts, resolves their real capabilities, then stages
@@ -267,7 +296,7 @@ silently remapped. See [the typography foundation](docs/typography-foundation.md
 ### Time & Motion
 
 Time defines one or more simultaneously available atomic duration scales.
-Motion recipes turn those primitives into author-named, property-agnostic
+Motion composites turn those primitives into author-named, property-agnostic
 duration/easing/delay fragments:
 
 ```typescript
@@ -280,7 +309,7 @@ time: {
 },
 motion: {
   easings: { standard: [0.2, 0, 0.38, 0.9] },
-  recipes: {
+  composites: {
     hover: {
       base: { duration: 2, easing: 'standard' },
       variants: {
@@ -307,9 +336,9 @@ motion: {
 
 The generated TypeScript contract exposes the same easing tuple and resolved
 millisecond/second values for JavaScript animation libraries. TFS deliberately
-does not attach CSS property names to recipes.
+does not attach CSS property names to composites.
 
-Every recipe must make one explicit reduced-motion decision. Use
+Every composite must make one explicit reduced-motion decision. Use
 `reducedMotion: "preserve"` only when the motion itself is essential, or author
 a base reduced override inherited by its variants. Any variant can override
 that reduced value or use `"preserve"` independently. TFS emits the resolved
@@ -323,7 +352,7 @@ small explicit system.
 
 ### Shadows
 
-Box and text shadows are separate author-owned recipe families because their CSS
+Box and text shadows are separate author-owned composite families because their CSS
 grammars differ. Values are ordered layer arrays, so a tight contact shadow plus
 a broad ambient shadow is a normal value:
 
@@ -383,20 +412,25 @@ diagnostic identifies the actual metric as `oklch-l`. This is not WCAG relative
 luminance, a contrast ratio, or an accessibility-conformance result. A future
 WCAG diagnostic must remain separate rather than silently changing this model.
 
-A color system can own that reusable policy once. If it also supports
-user-authored runtime themes, it separately declares the exact editable subset:
+A color system owns its reusable constraint policy once. A project that supports
+user-authored runtime themes separately declares that consumer capability:
 
 ```typescript
 colors: {
 	modes,
-	alphaSchedule,
 	luminance: {
 		minimumLuminanceDelta: 0.4,
 		backgroundColors: ['bg', 'ev'],
 		foregroundColors: ['primary', 'neutral', 'ink'],
 	},
-	runtimeThemes: {
-		colorNames: ['bg', 'ev', 'primary', 'neutral', 'ink'],
+}
+
+alpha,
+
+runtime: {
+	colorThemes: {
+		colors: { include: ['bg', 'ev', 'primary', 'neutral', 'ink'] },
+		enforce: ['luminance'],
 	},
 }
 ```
@@ -431,7 +465,7 @@ not retarget an alias that was inherited after resolving in `:root`.
 
 When scaling the atomic ramp is insufficient, a role may explicitly author
 `modeOverrides` for any non-default typography mode. Each override is a partial
-tuple: omitted fields retain the role recipe, while authored `fontSize`,
+tuple: omitted fields retain the role composite, while authored `fontSize`,
 `weight`, `lineHeight`, or `letterSpacing` values are emitted only inside that
 mode selector. Mode and variant names are validated; TFS never guesses which
 roles should tighten, grow, or become heavier.
@@ -469,8 +503,8 @@ native OKLCH custom properties, and returns explicitly identified OKLCH-L
 diagnostics. The release gate executes this path from packed npm and generated
 package tarballs in Chromium; compiler, font, CLI, and Culori code must not enter
 that browser bundle. Author `colors.luminance` once and explicitly declare the
-user-editable subset in `colors.runtimeThemes.colorNames`; the generated runtime
-policy preserves literal color names, alpha schedule, custom property naming,
+user-editable subset in `defineTfsProject({ runtime: { colorThemes } })`; the generated
+runtime policy preserves literal color identities, the resolved alpha scale, custom-property naming,
 and separation groups without app-side duplication. Static palette tokens do
 not accidentally become runtime-editable.
 

@@ -42,8 +42,8 @@
 					Sphinx of black quartz, judge my vow.
 				</span>
 				<code>
-					--{reviewCase.recipe.atomicFontSizeToken} · {reviewCase.weight.alias} ·
-					{reviewCase.recipe.lineHeight}
+					--{reviewCase.composite.atomicFontSizeToken} · {reviewCase.weight.alias} ·
+					{reviewCase.composite.lineHeight}
 				</code>
 			{:else if reviewCase.kind === 'shadow'}
 				<div class="matrix-shadow">

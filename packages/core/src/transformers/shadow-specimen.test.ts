@@ -3,6 +3,14 @@ import { generate, oklch } from '../index.js';
 import { toShadowSpecimen } from './shadow-specimen.js';
 
 const ir = generate({
+	alpha: {
+		defaultScale: 'standard',
+		scales: {
+			standard: {
+				values: { min: 0.08, 'lo-x': 0.125, lo: 0.2, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+			},
+		},
+	},
 	colors: {
 		modes: [
 			{
@@ -17,7 +25,6 @@ const ir = generate({
 			},
 			{ name: 'light', tokens: { bg: oklch(0.98, 0, 0), ink: oklch(0.1, 0, 0) } },
 		],
-		alphaSchedule: { min: 0.08, lo: 0.2 },
 	},
 	shadows: {
 		unit: 'px',

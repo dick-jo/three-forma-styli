@@ -132,107 +132,118 @@ export function validateMotionPartial(
 		}
 	}
 
-	if (!motion.recipes || typeof motion.recipes !== 'object' || Array.isArray(motion.recipes)) {
-		throw new ValidationError('motion.recipes must be an object');
+	if (
+		!motion.composites ||
+		typeof motion.composites !== 'object' ||
+		Array.isArray(motion.composites)
+	) {
+		throw new ValidationError('motion.composites must be an object');
 	}
-	if (Object.keys(motion.recipes).length === 0) {
-		throw new ValidationError('motion.recipes must contain at least one recipe');
+	if (Object.keys(motion.composites).length === 0) {
+		throw new ValidationError('motion.composites must contain at least one composite');
 	}
-	for (const [recipeName, recipe] of Object.entries(motion.recipes)) {
-		if (!tokenNamePattern.test(recipeName)) {
-			throw new ValidationError(`motion.recipes name "${recipeName}" is not CSS-token safe`);
+	for (const [compositeName, composite] of Object.entries(motion.composites)) {
+		if (!tokenNamePattern.test(compositeName)) {
+			throw new ValidationError(`motion.composites name "${compositeName}" is not CSS-token safe`);
 		}
-		if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe) || !recipe.base) {
-			throw new ValidationError(`motion.recipes.${recipeName}.base is required`);
+		if (
+			!composite ||
+			typeof composite !== 'object' ||
+			Array.isArray(composite) ||
+			!composite.base
+		) {
+			throw new ValidationError(`motion.composites.${compositeName}.base is required`);
 		}
-		if (recipe.reducedMotion === undefined) {
+		if (composite.reducedMotion === undefined) {
 			throw new ValidationError(
-				`motion.recipes.${recipeName}.reducedMotion is required; use "preserve" for essential motion or author a reduced override`
+				`motion.composites.${compositeName}.reducedMotion is required; use "preserve" for essential motion or author a reduced override`
 			);
 		}
-		if ('base' in (recipe.variants ?? {})) {
+		if ('base' in (composite.variants ?? {})) {
 			throw new ValidationError(
-				`motion.recipes.${recipeName}.variants must not contain reserved name "base"`
+				`motion.composites.${compositeName}.variants must not contain reserved name "base"`
 			);
 		}
-		for (const variantName of Object.keys(recipe.variants ?? {})) {
+		for (const variantName of Object.keys(composite.variants ?? {})) {
 			if (!tokenNamePattern.test(variantName)) {
 				throw new ValidationError(
-					`motion.recipes.${recipeName}.variants name "${variantName}" is not CSS-token safe`
+					`motion.composites.${compositeName}.variants name "${variantName}" is not CSS-token safe`
 				);
 			}
 		}
-		if (recipe.displayOrder) {
-			const expected = ['base', ...Object.keys(recipe.variants ?? {})].sort();
-			const received = [...recipe.displayOrder].sort();
+		if (composite.displayOrder) {
+			const expected = ['base', ...Object.keys(composite.variants ?? {})].sort();
+			const received = [...composite.displayOrder].sort();
 			if (
 				expected.length !== received.length ||
 				expected.some((name, index) => name !== received[index])
 			) {
 				throw new ValidationError(
-					`motion.recipes.${recipeName}.displayOrder must contain base and every variant exactly once`
+					`motion.composites.${compositeName}.displayOrder must contain base and every variant exactly once`
 				);
 			}
 		}
 
 		for (const [variantName, variant] of [
-			['base', recipe.base] as const,
-			...Object.entries(recipe.variants ?? {}),
+			['base', composite.base] as const,
+			...Object.entries(composite.variants ?? {}),
 		]) {
-			const path = `motion.recipes.${recipeName}.${variantName}`;
-			validateMotionValue(variant, path, recipe.base, motion, time, {
+			const path = `motion.composites.${compositeName}.${variantName}`;
+			validateMotionValue(variant, path, composite.base, motion, time, {
 				allowZeroDuration: false,
 				requireField: false,
 			});
 		}
 
-		if (recipe.reducedMotion !== 'preserve') {
+		if (composite.reducedMotion !== 'preserve') {
 			if (
-				!recipe.reducedMotion ||
-				typeof recipe.reducedMotion !== 'object' ||
-				Array.isArray(recipe.reducedMotion)
+				!composite.reducedMotion ||
+				typeof composite.reducedMotion !== 'object' ||
+				Array.isArray(composite.reducedMotion)
 			) {
 				throw new ValidationError(
-					`motion.recipes.${recipeName}.reducedMotion must be "preserve" or an object`
+					`motion.composites.${compositeName}.reducedMotion must be "preserve" or an object`
 				);
 			}
 			const reducedAllowed = new Set(['base', 'variants']);
-			for (const key of Object.keys(recipe.reducedMotion)) {
+			for (const key of Object.keys(composite.reducedMotion)) {
 				if (!reducedAllowed.has(key)) {
 					throw new ValidationError(
-						`motion.recipes.${recipeName}.reducedMotion contains unknown field "${key}"`
+						`motion.composites.${compositeName}.reducedMotion contains unknown field "${key}"`
 					);
 				}
 			}
 			validateMotionValue(
-				recipe.reducedMotion.base,
-				`motion.recipes.${recipeName}.reducedMotion.base`,
-				recipe.base,
+				composite.reducedMotion.base,
+				`motion.composites.${compositeName}.reducedMotion.base`,
+				composite.base,
 				motion,
 				time,
 				{ allowZeroDuration: true, requireField: true }
 			);
 			if (
-				recipe.reducedMotion.variants !== undefined &&
-				(!recipe.reducedMotion.variants ||
-					typeof recipe.reducedMotion.variants !== 'object' ||
-					Array.isArray(recipe.reducedMotion.variants))
+				composite.reducedMotion.variants !== undefined &&
+				(!composite.reducedMotion.variants ||
+					typeof composite.reducedMotion.variants !== 'object' ||
+					Array.isArray(composite.reducedMotion.variants))
 			) {
 				throw new ValidationError(
-					`motion.recipes.${recipeName}.reducedMotion.variants must be an object`
+					`motion.composites.${compositeName}.reducedMotion.variants must be an object`
 				);
 			}
-			for (const [variantName, override] of Object.entries(recipe.reducedMotion.variants ?? {})) {
-				if (!recipe.variants?.[variantName]) {
+			for (const [variantName, override] of Object.entries(
+				composite.reducedMotion.variants ?? {}
+			)) {
+				if (!composite.variants?.[variantName]) {
 					throw new ValidationError(
-						`motion.recipes.${recipeName}.reducedMotion.variants references unknown variant "${variantName}"`
+						`motion.composites.${compositeName}.reducedMotion.variants references unknown variant "${variantName}"`
 					);
 				}
 				if (override === 'preserve') continue;
 				validateMotionValue(
 					override,
-					`motion.recipes.${recipeName}.reducedMotion.variants.${variantName}`,
-					recipe.base,
+					`motion.composites.${compositeName}.reducedMotion.variants.${variantName}`,
+					composite.base,
 					motion,
 					time,
 					{ allowZeroDuration: true, requireField: true }
@@ -244,7 +255,8 @@ export function validateMotionPartial(
 
 export function validateShadowsPartial(
 	shadows: NonNullable<PartialDesignSystem['shadows']>,
-	colors: NonNullable<PartialDesignSystem['colors']>
+	colors: NonNullable<PartialDesignSystem['colors']>,
+	alpha?: PartialDesignSystem['alpha']
 ): void {
 	validateCssUnit(shadows.unit, 'shadows.unit');
 	if (['%', 'ms', 's', 'deg'].includes(shadows.unit)) {
@@ -253,34 +265,35 @@ export function validateShadowsPartial(
 	const box = shadows.box ?? {};
 	const text = shadows.text ?? {};
 	if (Object.keys(box).length === 0 && Object.keys(text).length === 0) {
-		throw new ValidationError('shadows must contain at least one box or text recipe');
+		throw new ValidationError('shadows must contain at least one box or text composite');
 	}
 	const defaultColorMode = colors.modes.find((mode) => mode.isDefault) ?? colors.modes[0];
-	const colorNames = new Set(Object.keys(defaultColorMode?.tokens ?? {}));
-	const alphaNames = new Set(
-		Object.keys(defaultColorMode?.alphaSchedule ?? colors.alphaSchedule ?? {})
+	const colorIdentities = new Set(Object.keys(defaultColorMode?.tokens ?? {}));
+	const selectedAlphaScale = alpha?.scales[colors.alphaScale ?? alpha.defaultScale];
+	const alphaIdentities = new Set(
+		selectedAlphaScale ? ['non', ...Object.keys(selectedAlphaScale.values)] : []
 	);
 
-	for (const [kind, recipes] of [['box', box] as const, ['text', text] as const]) {
-		for (const [recipeName, recipe] of Object.entries(recipes)) {
-			const path = `shadows.${kind}.${recipeName}`;
-			if (!tokenNamePattern.test(recipeName)) {
+	for (const [kind, composites] of [['box', box] as const, ['text', text] as const]) {
+		for (const [compositeName, composite] of Object.entries(composites)) {
+			const path = `shadows.${kind}.${compositeName}`;
+			if (!tokenNamePattern.test(compositeName)) {
 				throw new ValidationError(`${path} name is not CSS-token safe`);
 			}
-			if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe)) {
+			if (!composite || typeof composite !== 'object' || Array.isArray(composite)) {
 				throw new ValidationError(`${path} must be an object`);
 			}
-			if ('base' in (recipe.variants ?? {})) {
+			if ('base' in (composite.variants ?? {})) {
 				throw new ValidationError(`${path}.variants must not contain reserved name "base"`);
 			}
-			for (const variantName of Object.keys(recipe.variants ?? {})) {
+			for (const variantName of Object.keys(composite.variants ?? {})) {
 				if (!tokenNamePattern.test(variantName)) {
 					throw new ValidationError(`${path}.variants name "${variantName}" is not CSS-token safe`);
 				}
 			}
-			if (recipe.displayOrder) {
-				const expected = ['base', ...Object.keys(recipe.variants ?? {})].sort();
-				const received = [...recipe.displayOrder].sort();
+			if (composite.displayOrder) {
+				const expected = ['base', ...Object.keys(composite.variants ?? {})].sort();
+				const received = [...composite.displayOrder].sort();
 				if (
 					expected.length !== received.length ||
 					expected.some((name, index) => name !== received[index])
@@ -291,8 +304,8 @@ export function validateShadowsPartial(
 				}
 			}
 			for (const [variantName, layers] of [
-				['base', recipe.base] as const,
-				...Object.entries(recipe.variants ?? {}),
+				['base', composite.base] as const,
+				...Object.entries(composite.variants ?? {}),
 			]) {
 				const layerPath = `${path}.${variantName}`;
 				if (!Array.isArray(layers) || layers.length === 0) {
@@ -336,14 +349,14 @@ export function validateShadowsPartial(
 					if (!tokenNamePattern.test(layer.color.color)) {
 						throw new ValidationError(`${current}.color.color is not CSS-token safe`);
 					}
-					if (!colorNames.has(layer.color.color)) {
+					if (!colorIdentities.has(layer.color.color)) {
 						throw new ValidationError(
-							`${current}.color references unknown default color "${layer.color.color}"`
+							`${current}.color references unknown default color identity "${layer.color.color}"`
 						);
 					}
-					if (layer.color.alpha !== undefined && !alphaNames.has(layer.color.alpha)) {
+					if (layer.color.alpha !== undefined && !alphaIdentities.has(layer.color.alpha)) {
 						throw new ValidationError(
-							`${current}.color references unknown alpha level "${layer.color.alpha}"`
+							`${current}.color references unknown alpha identity "${layer.color.alpha}"`
 						);
 					}
 				}

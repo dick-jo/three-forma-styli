@@ -1,12 +1,17 @@
 import { defineTfsProject } from '@three-forma-styli/compiler';
+import { defineAlpha, defineTypography } from '@three-forma-styli/core';
 
 export default defineTfsProject({
 	system: {
-		colors: {
-			alphaSchedule: {
-				soft: 0.12,
-				strong: 0.68,
+		alpha: defineAlpha({
+			defaultScale: 'editorial',
+			scales: {
+				editorial: {
+					values: { min: 0.06, 'lo-x': 0.12, lo: 0.22, hi: 0.42, 'hi-x': 0.68, max: 0.86 },
+				},
 			},
+		}),
+		colors: {
 			modes: [
 				{
 					name: 'journal',
@@ -19,7 +24,7 @@ export default defineTfsProject({
 				},
 			],
 		},
-		typography: {
+		typography: defineTypography({
 			modes: [
 				{
 					name: 'reading',
@@ -58,57 +63,47 @@ export default defineTfsProject({
 			roles: {
 				article: {
 					font: 'editorial',
-					weights: {
-						book: 400,
-						emphasis: 700,
-					},
-					base: {
-						fontSize: 2,
-						weight: 'book',
-						lineHeight: 1.55,
-						letterSpacing: 0,
-					},
-					variants: {
-						aside: {
+					weights: { min: 400, max: 700 },
+					weight: 'min',
+					sizes: {
+						min: {
 							fontSize: 1,
-							weight: 'book',
 							lineHeight: 1.45,
 							letterSpacing: 0.005,
 						},
-						lead: {
+						base: {
+							fontSize: 2,
+							lineHeight: 1.55,
+							letterSpacing: 0,
+						},
+						max: {
 							fontSize: 4,
-							weight: 'book',
 							lineHeight: 1.35,
 							letterSpacing: -0.01,
 						},
 					},
-					displayOrder: ['aside', 'base', 'lead'],
 				},
 				caption: {
 					font: 'annotation',
-					weights: {
-						plain: 400,
-						emphasis: 600,
-					},
+					weights: { min: 400, max: 600 },
+					weight: 'min',
 					textTransform: 'uppercase',
-					base: {
-						fontSize: 'min',
-						weight: 'emphasis',
-						lineHeight: 1.25,
-						letterSpacing: 0.06,
-					},
-					variants: {
-						expanded: {
+					sizes: {
+						min: {
+							fontSize: 'min',
+							weight: 'max',
+							lineHeight: 1.25,
+							letterSpacing: 0.06,
+						},
+						base: {
 							fontSize: 1,
-							weight: 'plain',
 							lineHeight: 1.35,
 							letterSpacing: 0.04,
 						},
 					},
-					displayOrder: ['base', 'expanded'],
 				},
 			},
-		},
+		}),
 	},
 	output: {
 		directory: './generated',

@@ -16,6 +16,7 @@ import type {
 } from './types.js';
 import { defaultGeneratorConfig } from './types.js';
 import { validatePartialDesignSystem, ValidationError } from './validate.js';
+import { alphaScaleValues, generateAlphaTokens, resolvedAlphaValues } from './alpha.js';
 import { generateColorTokens } from './colors.js';
 import { generateSpacingTokens } from './spacing.js';
 import { generateGapTokens } from './gap.js';
@@ -40,6 +41,7 @@ export type {
 	ShadowGeneratorResult,
 	ShadowContract,
 	TypographyContract,
+	AlphaContract,
 } from './types.js';
 
 /**
@@ -146,9 +148,12 @@ function validateOverrideModeIdentity(colorOverrides: string[], sizeOverrides: s
  * @example Partial - just colors
  * ```ts
  * const ir = generate({
+ *   alpha: defineAlpha({
+ *     defaultScale: 'standard',
+ *     scales: { standard: { values: alphaValues } },
+ *   }),
  *   colors: {
  *     modes: [{ name: 'default', isDefault: true, tokens: { bg, primary, ink } }],
- *     alphaSchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 },
  *   },
  * });
  * ```
@@ -163,10 +168,22 @@ export function generate(
 	// Merge config
 	const config = resolveGeneratorConfig(userConfig);
 	validateConfig(config);
+	if (designSystem.alpha && config.colorFormat.alphaModifier !== 'a') {
+		throw new ValidationError('The v0.5 alpha grammar fixes the color alpha modifier as "a"');
+	}
+	const alphaResult = designSystem.alpha ? generateAlphaTokens(designSystem.alpha) : undefined;
+	const selectedAlphaSchedule = designSystem.alpha
+		? resolvedAlphaValues(
+				alphaScaleValues(
+					designSystem.alpha,
+					designSystem.colors?.alphaScale ?? designSystem.alpha.defaultScale
+				)
+			)
+		: undefined;
 
 	// Generate tokens for each family (if provided)
 	const colorResult = designSystem.colors
-		? generateColorTokens(designSystem.colors, config)
+		? generateColorTokens(designSystem.colors, config, selectedAlphaSchedule)
 		: emptyResult;
 
 	const spacingResult = designSystem.spacing
@@ -214,6 +231,7 @@ export function generate(
 
 	// Combine all default tokens
 	const allDefaultTokens = [
+		...(alphaResult?.defaultTokens ?? []),
 		...colorResult.defaultTokens,
 		...spacingResult.defaultTokens,
 		...gapResult.defaultTokens,
@@ -279,6 +297,7 @@ export function generate(
 
 	return {
 		tokens: tokensToRecord(allDefaultTokens, 'the default token set'),
+		alpha: alphaResult?.contract,
 		typography: designSystem.typography
 			? generateTypographyContract(designSystem.typography, config)
 			: undefined,

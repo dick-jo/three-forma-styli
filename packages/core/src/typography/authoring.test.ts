@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { defineTypography, deriveTypographyRange } from './authoring.js';
+import { defineTypography, deriveTypographySizes } from './authoring.js';
 
 const scale = { unit: 'rem', base: 0.75, min: 0.625, increment: 0.125, range: 12 };
 
 describe('defineTypography', () => {
-	it('preserves explicit arbitrary role and variant names without adding policy', () => {
+	it('normalizes fixed size ranges while preserving arbitrary roles and categorical variants', () => {
 		const typography = defineTypography({
 			modes: [{ name: 'default', isDefault: true, tokens: scale }],
 			fonts: {
@@ -17,153 +17,124 @@ describe('defineTypography', () => {
 			roles: {
 				legal: {
 					font: 'editorial',
-					base: { fontSize: 3, weight: 'regular', lineHeight: 1.4, letterSpacing: 0 },
-					variants: {
-						footnote: { fontSize: 'min', weight: 'regular', lineHeight: 1.5, letterSpacing: 0.01 },
+					weights: 400,
+					sizes: {
+						min: { fontSize: 'min', lineHeight: 1.5, letterSpacing: 0.01 },
+						base: { fontSize: 3, lineHeight: 1.4, letterSpacing: 0 },
 					},
-					weights: { regular: 400 },
+					variants: { legalese: { letterSpacing: 0.02 } },
 				},
 			},
 		});
 
 		expect(Object.keys(typography.roles)).toEqual(['legal']);
-		expect(Object.keys(typography.roles.legal.variants)).toEqual(['footnote']);
-		expect(typography.roles.legal.base.fontSize).toBe(3);
+		expect(Object.keys(typography.roles.legal.sizes)).toEqual(['min', 'base']);
+		expect(Object.keys(typography.roles.legal.variants ?? {})).toEqual(['legalese']);
+		expect(typography.roles.legal.sizes.base).toMatchObject({ fontSize: 3, weight: 'base' });
+	});
+
+	it('enforces sparse size and role-local weight grammar', () => {
+		const base = {
+			modes: [{ name: 'default', isDefault: true as const, tokens: scale }],
+			fonts: { ui: { family: 'UI', verification: 'unavailable' as const } },
+		};
+		expect(() =>
+			defineTypography({
+				...base,
+				roles: {
+					bad: {
+						font: 'ui',
+						weights: 400,
+						sizes: {
+							base: { fontSize: 2, lineHeight: 1.2, letterSpacing: 0 },
+							s: { fontSize: 1, lineHeight: 1.3, letterSpacing: 0 },
+						},
+					},
+				},
+			})
+		).toThrow('size s requires min');
+		expect(() =>
+			defineTypography({
+				...base,
+				roles: {
+					bad: {
+						font: 'ui',
+						weight: 'min',
+						weights: { min: 700, max: 400 },
+						sizes: { base: { fontSize: 2, lineHeight: 1.2, letterSpacing: 0 } },
+					},
+				},
+			})
+		).toThrow('weights must be unique increasing');
+		expect(() =>
+			defineTypography({
+				...base,
+				roles: {
+					bad: {
+						font: 'ui',
+						weights: 400,
+						sizes: { base: { fontSize: 2, lineHeight: 1.2, letterSpacing: 0 } },
+						variants: { display: { fontSize: 6 } },
+					},
+				},
+			} as never)
+		).toThrow('contains unsupported field: fontSize');
 	});
 });
 
-describe('deriveTypographyRange', () => {
-	it('derives caller-named variants around an unsuffixed base', () => {
-		const range = deriveTypographyRange({
+describe('deriveTypographySizes', () => {
+	it('derives only the fixed role-local size range', () => {
+		const sizes = deriveTypographySizes({
 			scale,
-			order: ['compact', 'reading', 'base', 'roomy', 'display'],
 			anchors: {
-				compact: { fontSize: 'min', weight: 'regular', lineHeight: 1.4, letterSpacing: 0.01 },
-				base: { fontSize: 2, weight: 'regular', lineHeight: 1.3, letterSpacing: 0 },
-				display: { fontSize: 4, weight: 'regular', lineHeight: 1.2, letterSpacing: -0.01 },
+				min: { fontSize: 'min', weight: 'min', lineHeight: 1.4, letterSpacing: 0.01 },
+				base: { fontSize: 2, weight: 'min', lineHeight: 1.3, letterSpacing: 0 },
+				max: { fontSize: 4, weight: 'max', lineHeight: 1.1, letterSpacing: -0.01 },
 			},
 			derived: {
-				reading: { between: ['compact', 'base'] },
-				roomy: { between: ['base', 'display'] },
+				s: { between: ['min', 'base'] },
+				l: { between: ['base', 'max'], weight: 'hi' },
 			},
 		});
-
-		expect(range.base).toEqual({
-			fontSize: 2,
-			weight: 'regular',
-			lineHeight: 1.3,
-			letterSpacing: 0,
-		});
-		expect(range.displayOrder).toEqual(['compact', 'reading', 'base', 'roomy', 'display']);
-		expect(range.variants).toEqual({
-			compact: { fontSize: 'min', weight: 'regular', lineHeight: 1.4, letterSpacing: 0.01 },
-			reading: { fontSize: 1, weight: 'regular', lineHeight: 1.35, letterSpacing: 0.005 },
-			roomy: { fontSize: 3, weight: 'regular', lineHeight: 1.25, letterSpacing: -0.005 },
-			display: { fontSize: 4, weight: 'regular', lineHeight: 1.2, letterSpacing: -0.01 },
+		expect(sizes).toEqual({
+			min: { fontSize: 'min', weight: 'min', lineHeight: 1.4, letterSpacing: 0.01 },
+			s: { fontSize: 1, weight: 'min', lineHeight: 1.35, letterSpacing: 0.005 },
+			base: { fontSize: 2, weight: 'min', lineHeight: 1.3, letterSpacing: 0 },
+			l: { fontSize: 3, weight: 'hi', lineHeight: 1.2, letterSpacing: -0.005 },
+			max: { fontSize: 4, weight: 'max', lineHeight: 1.1, letterSpacing: -0.01 },
 		});
 	});
 
-	it('requires an exact, non-duplicated output order', () => {
+	it('fails instead of guessing a disputed weight or impossible atomic step', () => {
 		expect(() =>
-			deriveTypographyRange({
+			deriveTypographySizes({
 				scale,
-				order: ['base', 'base'],
-				anchors: { base: { fontSize: 2, weight: 'regular', lineHeight: 1.2, letterSpacing: 0 } },
-				derived: {},
-			})
-		).toThrow('must not contain duplicate names');
-	});
-
-	it('fails when the atomic scale cannot provide a distinct derived step', () => {
-		expect(() =>
-			deriveTypographyRange({
-				scale,
-				order: ['near', 'base', 'far'],
 				anchors: {
-					base: { fontSize: 1, weight: 'regular', lineHeight: 1.2, letterSpacing: 0 },
-					far: { fontSize: 2, weight: 'regular', lineHeight: 1.1, letterSpacing: 0 },
+					base: { fontSize: 2, weight: 'min', lineHeight: 1.3, letterSpacing: 0 },
+					max: { fontSize: 4, weight: 'max', lineHeight: 1.1, letterSpacing: -0.01 },
 				},
-				derived: { near: { between: ['base', 'far'] } },
-			})
-		).toThrow('Cannot derive a distinct font-size reference');
-	});
-
-	it('never silently chooses non-interpolable settings from one anchor', () => {
-		expect(() =>
-			deriveTypographyRange({
-				scale,
-				order: ['base', 'middle', 'display'],
-				anchors: {
-					base: {
-						fontSize: 2,
-						weight: 'regular',
-						lineHeight: 1.3,
-						letterSpacing: 0,
-						fontKerning: 'normal',
-					},
-					display: {
-						fontSize: 4,
-						weight: 'regular',
-						lineHeight: 1.1,
-						letterSpacing: -0.01,
-						fontKerning: 'none',
-					},
-				},
-				derived: { middle: { between: ['base', 'display'] } },
-			})
-		).toThrow('provide settings explicitly');
-
-		const range = deriveTypographyRange({
-			scale,
-			order: ['base', 'middle', 'display'],
-			anchors: {
-				base: {
-					fontSize: 2,
-					weight: 'regular',
-					lineHeight: 1.3,
-					letterSpacing: 0,
-					fontKerning: 'normal',
-				},
-				display: {
-					fontSize: 4,
-					weight: 'regular',
-					lineHeight: 1.1,
-					letterSpacing: -0.01,
-					fontKerning: 'none',
-				},
-			},
-			derived: {
-				middle: {
-					between: ['base', 'display'],
-					settings: { fontKerning: 'auto' },
-				},
-			},
-		});
-		expect(range.variants.middle.fontKerning).toBe('auto');
-	});
-
-	it('never silently chooses a weight from disagreeing anchors', () => {
-		expect(() =>
-			deriveTypographyRange({
-				scale,
-				order: ['base', 'middle', 'display'],
-				anchors: {
-					base: { fontSize: 2, weight: 'lo', lineHeight: 1.3, letterSpacing: 0 },
-					display: { fontSize: 4, weight: 'max', lineHeight: 1.1, letterSpacing: -0.01 },
-				},
-				derived: { middle: { between: ['base', 'display'] } },
+				derived: { l: { between: ['base', 'max'] } },
 			})
 		).toThrow('provide weight explicitly');
-
-		const range = deriveTypographyRange({
-			scale,
-			order: ['base', 'middle', 'display'],
-			anchors: {
-				base: { fontSize: 2, weight: 'lo', lineHeight: 1.3, letterSpacing: 0 },
-				display: { fontSize: 4, weight: 'max', lineHeight: 1.1, letterSpacing: -0.01 },
-			},
-			derived: { middle: { between: ['base', 'display'], weight: 'hi' } },
-		});
-		expect(range.variants.middle.weight).toBe('hi');
+		expect(() =>
+			deriveTypographySizes({
+				scale,
+				anchors: {
+					base: { fontSize: 1, lineHeight: 1.2, letterSpacing: 0 },
+					max: { fontSize: 2, lineHeight: 1.1, letterSpacing: 0 },
+				},
+				derived: { l: { between: ['base', 'max'] } },
+			})
+		).toThrow('Cannot derive a distinct font-size reference');
+		expect(() =>
+			deriveTypographySizes({
+				scale,
+				anchors: {
+					base: { fontSize: 2, lineHeight: 1.2, letterSpacing: 0 },
+					max: { fontSize: 4, lineHeight: 1, letterSpacing: 0 },
+				},
+				derived: { max: { between: ['base', 'max'] } },
+			} as never)
+		).toThrow('cannot be both an anchor and a derived size');
 	});
 });

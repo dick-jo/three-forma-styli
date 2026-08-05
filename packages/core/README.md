@@ -44,15 +44,15 @@ const colorsCss = toCss(generate(partial));
   (color, dimension, duration, easing, transition, typography, and shadow) or
   color-only Figma Variables JSON
 - `toFigmaJson(ir, config?, format?)` - Transform a hex/profile-aware IR to JSON
-- `defineTypography(system)` - Preserve literal font/role/variant names for an explicit typography system; adds no hidden defaults
-- `deriveTypographyRange(input)` - Optionally derive caller-named role variants from explicit anchors
+- `defineTypography(system)` - Preserve literal font, role, size, and categorical-variant identities while validating the v0.5 typography grammar; adds no hidden defaults
+- `deriveTypographySizes(input)` - Optionally derive the fixed role-local size range from explicit anchors
 - `fontFromManifest(manifest, id, options?)` - Bind prepared font capabilities into typography validation
 - `generateTypographyTypescript(designSystem, config?)` - Generate a typed semantic typography contract
 - `toTypographyTypescript(ir)` - Transform structured typography IR into TypeScript
 - `generateTypographySpecimen(designSystem, config?)` - Generate a static calibration workbench
 - `toTypographySpecimen(ir, config?)` - Transform structured typography IR into HTML
-- `toTypographyCss(ir, config?)` - Generate global or local CSS Module recipes with explicit specificity policy
-- `toTypographyCssModuleTypes(ir)` - Generate literal declarations for the CSS Module recipe keys
+- `toTypographyCss(ir, config?)` - Generate global or local CSS Module composites with explicit specificity policy
+- `toTypographyCssModuleTypes(ir)` - Generate literal declarations for the CSS Module composite keys
 
 ## Types
 
@@ -86,8 +86,8 @@ missing fields, extra fields, unsafe names, non-finite numbers, and invalid rang
 fail before CSS is emitted. CSS values stay in native `oklch()`, preserving
 Display-P3-capable chroma for the browser instead of clipping through sRGB.
 Workspace-package projects generate the policy from `colors.luminance` plus the
-explicit `colors.runtimeThemes.colorNames` subset; a hand-authored structural
-config remains available for non-compiler integrations.
+project-level `runtime.colorThemes.colors.include` selection; a hand-authored
+structural config remains available for non-compiler integrations.
 
 TFS retains its public `luminance` terminology. Shared and runtime validation
 results identify the current metric as `oklch-l`. Runtime diagnostics compare

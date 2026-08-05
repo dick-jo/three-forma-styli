@@ -1,6 +1,6 @@
 import {
 	defineTypography,
-	deriveTypographyRange,
+	deriveTypographySizes,
 	fontFromManifest,
 	type FontSizeSystem,
 	type PartialDesignSystem,
@@ -24,9 +24,8 @@ export const TYPE_SCALE: FontSizeSystem = {
 	range: 12,
 };
 
-const proseRange = deriveTypographyRange({
+const proseSizes = deriveTypographySizes({
 	scale: TYPE_SCALE,
-	order: ['min', 's', 'base', 'l', 'max'],
 	anchors: {
 		min: { fontSize: 'min', weight: 'min', lineHeight: 1.35, letterSpacing: 0.01 },
 		base: { fontSize: 2, weight: 'lo', lineHeight: 1.25, letterSpacing: 0 },
@@ -38,9 +37,8 @@ const proseRange = deriveTypographyRange({
 	},
 });
 
-const headingRange = deriveTypographyRange({
+const headingSizes = deriveTypographySizes({
 	scale: TYPE_SCALE,
-	order: ['min', 's', 'base', 'l', 'max'],
 	anchors: {
 		min: { fontSize: 1, weight: 'lo', lineHeight: 1.12, letterSpacing: 0 },
 		base: { fontSize: 5, weight: 'max', lineHeight: 1, letterSpacing: -0.012 },
@@ -52,9 +50,8 @@ const headingRange = deriveTypographyRange({
 	},
 });
 
-const labelRange = deriveTypographyRange({
+const labelSizes = deriveTypographySizes({
 	scale: TYPE_SCALE,
-	order: ['min', 's', 'base', 'l', 'max'],
 	anchors: {
 		min: { fontSize: 'min', weight: 'min', lineHeight: 1.3, letterSpacing: 0.02 },
 		base: { fontSize: 2, weight: 'lo', lineHeight: 1.2, letterSpacing: 0.01 },
@@ -76,7 +73,8 @@ export const typography = defineTypography({
 	roles: {
 		prose: {
 			font: 'supreme',
-			...proseRange,
+			weight: 'lo',
+			sizes: proseSizes,
 			weights: { min: 300, lo: 400, hi: 500, max: 700 },
 			styles: {
 				normal: { weights: ['min', 'lo', 'hi', 'max'] },
@@ -85,7 +83,8 @@ export const typography = defineTypography({
 		},
 		heading: {
 			font: 'supreme',
-			...headingRange,
+			weight: 'max',
+			sizes: headingSizes,
 			weights: { min: 500, lo: 600, hi: 700, max: 800 },
 			styles: {
 				normal: { weights: ['min', 'lo', 'hi', 'max'] },
@@ -94,7 +93,8 @@ export const typography = defineTypography({
 		},
 		label: {
 			font: 'jetbrains',
-			...labelRange,
+			weight: 'lo',
+			sizes: labelSizes,
 			weights: { min: 400, lo: 500, hi: 600, max: 700 },
 			styles: {
 				normal: { weights: ['min', 'lo', 'hi', 'max'] },

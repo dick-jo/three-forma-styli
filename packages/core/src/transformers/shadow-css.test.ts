@@ -3,6 +3,14 @@ import { generate, oklch } from '../index.js';
 import { toShadowCss, toShadowCssModuleTypes } from './shadow-css.js';
 
 const ir = generate({
+	alpha: {
+		defaultScale: 'standard',
+		scales: {
+			standard: {
+				values: { min: 0.08, 'lo-x': 0.125, lo: 0.2, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+			},
+		},
+	},
 	colors: {
 		modes: [
 			{
@@ -11,7 +19,6 @@ const ir = generate({
 				tokens: { ink: oklch(0.1, 0, 0), pri: oklch(0.7, 0.2, 300) },
 			},
 		],
-		alphaSchedule: { lo: 0.2 },
 	},
 	shadows: {
 		unit: 'px',

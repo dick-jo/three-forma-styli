@@ -209,6 +209,7 @@
 				(reviewCase) =>
 					reviewCase.mode === visibleTypographyMode &&
 					reviewCase.role === activeCase.role &&
+					reviewCase.size === activeCase.size &&
 					reviewCase.variant === activeCase.variant
 			) ?? activeLab.cases.find((reviewCase) => reviewCase.mode === visibleTypographyMode);
 		if (replacement) activeCaseId = replacement.id;

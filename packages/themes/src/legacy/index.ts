@@ -1,7 +1,11 @@
-import { oklch, type DesignSystem, type TypographyMode } from '@three-forma-styli/core';
+import {
+	defineAlpha,
+	oklch,
+	type DesignSystem,
+	type TypographyMode,
+} from '@three-forma-styli/core';
 
-const alphaSchedule = {
-	non: 0,
+const alphaValues = {
 	min: 0.07,
 	'lo-x': 0.125,
 	lo: 0.25,
@@ -9,6 +13,11 @@ const alphaSchedule = {
 	'hi-x': 0.85,
 	max: 0.93,
 };
+
+export const alpha = defineAlpha({
+	defaultScale: 'standard',
+	scales: { standard: { values: alphaValues } },
+});
 
 export const color: DesignSystem['colors'] = {
 	modes: [
@@ -24,10 +33,8 @@ export const color: DesignSystem['colors'] = {
 				pos: oklch(0.7625, 0.203, 150.49),
 				neg: oklch(0.6875, 0.2113, 7.38),
 			},
-			alphaSchedule,
 		},
 	],
-	alphaSchedule,
 };
 
 export const spacing: DesignSystem['spacing'] = {
@@ -89,6 +96,7 @@ export const typography: DesignSystem['typography'] = {
 };
 
 export const legacyDesignSystem: DesignSystem = {
+	alpha,
 	colors: color,
 	spacing,
 	gap,

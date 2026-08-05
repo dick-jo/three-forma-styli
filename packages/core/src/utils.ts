@@ -1,7 +1,8 @@
 // src/utils.ts
 import { toGamut, formatHex, formatRgb } from 'culori';
-import type { Oklch, P3, Rgb } from 'culori';
+import type { P3, Rgb } from 'culori';
 import { formatNativeOklch, formatNativeOklchWithAlpha } from './color-css.js';
+import type { Oklch } from './types.js';
 
 /**
  * Create an OKLCH color object

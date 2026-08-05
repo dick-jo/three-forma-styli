@@ -1,4 +1,4 @@
-import type { IR, TypographyContract, TypographyContractRecipe } from '../generator/types.js';
+import type { IR, TypographyContract, TypographyContractComposite } from '../generator/types.js';
 
 export interface TypographySpecimenConfig {
 	title?: string;
@@ -58,54 +58,56 @@ function typographyTokenCss(ir: IR): string {
 	return [`:root {\n${declarations.join('\n')}\n}`, ...overrides].join('\n\n');
 }
 
-interface SpecimenRecipeBaseline {
+interface SpecimenCompositeBaseline {
 	fontSize: string | number;
 	weight: string;
 	lineHeight: number;
 	letterSpacing: number;
 }
 
-function modeRecipeBaselines(
+function modeCompositeBaselines(
 	ir: IR,
 	contract: TypographyContract
-): Record<string, Record<string, Record<string, SpecimenRecipeBaseline>>> {
+): Record<string, Record<string, Record<string, SpecimenCompositeBaseline>>> {
 	const modes = [ir.modes.size.default, ...ir.modes.size.overrides];
 	return Object.fromEntries(
 		modes.map((modeName) => [
 			modeName,
 			Object.fromEntries(
 				Object.entries(contract.roles).map(([roleName, role]) => {
-					const recipes = [['base', role.base] as const, ...Object.entries(role.variants)];
+					const composites = Object.entries(role.sizes);
 					return [
 						roleName,
 						Object.fromEntries(
-							recipes.map(([variantName, recipe]) => {
+							composites.map(([sizeName, composite]) => {
 								const modeTokens =
 									modeName === ir.modes.size.default
 										? ir.tokens
 										: (ir.overrideTokens[modeName] ?? {});
-								const fontSizeToken = modeTokens[recipe.fontSizeToken];
+								const fontSizeToken = modeTokens[composite.fontSizeToken];
 								const atomicPrefix = atomicFontSizePrefix(
-									recipe.fontSizeReference,
-									recipe.atomicFontSizeToken
+									composite.fontSizeReference,
+									composite.atomicFontSizeToken
 								);
 								const reference = fontSizeToken?.reference;
 								const fontSizeSuffix = reference?.startsWith(`${atomicPrefix}-`)
 									? reference.slice(atomicPrefix.length + 1)
-									: String(recipe.fontSizeReference);
-								const weightToken = modeTokens[recipe.fontWeightToken];
+									: String(composite.fontSizeReference);
+								const weightToken = modeTokens[composite.fontWeightToken];
 								const weight =
 									Object.entries(role.weightTokens).find(
 										([, token]) => token === weightToken?.reference
-									)?.[0] ?? recipe.weight;
+									)?.[0] ?? composite.weight;
 								return [
-									variantName,
+									sizeName,
 									{
 										fontSize: fontSizeSuffix === 'min' ? 'min' : Number(fontSizeSuffix),
 										weight,
-										lineHeight: modeTokens[recipe.lineHeightToken]?.rawValue ?? recipe.lineHeight,
+										lineHeight:
+											modeTokens[composite.lineHeightToken]?.rawValue ?? composite.lineHeight,
 										letterSpacing:
-											modeTokens[recipe.letterSpacingToken]?.rawValue ?? recipe.letterSpacingEm,
+											modeTokens[composite.letterSpacingToken]?.rawValue ??
+											composite.letterSpacingEm,
 									},
 								];
 							})
@@ -119,41 +121,45 @@ function modeRecipeBaselines(
 
 function recipeDeclarations(
 	role: TypographyContract['roles'][string],
-	recipe: TypographyContractRecipe
+	composite: TypographyContractComposite
 ) {
 	return [
 		`  font-family: ${variable(role.fontFamilyToken)};`,
-		`  font-size: ${variable(recipe.fontSizeToken)};`,
-		`  font-weight: ${variable(recipe.fontWeightToken)};`,
+		`  font-size: ${variable(composite.fontSizeToken)};`,
+		`  font-weight: ${variable(composite.fontWeightToken)};`,
 		`  font-style: ${variable(role.fontStyleToken)};`,
 		`  font-synthesis: none;`,
-		`  line-height: ${variable(recipe.lineHeightToken)};`,
-		`  letter-spacing: ${variable(recipe.letterSpacingToken)};`,
-		...(recipe.textTransformToken
-			? [`  text-transform: ${variable(recipe.textTransformToken)};`]
+		`  line-height: ${variable(composite.lineHeightToken)};`,
+		`  letter-spacing: ${variable(composite.letterSpacingToken)};`,
+		...(composite.textTransformToken
+			? [`  text-transform: ${variable(composite.textTransformToken)};`]
 			: []),
-		...(recipe.fontKerningToken ? [`  font-kerning: ${variable(recipe.fontKerningToken)};`] : []),
-		...(recipe.fontOpticalSizingToken
-			? [`  font-optical-sizing: ${variable(recipe.fontOpticalSizingToken)};`]
+		...(composite.fontKerningToken
+			? [`  font-kerning: ${variable(composite.fontKerningToken)};`]
 			: []),
-		...(recipe.fontFeatureSettingsToken
-			? [`  font-feature-settings: ${variable(recipe.fontFeatureSettingsToken)};`]
+		...(composite.fontOpticalSizingToken
+			? [`  font-optical-sizing: ${variable(composite.fontOpticalSizingToken)};`]
 			: []),
-		...(recipe.fontVariationSettingsToken
-			? [`  font-variation-settings: ${variable(recipe.fontVariationSettingsToken)};`]
+		...(composite.fontFeatureSettingsToken
+			? [`  font-feature-settings: ${variable(composite.fontFeatureSettingsToken)};`]
+			: []),
+		...(composite.fontVariationSettingsToken
+			? [`  font-variation-settings: ${variable(composite.fontVariationSettingsToken)};`]
 			: []),
 	].join('\n');
 }
 
 function roleCss(contract: TypographyContract): string {
 	return Object.entries(contract.roles)
-		.flatMap(([roleName, role]) => [
-			`[data-type-role=${JSON.stringify(roleName)}]:not([data-type-variant]) {\n${recipeDeclarations(role, role.base)}\n}`,
-			...Object.entries(role.variants).map(
-				([variantName, recipe]) =>
-					`[data-type-role=${JSON.stringify(roleName)}][data-type-variant=${JSON.stringify(variantName)}] {\n${recipeDeclarations(role, recipe)}\n}`
-			),
-		])
+		.flatMap(([roleName, role]) =>
+			Object.entries(role.sizes).map(([sizeName, composite]) => {
+				const sizeSelector =
+					sizeName === 'base'
+						? ':not([data-type-size])'
+						: `[data-type-size=${JSON.stringify(sizeName)}]`;
+				return `[data-type-role=${JSON.stringify(roleName)}]${sizeSelector} {\n${recipeDeclarations(role, composite)}\n}`;
+			})
+		)
 		.join('\n\n');
 }
 
@@ -232,23 +238,23 @@ function fontSizeOptions(ir: IR, selected: string | number, atomicToken: string)
 function calibrationControls(
 	ir: IR,
 	roleName: string,
-	variantName: string | undefined,
-	recipe: TypographyContractRecipe,
+	sizeName: string | undefined,
+	composite: TypographyContractComposite,
 	role: TypographyContract['roles'][string],
 	interactive: boolean
 ): string {
 	if (!interactive) return '';
 	const weightOptions = role.styles[role.defaultStyle]!.weights.map(
 		(alias) =>
-			`<option value="${escapeHtml(alias)}"${recipe.weight === alias ? ' selected' : ''}>${escapeHtml(alias)} · ${role.weights[alias]}</option>`
+			`<option value="${escapeHtml(alias)}"${composite.weight === alias ? ' selected' : ''}>${escapeHtml(alias)} · ${role.weights[alias]}</option>`
 	).join('');
-	const weightPrefix = role.weightTokens[recipe.weight].slice(0, -recipe.weight.length);
-	return `<div class="calibration" data-role="${escapeHtml(roleName)}" data-variant="${escapeHtml(variantName ?? '')}" data-atomic-prefix="${escapeHtml(atomicFontSizePrefix(recipe.fontSizeReference, recipe.atomicFontSizeToken))}" data-weight-prefix="${escapeHtml(weightPrefix)}">
-  <label>size<select data-control="fontSize">${fontSizeOptions(ir, recipe.fontSizeReference, recipe.atomicFontSizeToken)}</select></label>
+	const weightPrefix = role.weightTokens[composite.weight].slice(0, -composite.weight.length);
+	return `<div class="calibration" data-role="${escapeHtml(roleName)}" data-size="${escapeHtml(sizeName ?? '')}" data-atomic-prefix="${escapeHtml(atomicFontSizePrefix(composite.fontSizeReference, composite.atomicFontSizeToken))}" data-weight-prefix="${escapeHtml(weightPrefix)}">
+  <label>size<select data-control="fontSize">${fontSizeOptions(ir, composite.fontSizeReference, composite.atomicFontSizeToken)}</select></label>
   <label>weight<select data-control="weight">${weightOptions}</select></label>
-  <label>line height<input data-control="lineHeight" type="range" min="0.7" max="2" step="any" value="${recipe.lineHeight}"><output>${recipe.lineHeight}</output></label>
-  <label>letter spacing<input data-control="letterSpacing" type="range" min="-0.1" max="0.2" step="any" value="${recipe.letterSpacingEm}"><output>${recipe.letterSpacingEm}em</output></label>
-  <button class="reset-recipe" type="button">Reset recipe</button>
+  <label>line height<input data-control="lineHeight" type="range" min="0.7" max="2" step="any" value="${composite.lineHeight}"><output>${composite.lineHeight}</output></label>
+  <label>letter spacing<input data-control="letterSpacing" type="range" min="-0.1" max="0.2" step="any" value="${composite.letterSpacingEm}"><output>${composite.letterSpacingEm}em</output></label>
+  <button class="reset-composite" type="button">Reset composite</button>
 </div>`;
 }
 
@@ -261,35 +267,35 @@ function roleCards(
 	return Object.entries(contract.roles)
 		.map(([roleName, role]) => {
 			const family = contract.fonts[role.font];
-			const recipes: Array<[string | undefined, TypographyContractRecipe]> = role.displayOrder.map(
-				(name) => (name === 'base' ? [undefined, role.base] : [name, role.variants[name]])
-			);
-			const rows = recipes
-				.map(([variantName, recipe]) => {
-					const label = variantName ?? 'base';
-					const fallbackKey = `${roleName}::recipe::${label}`;
+			const composites: Array<[string | undefined, TypographyContractComposite]> =
+				role.displayOrder.map((name) => [name === 'base' ? undefined : name, role.sizes[name]!]);
+			const rows = composites
+				.map(([sizeName, composite]) => {
+					const label = sizeName ?? 'base';
+					const fallbackKey = `${roleName}::composite::${label}`;
 					return `<article class="sample-row">
   <div class="sample-meta">
     <strong>${escapeHtml(label)}</strong>
-    <code data-meta="font-size">--${escapeHtml(recipe.atomicFontSizeToken)}</code>
-	<code data-meta="weight">weight ${escapeHtml(recipe.weight)} · ${role.weights[recipe.weight]}</code>
-    <code data-meta="line-height">lh ${recipe.lineHeight}</code>
-    <code data-meta="letter-spacing">ls ${recipe.letterSpacingEm}em</code>${recipe.textTransform ? `\n    <code>transform ${escapeHtml(recipe.textTransform)}</code>` : ''}
+    <code data-meta="font-size">--${escapeHtml(composite.atomicFontSizeToken)}</code>
+	<code data-meta="weight">weight ${escapeHtml(composite.weight)} · ${role.weights[composite.weight]}</code>
+    <code data-meta="line-height">lh ${composite.lineHeight}</code>
+    <code data-meta="letter-spacing">ls ${composite.letterSpacingEm}em</code>${composite.textTransform ? `\n    <code>transform ${escapeHtml(composite.textTransform)}</code>` : ''}
 	${fallbackRoles.has(roleName) ? fallbackDiagnostic(fallbackKey, 'fallback delta') : ''}
   </div>
-  <div class="sample-preview" data-type-role="${escapeHtml(roleName)}"${variantName ? ` data-type-variant="${escapeHtml(variantName)}"` : ''}>
-    <div class="sample-copy" contenteditable="true" spellcheck="false" data-type-role="${escapeHtml(roleName)}"${variantName ? ` data-type-variant="${escapeHtml(variantName)}"` : ''}${fallbackRoles.has(roleName) ? ` data-fallback-measure="${escapeHtml(fallbackKey)}"` : ''}>${escapeHtml(specimenText.short)}</div>
+	  <div class="sample-preview" data-type-role="${escapeHtml(roleName)}"${sizeName ? ` data-type-size="${escapeHtml(sizeName)}"` : ''}>
+	    <div class="sample-copy" contenteditable="true" spellcheck="false" data-type-role="${escapeHtml(roleName)}"${sizeName ? ` data-type-size="${escapeHtml(sizeName)}"` : ''}${fallbackRoles.has(roleName) ? ` data-fallback-measure="${escapeHtml(fallbackKey)}"` : ''}>${escapeHtml(specimenText.short)}</div>
     <div class="metric-overlay" aria-hidden="true"></div>
     <div class="metric-probe" aria-hidden="true">Hhx<span class="baseline-probe"></span><i class="cap-probe"></i><i class="ex-probe"></i></div>
   </div>
-  ${calibrationControls(ir, roleName, variantName, recipe, role, interactive)}
+	  ${calibrationControls(ir, roleName, sizeName, composite, role, interactive)}
 </article>`;
 				})
 				.join('\n');
+			const base = role.sizes.base!;
 			return `<section class="role-card" id="role-${escapeHtml(roleName)}">
   <header class="role-header">
     <div><span class="eyebrow">role</span><h2>${escapeHtml(roleName)}</h2></div>
-    <div class="role-defaults"><code>${escapeHtml(family?.family ?? role.font)}</code><code>${family?.verified ? 'verified font faces' : 'unverified external stack'}</code><code>base weight ${escapeHtml(role.base.weight)} (${role.weights[role.base.weight]})</code></div>
+    <div class="role-defaults"><code>${escapeHtml(family?.family ?? role.font)}</code><code>${family?.verified ? 'verified font faces' : 'unverified external stack'}</code><code>base weight ${escapeHtml(base.weight)} (${role.weights[base.weight]})</code></div>
   </header>
   ${rows}
 </section>`;
@@ -328,7 +334,7 @@ function stressCards(contract: TypographyContract, fallbackRoles: Set<string>): 
 					? fallbackDiagnostic(`${roleName}::stress::${name}`, label)
 					: '';
 			return `<article class="stress-card">
-  <div class="sample-meta"><strong>${escapeHtml(roleName)}</strong><code>base recipe</code></div>
+  <div class="sample-meta"><strong>${escapeHtml(roleName)}</strong><code>base composite</code></div>
   <p class="wrap-s" data-type-role="${escapeHtml(roleName)}"${measure('narrow')}>${escapeHtml(specimenText.long)}</p>
   ${diagnostic('narrow', 'narrow wrap')}
   <p class="wrap-l" data-type-role="${escapeHtml(roleName)}"${measure('wide')}>${escapeHtml(specimenText.long)}</p>
@@ -368,7 +374,7 @@ export function toTypographySpecimen(ir: IR, config: TypographySpecimenConfig = 
 	const fallbackStacks = fallbackComparisonStacks(ir.typography, config.adjustedFallbackFamilies);
 	const fallbackRoles = new Set(Object.keys(fallbackStacks.adjusted));
 	const sizeModes = [ir.modes.size.default, ...ir.modes.size.overrides];
-	const recipeBaselines = modeRecipeBaselines(ir, ir.typography);
+	const compositeBaselines = modeCompositeBaselines(ir, ir.typography);
 	const sizeModeControl =
 		sizeModes.length > 1
 			? `<label>size mode<select id="size-mode">${sizeModes.map((mode) => `<option value="${escapeHtml(mode)}">${escapeHtml(mode)}</option>`).join('')}</select></label>`
@@ -391,14 +397,14 @@ ${escapeStyle(config.fontFaceCss ?? '')}
 ${escapeStyle(typographyTokenCss(ir))}
 ${roleCss(ir.typography)}
 ${adjustedFallbackCss(ir.typography, config.adjustedFallbackFamilies)}
-*{box-sizing:border-box}html{color-scheme:dark;background:#111}body{margin:0;background:#111;color:#f4f4f0;font-family:system-ui,sans-serif}main{width:min(1180px,calc(100% - 32px));margin:auto;padding:48px 0 96px}.page-header{display:grid;gap:12px;margin-bottom:32px}.page-header h1,.role-header h2,.weight-card h3{margin:0}.page-header p{max-width:76ch;margin:0;color:#aaa}.notice{display:flex;gap:8px;padding:12px 16px;border:1px solid #3c3c38;background:#191917}.notice:not(.fallback-notice){display:block}.fallback-notice{margin:16px 0;color:#bbb}.fallback-notice strong{color:#f4f4f0;white-space:nowrap}.tools{position:sticky;z-index:3;top:8px;display:flex;flex-wrap:wrap;gap:14px;width:fit-content;margin:0 0 24px auto;padding:10px 12px;border:1px solid #3c3c38;background:rgb(17 17 17/.94);font:500 12px/1.2 ui-monospace,monospace}.tools label{display:flex;align-items:center;gap:6px}.metric-legend{display:none;gap:10px;width:100%;color:#aaa}.metric-legend i{font-style:normal}.metric-legend i::before{display:inline-block;width:16px;margin-right:5px;border-top:1px solid;content:""}.metric-legend .cap::before{color:#ff4f9a}.metric-legend .ex::before{color:#52b7ff}.metric-legend .baseline::before{color:#ffd166}body[data-lines=true] .metric-legend{display:flex}.section-title{margin:48px 0 16px;font:700 12px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#aaa}.role-card,.weight-card,.stress-card{border:1px solid #30302d;background:#181816}.role-card+.role-card,.weight-card+.weight-card,.stress-card+.stress-card{margin-top:16px}.role-header{display:flex;align-items:end;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid #30302d}.eyebrow{display:block;margin-bottom:4px;font:500 10px/1 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:#888}.role-defaults,.sample-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px}code{font:500 11px/1.2 ui-monospace,monospace;color:#aaa}.fallback-diagnostic{display:flex;flex-basis:100%;gap:7px;color:#aaa;font:500 10px/1.35 ui-monospace,monospace}.fallback-diagnostic strong{color:#d4bfff;text-transform:uppercase}.fallback-diagnostic[data-residual=true] span{color:#f0c779}.sample-row{display:grid;grid-template-columns:220px minmax(220px,1fr) minmax(300px,1fr);gap:20px;align-items:center;padding:20px}.sample-row+.sample-row{border-top:1px solid #282826}.sample-preview{position:relative;min-width:0;padding:8px;border-radius:3px}.sample-copy{position:relative;z-index:1;min-width:0;outline:none}.sample-preview:focus-within{box-shadow:0 0 0 1px #a98cff}.metric-probe{position:fixed;left:-10000px;top:0;display:inline-block;visibility:hidden;white-space:nowrap}.baseline-probe{display:inline-block;width:0;height:0;vertical-align:baseline}.cap-probe,.ex-probe{position:absolute;display:block;width:0}.cap-probe{height:1cap}.ex-probe{height:1ex}.metric-overlay{display:none;position:absolute;z-index:2;inset:8px;pointer-events:none}.metric-guide{position:absolute;right:0;left:0;border-top:1px solid}.metric-guide i{position:absolute;right:2px;bottom:2px;padding:1px 3px;background:rgb(17 17 17/.86);font:500 8px/1 ui-monospace,monospace;font-style:normal;text-transform:uppercase}.metric-line{color:rgb(255 255 255/.28)}.metric-cap{color:#ff4f9a}.metric-ex{color:#52b7ff}.metric-baseline{color:#ffd166}body[data-lines=true] .sample-preview{outline:1px solid rgb(255 255 255/.28)}body[data-lines=true] .metric-overlay{display:block}.sample-meta strong{font:700 12px/1 ui-monospace,monospace;text-transform:uppercase}.calibration{display:grid;gap:8px;padding:12px;border:1px solid #30302d;background:#131311}.calibration label{display:grid;grid-template-columns:100px 1fr 64px;gap:8px;align-items:center;font:500 11px/1.2 ui-monospace,monospace}.calibration select,.calibration input{width:100%}.calibration.changed{border-color:#a98cff}.reset-recipe{justify-self:end;padding:4px 7px;border:1px solid #555;background:#222;color:inherit;font:500 10px/1 ui-monospace,monospace;cursor:pointer}.weight-card,.stress-card{padding:20px}.weight-card h3{margin-bottom:16px}.weight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:#30302d;border:1px solid #30302d}.weight-sample{display:grid;gap:12px;padding:16px;background:#181816}.weight-sample span{font-size:24px;line-height:1}.stress-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.stress-card{margin:0!important}.stress-card p{margin:18px 0}.stress-card>.fallback-diagnostic{margin:-10px 0 14px}.wrap-s{width:18rem;max-width:100%}.wrap-l{width:32rem;max-width:100%}.glyphs{overflow-wrap:anywhere;padding-top:16px;border-top:1px solid #30302d}pre{overflow:auto;max-height:340px;padding:16px;border:1px solid #30302d;background:#0c0c0b;color:#d8d8cf;font:12px/1.5 ui-monospace,monospace}.copy-button{padding:8px 12px;border:1px solid #555;background:#222;color:inherit;cursor:pointer}body[data-theme=light]{background:#f5f5f0;color:#171714}body[data-theme=light] .role-card,body[data-theme=light] .weight-card,body[data-theme=light] .stress-card,body[data-theme=light] .notice{background:#fff;border-color:#d8d8d0}body[data-wcag=true] [data-type-role]{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}@media(max-width:850px){main{width:min(100% - 20px,1180px);padding-top:28px}.sample-row{grid-template-columns:1fr}.stress-grid{grid-template-columns:1fr}.role-header{align-items:start;flex-direction:column}}
+*{box-sizing:border-box}html{color-scheme:dark;background:#111}body{margin:0;background:#111;color:#f4f4f0;font-family:system-ui,sans-serif}main{width:min(1180px,calc(100% - 32px));margin:auto;padding:48px 0 96px}.page-header{display:grid;gap:12px;margin-bottom:32px}.page-header h1,.role-header h2,.weight-card h3{margin:0}.page-header p{max-width:76ch;margin:0;color:#aaa}.notice{display:flex;gap:8px;padding:12px 16px;border:1px solid #3c3c38;background:#191917}.notice:not(.fallback-notice){display:block}.fallback-notice{margin:16px 0;color:#bbb}.fallback-notice strong{color:#f4f4f0;white-space:nowrap}.tools{position:sticky;z-index:3;top:8px;display:flex;flex-wrap:wrap;gap:14px;width:fit-content;margin:0 0 24px auto;padding:10px 12px;border:1px solid #3c3c38;background:rgb(17 17 17/.94);font:500 12px/1.2 ui-monospace,monospace}.tools label{display:flex;align-items:center;gap:6px}.metric-legend{display:none;gap:10px;width:100%;color:#aaa}.metric-legend i{font-style:normal}.metric-legend i::before{display:inline-block;width:16px;margin-right:5px;border-top:1px solid;content:""}.metric-legend .cap::before{color:#ff4f9a}.metric-legend .ex::before{color:#52b7ff}.metric-legend .baseline::before{color:#ffd166}body[data-lines=true] .metric-legend{display:flex}.section-title{margin:48px 0 16px;font:700 12px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#aaa}.role-card,.weight-card,.stress-card{border:1px solid #30302d;background:#181816}.role-card+.role-card,.weight-card+.weight-card,.stress-card+.stress-card{margin-top:16px}.role-header{display:flex;align-items:end;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid #30302d}.eyebrow{display:block;margin-bottom:4px;font:500 10px/1 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:#888}.role-defaults,.sample-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px}code{font:500 11px/1.2 ui-monospace,monospace;color:#aaa}.fallback-diagnostic{display:flex;flex-basis:100%;gap:7px;color:#aaa;font:500 10px/1.35 ui-monospace,monospace}.fallback-diagnostic strong{color:#d4bfff;text-transform:uppercase}.fallback-diagnostic[data-residual=true] span{color:#f0c779}.sample-row{display:grid;grid-template-columns:220px minmax(220px,1fr) minmax(300px,1fr);gap:20px;align-items:center;padding:20px}.sample-row+.sample-row{border-top:1px solid #282826}.sample-preview{position:relative;min-width:0;padding:8px;border-radius:3px}.sample-copy{position:relative;z-index:1;min-width:0;outline:none}.sample-preview:focus-within{box-shadow:0 0 0 1px #a98cff}.metric-probe{position:fixed;left:-10000px;top:0;display:inline-block;visibility:hidden;white-space:nowrap}.baseline-probe{display:inline-block;width:0;height:0;vertical-align:baseline}.cap-probe,.ex-probe{position:absolute;display:block;width:0}.cap-probe{height:1cap}.ex-probe{height:1ex}.metric-overlay{display:none;position:absolute;z-index:2;inset:8px;pointer-events:none}.metric-guide{position:absolute;right:0;left:0;border-top:1px solid}.metric-guide i{position:absolute;right:2px;bottom:2px;padding:1px 3px;background:rgb(17 17 17/.86);font:500 8px/1 ui-monospace,monospace;font-style:normal;text-transform:uppercase}.metric-line{color:rgb(255 255 255/.28)}.metric-cap{color:#ff4f9a}.metric-ex{color:#52b7ff}.metric-baseline{color:#ffd166}body[data-lines=true] .sample-preview{outline:1px solid rgb(255 255 255/.28)}body[data-lines=true] .metric-overlay{display:block}.sample-meta strong{font:700 12px/1 ui-monospace,monospace;text-transform:uppercase}.calibration{display:grid;gap:8px;padding:12px;border:1px solid #30302d;background:#131311}.calibration label{display:grid;grid-template-columns:100px 1fr 64px;gap:8px;align-items:center;font:500 11px/1.2 ui-monospace,monospace}.calibration select,.calibration input{width:100%}.calibration.changed{border-color:#a98cff}.reset-composite{justify-self:end;padding:4px 7px;border:1px solid #555;background:#222;color:inherit;font:500 10px/1 ui-monospace,monospace;cursor:pointer}.weight-card,.stress-card{padding:20px}.weight-card h3{margin-bottom:16px}.weight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:#30302d;border:1px solid #30302d}.weight-sample{display:grid;gap:12px;padding:16px;background:#181816}.weight-sample span{font-size:24px;line-height:1}.stress-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.stress-card{margin:0!important}.stress-card p{margin:18px 0}.stress-card>.fallback-diagnostic{margin:-10px 0 14px}.wrap-s{width:18rem;max-width:100%}.wrap-l{width:32rem;max-width:100%}.glyphs{overflow-wrap:anywhere;padding-top:16px;border-top:1px solid #30302d}pre{overflow:auto;max-height:340px;padding:16px;border:1px solid #30302d;background:#0c0c0b;color:#d8d8cf;font:12px/1.5 ui-monospace,monospace}.copy-button{padding:8px 12px;border:1px solid #555;background:#222;color:inherit;cursor:pointer}body[data-theme=light]{background:#f5f5f0;color:#171714}body[data-theme=light] .role-card,body[data-theme=light] .weight-card,body[data-theme=light] .stress-card,body[data-theme=light] .notice{background:#fff;border-color:#d8d8d0}body[data-wcag=true] [data-type-role]{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}@media(max-width:850px){main{width:min(100% - 20px,1180px);padding-top:28px}.sample-row{grid-template-columns:1fr}.stress-grid{grid-template-columns:1fr}.role-header{align-items:start;flex-direction:column}}
 </style>
 </head>
 <body>
 <main>
-  <header class="page-header"><span class="eyebrow">three-forma-styli</span><h1>${escapeHtml(title)}</h1><p>Inspect every configured role, base recipe, variant, style and weight. Calibration controls create an in-memory draft only; project configuration remains the source of truth.</p><div class="notice">${escapeHtml(fontNotice)}</div>${warningPanel}</header>
+	  <header class="page-header"><span class="eyebrow">three-forma-styli</span><h1>${escapeHtml(title)}</h1><p>Inspect every configured role, size, style and weight. Calibration controls create an in-memory draft only; project configuration remains the source of truth.</p><div class="notice">${escapeHtml(fontNotice)}</div>${warningPanel}</header>
   <div class="tools">${sizeModeControl}<label><input id="toggle-lines" type="checkbox">metric diagnostics</label><label><input id="toggle-theme" type="checkbox">light surface</label><label><input id="toggle-wcag" type="checkbox">WCAG spacing stress</label>${fallbackRoles.size ? '<label><input id="toggle-fallback" type="checkbox">force adjusted fallback</label>' : ''}${config.fontFaceHref ? '<label><input id="toggle-fonts" type="checkbox">disable all generated font faces</label>' : ''}<span id="font-status">checking fonts</span><span class="metric-legend"><i class="cap">CSS 1cap</i><i class="ex">CSS 1ex</i><i class="baseline">rendered baseline</i><span>grey = line box</span></span></div>
-  <h2 class="section-title">Role recipes</h2>${roleCards(ir, ir.typography, interactive, fallbackRoles)}
+  <h2 class="section-title">Role composites</h2>${roleCards(ir, ir.typography, interactive, fallbackRoles)}
   <h2 class="section-title">Style and weight combinations</h2>${weightCards(ir.typography)}
   <h2 class="section-title">Wrapping and glyph stress</h2>${fallbackNotice}<div class="stress-grid">${stressCards(ir.typography, fallbackRoles)}</div>
   ${interactive ? '<h2 class="section-title">Draft configuration patch</h2><button class="copy-button" id="copy-patch" type="button">Copy patch</button><pre id="draft-patch">No calibration changes.</pre>' : ''}
@@ -408,7 +414,7 @@ const families=${serializeScriptData(fontFamilies)};
 const primaryFamilyStacks=${serializeScriptData(fallbackStacks.primary)};
 const adjustedFamilyStacks=${serializeScriptData(fallbackStacks.adjusted)};
 const defaultSizeMode=${serializeScriptData(ir.modes.size.default)};
-const recipeBaselines=${serializeScriptData(recipeBaselines)};
+const compositeBaselines=${serializeScriptData(compositeBaselines)};
 const drafts={};
 function appendMetricGuide(overlay,name,top,label){if(!Number.isFinite(top))return;const guide=document.createElement('span');guide.className='metric-guide metric-'+name;guide.style.top=top+'px';const text=document.createElement('i');text.textContent=label;guide.append(text);overlay.append(guide)}
 function refreshMetrics(){document.querySelectorAll('.sample-preview').forEach(sample=>{const overlay=sample.querySelector('.metric-overlay');const probe=sample.querySelector('.metric-probe');const baselineProbe=sample.querySelector('.baseline-probe');if(!overlay||!probe||!baselineProbe)return;overlay.replaceChildren();const probeRect=probe.getBoundingClientRect();const baseline=baselineProbe.getBoundingClientRect().top-probeRect.top;appendMetricGuide(overlay,'line',0,'line top');appendMetricGuide(overlay,'line',probeRect.height,'line bottom');if(CSS.supports('height','1cap')){const cap=sample.querySelector('.cap-probe')?.getBoundingClientRect().height;appendMetricGuide(overlay,'cap',baseline-cap,'1cap')}if(CSS.supports('height','1ex')){const ex=sample.querySelector('.ex-probe')?.getBoundingClientRect().height;appendMetricGuide(overlay,'ex',baseline-ex,'1ex')}appendMetricGuide(overlay,'baseline',baseline,'baseline')})}
@@ -431,16 +437,16 @@ document.querySelectorAll('[data-fallback-measure]').forEach(element=>element.ad
 document.fonts.ready.then(()=>{refreshFontStatus();refreshMetrics();scheduleFallbackDiagnostics()});
 const sizeModeSelect=document.querySelector('#size-mode');
 function currentSizeMode(){return sizeModeSelect?.value||defaultSizeMode}
-function panelVariant(panel){return panel.dataset.variant||'base'}
-function panelBaseline(panel,mode=currentSizeMode()){return recipeBaselines[mode][panel.dataset.role][panelVariant(panel)]}
-function panelDraftKey(panel,mode=currentSizeMode()){return mode+'::'+panel.dataset.role+'::'+panelVariant(panel)}
+function panelSize(panel){return panel.dataset.size||'base'}
+function panelBaseline(panel,mode=currentSizeMode()){return compositeBaselines[mode][panel.dataset.role][panelSize(panel)]}
+function panelDraftKey(panel,mode=currentSizeMode()){return mode+'::'+panel.dataset.role+'::'+panelSize(panel)}
 function controlValue(controls){return {fontSize:controls.fontSize.value==='min'?'min':Number(controls.fontSize.value),weight:controls.weight.value,lineHeight:Number(controls.lineHeight.value),letterSpacing:Number(controls.letterSpacing.value)}}
 function refreshPanelMeta(panel,value){const meta=panel.parentElement?.querySelector('.sample-meta');if(!meta)return;meta.querySelector('[data-meta=font-size]').textContent='--'+panel.dataset.atomicPrefix+'-'+value.fontSize;meta.querySelector('[data-meta=weight]').textContent='weight '+value.weight+' · '+panel.querySelector('[data-control=weight] option:checked')?.textContent.split(' · ')[1];meta.querySelector('[data-meta=line-height]').textContent='lh '+value.lineHeight;meta.querySelector('[data-meta=letter-spacing]').textContent='ls '+value.letterSpacing+'em'}
 function applyPanelValue(panel,value,changed){const samples=panel.parentElement?.querySelectorAll('.sample-preview,.sample-copy')??[];const controls=Object.fromEntries(Array.from(panel.querySelectorAll('[data-control]')).map(control=>[control.dataset.control,control]));for(const [name,control] of Object.entries(controls))control.value=String(value[name]);for(const sample of samples){if(changed){sample.style.setProperty('font-size','var(--'+panel.dataset.atomicPrefix+'-'+value.fontSize+')');sample.style.setProperty('font-weight','var(--'+panel.dataset.weightPrefix+value.weight+')');sample.style.setProperty('line-height',String(value.lineHeight));sample.style.setProperty('letter-spacing',value.letterSpacing===0?'0':value.letterSpacing+'em')}else{sample.style.removeProperty('font-size');sample.style.removeProperty('font-weight');sample.style.removeProperty('line-height');sample.style.removeProperty('letter-spacing')}}controls.lineHeight.nextElementSibling.value=String(value.lineHeight);controls.letterSpacing.nextElementSibling.value=value.letterSpacing+'em';panel.classList.toggle('changed',changed);refreshPanelMeta(panel,value)}
-function draftPatch(){const roles={};for(const [key,value] of Object.entries(drafts)){const [mode,role,variant]=key.split('::');roles[role]??={};if(mode===defaultSizeMode){if(variant==='base')roles[role].base=value;else{roles[role].variants??={};roles[role].variants[variant]=value}}else{roles[role].modeOverrides??={};roles[role].modeOverrides[mode]??={};const target=roles[role].modeOverrides[mode];if(variant==='base')target.base=value;else{target.variants??={};target.variants[variant]=value}}}return Object.keys(roles).length?JSON.stringify({roles},null,2):'No calibration changes.'}
+function draftPatch(){const roles={};for(const [key,value] of Object.entries(drafts)){const [mode,role,size]=key.split('::');roles[role]??={};if(mode===defaultSizeMode){roles[role].sizes??={};roles[role].sizes[size]=value}else{roles[role].modeOverrides??={};roles[role].modeOverrides[mode]??={sizes:{}};roles[role].modeOverrides[mode].sizes??={};roles[role].modeOverrides[mode].sizes[size]=value}}return Object.keys(roles).length?JSON.stringify({roles},null,2):'No calibration changes.'}
 function refreshPatch(){const target=document.querySelector('#draft-patch');if(target)target.textContent=draftPatch()}
 function activateSizeMode(){const mode=currentSizeMode();document.body.dataset.sizeMode=mode;for(const panel of document.querySelectorAll('.calibration')){const key=panelDraftKey(panel,mode);applyPanelValue(panel,drafts[key]??panelBaseline(panel,mode),Boolean(drafts[key]))}refreshMetrics();scheduleFallbackDiagnostics()}
-document.querySelectorAll('.calibration').forEach(panel=>{const controls=Object.fromEntries(Array.from(panel.querySelectorAll('[data-control]')).map(control=>[control.dataset.control,control]));const update=()=>{const baseline=panelBaseline(panel);const value=controlValue(controls);const unchanged=JSON.stringify(value)===JSON.stringify(baseline);const key=panelDraftKey(panel);if(unchanged)delete drafts[key];else drafts[key]=value;applyPanelValue(panel,value,!unchanged);refreshPatch();refreshMetrics();scheduleFallbackDiagnostics()};Object.entries(controls).forEach(([name,control])=>{control.addEventListener('input',update);if(control.matches('input[type=range]')){control.title='Double-click to reset';control.addEventListener('dblclick',event=>{event.preventDefault();control.value=String(panelBaseline(panel)[name]);update()})}});panel.querySelector('.reset-recipe')?.addEventListener('click',()=>{const baseline=panelBaseline(panel);for(const [name,control] of Object.entries(controls))control.value=String(baseline[name]);update()})});
+document.querySelectorAll('.calibration').forEach(panel=>{const controls=Object.fromEntries(Array.from(panel.querySelectorAll('[data-control]')).map(control=>[control.dataset.control,control]));const update=()=>{const baseline=panelBaseline(panel);const value=controlValue(controls);const unchanged=JSON.stringify(value)===JSON.stringify(baseline);const key=panelDraftKey(panel);if(unchanged)delete drafts[key];else drafts[key]=value;applyPanelValue(panel,value,!unchanged);refreshPatch();refreshMetrics();scheduleFallbackDiagnostics()};Object.entries(controls).forEach(([name,control])=>{control.addEventListener('input',update);if(control.matches('input[type=range]')){control.title='Double-click to reset';control.addEventListener('dblclick',event=>{event.preventDefault();control.value=String(panelBaseline(panel)[name]);update()})}});panel.querySelector('.reset-composite')?.addEventListener('click',()=>{const baseline=panelBaseline(panel);for(const [name,control] of Object.entries(controls))control.value=String(baseline[name]);update()})});
 sizeModeSelect?.addEventListener('change',activateSizeMode);activateSizeMode();
 new ResizeObserver(()=>{refreshMetrics();scheduleFallbackDiagnostics()}).observe(document.querySelector('main'));window.addEventListener('resize',()=>{refreshMetrics();scheduleFallbackDiagnostics()});
 document.querySelector('#copy-patch')?.addEventListener('click',async()=>{await navigator.clipboard.writeText(draftPatch());const button=document.querySelector('#copy-patch');if(button){button.textContent='Copied';setTimeout(()=>button.textContent='Copy patch',1200)}});

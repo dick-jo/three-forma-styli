@@ -7,16 +7,18 @@ ambiguous, lossy, unsupported, or silently overwritten input fails before output
 
 ## Names
 
-Mode names, color token names, alpha levels, typography fonts/roles/variants,
-weight aliases, and configurable namespaces must be CSS-token safe:
+Mode names, color identities and groups, Alpha scale identities, typography
+fonts/roles/variants, and configurable namespaces must be CSS-token safe:
 
 ```text
 letter, followed by letters, numbers, or hyphens
 ```
 
-Names are author-owned. TFS does not impose `prose`, `heading`, `label`, `min`,
-`lo`, or any other semantic vocabulary. It only rejects values that cannot enter
-the stable CSS/TypeScript output safely.
+Project vocabulary such as `pri`, `network-ethereum`, `prose`, and `hover` is
+author-owned. TFS deliberately owns structural positions: Alpha uses
+`min / lo-x / lo / hi / hi-x / max`, typography sizes use
+`min / s / base / l / max`, and role-local weight ranges use
+`min / lo / hi / max` with controlled sparsity.
 
 Every family must have unique mode names and at most one explicit default. When no
 mode is marked, the first remains the deliberate backwards-compatible default.
@@ -35,9 +37,10 @@ change them.
 - OKLCH lightness is `0..1`; chroma is any non-negative finite value, so
   wide-gamut/P3 author intent is not artificially capped; hue may be any finite
   angle and wraps according to CSS.
-- Base colors are opaque. Transparency belongs to the alpha schedule so derived
+- Base colors are opaque. Transparency belongs to an Alpha scale so derived
   output remains consistent and inspectable.
-- Alpha schedule values are finite and `0..1`.
+- TFS generates `non: 0`; the six authored Alpha values are finite, strictly
+  increasing, greater than zero, and below one.
 - Size/time ranges are positive integers. Spacing, typography, border, and time
   measurements enforce their documented positive/non-negative constraints.
 - Units are plain CSS unit identifiers such as `px`, `rem`, `%`, `ms`, or `s`;
@@ -50,16 +53,17 @@ integer from `1` through the selected spacing mode's range. An explicit
 `spacingMode` must exist. Omitting it still follows the documented resolution:
 same-named spacing mode when available, otherwise the spacing default.
 
-Typography semantic recipes reference a generated atomic font-size step and an
-explicit role-local weight. Prepared fonts prove requested physical styles,
-weights, OpenType features, and variation axes. No unsupported cut is remapped or
-synthesized.
+Typography size composites reference a generated atomic font-size step and
+resolve a final role-local weight. Prepared fonts prove requested physical
+styles, weights, OpenType features, and variation axes. No unsupported cut is
+remapped or synthesized. Categorical variants cannot change font family or size.
 
 Luminance groups reference declared colors in the default palette, are non-empty,
-unique and disjoint. Runtime-theme color names are an explicit non-empty subset
+unique and disjoint. Runtime-theme color identities are an explicit non-empty subset
 of that same palette and must include every constrained color. Override modes may
-still add static mode-specific colors. TFS never infers that every palette token
-is editable by an untrusted runtime payload.
+omit unchanged identities but cannot introduce identities absent from the default
+mode. TFS never infers that every palette token is editable by an untrusted runtime
+payload.
 
 ## Output collisions
 

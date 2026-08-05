@@ -51,8 +51,8 @@ The scaffold names physical styles `design-system.css`,
 files. This makes generated ownership obvious in DevTools and mixed CSS
 codebases while package imports remain short and stable.
 
-When the authored color system includes `colors.luminance` and an explicit
-`colors.runtimeThemes.colorNames` subset, `runtimeColorThemeConfig` is the exact
+When the authored color system includes `colors.luminance` and the project declares
+`runtime.colorThemes.colors.include`, `runtimeColorThemeConfig` is the exact
 browser-safe policy consumed by `@three-forma-styli/core/runtime`. Applications
 do not repeat editable color names, alpha schedules, prefixes, or luminance
 groups. Static design-system colors remain outside the user-authored payload.

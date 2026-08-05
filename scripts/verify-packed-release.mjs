@@ -150,7 +150,7 @@ generateRuntimeColorTheme(
     colors: { canvas: { l: 0.1, c: 0, h: 0 }, ink: { l: 0.9, c: 0, h: 0 } },
   },
   {
-    colorNames: ['canvas', 'ink'],
+    colorIdentities: ['canvas', 'ink'],
     luminance: {
       minimumLuminanceDelta: 0.5,
       backgroundColors: ['canvas'],

@@ -73,15 +73,25 @@ simultaneously and does not need a selector.
 
 ## Token Families
 
-### Colors
+### Alpha and colors
 
-**Philosophy:** Alpha-driven variations. User provides root colors, generator creates alpha variants.
+**Philosophy:** Alpha is an explicit reusable scale. Colors provide root
+identities, and the generator derives their alpha ramps from the selected scale.
 
 **Input:**
 
 ```typescript
+interface AlphaSystem {
+	defaultScale: string;
+	scales: Record<
+		string,
+		{
+			values: Record<'min' | 'lo-x' | 'lo' | 'hi' | 'hi-x' | 'max', number>;
+		}
+	>;
+}
+
 interface ColorSystem {
-	alphaSchedule: AlphaSchedule; // Default for all modes
 	modes: ColorMode[];
 }
 
@@ -89,16 +99,6 @@ interface ColorMode {
 	name: string;
 	isDefault?: boolean;
 	tokens: Record<string, Oklch>; // Arbitrary color names (not enforced)
-	alphaSchedule?: AlphaSchedule; // Override per mode
-}
-
-interface AlphaSchedule {
-	min: number; // e.g., 0.07
-	'lo-x': number; // e.g., 0.125
-	lo: number; // e.g., 0.25
-	hi: number; // e.g., 0.68
-	'hi-x': number; // e.g., 0.85
-	max: number; // e.g., 0.93
 }
 ```
 
@@ -118,7 +118,8 @@ interface AlphaSchedule {
 
 - Override modes only define colors they want to change
 - Missing colors inherit from default mode
-- Missing alphaSchedule inherits from default mode or system default
+- Alpha values are mode-independent and remain available simultaneously
+- Colors consume the default Alpha scale unless the generator configuration selects another
 
 ---
 
@@ -338,7 +339,7 @@ motion: {
     enter: [0, 0, 0.38, 0.9],
     exit: [0.2, 0, 1, 0.9],
   },
-  recipes: {
+  composites: {
     hover: {
       base: { duration: 2, easing: "standard" },
       variants: {
@@ -359,7 +360,7 @@ motion: {
 }
 ```
 
-Recipe, variant, and easing names are entirely author-defined. Duration numbers
+Composite, variant, and easing names are entirely author-defined. Duration numbers
 reference the default time scale; `{ scale: "ambient", step: 2 }` explicitly
 references another scale. Variants inherit omitted easing and delay decisions
 from their base. `reducedMotion` is mandatory: `"preserve"` records essential
@@ -653,7 +654,7 @@ profile.
 
 The `validateLuminance` function checks color relationships directly. Projects
 may also author reusable groups and a minimum once as `colors.luminance`. A
-separate `colors.runtimeThemes.colorNames` list identifies the exact
+project-level `runtime.colorThemes.colors.include` selection identifies the exact
 user-editable subset; static palette members do not silently become runtime
 fields. When both policies exist, the workspace compiler emits their shared
 contract as `runtime-color-theme` for strict browser theme generation.
@@ -773,7 +774,7 @@ unique names support focused contexts such as a typography-only fixed-canvas
 
 Semantic font-size aliases are the deliberate exception to “atomic tokens only”
 inside a typography override block. TFS re-declares those aliases alongside the
-new `--fs-*` ruler so a mode scoped below `:root` resolves role recipes against
+new `--fs-*` ruler so a mode scoped below `:root` resolves role composites against
 the local scale instead of the already-resolved root scale.
 
 ### Why resolve gap/border-radius to values (not var references)?

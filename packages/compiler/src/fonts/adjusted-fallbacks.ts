@@ -119,13 +119,13 @@ function privateFamily(fontId: string): string {
 }
 
 function assertRoleHasStableVariationInstance(roleName: string, role: TypographyRole): void {
-	const recipes = [role.base, ...Object.values(role.variants ?? {})];
+	const composites = Object.values(role.sizes);
 	if (
 		Object.keys(role.variations ?? {}).length > 0 ||
-		recipes.some((recipe) => Object.keys(recipe.variations ?? {}).length > 0)
+		composites.some((composite) => Object.keys(composite.variations ?? {}).length > 0)
 	) {
 		throw new Error(
-			`Adjusted fallback role "${roleName}" uses custom variation coordinates; recipe-specific axis calibration is not supported yet.`
+			`Adjusted fallback role "${roleName}" uses custom variation coordinates; composite-specific axis calibration is not supported yet.`
 		);
 	}
 }

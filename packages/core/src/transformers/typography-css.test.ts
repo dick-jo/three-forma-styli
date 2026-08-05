@@ -28,48 +28,48 @@ const system = {
 			control: {
 				font: 'interface',
 				textTransform: 'uppercase' as const,
-				base: { fontSize: 2, weight: 'regular', lineHeight: 1.2, letterSpacing: 0 },
-				variants: {
-					compact: {
+				sizes: {
+					min: {
 						fontSize: 1,
-						weight: 'strong',
+						weight: 'max',
 						lineHeight: 1.1,
 						letterSpacing: 0.01,
 						textTransform: 'lowercase' as const,
 					},
+					base: { fontSize: 2, weight: 'min', lineHeight: 1.2, letterSpacing: 0 },
 				},
-				weights: { regular: 400, strong: 700 },
+				weights: { min: 400, max: 700 },
 				styles: {
-					normal: { weights: ['regular', 'strong'] },
-					italic: { weights: ['regular'] },
+					normal: { weights: ['min', 'max'] },
+					italic: { weights: ['min'] },
 				},
 			},
 		},
 	},
 };
 
-describe('typography CSS recipes', () => {
-	it('emits unsuffixed base and arbitrary ordinary-class kebab-case helpers', () => {
+describe('typography CSS composites', () => {
+	it('emits unsuffixed base and fixed-size ordinary-class kebab-case helpers', () => {
 		const css = toTypographyCss(generate(system));
 		expect(css).toContain('.text--control {');
-		expect(css).toContain('.text--control-compact {');
+		expect(css).toContain('.text--control-min {');
 		expect(css).toContain('font-family: var(--text-control-font-family);');
 		expect(css).toContain('font-weight: var(--text-control-font-weight);');
-		expect(css).toContain('font-weight: var(--text-control-compact-font-weight);');
+		expect(css).toContain('font-weight: var(--text-control-min-font-weight);');
 		expect(css).toContain('font-synthesis: none;');
 		expect(css).toContain('text-transform: var(--text-control-text-transform);');
-		expect(css).toContain('text-transform: var(--text-control-compact-text-transform);');
-		expect(css).toContain('.text--control-style-normal-weight-strong {');
-		expect(css).not.toContain('.text--control-weight-strong)');
-		expect(css).toContain('.text--control-style-italic-weight-regular {');
-		expect(css).not.toContain('.text--control-style-italic-weight-strong)');
+		expect(css).toContain('text-transform: var(--text-control-min-text-transform);');
+		expect(css).toContain('.text--control-style-normal-weight-max {');
+		expect(css).not.toContain('.text--control-weight-max)');
+		expect(css).toContain('.text--control-style-italic-weight-min {');
+		expect(css).not.toContain('.text--control-style-italic-weight-max)');
 		expect(css).not.toContain('.controlCompact');
 	});
 
 	it('supports deliberate zero-specificity global helpers', () => {
 		const css = toTypographyCss(generate(system), { specificity: 'zero' });
 		expect(css).toContain(':where(.text--control) {');
-		expect(css).toContain(':where(.text--control-compact) {');
+		expect(css).toContain(':where(.text--control-min) {');
 	});
 
 	it('supports a caller-owned global prefix and places supplied font faces first', () => {
@@ -101,10 +101,10 @@ describe('typography CSS recipes', () => {
 		const css = toTypographyCss(ir, { scope: 'module' });
 		const types = toTypographyCssModuleTypes(ir);
 		expect(css).toContain('.control {');
-		expect(css).toContain('.control-compact {');
+		expect(css).toContain('.control-min {');
 		expect(css).not.toContain(':where(');
 		expect(types).toContain('readonly "control": string;');
-		expect(types).toContain('readonly "control-compact": string;');
-		expect(types).toContain('readonly "control-style-normal-weight-strong": string;');
+		expect(types).toContain('readonly "control-min": string;');
+		expect(types).toContain('readonly "control-style-normal-weight-max": string;');
 	});
 });

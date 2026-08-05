@@ -1,4 +1,9 @@
-import type { IR, ShadowContractRecipe, TypographyContractRecipe } from '../generator/types.js';
+import type {
+	IR,
+	ShadowContractComposite,
+	TypographyContractComposite,
+	TypographyContractSemanticVariant,
+} from '../generator/types.js';
 import type {
 	FontSizeReference,
 	PartialDesignSystem,
@@ -53,9 +58,18 @@ function caseIdSegment(value: string): string {
 
 function colorCases(system: PartialDesignSystem, ir: IR): ColorReviewCase[] {
 	if (!system.colors) return [];
+	const selectedAlphaScale = ir.alpha?.scales[system.colors.alphaScale ?? ir.alpha.defaultScale];
+	const resolvedAlphaSchedule = selectedAlphaScale
+		? Object.fromEntries(
+				Object.entries(selectedAlphaScale.values).map(([position, value]) => [
+					position,
+					value.value,
+				])
+			)
+		: undefined;
 	return system.colors.modes.flatMap((mode, modeIndex) => {
 		const tokens = mode.isDefault ? ir.tokens : (ir.overrideTokens[mode.name] ?? {});
-		const alphaSchedule = mode.alphaSchedule ?? system.colors!.alphaSchedule;
+		const alphaSchedule = resolvedAlphaSchedule ?? {};
 		return Object.entries(mode.tokens).flatMap(([colorName, value]) => {
 			const base = Object.values(tokens).find(
 				(token) =>
@@ -180,20 +194,20 @@ function typographySizeOptions(mode: TypographyMode & { name: string }): Typogra
 function recipeControls(
 	sourcePath: string,
 	role: TypographyRole,
-	recipe: TypographyContractRecipe,
+	composite: TypographyContractComposite,
 	sizeOptions: TypographySizeOption[]
 ): ReviewControl[] {
-	const weightAlias = recipe.weight;
+	const weightAlias = composite.weight;
 	const currentSuffix =
-		recipe.fontSizeReference === 'min' ? 'min' : String(recipe.fontSizeReference);
-	const atomicPrefix = recipe.atomicFontSizeToken.slice(0, -(currentSuffix.length + 1));
+		composite.fontSizeReference === 'min' ? 'min' : String(composite.fontSizeReference);
+	const atomicPrefix = composite.atomicFontSizeToken.slice(0, -(currentSuffix.length + 1));
 	return [
 		{
 			kind: 'select',
 			id: 'fontSize',
 			label: 'size',
 			path: `${sourcePath}/fontSize`,
-			value: recipe.fontSizeReference,
+			value: composite.fontSizeReference,
 			options: sizeOptions.map((option) => ({
 				...option,
 				css: `var(--${atomicPrefix}-${option.value})`,
@@ -204,7 +218,7 @@ function recipeControls(
 			id: 'lineHeight',
 			label: 'line height',
 			path: `${sourcePath}/lineHeight`,
-			value: recipe.lineHeight,
+			value: composite.lineHeight,
 			min: 0.5,
 			max: 3,
 			step: 0.005,
@@ -214,7 +228,7 @@ function recipeControls(
 			id: 'letterSpacing',
 			label: 'letter spacing',
 			path: `${sourcePath}/letterSpacing`,
-			value: recipe.letterSpacingEm,
+			value: composite.letterSpacingEm,
 			min: -0.1,
 			max: 0.1,
 			step: 0.0005,
@@ -234,9 +248,61 @@ function recipeControls(
 	];
 }
 
-function atomicFontSizePrefix(recipe: TypographyContractRecipe): string {
-	const suffix = recipe.fontSizeReference === 'min' ? 'min' : String(recipe.fontSizeReference);
-	return recipe.atomicFontSizeToken.slice(0, -(suffix.length + 1));
+function semanticVariantControls(
+	sourcePath: string,
+	role: TypographyRole,
+	composite: TypographyContractComposite,
+	style: string,
+	availableStyles: string[]
+): ReviewControl[] {
+	return [
+		{
+			kind: 'number',
+			id: 'lineHeight',
+			label: 'line height',
+			path: `${sourcePath}/lineHeight`,
+			value: composite.lineHeight,
+			min: 0.5,
+			max: 3,
+			step: 0.005,
+		},
+		{
+			kind: 'number',
+			id: 'letterSpacing',
+			label: 'letter spacing',
+			path: `${sourcePath}/letterSpacing`,
+			value: composite.letterSpacingEm,
+			min: -0.1,
+			max: 0.1,
+			step: 0.0005,
+			unit: 'em',
+		},
+		{
+			kind: 'select',
+			id: 'weight',
+			label: 'weight',
+			path: `${sourcePath}/weight`,
+			value: composite.weight,
+			options: Object.entries(role.weights).map(([alias, value]) => ({
+				label: `${alias} · ${value}`,
+				value: alias,
+			})),
+		},
+		{
+			kind: 'select',
+			id: 'fontStyle',
+			label: 'style',
+			path: `${sourcePath}/fontStyle`,
+			value: style,
+			options: availableStyles.map((value) => ({ label: value, value })),
+		},
+	];
+}
+
+function atomicFontSizePrefix(composite: TypographyContractComposite): string {
+	const suffix =
+		composite.fontSizeReference === 'min' ? 'min' : String(composite.fontSizeReference);
+	return composite.atomicFontSizeToken.slice(0, -(suffix.length + 1));
 }
 
 function fontSizeReference(
@@ -252,19 +318,19 @@ function fontSizeReference(
 }
 
 /**
- * Resolve the exact recipe visible in one typography mode from the generated IR.
+ * Resolve the exact composite visible in one typography mode from the generated IR.
  *
  * Non-default mode token sets intentionally contain only declarations that must
  * be rebound inside that selector. Missing declarations therefore inherit the
  * default contract rather than becoming empty values.
  */
-function modeRecipe(
+function modeComposite(
 	ir: IR,
 	modeName: string,
 	defaultModeName: string,
-	role: TypographyContractRecipe,
+	role: TypographyContractComposite,
 	weightTokens: Record<string, string>
-): TypographyContractRecipe {
+): TypographyContractComposite {
 	const tokens = modeName === defaultModeName ? ir.tokens : (ir.overrideTokens[modeName] ?? {});
 	const atomicPrefix = atomicFontSizePrefix(role);
 	const resolvedFontSize = fontSizeReference(
@@ -289,8 +355,48 @@ function modeRecipe(
 		...(textTransformValue
 			? {
 					textTransformToken: textTransformTokenName,
-					textTransform: textTransformValue as TypographyContractRecipe['textTransform'],
+					textTransform: textTransformValue as TypographyContractComposite['textTransform'],
 				}
+			: {}),
+	};
+}
+
+function semanticVariantComposite(
+	ir: IR,
+	composite: TypographyContractComposite,
+	variant: TypographyContractSemanticVariant
+): TypographyContractComposite {
+	const token = (name: string | undefined) => (name ? ir.tokens[name] : undefined);
+	const textTransform = token(variant.textTransformToken)?.value as
+		TypographyContractComposite['textTransform'] | undefined;
+	return {
+		...composite,
+		...(variant.weight ? { weight: variant.weight } : {}),
+		...(variant.fontWeightToken ? { fontWeightToken: variant.fontWeightToken } : {}),
+		...(variant.lineHeightToken
+			? {
+					lineHeightToken: variant.lineHeightToken,
+					lineHeight: token(variant.lineHeightToken)?.rawValue ?? composite.lineHeight,
+				}
+			: {}),
+		...(variant.letterSpacingToken
+			? {
+					letterSpacingToken: variant.letterSpacingToken,
+					letterSpacingEm: token(variant.letterSpacingToken)?.rawValue ?? composite.letterSpacingEm,
+				}
+			: {}),
+		...(variant.textTransformToken
+			? { textTransformToken: variant.textTransformToken, textTransform }
+			: {}),
+		...(variant.fontKerningToken ? { fontKerningToken: variant.fontKerningToken } : {}),
+		...(variant.fontOpticalSizingToken
+			? { fontOpticalSizingToken: variant.fontOpticalSizingToken }
+			: {}),
+		...(variant.fontFeatureSettingsToken
+			? { fontFeatureSettingsToken: variant.fontFeatureSettingsToken }
+			: {}),
+		...(variant.fontVariationSettingsToken
+			? { fontVariationSettingsToken: variant.fontVariationSettingsToken }
 			: {}),
 	};
 }
@@ -318,48 +424,59 @@ function typographyCases(
 		if (!font) return [];
 		const adjustedFallback = adjustedFallbackFamilies[roleName];
 		return orderedModes.flatMap((mode) => {
-			const recipes = [
-				[null, contractRole.base] as const,
-				...contractRole.displayOrder
-					.filter((name) => name !== 'base')
-					.map((name) => [name, contractRole.variants[name]] as const),
-			].filter((entry): entry is readonly [string | null, TypographyContractRecipe] =>
-				Boolean(entry[1])
-			);
+			const composites = contractRole.displayOrder
+				.map((name) => [name === 'base' ? null : name, contractRole.sizes[name]] as const)
+				.filter((entry): entry is readonly [string | null, TypographyContractComposite] =>
+					Boolean(entry[1])
+				);
 			const sizes = typographySizeOptions(mode);
-			return recipes.map(([variantName, defaultRecipe]) => {
-				const recipe = modeRecipe(
+			return composites.flatMap(([sizeName, defaultComposite]) => {
+				const composite = modeComposite(
 					ir,
 					mode.name,
 					defaultMode.name,
-					defaultRecipe,
+					defaultComposite,
 					contractRole.weightTokens
 				);
-				const recipePath =
-					variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`;
+				const recipePath = `sizes/${pointerSegment(sizeName ?? 'base')}`;
 				const sourcePath =
 					mode.name === defaultMode.name
 						? `/typography/roles/${pointerSegment(roleName)}/${recipePath}`
 						: `/typography/roles/${pointerSegment(roleName)}/modeOverrides/${pointerSegment(
 								mode.name
 							)}/${recipePath}`;
-				const weightAlias = recipe.weight;
 				const defaultId = `typography--${caseIdSegment(roleName)}--${caseIdSegment(
-					variantName ?? 'base'
+					sizeName ?? 'base'
 				)}`;
-				return {
+				const id =
+					mode.name === defaultMode.name
+						? defaultId
+						: `typography--${caseIdSegment(mode.name)}--${caseIdSegment(
+								roleName
+							)}--${caseIdSegment(sizeName ?? 'base')}`;
+				const availableStyles = Object.keys(contractRole.styles);
+				const availableWeights = Object.entries(sourceRole.weights).map(([alias, value]) => ({
+					alias,
+					value,
+				}));
+				const styleWeights = Object.fromEntries(
+					Object.entries(contractRole.styles).map(([style, entry]) => [
+						style,
+						(entry?.weights ?? []).map((alias) => ({
+							alias,
+							value: sourceRole.weights[alias]!,
+						})),
+					])
+				);
+				const baseCase: TypographyReviewCase = {
 					kind: 'typography',
-					id:
-						mode.name === defaultMode.name
-							? defaultId
-							: `typography--${caseIdSegment(mode.name)}--${caseIdSegment(
-									roleName
-								)}--${caseIdSegment(variantName ?? 'base')}`,
-					label: `${roleName} / ${variantName ?? 'base'}`,
+					id,
+					label: `${roleName} / ${sizeName ?? 'base'}`,
 					sourcePath,
 					mode: mode.name,
 					role: roleName,
-					variant: variantName,
+					size: sizeName,
+					variant: null,
 					font: {
 						id: contractRole.font,
 						family: font.family,
@@ -367,25 +484,44 @@ function typographyCases(
 						...(adjustedFallback ? { adjustedFallback } : {}),
 					},
 					style: contractRole.defaultStyle,
-					weight: { alias: weightAlias, value: sourceRole.weights[weightAlias]! },
-					availableStyles: Object.keys(contractRole.styles),
-					availableWeights: Object.entries(sourceRole.weights).map(([alias, value]) => ({
-						alias,
-						value,
-					})),
-					styleWeights: Object.fromEntries(
-						Object.entries(contractRole.styles).map(([style, entry]) => [
-							style,
-							(entry?.weights ?? []).map((alias) => ({
-								alias,
-								value: sourceRole.weights[alias]!,
-							})),
-						])
-					),
-					recipe,
-					controls: recipeControls(sourcePath, sourceRole, recipe, sizes),
+					weight: { alias: composite.weight, value: sourceRole.weights[composite.weight]! },
+					availableStyles,
+					availableWeights,
+					styleWeights,
+					composite,
+					controls: recipeControls(sourcePath, sourceRole, composite, sizes),
 					capture: capturePolicy({ sizeModes: [mode.name] }),
 				};
+				const variants = Object.entries(contractRole.variants).map(
+					([variantName, semanticVariant]): TypographyReviewCase => {
+						const variantComposite = semanticVariantComposite(ir, composite, semanticVariant);
+						const variantStyle = semanticVariant.fontStyle ?? contractRole.defaultStyle;
+						const variantPath = `/typography/roles/${pointerSegment(
+							roleName
+						)}/variants/${pointerSegment(variantName)}`;
+						return {
+							...baseCase,
+							id: `${id}--variant--${caseIdSegment(variantName)}`,
+							label: `${roleName} / ${sizeName ?? 'base'} / ${variantName}`,
+							sourcePath: variantPath,
+							variant: variantName,
+							style: variantStyle,
+							weight: {
+								alias: variantComposite.weight,
+								value: sourceRole.weights[variantComposite.weight]!,
+							},
+							composite: variantComposite,
+							controls: semanticVariantControls(
+								variantPath,
+								sourceRole,
+								variantComposite,
+								variantStyle,
+								availableStyles
+							),
+						};
+					}
+				);
+				return [baseCase, ...variants];
 			});
 		});
 	});
@@ -393,12 +529,12 @@ function typographyCases(
 
 function shadowLayerControls(
 	kind: 'box' | 'text',
-	recipeName: string,
+	compositeName: string,
 	variantName: string | null,
 	layers: ShadowReviewCase['layers'],
 	unit: string
 ): ReviewControl[] {
-	const path = `/shadows/${kind}/${pointerSegment(recipeName)}/${
+	const path = `/shadows/${kind}/${pointerSegment(compositeName)}/${
 		variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`
 	}`;
 	return layers.flatMap((layer, index) => {
@@ -455,17 +591,17 @@ function shadowLayerControls(
 	});
 }
 
-function shadowRecipeCases(
+function shadowCompositeCases(
 	kind: 'box' | 'text',
 	name: string,
-	recipe: ShadowContractRecipe,
+	composite: ShadowContractComposite,
 	unit: string
 ): ShadowReviewCase[] {
 	const values = [
-		[null, recipe.base] as const,
-		...recipe.displayOrder
+		[null, composite.base] as const,
+		...composite.displayOrder
 			.filter((variant) => variant !== 'base')
-			.map((variant) => [variant, recipe.variants[variant]] as const),
+			.map((variant) => [variant, composite.variants[variant]] as const),
 	].filter((entry): entry is readonly [string | null, NonNullable<(typeof entry)[1]>] =>
 		Boolean(entry[1])
 	);
@@ -477,7 +613,7 @@ function shadowRecipeCases(
 			variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`
 		}`,
 		shadowKind: kind,
-		recipe: name,
+		composite: name,
 		variant: variantName,
 		token: value.token,
 		css: value.css,
@@ -491,39 +627,39 @@ function shadowRecipeCases(
 function shadowCases(ir: IR): ShadowReviewCase[] {
 	if (!ir.shadows) return [];
 	return [
-		...Object.entries(ir.shadows.box).flatMap(([name, recipe]) =>
-			shadowRecipeCases('box', name, recipe, ir.shadows!.unit)
+		...Object.entries(ir.shadows.box).flatMap(([name, composite]) =>
+			shadowCompositeCases('box', name, composite, ir.shadows!.unit)
 		),
-		...Object.entries(ir.shadows.text).flatMap(([name, recipe]) =>
-			shadowRecipeCases('text', name, recipe, ir.shadows!.unit)
+		...Object.entries(ir.shadows.text).flatMap(([name, composite]) =>
+			shadowCompositeCases('text', name, composite, ir.shadows!.unit)
 		),
 	];
 }
 
 function motionCases(ir: IR): MotionReviewCase[] {
 	if (!ir.motion) return [];
-	return Object.entries(ir.motion.recipes).flatMap(([recipeName, recipe]) => {
+	return Object.entries(ir.motion.composites).flatMap(([compositeName, composite]) => {
 		const values = [
-			[null, recipe.base] as const,
-			...recipe.displayOrder
+			[null, composite.base] as const,
+			...composite.displayOrder
 				.filter((variant) => variant !== 'base')
-				.map((variant) => [variant, recipe.variants[variant]] as const),
+				.map((variant) => [variant, composite.variants[variant]] as const),
 		].filter((entry): entry is readonly [string | null, NonNullable<(typeof entry)[1]>] =>
 			Boolean(entry[1])
 		);
 		return values.map(([variantName, value]) => {
 			const reduced =
 				variantName === null
-					? recipe.reducedMotion.base
-					: recipe.reducedMotion.variants[variantName];
+					? composite.reducedMotion.base
+					: composite.reducedMotion.variants[variantName];
 			return {
 				kind: 'motion',
-				id: `motion--${caseIdSegment(recipeName)}--${caseIdSegment(variantName ?? 'base')}`,
-				label: `${recipeName} / ${variantName ?? 'base'}`,
-				sourcePath: `/motion/recipes/${pointerSegment(recipeName)}/${
+				id: `motion--${caseIdSegment(compositeName)}--${caseIdSegment(variantName ?? 'base')}`,
+				label: `${compositeName} / ${variantName ?? 'base'}`,
+				sourcePath: `/motion/composites/${pointerSegment(compositeName)}/${
 					variantName === null ? 'base' : `variants/${pointerSegment(variantName)}`
 				}`,
-				recipe: recipeName,
+				composite: compositeName,
 				variant: variantName,
 				token: value.token,
 				duration: {

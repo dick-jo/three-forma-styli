@@ -4,7 +4,8 @@
  * Validates inputs at the generator entry point and throws helpful errors.
  */
 
-import type { AlphaSchedule, DesignSystem, PartialDesignSystem } from '../types.js';
+import { ALPHA_POSITIONS } from '../alpha/index.js';
+import type { AlphaSystem, DesignSystem, PartialDesignSystem } from '../types.js';
 import {
 	ValidationError,
 	tokenNamePattern,
@@ -21,28 +22,30 @@ import { validateTypographyPartial } from './validate-typography.js';
 
 export { ValidationError } from './validation-shared.js';
 
-function validateColorNameList(
+function validateColorIdentityList(
 	value: unknown,
 	path: string,
-	declaredColorNames: ReadonlySet<string>
+	declaredColorIdentities: ReadonlySet<string>
 ): string[] {
 	if (!Array.isArray(value) || value.length === 0) {
 		throw new ValidationError(`${path} must be a non-empty array`);
 	}
 	const names: string[] = [];
 	const seen = new Set<string>();
-	for (const colorName of value) {
-		if (typeof colorName !== 'string' || !tokenNamePattern.test(colorName)) {
-			throw new ValidationError(`${path} contains a non-token-safe color name`);
+	for (const colorIdentity of value) {
+		if (typeof colorIdentity !== 'string' || !tokenNamePattern.test(colorIdentity)) {
+			throw new ValidationError(`${path} contains a non-token-safe color identity`);
 		}
-		if (seen.has(colorName)) {
+		if (seen.has(colorIdentity)) {
 			throw new ValidationError(`${path} must not contain duplicates`);
 		}
-		if (!declaredColorNames.has(colorName)) {
-			throw new ValidationError(`${path} references undeclared default color "${colorName}"`);
+		if (!declaredColorIdentities.has(colorIdentity)) {
+			throw new ValidationError(
+				`${path} references undeclared default color identity "${colorIdentity}"`
+			);
 		}
-		seen.add(colorName);
-		names.push(colorName);
+		seen.add(colorIdentity);
+		names.push(colorIdentity);
 	}
 	return names;
 }
@@ -55,6 +58,7 @@ export function validateDesignSystem(ds: DesignSystem): void {
 		throw new ValidationError('DesignSystem is required');
 	}
 
+	if (ds.alpha) validateAlphaPartial(ds.alpha);
 	validateColors(ds);
 	validateSpacing(ds);
 	validateGap(ds);
@@ -62,7 +66,7 @@ export function validateDesignSystem(ds: DesignSystem): void {
 	validateBorder(ds);
 	validateTime(ds);
 	if (ds.motion) validateMotionPartial(ds.motion, ds.time);
-	if (ds.shadows) validateShadowsPartial(ds.shadows, ds.colors);
+	if (ds.shadows) validateShadowsPartial(ds.shadows, ds.colors, ds.alpha);
 }
 
 /**
@@ -77,6 +81,7 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 
 	// Check that at least one family is provided
 	const hasColors = !!ds.colors;
+	const hasAlpha = !!ds.alpha;
 	const hasSpacing = !!ds.spacing;
 	const hasGap = !!ds.gap;
 	const hasTypography = !!ds.typography;
@@ -87,6 +92,7 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 
 	if (
 		!hasColors &&
+		!hasAlpha &&
 		!hasSpacing &&
 		!hasGap &&
 		!hasTypography &&
@@ -114,10 +120,13 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 	if (hasShadows && !hasColors) {
 		throw new ValidationError('Shadows require colors (shadow layers reference color tokens)');
 	}
-
 	// Validate each provided family
+	if (hasAlpha) {
+		validateAlphaPartial(ds.alpha!);
+	}
 	if (hasColors) {
 		validateColorsPartial(ds.colors!);
+		if (ds.alpha) validateColorAlphaReference(ds.colors!, ds.alpha);
 	}
 	if (hasSpacing) {
 		validateSpacingPartial(ds.spacing!);
@@ -138,7 +147,62 @@ export function validatePartialDesignSystem(ds: DesignSystem | PartialDesignSyst
 		validateMotionPartial(ds.motion!, ds.time!);
 	}
 	if (hasShadows) {
-		validateShadowsPartial(ds.shadows!, ds.colors!);
+		validateShadowsPartial(ds.shadows!, ds.colors!, ds.alpha);
+	}
+}
+
+function validateAlphaPartial(alpha: AlphaSystem): void {
+	if (!alpha || typeof alpha !== 'object' || Array.isArray(alpha)) {
+		throw new ValidationError('alpha must be an object');
+	}
+	if (!tokenNamePattern.test(alpha.defaultScale)) {
+		throw new ValidationError('alpha.defaultScale must be a CSS-token-safe scale identity');
+	}
+	const entries = Object.entries(alpha.scales ?? {});
+	if (entries.length === 0)
+		throw new ValidationError('alpha.scales must define at least one scale');
+	if (!(alpha.defaultScale in alpha.scales)) {
+		throw new ValidationError(
+			`alpha.defaultScale references unknown scale "${alpha.defaultScale}"`
+		);
+	}
+	for (const [scaleName, scale] of entries) {
+		const path = `alpha.scales.${scaleName}`;
+		if (!tokenNamePattern.test(scaleName)) {
+			throw new ValidationError(`${path} identity is not CSS-token safe`);
+		}
+		if (!scale || typeof scale !== 'object' || Array.isArray(scale)) {
+			throw new ValidationError(`${path} must be an object`);
+		}
+		const keys = Object.keys(scale.values ?? {});
+		if (
+			keys.length !== ALPHA_POSITIONS.length ||
+			ALPHA_POSITIONS.some((position) => !keys.includes(position))
+		) {
+			throw new ValidationError(
+				`${path}.values must define exactly ${ALPHA_POSITIONS.join(', ')}; non is compiler-owned`
+			);
+		}
+		let previous = 0;
+		for (const position of ALPHA_POSITIONS) {
+			const value = scale.values[position];
+			if (!Number.isFinite(value) || value <= previous || value >= 1) {
+				throw new ValidationError(
+					`${path}.values.${position} must be finite, greater than ${previous}, and below 1`
+				);
+			}
+			previous = value;
+		}
+	}
+}
+
+function validateColorAlphaReference(
+	colors: NonNullable<PartialDesignSystem['colors']>,
+	alpha: AlphaSystem
+): void {
+	const selected = colors.alphaScale ?? alpha.defaultScale;
+	if (!(selected in alpha.scales)) {
+		throw new ValidationError(`colors.alphaScale references unknown alpha scale "${selected}"`);
 	}
 }
 
@@ -176,7 +240,7 @@ function validateColorsPartial(colors: NonNullable<PartialDesignSystem['colors']
 				validateFiniteNumber(color.alpha, `${path}.alpha`);
 				if (color.alpha !== 1) {
 					throw new ValidationError(
-						`${path}.alpha must be 1; define transparency through colors.alphaSchedule`
+						`${path}.alpha must be 1; define transparency through the top-level alpha system`
 					);
 				}
 			}
@@ -188,61 +252,78 @@ function validateColorsPartial(colors: NonNullable<PartialDesignSystem['colors']
 			`Default color mode "${defaultMode.name}" must define at least one token`
 		);
 	}
+	const defaultColorIdentities = new Set(Object.keys(defaultMode.tokens));
+	for (const mode of colors.modes) {
+		if (mode === defaultMode) continue;
+		for (const identity of Object.keys(mode.tokens)) {
+			if (!defaultColorIdentities.has(identity)) {
+				throw new ValidationError(
+					`Color mode "${mode.name}" introduces "${identity}", which is not declared by default mode "${defaultMode.name}"`
+				);
+			}
+		}
+	}
+	for (const [groupName, group] of Object.entries(colors.groups ?? {})) {
+		const path = `colors.groups.${groupName}`;
+		if (!tokenNamePattern.test(groupName)) {
+			throw new ValidationError(`${path} identity is not CSS-token safe`);
+		}
+		if (!group || typeof group !== 'object' || Array.isArray(group)) {
+			throw new ValidationError(`${path} must be an object`);
+		}
+		const hasIdentities = Array.isArray(group.identities);
+		const hasMatch = Boolean(group.match && typeof group.match === 'object');
+		if (hasIdentities === hasMatch) {
+			throw new ValidationError(`${path} must define exactly one of identities or match`);
+		}
+		if (hasIdentities) {
+			if (
+				group.identities!.length === 0 ||
+				new Set(group.identities).size !== group.identities!.length
+			) {
+				throw new ValidationError(`${path}.identities must be a non-empty unique list`);
+			}
+			for (const identity of group.identities!) {
+				if (!defaultColorIdentities.has(identity)) {
+					throw new ValidationError(
+						`${path}.identities references unknown color identity "${identity}"`
+					);
+				}
+			}
+		} else {
+			const prefix = group.match!.prefix;
+			if (typeof prefix !== 'string' || !/^[a-z][a-z0-9-]*$/i.test(prefix)) {
+				throw new ValidationError(`${path}.match.prefix must be a CSS-token-safe prefix`);
+			}
+			if (![...defaultColorIdentities].some((identity) => identity.startsWith(prefix))) {
+				throw new ValidationError(`${path}.match.prefix does not match any color identity`);
+			}
+		}
+	}
 	if (colors.luminance) {
 		const path = 'colors.luminance';
 		validateFiniteNumber(colors.luminance.minimumLuminanceDelta, `${path}.minimumLuminanceDelta`);
 		if (colors.luminance.minimumLuminanceDelta < 0 || colors.luminance.minimumLuminanceDelta > 1) {
 			throw new ValidationError(`${path}.minimumLuminanceDelta must be between 0 and 1`);
 		}
-		const defaultColorNames = new Set(Object.keys(defaultMode.tokens));
 		const groups = [
-			validateColorNameList(
+			validateColorIdentityList(
 				colors.luminance.backgroundColors,
 				`${path}.backgroundColors`,
-				defaultColorNames
+				defaultColorIdentities
 			),
-			validateColorNameList(
+			validateColorIdentityList(
 				colors.luminance.foregroundColors,
 				`${path}.foregroundColors`,
-				defaultColorNames
+				defaultColorIdentities
 			),
 		] as const;
-		for (const colorName of groups[0]) {
-			if (groups[1].includes(colorName)) {
-				throw new ValidationError(`${path} assigns "${colorName}" to both color groups`);
+		for (const colorIdentity of groups[0]) {
+			if (groups[1].includes(colorIdentity)) {
+				throw new ValidationError(`${path} assigns "${colorIdentity}" to both color groups`);
 			}
 		}
-		if (colors.runtimeThemes) {
-			const runtimePath = 'colors.runtimeThemes.colorNames';
-			const runtimeNames = validateColorNameList(
-				colors.runtimeThemes.colorNames,
-				runtimePath,
-				defaultColorNames
-			);
-			const runtimeSet = new Set(runtimeNames);
-			for (const names of groups) {
-				for (const colorName of names) {
-					if (!runtimeSet.has(colorName)) {
-						throw new ValidationError(
-							`${runtimePath} must include luminance-group color "${colorName}"`
-						);
-					}
-				}
-			}
-		}
-	} else if (colors.runtimeThemes) {
-		throw new ValidationError('colors.runtimeThemes requires colors.luminance');
 	}
-
-	if (colors.alphaSchedule) {
-		validateAlphaSchedule(colors.alphaSchedule, 'colors.alphaSchedule');
-	}
-
-	colors.modes.forEach((mode) => {
-		if (mode.alphaSchedule) {
-			validateAlphaSchedule(mode.alphaSchedule, `colors.modes["${mode.name}"].alphaSchedule`);
-		}
-	});
 }
 
 function validateColors(ds: DesignSystem): void {
@@ -408,26 +489,6 @@ function validateBorderPartial(
 				);
 			}
 		});
-	}
-}
-
-function validateAlphaSchedule(schedule: AlphaSchedule, path: string): void {
-	const entries = Object.entries(schedule);
-
-	if (entries.length === 0) {
-		throw new ValidationError(`${path} must have at least one alpha level`);
-	}
-
-	for (const [level, value] of entries) {
-		if (!tokenNamePattern.test(level)) {
-			throw new ValidationError(`${path} alpha level "${level}" is not CSS-token safe`);
-		}
-		if (typeof value !== 'number' || !Number.isFinite(value)) {
-			throw new ValidationError(`${path}.${level} must be a finite number`);
-		}
-		if (value < 0 || value > 1) {
-			throw new ValidationError(`${path}.${level} must be between 0 and 1 (got ${value})`);
-		}
 	}
 }
 

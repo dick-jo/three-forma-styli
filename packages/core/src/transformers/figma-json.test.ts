@@ -17,6 +17,14 @@ addFormats(dtcgAjv);
 const validatesDtcg = dtcgAjv.compile(dtcgSchema);
 
 const colors: PartialDesignSystem = {
+	alpha: {
+		defaultScale: 'standard',
+		scales: {
+			standard: {
+				values: { min: 0.08, 'lo-x': 0.16, lo: 0.24, hi: 0.32, 'hi-x': 0.4, max: 0.5 },
+			},
+		},
+	},
 	colors: {
 		modes: [
 			{
@@ -33,7 +41,6 @@ const colors: PartialDesignSystem = {
 				},
 			},
 		],
-		alphaSchedule: { half: 0.5 },
 	},
 };
 
@@ -62,7 +69,7 @@ describe('toFigmaJson', () => {
 			components: [0, 0, 0],
 			hex: '#000000',
 		});
-		expect(output.color['clr-ink-a-half'].$value).toEqual({
+		expect(output.color['clr-ink-a-max'].$value).toEqual({
 			colorSpace: 'srgb',
 			components: [0, 0, 0],
 			alpha: 0.501961,
@@ -79,7 +86,7 @@ describe('toFigmaJson', () => {
 		expect(extension.modes.dark.hex).toBe('#ffffff');
 	});
 
-	it('emits layered box/text recipes as DTCG shadow composites', () => {
+	it('emits layered box/text composites as DTCG shadow composites', () => {
 		const system: PartialDesignSystem = {
 			...colors,
 			shadows: {
@@ -87,21 +94,21 @@ describe('toFigmaJson', () => {
 				box: {
 					elevation: {
 						base: [
-							{ x: 0, y: 1, blur: 3, color: { color: 'ink', alpha: 'half' } },
+							{ x: 0, y: 1, blur: 3, color: { color: 'ink', alpha: 'max' } },
 							{
 								x: 0,
 								y: 8,
 								blur: 24,
 								spread: -4,
 								inset: true,
-								color: { color: 'ink', alpha: 'half' },
+								color: { color: 'ink', alpha: 'max' },
 							},
 						],
 					},
 				},
 				text: {
 					glow: {
-						base: [{ x: 0, y: 0, blur: 8, color: { color: 'ink', alpha: 'half' } }],
+						base: [{ x: 0, y: 0, blur: 8, color: { color: 'ink', alpha: 'max' } }],
 					},
 				},
 			},
@@ -114,7 +121,7 @@ describe('toFigmaJson', () => {
 		expect(output.shadow.$type).toBe('shadow');
 		expect(output.shadow['box-elevation'].$value).toHaveLength(2);
 		expect(output.shadow['box-elevation'].$value[1]).toEqual({
-			color: '{color.clr-ink-a-half}',
+			color: '{color.clr-ink-a-max}',
 			offsetX: { value: 0, unit: 'px' },
 			offsetY: { value: 8, unit: 'px' },
 			blur: { value: 24, unit: 'px' },
@@ -222,13 +229,13 @@ describe('toFigmaJson', () => {
 				roles: {
 					prose: {
 						font: 'sans',
-						base: {
-							fontSize: 2,
-							weight: 'base',
-							lineHeight: 1.25,
-							letterSpacing: 0.01,
-						},
-						variants: {
+						sizes: {
+							base: {
+								fontSize: 2,
+								weight: 'min',
+								lineHeight: 1.25,
+								letterSpacing: 0.01,
+							},
 							max: {
 								fontSize: 4,
 								weight: 'max',
@@ -237,10 +244,9 @@ describe('toFigmaJson', () => {
 							},
 						},
 						modeOverrides: {
-							large: { base: { lineHeight: 1.2, weight: 'max' } },
+							large: { sizes: { base: { lineHeight: 1.2, weight: 'max' } } },
 						},
-						displayOrder: ['base', 'max'],
-						weights: { base: 400, max: 700 },
+						weights: { min: 400, max: 700 },
 					},
 				},
 			},
@@ -255,7 +261,7 @@ describe('toFigmaJson', () => {
 			},
 			motion: {
 				easings: { standard: [0.2, 0, 0.38, 0.9] },
-				recipes: {
+				composites: {
 					hover: {
 						base: { duration: 2, easing: 'standard' },
 						variants: { max: { duration: 3, delay: 1 } },
@@ -337,13 +343,13 @@ describe('toFigmaJson', () => {
 					roles: {
 						prose: {
 							font: 'sans',
-							base: {
-								fontSize: 2,
-								weight: 'base',
-								lineHeight: 1.25,
-								letterSpacing: 0.01,
-							},
-							variants: {
+							sizes: {
+								base: {
+									fontSize: 2,
+									weight: 'min',
+									lineHeight: 1.25,
+									letterSpacing: 0.01,
+								},
 								max: {
 									fontSize: 4,
 									weight: 'max',
@@ -351,8 +357,7 @@ describe('toFigmaJson', () => {
 									letterSpacing: -0.01,
 								},
 							},
-							displayOrder: ['base', 'max'],
-							weights: { base: 400, max: 700 },
+							weights: { min: 400, max: 700 },
 						},
 					},
 				},
@@ -367,7 +372,7 @@ describe('toFigmaJson', () => {
 				},
 				motion: {
 					easings: { standard: [0.2, 0, 0.38, 0.9] },
-					recipes: {
+					composites: {
 						hover: {
 							base: { duration: 2, easing: 'standard' },
 							variants: { max: { duration: 3, delay: 1 } },
@@ -379,7 +384,7 @@ describe('toFigmaJson', () => {
 					unit: 'px',
 					box: {
 						elevation: {
-							base: [{ x: 0, y: 1, blur: 3, color: { color: 'ink', alpha: 'half' } }],
+							base: [{ x: 0, y: 1, blur: 3, color: { color: 'ink', alpha: 'max' } }],
 						},
 					},
 				},

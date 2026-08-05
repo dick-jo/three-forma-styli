@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { generateColorTokens } from './colors.js';
 import { defaultGeneratorConfig } from './types.js';
-import type { DesignSystem, AlphaSchedule } from '../types.js';
+import type { DesignSystem } from '../types.js';
 
-const defaultAlphaSchedule: AlphaSchedule = {
+const defaultAlphaSchedule: Readonly<Record<string, number>> = {
 	min: 0.07,
 	'lo-x': 0.125,
 	lo: 0.25,
@@ -14,7 +14,6 @@ const defaultAlphaSchedule: AlphaSchedule = {
 
 describe('generateColorTokens', () => {
 	const basicColors: DesignSystem['colors'] = {
-		alphaSchedule: defaultAlphaSchedule,
 		modes: [
 			{
 				name: 'default',
@@ -33,7 +32,7 @@ describe('generateColorTokens', () => {
 	};
 
 	it('generates base color tokens', () => {
-		const result = generateColorTokens(basicColors, defaultGeneratorConfig);
+		const result = generateColorTokens(basicColors, defaultGeneratorConfig, defaultAlphaSchedule);
 
 		const bgToken = result.defaultTokens.find((t) => t.name === 'clr-bg');
 		const primaryToken = result.defaultTokens.find((t) => t.name === 'clr-primary');
@@ -44,7 +43,7 @@ describe('generateColorTokens', () => {
 	});
 
 	it('generates alpha variants for each color', () => {
-		const result = generateColorTokens(basicColors, defaultGeneratorConfig);
+		const result = generateColorTokens(basicColors, defaultGeneratorConfig, defaultAlphaSchedule);
 
 		// Check that bg has all alpha variants
 		const bgAlphaMin = result.defaultTokens.find((t) => t.name === 'clr-bg-a-min');
@@ -59,7 +58,7 @@ describe('generateColorTokens', () => {
 	});
 
 	it('includes alpha metadata on alpha variants', () => {
-		const result = generateColorTokens(basicColors, defaultGeneratorConfig);
+		const result = generateColorTokens(basicColors, defaultGeneratorConfig, defaultAlphaSchedule);
 
 		const bgAlphaLo = result.defaultTokens.find((t) => t.name === 'clr-bg-a-lo');
 
@@ -69,7 +68,7 @@ describe('generateColorTokens', () => {
 	});
 
 	it('stores rawValue for alpha variants', () => {
-		const result = generateColorTokens(basicColors, defaultGeneratorConfig);
+		const result = generateColorTokens(basicColors, defaultGeneratorConfig, defaultAlphaSchedule);
 
 		const bgAlphaMin = result.defaultTokens.find((t) => t.name === 'clr-bg-a-min');
 		const bgAlphaMax = result.defaultTokens.find((t) => t.name === 'clr-bg-a-max');
@@ -79,7 +78,7 @@ describe('generateColorTokens', () => {
 	});
 
 	it('generates correct number of tokens (base + 6 alpha variants per color)', () => {
-		const result = generateColorTokens(basicColors, defaultGeneratorConfig);
+		const result = generateColorTokens(basicColors, defaultGeneratorConfig, defaultAlphaSchedule);
 
 		// 7 colors * 7 tokens each (1 base + 6 alpha) = 49 tokens
 		expect(result.defaultTokens).toHaveLength(49);
@@ -94,7 +93,7 @@ describe('generateColorTokens', () => {
 			},
 		};
 
-		const result = generateColorTokens(basicColors, customConfig);
+		const result = generateColorTokens(basicColors, customConfig, defaultAlphaSchedule);
 
 		const bgToken = result.defaultTokens.find((t) => t.name === 'color-bg');
 		expect(bgToken).toBeDefined();
@@ -109,7 +108,7 @@ describe('generateColorTokens', () => {
 			},
 		};
 
-		const result = generateColorTokens(basicColors, customConfig);
+		const result = generateColorTokens(basicColors, customConfig, defaultAlphaSchedule);
 
 		const bgAlphaLo = result.defaultTokens.find((t) => t.name === 'clr-bg-tr-lo');
 		expect(bgAlphaLo).toBeDefined();
@@ -117,7 +116,6 @@ describe('generateColorTokens', () => {
 
 	describe('mode handling', () => {
 		const multiModeColors: DesignSystem['colors'] = {
-			alphaSchedule: defaultAlphaSchedule,
 			modes: [
 				{
 					name: 'light',
@@ -144,19 +142,31 @@ describe('generateColorTokens', () => {
 		};
 
 		it('identifies correct default mode', () => {
-			const result = generateColorTokens(multiModeColors, defaultGeneratorConfig);
+			const result = generateColorTokens(
+				multiModeColors,
+				defaultGeneratorConfig,
+				defaultAlphaSchedule
+			);
 
 			expect(result.modeInfo.default).toBe('light');
 		});
 
 		it('identifies override modes', () => {
-			const result = generateColorTokens(multiModeColors, defaultGeneratorConfig);
+			const result = generateColorTokens(
+				multiModeColors,
+				defaultGeneratorConfig,
+				defaultAlphaSchedule
+			);
 
 			expect(result.modeInfo.overrides).toContain('dark');
 		});
 
 		it('only generates tokens for explicitly defined colors in override modes', () => {
-			const result = generateColorTokens(multiModeColors, defaultGeneratorConfig);
+			const result = generateColorTokens(
+				multiModeColors,
+				defaultGeneratorConfig,
+				defaultAlphaSchedule
+			);
 
 			// Dark mode only defines bg and ink, so only those should be in overrideTokens
 			const darkTokens = result.overrideTokens['dark'];
@@ -179,10 +189,9 @@ describe('generateColorTokens', () => {
 		});
 	});
 
-	describe('alpha schedule override', () => {
-		it('allows mode-specific alpha schedule', () => {
-			const colorsWithModeSchedule: DesignSystem['colors'] = {
-				alphaSchedule: defaultAlphaSchedule,
+	describe('selected Alpha scale', () => {
+		it('applies one resolved scale consistently across color modes', () => {
+			const colors: DesignSystem['colors'] = {
 				modes: [
 					{
 						name: 'default',
@@ -196,22 +205,23 @@ describe('generateColorTokens', () => {
 							positive: { mode: 'oklch', l: 0.76, c: 0.2, h: 150 },
 							negative: { mode: 'oklch', l: 0.69, c: 0.21, h: 7 },
 						},
-						alphaSchedule: {
-							min: 0.1, // Different from system default
-							'lo-x': 0.2,
-							lo: 0.3,
-							hi: 0.7,
-							'hi-x': 0.8,
-							max: 0.9,
-						},
 					},
 				],
 			};
+			const selected = {
+				non: 0,
+				min: 0.1,
+				'lo-x': 0.2,
+				lo: 0.3,
+				hi: 0.7,
+				'hi-x': 0.8,
+				max: 0.9,
+			};
 
-			const result = generateColorTokens(colorsWithModeSchedule, defaultGeneratorConfig);
+			const result = generateColorTokens(colors, defaultGeneratorConfig, selected);
 
 			const bgAlphaMin = result.defaultTokens.find((t) => t.name === 'clr-bg-a-min');
-			expect(bgAlphaMin?.rawValue).toBe(0.1); // Uses mode-specific schedule
+			expect(bgAlphaMin?.rawValue).toBe(0.1);
 		});
 	});
 });

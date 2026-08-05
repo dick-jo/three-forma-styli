@@ -2,7 +2,7 @@ import type {
 	CssTransformerConfig,
 	GeneratorOptions,
 	PartialDesignSystem,
-	TypographyRole,
+	AuthoredTypographyRole,
 	TypographySystem,
 } from '@three-forma-styli/core';
 import type { FontPreparationFamily } from './fonts/prepare.js';
@@ -14,14 +14,14 @@ export interface ProjectFont extends FontPreparationFamily {
 }
 
 export type ProjectTypographyRole<Fonts extends Record<string, ProjectFont>> = Omit<
-	TypographyRole,
+	AuthoredTypographyRole,
 	'font'
 > & {
 	font: Extract<keyof Fonts, string>;
 };
 
 export type ProjectTypographyInput<Fonts extends Record<string, ProjectFont>> = Omit<
-	TypographySystem,
+	import('@three-forma-styli/core').AuthoredTypographySystem,
 	'fonts' | 'roles'
 > & {
 	roles: Record<string, ProjectTypographyRole<Fonts>>;
@@ -126,7 +126,7 @@ export interface WorkspaceRuntimeCssOutput {
 	typography?: boolean | Omit<ProjectTypographyCssOutput, 'file' | 'fontFaces'>;
 	/** Emit the CSS Module and declaration. Defaults to true when roles exist. */
 	module?: boolean;
-	/** Emit global box/text shadow helper classes when shadow recipes exist. */
+	/** Emit global box/text shadow helper classes when shadow composites exist. */
 	shadows?: boolean | Omit<ProjectShadowCssOutput, 'file'>;
 	/** Emit kebab-case shadow CSS Module helpers and their declaration. */
 	shadowModule?: boolean;
@@ -135,6 +135,8 @@ export interface WorkspaceRuntimeCssOutput {
 }
 
 export interface WorkspaceRuntimeContractsOutput {
+	/** Emit the compact public token catalogue and typed CSS-variable helpers. */
+	tokens?: boolean;
 	/** Emit runtime/system.js and its literal declaration. Defaults to true. */
 	system?: boolean;
 	/** Emit runtime/typography.js and its literal declaration when roles exist. Defaults to true. */
@@ -166,7 +168,7 @@ export interface WorkspaceReviewOutput {
 	workbench?: boolean | WorkspaceWorkbenchOutput;
 	/** @deprecated Use workbench. Retained temporarily for migration evidence. */
 	specimen?: boolean | WorkspaceSpecimenOutput;
-	/** Layering, clipping, banding and color-mode review for shadow recipes. */
+	/** Layering, clipping, banding and color-mode review for shadow composites. */
 	/** @deprecated Use workbench. Retained temporarily for migration evidence. */
 	shadowSpecimen?: boolean | Omit<WorkspaceSpecimenOutput, 'fonts'>;
 }
@@ -202,9 +204,25 @@ export interface WorkspacePackageOutput {
 /** Strictly discriminated output layouts; workspace-package cannot mix flat keys. */
 export type TfsProjectOutput = LegacyTfsProjectOutput | WorkspacePackageOutput;
 
+export type RuntimeColorSelection = string | { readonly group: string };
+
+/** Optional build-time contract for an application that compiles untrusted color themes. */
+export interface ProjectRuntimeColorThemes {
+	/** Exact colour identities and/or project-authored groups accepted from callers. */
+	colors: { readonly include: readonly RuntimeColorSelection[] };
+	/** Constraints the runtime compiler must enforce. */
+	enforce?: readonly 'luminance'[];
+}
+
+export interface ProjectRuntimeCapabilities {
+	colorThemes?: ProjectRuntimeColorThemes;
+}
+
 export interface TfsProjectInput<Fonts extends Record<string, ProjectFont>> {
 	fonts?: Fonts;
 	system: ProjectSystem<Fonts>;
+	/** Consumer capabilities belong to the project boundary, not the design-system source. */
+	runtime?: ProjectRuntimeCapabilities;
 	/** Shared naming and color-format policy applied to every generated target. */
 	generator?: GeneratorOptions;
 	output: TfsProjectOutput;

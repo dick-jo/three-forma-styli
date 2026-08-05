@@ -104,7 +104,9 @@ function typography(overrides: Partial<TypographySystem['roles'][string]> = {}):
 		roles: {
 			text: {
 				font: 'example',
-				base: { fontSize: 2, weight: 'lo', lineHeight: 1.25, letterSpacing: 0 },
+				sizes: {
+					base: { fontSize: 2, weight: 'lo', lineHeight: 1.25, letterSpacing: 0 },
+				},
 				weights: { lo: 400, hi: 700 },
 				...overrides,
 			},

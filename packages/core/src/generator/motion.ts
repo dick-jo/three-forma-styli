@@ -1,8 +1,8 @@
 import type {
 	MotionEasing,
-	MotionRecipeBase,
-	MotionRecipeVariant,
-	ReducedMotionRecipeVariant,
+	MotionCompositeBase,
+	MotionCompositeVariant,
+	ReducedMotionCompositeVariant,
 	MotionSystem,
 	TimeReference,
 	TimeSystem,
@@ -64,8 +64,8 @@ function zeroTimeValue(): MotionContractTimeValue {
 }
 
 function resolvedValue(
-	base: MotionRecipeBase,
-	...overrides: Array<MotionRecipeVariant | ReducedMotionRecipeVariant | undefined>
+	base: MotionCompositeBase,
+	...overrides: Array<MotionCompositeVariant | ReducedMotionCompositeVariant | undefined>
 ): ResolvedMotionValue {
 	let value: ResolvedMotionValue = {
 		duration: base.duration,
@@ -84,7 +84,7 @@ function resolvedValue(
 }
 
 function resolveValue(
-	recipeName: string,
+	compositeName: string,
 	variantName: string,
 	value: ResolvedMotionValue,
 	system: MotionSystem,
@@ -95,15 +95,15 @@ function resolveValue(
 	const namespace = config.prefixes.motion;
 	const prefix =
 		variantName === 'base'
-			? `${namespace}-${recipeName}`
-			: `${namespace}-${recipeName}-${variantName}`;
+			? `${namespace}-${compositeName}`
+			: `${namespace}-${compositeName}-${variantName}`;
 	const duration = value.duration === 0 ? zeroTimeValue() : timeValue(value.duration, time, config);
 	const delay = value.delay === 0 ? zeroTimeValue() : timeValue(value.delay, time, config);
 	const easingName = value.easing;
 	const easing = system.easings[easingName]!;
 	const easingToken = `${namespace}-ease-${easingName}`;
 	const metadata = {
-		motionRecipe: recipeName,
+		motionComposite: compositeName,
 		motionVariant: variantName,
 		motionPreference: preference,
 	};
@@ -167,7 +167,7 @@ export function generateMotionTokens(
 	const defaultTokens: TokenValue[] = [];
 	const reducedMotionTokens: TokenValue[] = [];
 	const easings: MotionContract['easings'] = {};
-	const recipes: MotionContract['recipes'] = {};
+	const composites: MotionContract['composites'] = {};
 
 	for (const [name, value] of Object.entries(system.easings)) {
 		const token = `${namespace}-ease-${name}`;
@@ -180,28 +180,28 @@ export function generateMotionTokens(
 		easings[name] = { token, css, value };
 	}
 
-	for (const [recipeName, recipe] of Object.entries(system.recipes)) {
-		const normalBaseValue = resolvedValue(recipe.base);
-		const base = resolveValue(recipeName, 'base', normalBaseValue, system, time, config);
+	for (const [compositeName, composite] of Object.entries(system.composites)) {
+		const normalBaseValue = resolvedValue(composite.base);
+		const base = resolveValue(compositeName, 'base', normalBaseValue, system, time, config);
 		defaultTokens.push(...base.tokens);
 
 		const variants: Record<string, MotionContractValue> = {};
 		const normalVariantValues: Record<string, ResolvedMotionValue> = {};
-		for (const [variantName, variant] of Object.entries(recipe.variants ?? {})) {
-			const normalValue = resolvedValue(recipe.base, variant);
-			const resolved = resolveValue(recipeName, variantName, normalValue, system, time, config);
+		for (const [variantName, variant] of Object.entries(composite.variants ?? {})) {
+			const normalValue = resolvedValue(composite.base, variant);
+			const resolved = resolveValue(compositeName, variantName, normalValue, system, time, config);
 			defaultTokens.push(...resolved.tokens);
 			variants[variantName] = resolved.contract;
 			normalVariantValues[variantName] = normalValue;
 		}
 
-		const reducedBaseBehavior = recipe.reducedMotion === 'preserve' ? 'preserve' : 'override';
+		const reducedBaseBehavior = composite.reducedMotion === 'preserve' ? 'preserve' : 'override';
 		const reducedBaseValue =
-			recipe.reducedMotion === 'preserve'
+			composite.reducedMotion === 'preserve'
 				? normalBaseValue
-				: resolvedValue(recipe.base, recipe.reducedMotion.base);
+				: resolvedValue(composite.base, composite.reducedMotion.base);
 		const reducedBase = resolveValue(
-			recipeName,
+			compositeName,
 			'base',
 			reducedBaseValue,
 			system,
@@ -211,24 +211,24 @@ export function generateMotionTokens(
 		);
 		if (reducedBaseBehavior === 'override') reducedMotionTokens.push(...reducedBase.tokens);
 
-		const reducedVariants: MotionContract['recipes'][string]['reducedMotion']['variants'] = {};
+		const reducedVariants: MotionContract['composites'][string]['reducedMotion']['variants'] = {};
 		for (const [variantName, normalValue] of Object.entries(normalVariantValues)) {
 			const authored =
-				recipe.reducedMotion === 'preserve'
+				composite.reducedMotion === 'preserve'
 					? 'preserve'
-					: recipe.reducedMotion.variants?.[variantName];
+					: composite.reducedMotion.variants?.[variantName];
 			const behavior = authored === 'preserve' ? 'preserve' : 'override';
 			const reducedValue =
 				authored === 'preserve'
 					? normalValue
 					: resolvedValue(
-							recipe.base,
-							recipe.variants?.[variantName],
-							recipe.reducedMotion === 'preserve' ? undefined : recipe.reducedMotion.base,
+							composite.base,
+							composite.variants?.[variantName],
+							composite.reducedMotion === 'preserve' ? undefined : composite.reducedMotion.base,
 							authored
 						);
 			const resolved = resolveValue(
-				recipeName,
+				compositeName,
 				variantName,
 				reducedValue,
 				system,
@@ -240,10 +240,10 @@ export function generateMotionTokens(
 			reducedVariants[variantName] = { ...resolved.contract, behavior };
 		}
 
-		recipes[recipeName] = {
+		composites[compositeName] = {
 			base: base.contract,
 			variants,
-			displayOrder: recipe.displayOrder ?? ['base', ...Object.keys(variants)],
+			displayOrder: composite.displayOrder ?? ['base', ...Object.keys(variants)],
 			reducedMotion: {
 				base: { ...reducedBase.contract, behavior: reducedBaseBehavior },
 				variants: reducedVariants,
@@ -254,6 +254,6 @@ export function generateMotionTokens(
 	return {
 		defaultTokens,
 		reducedMotionTokens,
-		contract: { namespace, easings, recipes },
+		contract: { namespace, easings, composites },
 	};
 }

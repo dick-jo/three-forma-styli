@@ -5,9 +5,10 @@ import type {
 	FontSizeReference,
 	TypographyFeatureValue,
 	TypographyMode,
-	TypographyModeRecipeOverride,
-	TypographyRecipe,
+	TypographyModeSizeOverride,
+	TypographyComposite,
 	TypographyRole,
+	TypographySemanticVariant,
 	TypographySettings,
 } from '../types.js';
 import type {
@@ -15,7 +16,7 @@ import type {
 	GeneratorResult,
 	TokenValue,
 	TypographyContract,
-	TypographyContractRecipe,
+	TypographyContractComposite,
 } from './types.js';
 import { getDefaultEntry } from './utils.js';
 
@@ -50,7 +51,7 @@ function typographyReference(reference: FontSizeReference, prefix: string): stri
 function recipeFontSizeToken(
 	roleName: string,
 	variantName: string | undefined,
-	recipe: TypographyRecipe,
+	composite: TypographyComposite,
 	config: GeneratorConfig
 ): TokenValue {
 	const rolePrefix = `${config.prefixes.typographyRole}-${roleName}`;
@@ -58,16 +59,16 @@ function recipeFontSizeToken(
 	return {
 		family: 'typography',
 		name: `${recipePrefix}-font-size`,
-		value: typographyReference(recipe.fontSize, config.prefixes.typography),
-		reference: `${config.prefixes.typography}-${recipe.fontSize}`,
+		value: typographyReference(composite.fontSize, config.prefixes.typography),
+		reference: `${config.prefixes.typography}-${composite.fontSize}`,
 	};
 }
 
 function applyModeOverride(
-	recipe: TypographyRecipe,
-	override: TypographyModeRecipeOverride
-): TypographyRecipe {
-	return { ...recipe, ...override };
+	composite: TypographyComposite,
+	override: TypographyModeSizeOverride
+): TypographyComposite {
+	return { ...composite, ...override };
 }
 
 function featureSettings(features: Record<string, TypographyFeatureValue>): string {
@@ -89,71 +90,72 @@ function variationSettings(variations: Record<string, number>): string {
 
 function resolvedSettings(
 	role: TypographyRole,
-	base: TypographyRecipe,
-	recipe: TypographyRecipe
+	base: TypographyComposite,
+	composite: TypographyComposite
 ): TypographySettings {
 	const features = {
 		...(role.features ?? {}),
 		...(base.features ?? {}),
-		...(recipe.features ?? {}),
+		...(composite.features ?? {}),
 	};
 	const variations = {
 		...(role.variations ?? {}),
 		...(base.variations ?? {}),
-		...(recipe.variations ?? {}),
+		...(composite.variations ?? {}),
 	};
 	return {
 		features: Object.keys(features).length > 0 ? features : undefined,
 		variations: Object.keys(variations).length > 0 ? variations : undefined,
-		fontKerning: recipe.fontKerning ?? base.fontKerning ?? role.fontKerning,
-		fontOpticalSizing: recipe.fontOpticalSizing ?? base.fontOpticalSizing ?? role.fontOpticalSizing,
-		textTransform: recipe.textTransform ?? base.textTransform ?? role.textTransform,
+		fontKerning: composite.fontKerning ?? base.fontKerning ?? role.fontKerning,
+		fontOpticalSizing:
+			composite.fontOpticalSizing ?? base.fontOpticalSizing ?? role.fontOpticalSizing,
+		textTransform: composite.textTransform ?? base.textTransform ?? role.textTransform,
 	};
 }
 
 function recipeTokens(
 	roleName: string,
 	variantName: string | undefined,
-	recipe: TypographyRecipe,
+	composite: TypographyComposite,
 	role: TypographyRole,
 	config: GeneratorConfig
-): { tokens: TokenValue[]; contract: TypographyContractRecipe } {
+): { tokens: TokenValue[]; contract: TypographyContractComposite } {
 	const rolePrefix = `${config.prefixes.typographyRole}-${roleName}`;
 	const recipePrefix = variantName ? `${rolePrefix}-${variantName}` : rolePrefix;
-	const settings = resolvedSettings(role, role.base, recipe);
+	const settings = resolvedSettings(role, role.sizes.base, composite);
 	const tokens: TokenValue[] = [
-		recipeFontSizeToken(roleName, variantName, recipe, config),
+		recipeFontSizeToken(roleName, variantName, composite, config),
 		{
 			family: 'typography',
 			name: `${recipePrefix}-font-weight`,
-			value: `var(--${rolePrefix}-font-weight-${recipe.weight})`,
-			reference: `${rolePrefix}-font-weight-${recipe.weight}`,
+			value: `var(--${rolePrefix}-font-weight-${composite.weight})`,
+			reference: `${rolePrefix}-font-weight-${composite.weight}`,
 		},
 		{
 			family: 'typography',
 			name: `${recipePrefix}-line-height`,
-			value: formatNumber(recipe.lineHeight),
-			rawValue: recipe.lineHeight,
+			value: formatNumber(composite.lineHeight),
+			rawValue: composite.lineHeight,
 		},
 		{
 			family: 'typography',
 			name: `${recipePrefix}-letter-spacing`,
-			value: recipe.letterSpacing === 0 ? '0' : `${formatNumber(recipe.letterSpacing)}em`,
-			rawValue: recipe.letterSpacing,
-			unit: recipe.letterSpacing === 0 ? undefined : 'em',
+			value: composite.letterSpacing === 0 ? '0' : `${formatNumber(composite.letterSpacing)}em`,
+			rawValue: composite.letterSpacing,
+			unit: composite.letterSpacing === 0 ? undefined : 'em',
 		},
 	];
 
-	const contract: TypographyContractRecipe = {
+	const contract: TypographyContractComposite = {
 		fontSizeToken: `${recipePrefix}-font-size`,
 		fontWeightToken: `${recipePrefix}-font-weight`,
-		weight: recipe.weight,
+		weight: composite.weight,
 		lineHeightToken: `${recipePrefix}-line-height`,
 		letterSpacingToken: `${recipePrefix}-letter-spacing`,
-		atomicFontSizeToken: `${config.prefixes.typography}-${recipe.fontSize}`,
-		fontSizeReference: recipe.fontSize,
-		lineHeight: recipe.lineHeight,
-		letterSpacingEm: recipe.letterSpacing,
+		atomicFontSizeToken: `${config.prefixes.typography}-${composite.fontSize}`,
+		fontSizeReference: composite.fontSize,
+		lineHeight: composite.lineHeight,
+		letterSpacingEm: composite.letterSpacing,
 	};
 
 	if (settings.fontKerning) {
@@ -201,6 +203,99 @@ function recipeTokens(
 	return { tokens, contract };
 }
 
+function semanticVariantTokens(
+	roleName: string,
+	variantName: string,
+	variant: TypographySemanticVariant,
+	role: TypographyRole,
+	config: GeneratorConfig
+): { tokens: TokenValue[]; contract: import('./types.js').TypographyContractSemanticVariant } {
+	const rolePrefix = `${config.prefixes.typographyRole}-${roleName}`;
+	const prefix = `${rolePrefix}-variant-${variantName}`;
+	const tokens: TokenValue[] = [];
+	const contract: import('./types.js').TypographyContractSemanticVariant = {};
+	if (variant.weight) {
+		contract.weight = variant.weight;
+		contract.fontWeightToken = `${prefix}-font-weight`;
+		tokens.push({
+			family: 'typography',
+			name: contract.fontWeightToken,
+			value: `var(--${rolePrefix}-font-weight-${variant.weight})`,
+			reference: `${rolePrefix}-font-weight-${variant.weight}`,
+		});
+	}
+	if (variant.fontStyle) {
+		contract.fontStyle = variant.fontStyle;
+		contract.fontStyleToken = `${prefix}-font-style`;
+		tokens.push({
+			family: 'typography',
+			name: contract.fontStyleToken,
+			value: `var(--${rolePrefix}-font-style-${variant.fontStyle})`,
+			reference: `${rolePrefix}-font-style-${variant.fontStyle}`,
+		});
+	}
+	if (variant.lineHeight !== undefined) {
+		contract.lineHeightToken = `${prefix}-line-height`;
+		tokens.push({
+			family: 'typography',
+			name: contract.lineHeightToken,
+			value: formatNumber(variant.lineHeight),
+			rawValue: variant.lineHeight,
+		});
+	}
+	if (variant.letterSpacing !== undefined) {
+		contract.letterSpacingToken = `${prefix}-letter-spacing`;
+		tokens.push({
+			family: 'typography',
+			name: contract.letterSpacingToken,
+			value: variant.letterSpacing === 0 ? '0' : `${formatNumber(variant.letterSpacing)}em`,
+			rawValue: variant.letterSpacing,
+			unit: variant.letterSpacing === 0 ? undefined : 'em',
+		});
+	}
+	if (variant.textTransform) {
+		contract.textTransformToken = `${prefix}-text-transform`;
+		tokens.push({
+			family: 'typography',
+			name: contract.textTransformToken,
+			value: variant.textTransform,
+		});
+	}
+	if (variant.fontKerning) {
+		contract.fontKerningToken = `${prefix}-font-kerning`;
+		tokens.push({
+			family: 'typography',
+			name: contract.fontKerningToken,
+			value: variant.fontKerning,
+		});
+	}
+	if (variant.fontOpticalSizing) {
+		contract.fontOpticalSizingToken = `${prefix}-font-optical-sizing`;
+		tokens.push({
+			family: 'typography',
+			name: contract.fontOpticalSizingToken,
+			value: variant.fontOpticalSizing,
+		});
+	}
+	if (variant.features) {
+		contract.fontFeatureSettingsToken = `${prefix}-font-feature-settings`;
+		tokens.push({
+			family: 'typography',
+			name: contract.fontFeatureSettingsToken,
+			value: featureSettings({ ...(role.features ?? {}), ...variant.features }),
+		});
+	}
+	if (variant.variations) {
+		contract.fontVariationSettingsToken = `${prefix}-font-variation-settings`;
+		tokens.push({
+			family: 'typography',
+			name: contract.fontVariationSettingsToken,
+			value: variationSettings({ ...(role.variations ?? {}), ...variant.variations }),
+		});
+	}
+	return { tokens, contract };
+}
+
 function normalizedStyles(role: TypographyRole) {
 	return (
 		role.styles ?? {
@@ -229,16 +324,20 @@ export function generateTypographyContract(
 		Object.entries(typography.roles).map(([roleName, role]) => {
 			const rolePrefix = `${config.prefixes.typographyRole}-${roleName}`;
 			const styles = normalizedStyles(role);
-			const base = recipeTokens(roleName, undefined, role.base, role, config).contract;
-			const variants = Object.fromEntries(
-				Object.entries(role.variants ?? {}).map(([name, recipe]) => [
+			const sizes = Object.fromEntries(
+				Object.entries(role.sizes).map(([name, composite]) => [
 					name,
-					recipeTokens(roleName, name, recipe, role, config).contract,
+					recipeTokens(roleName, name === 'base' ? undefined : name, composite, role, config)
+						.contract,
 				])
 			);
-			const displayOrder = role.displayOrder
-				? [...role.displayOrder]
-				: ['base', ...Object.keys(role.variants ?? {})];
+			const variants = Object.fromEntries(
+				Object.entries(role.variants ?? {}).map(([name, variant]) => [
+					name,
+					semanticVariantTokens(roleName, name, variant, role, config).contract,
+				])
+			);
+			const displayOrder = ['min', 's', 'base', 'l', 'max'].filter((size) => sizes[size]);
 			return [
 				roleName,
 				{
@@ -259,7 +358,7 @@ export function generateTypographyContract(
 							},
 						])
 					),
-					base,
+					sizes,
 					variants,
 					displayOrder,
 				},
@@ -309,9 +408,19 @@ function generateSemanticTokens(
 			value: `var(--${rolePrefix}-font-style-${role.defaultStyle ?? 'normal'})`,
 			reference: `${rolePrefix}-font-style-${role.defaultStyle ?? 'normal'}`,
 		});
-		tokens.push(...recipeTokens(roleName, undefined, role.base, role, config).tokens);
-		for (const [variantName, recipe] of Object.entries(role.variants ?? {})) {
-			tokens.push(...recipeTokens(roleName, variantName, recipe, role, config).tokens);
+		for (const [sizeName, composite] of Object.entries(role.sizes)) {
+			tokens.push(
+				...recipeTokens(
+					roleName,
+					sizeName === 'base' ? undefined : sizeName,
+					composite,
+					role,
+					config
+				).tokens
+			);
+		}
+		for (const [variantName, variant] of Object.entries(role.variants ?? {})) {
+			tokens.push(...semanticVariantTokens(roleName, variantName, variant, role, config).tokens);
 		}
 	}
 	return tokens;
@@ -335,30 +444,14 @@ function generateSemanticModeTokens(
 	const tokens: TokenValue[] = [];
 	for (const [roleName, role] of Object.entries(typography.roles)) {
 		const modeOverride = role.modeOverrides?.[modeName];
-		const baseOverride = modeOverride?.base;
-		tokens.push(
-			...(baseOverride
-				? recipeTokens(
-						roleName,
-						undefined,
-						applyModeOverride(role.base, baseOverride),
-						role,
-						config
-					).tokens
-				: [recipeFontSizeToken(roleName, undefined, role.base, config)])
-		);
-		for (const [variantName, recipe] of Object.entries(role.variants ?? {})) {
-			const variantOverride = modeOverride?.variants?.[variantName];
+		for (const [sizeName, composite] of Object.entries(role.sizes)) {
+			const sizeOverride = modeOverride?.sizes[sizeName as keyof typeof modeOverride.sizes];
+			const suffix = sizeName === 'base' ? undefined : sizeName;
 			tokens.push(
-				...(variantOverride
-					? recipeTokens(
-							roleName,
-							variantName,
-							applyModeOverride(recipe, variantOverride),
-							role,
-							config
-						).tokens
-					: [recipeFontSizeToken(roleName, variantName, recipe, config)])
+				...(sizeOverride
+					? recipeTokens(roleName, suffix, applyModeOverride(composite, sizeOverride), role, config)
+							.tokens
+					: [recipeFontSizeToken(roleName, suffix, composite, config)])
 			);
 		}
 	}

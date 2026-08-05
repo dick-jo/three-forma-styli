@@ -186,24 +186,24 @@ function typographyComposite(
 } {
 	const typography = ir.typography!;
 	const role = typography.roles[roleName]!;
-	const recipe = variantName === 'base' ? role.base : role.variants[variantName]!;
-	const fontSizeAlias = rawToken(ir, recipe.fontSizeToken, mode);
+	const composite = role.sizes[variantName]!;
+	const fontSizeAlias = rawToken(ir, composite.fontSizeToken, mode);
 	const fontSize = referencedToken(ir, fontSizeAlias, mode);
 	if (fontSize.rawValue === undefined || !fontSize.unit) {
 		throw new Error(
 			`DTCG typography export could not resolve a numeric font size for ${roleName}/${variantName}`
 		);
 	}
-	const weightAlias = rawToken(ir, recipe.fontWeightToken, mode);
+	const weightAlias = rawToken(ir, composite.fontWeightToken, mode);
 	const weight = referencedToken(ir, weightAlias, mode);
 	if (weight.rawValue === undefined) {
 		throw new Error(
 			`DTCG typography export could not resolve a numeric font weight for ${roleName}/${variantName}`
 		);
 	}
-	const lineHeight = rawToken(ir, recipe.lineHeightToken, mode);
-	const letterSpacing = rawToken(ir, recipe.letterSpacingToken, mode);
-	const letterSpacingEm = letterSpacing.rawValue ?? recipe.letterSpacingEm;
+	const lineHeight = rawToken(ir, composite.lineHeightToken, mode);
+	const letterSpacing = rawToken(ir, composite.letterSpacingToken, mode);
+	const letterSpacingEm = letterSpacing.rawValue ?? composite.letterSpacingEm;
 	const fontStyle = referencedToken(ir, rawToken(ir, role.fontStyleToken, mode), mode).value;
 	const font = typography.fonts[role.font]!;
 	const optionalTokenValue = (name?: string): string | undefined =>
@@ -219,27 +219,27 @@ function typographyComposite(
 				fontSize.unit,
 				`${roleName}/${variantName} letter spacing`
 			),
-			lineHeight: lineHeight.rawValue ?? recipe.lineHeight,
+			lineHeight: lineHeight.rawValue ?? composite.lineHeight,
 		},
 		extension: {
 			role: roleName,
 			variant: variantName,
 			fontStyle,
 			letterSpacingEm,
-			...(optionalTokenValue(recipe.textTransformToken)
-				? { textTransform: optionalTokenValue(recipe.textTransformToken) }
+			...(optionalTokenValue(composite.textTransformToken)
+				? { textTransform: optionalTokenValue(composite.textTransformToken) }
 				: {}),
-			...(optionalTokenValue(recipe.fontKerningToken)
-				? { fontKerning: optionalTokenValue(recipe.fontKerningToken) }
+			...(optionalTokenValue(composite.fontKerningToken)
+				? { fontKerning: optionalTokenValue(composite.fontKerningToken) }
 				: {}),
-			...(optionalTokenValue(recipe.fontOpticalSizingToken)
-				? { fontOpticalSizing: optionalTokenValue(recipe.fontOpticalSizingToken) }
+			...(optionalTokenValue(composite.fontOpticalSizingToken)
+				? { fontOpticalSizing: optionalTokenValue(composite.fontOpticalSizingToken) }
 				: {}),
-			...(optionalTokenValue(recipe.fontFeatureSettingsToken)
-				? { fontFeatureSettings: optionalTokenValue(recipe.fontFeatureSettingsToken) }
+			...(optionalTokenValue(composite.fontFeatureSettingsToken)
+				? { fontFeatureSettings: optionalTokenValue(composite.fontFeatureSettingsToken) }
 				: {}),
-			...(optionalTokenValue(recipe.fontVariationSettingsToken)
-				? { fontVariationSettings: optionalTokenValue(recipe.fontVariationSettingsToken) }
+			...(optionalTokenValue(composite.fontVariationSettingsToken)
+				? { fontVariationSettings: optionalTokenValue(composite.fontVariationSettingsToken) }
 				: {}),
 		},
 	};
@@ -371,19 +371,19 @@ function generateDtcg(
 	}
 	if (shadowGroup && ir.shadows) {
 		const dimension = (value: number) => dtcgDimension(value, ir.shadows!.unit, 'Shadow system');
-		for (const [kind, recipes] of [
+		for (const [kind, composites] of [
 			['box', ir.shadows.box] as const,
 			['text', ir.shadows.text] as const,
 		]) {
-			for (const [recipeName, recipe] of Object.entries(recipes)) {
+			for (const [compositeName, composite] of Object.entries(composites)) {
 				for (const [variantName, value] of [
-					['base', recipe.base] as const,
-					...Object.entries(recipe.variants),
+					['base', composite.base] as const,
+					...Object.entries(composite.variants),
 				]) {
 					const name =
 						variantName === 'base'
-							? `${kind}-${recipeName}`
-							: `${kind}-${recipeName}-${variantName}`;
+							? `${kind}-${compositeName}`
+							: `${kind}-${compositeName}-${variantName}`;
 					const layers = value.layers.map((layer) => ({
 						color: `{color.${layer.color.token}}`,
 						offsetX: dimension(layer.x),
@@ -410,16 +410,16 @@ function generateDtcg(
 		for (const [name, easing] of Object.entries(ir.motion.easings)) {
 			easingGroup[name] = { $value: [...easing.value] };
 		}
-		for (const [recipeName, recipe] of Object.entries(ir.motion.recipes)) {
+		for (const [compositeName, composite] of Object.entries(ir.motion.composites)) {
 			for (const [variantName, value] of [
-				['base', recipe.base] as const,
-				...Object.entries(recipe.variants),
+				['base', composite.base] as const,
+				...Object.entries(composite.variants),
 			]) {
-				const name = variantName === 'base' ? recipeName : `${recipeName}-${variantName}`;
+				const name = variantName === 'base' ? compositeName : `${compositeName}-${variantName}`;
 				const reduced =
 					variantName === 'base'
-						? recipe.reducedMotion.base
-						: recipe.reducedMotion.variants[variantName];
+						? composite.reducedMotion.base
+						: composite.reducedMotion.variants[variantName];
 				transitionGroup[name] = {
 					$value: {
 						duration: { value: value.duration.milliseconds, unit: 'ms' },
@@ -428,7 +428,7 @@ function generateDtcg(
 					},
 					$extensions: {
 						[EXTENSION_KEY]: {
-							recipe: recipeName,
+							composite: compositeName,
 							variant: variantName,
 							reducedMotion: {
 								behavior: reduced.behavior,

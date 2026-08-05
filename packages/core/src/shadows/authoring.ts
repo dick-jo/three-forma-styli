@@ -1,7 +1,7 @@
 import type {
 	BoxShadowLayer,
 	ShadowColorReference,
-	ShadowRecipe,
+	ShadowComposite,
 	TextShadowLayer,
 } from '../types.js';
 
@@ -35,7 +35,7 @@ export type DerivedShadowRange<
 	Kind extends ShadowKind,
 	Anchors extends ShadowAnchors<Kind>,
 	Derived extends Record<string, DerivedShadowVariant<Extract<keyof Anchors, string>>>,
-> = ShadowRecipe<LayerFor<Kind>> & {
+> = ShadowComposite<LayerFor<Kind>> & {
 	variants: Record<
 		Exclude<Extract<keyof Anchors, string>, 'base'> | Extract<keyof Derived, string>,
 		readonly LayerFor<Kind>[]

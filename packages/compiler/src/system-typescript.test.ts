@@ -5,8 +5,15 @@ import { generateProjectSystemTypescript, projectSystemContract } from './system
 describe('project system TypeScript contract', () => {
 	it('preserves authored modes and simultaneous time scales as separate contracts', () => {
 		const system = {
+			alpha: {
+				defaultScale: 'standard',
+				scales: {
+					standard: {
+						values: { min: 0.08, 'lo-x': 0.125, lo: 0.2, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+					},
+				},
+			},
 			colors: {
-				alphaSchedule: { min: 0.08 },
 				modes: [
 					{
 						name: 'default',
@@ -37,7 +44,7 @@ describe('project system TypeScript contract', () => {
 			},
 			motion: {
 				easings: { standard: [0.2, 0, 0.38, 0.9] },
-				recipes: {
+				composites: {
 					hover: {
 						base: { duration: 1, easing: 'standard' },
 						variants: { max: { duration: { scale: 'ambient', step: 2 } } },
@@ -78,12 +85,12 @@ describe('project system TypeScript contract', () => {
 			't-ambient-2': '2000ms',
 			't-ambient-min': '500ms',
 		});
-		expect(contract.motion?.recipes.hover?.base.duration).toMatchObject({
+		expect(contract.motion?.composites.hover?.base.duration).toMatchObject({
 			token: 't-1',
 			milliseconds: 100,
 			seconds: 0.1,
 		});
-		expect(contract.motion?.recipes.hover?.variants.max?.duration).toMatchObject({
+		expect(contract.motion?.composites.hover?.variants.max?.duration).toMatchObject({
 			token: 't-ambient-2',
 			milliseconds: 2000,
 			seconds: 2,

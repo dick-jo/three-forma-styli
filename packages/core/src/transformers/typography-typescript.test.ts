@@ -51,20 +51,23 @@ const typography: DesignSystem['typography'] = {
 		interface: {
 			font: 'ui',
 			textTransform: 'uppercase',
-			base: { fontSize: 2, weight: 'regular', lineHeight: 1.2, letterSpacing: 0 },
-			variants: {
-				compact: {
+			sizes: {
+				min: {
 					fontSize: 1,
-					weight: 'strong',
+					weight: 'max',
 					lineHeight: 1.1,
 					letterSpacing: 0.01,
 					textTransform: 'lowercase',
 				},
+				base: { fontSize: 2, weight: 'min', lineHeight: 1.2, letterSpacing: 0 },
 			},
-			weights: { regular: 400, strong: 700 },
+			variants: {
+				emphatic: { weight: 'max', letterSpacing: -0.01 },
+			},
+			weights: { min: 400, max: 700 },
 			styles: {
-				normal: { weights: ['regular', 'strong'] },
-				italic: { weights: ['regular'] },
+				normal: { weights: ['min', 'max'] },
+				italic: { weights: ['min'] },
 			},
 		},
 	},
@@ -76,17 +79,18 @@ describe('toTypographyTypescript', () => {
 		expect(output).toContain('export const typography =');
 		expect(output).toContain('"fontFamily": "var(--text-interface-font-family)"');
 		expect(output).toContain('"base"');
-		expect(output).toContain('"compact"');
-		expect(output).toContain('"fontSize": "var(--text-interface-compact-font-size)"');
-		expect(output).toContain('"fontWeight": "var(--text-interface-compact-font-weight)"');
-		expect(output).toContain('"weight": "strong"');
+		expect(output).toContain('"min"');
+		expect(output).toContain('"fontSize": "var(--text-interface-min-font-size)"');
+		expect(output).toContain('"fontWeight": "var(--text-interface-min-font-weight)"');
+		expect(output).toContain('"weight": "max"');
 		expect(output).toContain('"textTransform": "var(--text-interface-text-transform)"');
 		expect(output).toContain('"textTransformValue": "uppercase"');
 		expect(output).toContain('"textTransformValue": "lowercase"');
 		expect(output).toContain('"base": "interface"');
-		expect(output).toContain('"compact": "interface-compact"');
+		expect(output).toContain('"min": "interface-min"');
+		expect(output).toContain('"emphatic": "interface-variant-emphatic"');
 		expect(output).toContain('"italic"');
-		expect(output).toContain('"regular": "interface-style-italic-weight-regular"');
+		expect(output).toContain('"min": "interface-style-italic-weight-min"');
 		expect(output).not.toContain('"defaultWeight"');
 		expect(output).not.toContain('"fonts":');
 		expect(output).toContain('export type TypographyVariant<R extends TypographyRole>');
@@ -99,7 +103,7 @@ describe('toTypographyTypescript', () => {
 			generate({ typography }, { prefixes: { typographyRole: 'copy' } })
 		);
 		expect(output).toContain('var(--copy-interface-font-family)');
-		expect(output).toContain('var(--copy-interface-compact-font-size)');
+		expect(output).toContain('var(--copy-interface-min-font-size)');
 	});
 
 	it('type-checks variants and style-specific weight combinations', () => {
@@ -109,26 +113,30 @@ describe('toTypographyTypescript', () => {
 				`${output}
 const base: TypographySelection = { role: 'interface' };
 const explicitDefaultStyle: TypographySelection = { role: 'interface', fontStyle: 'normal' };
-const compact: TypographySelection = { role: 'interface', variant: 'compact' };
-const italic: TypographySelection = { role: 'interface', fontStyle: 'italic', weight: 'regular' };
+const compact: TypographySelection = { role: 'interface', size: 'min' };
+const emphatic: TypographySelection = { role: 'interface', variant: 'emphatic' };
+const italic: TypographySelection = { role: 'interface', fontStyle: 'italic', weight: 'min' };
 const classes: TypographyClassMap = {
   interface: 'base',
-  'interface-compact': 'compact',
-  'interface-style-normal-weight-regular': 'normal-regular',
-  'interface-style-normal-weight-strong': 'normal-strong',
-  'interface-style-italic-weight-regular': 'italic-regular',
+  'interface-min': 'compact',
+  'interface-variant-emphatic': 'emphatic',
+  'interface-style-normal-weight-min': 'normal-min',
+  'interface-style-normal-weight-max': 'normal-max',
+  'interface-style-italic-weight-min': 'italic-min',
 };
 const className: string = typographyClassName(compact, classes);
-void base; void explicitDefaultStyle; void compact; void italic; void className;
-// @ts-expect-error unknown variant
-const badVariant: TypographySelection = { role: 'interface', variant: 'display' };
-// @ts-expect-error italic does not expose strong
-const badItalic: TypographySelection = { role: 'interface', fontStyle: 'italic', weight: 'strong' };
+void base; void explicitDefaultStyle; void compact; void emphatic; void italic; void className;
+// @ts-expect-error unknown size
+const badVariant: TypographySelection = { role: 'interface', size: 'display' };
+// @ts-expect-error unknown categorical variant
+const badSemanticVariant: TypographySelection = { role: 'interface', variant: 'display' };
+// @ts-expect-error italic does not expose max
+const badItalic: TypographySelection = { role: 'interface', fontStyle: 'italic', weight: 'max' };
 // @ts-expect-error an explicit style requires an explicit valid pair weight
 const missingItalicWeight: TypographySelection = { role: 'interface', fontStyle: 'italic' };
 // @ts-expect-error class maps must contain every generated key
 const incompleteClasses: TypographyClassMap = { interface: 'base' };
-void badVariant; void badItalic; void missingItalicWeight; void incompleteClasses;
+void badVariant; void badSemanticVariant; void badItalic; void missingItalicWeight; void incompleteClasses;
 `
 			)
 		).toEqual([]);

@@ -157,7 +157,7 @@ copy authoritative. The manifest must name its source commit.
 ```text
 scatter-design-system/
 ├── foundation.ts        # alpha schedule, palette and network source values
-├── typography.ts        # explicit role recipes; derivation is optional
+├── typography.ts        # explicit role composites; derivation is optional
 ├── fonts/               # licensed sources + attestations, or documented inputs
 ├── tfs.config.ts        # one build command and explicit output policy
 ├── regression/
@@ -182,7 +182,7 @@ in both directions.
 
 ## Pixel-perfect typography calibration
 
-Scatter should author complete role recipes explicitly. `deriveTypographyRange`
+Scatter should author complete role sizes explicitly. `deriveTypographySizes`
 is an optional drafting helper, not required architecture.
 
 The calibration loop can be evidence-driven:

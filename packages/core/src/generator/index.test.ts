@@ -3,11 +3,17 @@ import type { PartialDesignSystem } from '../types.js';
 import { generate, resolveGeneratorConfig, ValidationError } from './index.js';
 import { defaultGeneratorConfig } from './types.js';
 
-const alphaSchedule = { min: 0.1, max: 0.9 };
+const alpha: NonNullable<PartialDesignSystem['alpha']> = {
+	defaultScale: 'standard',
+	scales: {
+		standard: {
+			values: { min: 0.1, 'lo-x': 0.2, lo: 0.3, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+		},
+	},
+};
 
 function colorsWithOverride(name: string): NonNullable<PartialDesignSystem['colors']> {
 	return {
-		alphaSchedule,
 		modes: [
 			{
 				name: 'default',
@@ -26,6 +32,7 @@ describe('generate mode identity', () => {
 	it('rejects an override name shared by color and size categories', () => {
 		expect(() =>
 			generate({
+				alpha,
 				colors: colorsWithOverride('compact'),
 				spacing: {
 					modes: [

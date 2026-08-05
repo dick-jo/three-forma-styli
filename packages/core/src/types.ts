@@ -1,5 +1,3 @@
-// Updated types.ts with consistent patterns for all token types
-import type { Oklch } from 'culori';
 import type { LuminancePolicy } from './constraints/types.js';
 
 // COLOURS ---------------------------------------------- //
@@ -23,7 +21,38 @@ import type { LuminancePolicy } from './constraints/types.js';
  *
  * But you can use any color names you want.
  */
+/** Dependency-free public OKLCH shape; structurally compatible with Culori. */
+export interface Oklch {
+	readonly mode: 'oklch';
+	readonly l: number;
+	readonly c: number;
+	readonly h?: number;
+	readonly alpha?: number;
+}
+
 export type ColorTokens = Record<string, Oklch>;
+
+/** Fixed positional grammar shared by every authored alpha scale. */
+export type AlphaPosition = 'min' | 'lo-x' | 'lo' | 'hi' | 'hi-x' | 'max';
+
+/** The six authored values in an alpha scale. `non: 0` is compiler-owned. */
+export type AlphaScaleValues = Readonly<Record<AlphaPosition, number>>;
+
+/** Complete emitted scale used by generated and browser-runtime contracts. */
+export type ResolvedAlphaScaleValues = Readonly<{ non: 0 }> & AlphaScaleValues;
+
+export interface AlphaScale {
+	values: AlphaScaleValues;
+}
+
+/**
+ * Named, property-agnostic alpha scales. The selected default receives the
+ * terse --a-* namespace; additional scales receive --a-{scale}-*.
+ */
+export interface AlphaSystem {
+	defaultScale: string;
+	scales: Readonly<Record<string, AlphaScale>>;
+}
 
 /** Portable author-owned facts attached to a mode (for example a label or polarity). */
 export type ModeMetadata = Readonly<Record<string, string | number | boolean | null>>;
@@ -35,7 +64,6 @@ export interface DefaultColorMode {
 	isDefault: true;
 	metadata?: ModeMetadata;
 	tokens: ColorTokens;
-	alphaSchedule?: AlphaSchedule;
 }
 
 /**
@@ -45,7 +73,6 @@ export interface OverrideColorMode {
 	isDefault?: false;
 	metadata?: ModeMetadata;
 	tokens: ColorTokens; // Partial by nature - only override what changes
-	alphaSchedule?: AlphaSchedule;
 }
 
 /**
@@ -53,25 +80,10 @@ export interface OverrideColorMode {
  */
 export type ColorMode = DefaultColorMode | OverrideColorMode;
 
-/**
- * Alpha schedule defines opacity levels for alpha variants.
- * Each key becomes a suffix (e.g., "lo" -> --clr-pri-a-lo)
- * Each value is between 0 (fully transparent) and 1 (fully opaque).
- *
- * Recommended schedule (least opaque to most opaque):
- *   { non: 0, min: 0.07, "lo-x": 0.125, lo: 0.25, hi: 0.68, "hi-x": 0.85, max: 0.93 }
- *
- * Simple alternative:
- *   { non: 0, low: 0.25, high: 0.75 }
- */
-export interface AlphaSchedule {
-	[level: string]: number;
-}
-
-/** Deliberate subset accepted from user-authored runtime theme payloads. */
-export interface RuntimeColorThemesPolicy {
-	readonly colorNames: readonly string[];
-}
+/** Generic project-authored taxonomy over identities in one domain. */
+export type IdentityGroup =
+	| { readonly identities: readonly string[]; readonly match?: never }
+	| { readonly identities?: never; readonly match: { readonly prefix: string } };
 
 // SPACING ---------------------------------------------- //
 export interface SpacingSystem {
@@ -121,6 +133,8 @@ export interface TypographyMode {
 export type FontSizeReference = 'min' | number;
 export type TypographyFontStyle = 'normal' | 'italic' | 'oblique';
 export type TypographyAvailableWeights = number[] | { min: number; max: number };
+export type TypographySizeIdentity = 'min' | 's' | 'base' | 'l' | 'max';
+export type TypographyWeightIdentity = 'min' | 'lo' | 'hi' | 'max';
 
 export interface TypographyVariableAxis {
 	min: number;
@@ -178,26 +192,36 @@ export interface TypographySettings {
 	textTransform?: TypographyTextTransform;
 }
 
-/** A complete role-local size recipe. Letter spacing is expressed in em. */
-export interface TypographyRecipe extends TypographySettings {
+/** A complete role-local size composite. Letter spacing is expressed in em. */
+export interface TypographyComposite extends TypographySettings {
 	fontSize: FontSizeReference;
-	/** Role-local weight alias selected by this complete recipe. */
+	/** Role-local weight alias selected by this complete composite. */
 	weight: string;
 	lineHeight: number;
 	letterSpacing: number;
 }
 
 /**
- * Deliberate changes to one complete semantic recipe inside an atomic typography
- * mode. Core derives nothing here: omitted fields retain the authored recipe.
+ * Deliberate changes to one complete semantic composite inside an atomic typography
+ * mode. Core derives nothing here: omitted fields retain the authored composite.
  */
-export type TypographyModeRecipeOverride = Partial<
-	Pick<TypographyRecipe, 'fontSize' | 'weight' | 'lineHeight' | 'letterSpacing' | 'textTransform'>
+export type TypographyModeSizeOverride = Partial<
+	Pick<
+		TypographyComposite,
+		'fontSize' | 'weight' | 'lineHeight' | 'letterSpacing' | 'textTransform'
+	>
 >;
 
 export interface TypographyRoleModeOverride {
-	base?: TypographyModeRecipeOverride;
-	variants?: Record<string, TypographyModeRecipeOverride>;
+	sizes: Partial<Record<TypographySizeIdentity, TypographyModeSizeOverride>>;
+}
+
+/** Unordered categorical treatment; font family and size remain role/range-owned. */
+export interface TypographySemanticVariant extends TypographySettings {
+	weight?: string;
+	fontStyle?: TypographyFontStyle;
+	lineHeight?: number;
+	letterSpacing?: number;
 }
 
 export interface TypographyRoleStyle {
@@ -208,21 +232,18 @@ export interface TypographyRoleStyle {
 export interface TypographyRole extends TypographySettings {
 	/** Key of a font in typography.fonts. */
 	font: string;
-	/** The unsuffixed/default recipe, emitted as --text-{role}-* by default. */
-	base: TypographyRecipe;
-	/** Optional, arbitrarily named alternatives such as min, s, l, and max. */
-	variants?: Record<string, TypographyRecipe>;
+	/** Fixed role-local range. Base is required and emitted without a size suffix. */
+	sizes: { base: TypographyComposite } & Partial<
+		Record<Exclude<TypographySizeIdentity, 'base'>, TypographyComposite>
+	>;
+	/** Unordered categorical treatments that do not change font family or size. */
+	variants?: Record<string, TypographySemanticVariant>;
 	/**
 	 * Optional tuple changes keyed by an existing non-default typography mode.
 	 * This keeps role calibration explicit when display or compact contexts need
 	 * more than a globally scaled --fs-* ramp.
 	 */
 	modeOverrides?: Record<string, TypographyRoleModeOverride>;
-	/**
-	 * Optional specimen/presentation order. Must contain `base` and every variant
-	 * exactly once. This is authored per role; core assigns no semantic meaning to names.
-	 */
-	displayOrder?: string[];
 	/** Role-local semantic aliases mapped to intentional CSS weight values. */
 	weights: Record<string, number>;
 	/**
@@ -233,7 +254,7 @@ export interface TypographyRole extends TypographySettings {
 	defaultStyle?: TypographyFontStyle;
 }
 
-interface TypographyScaleSystem {
+export interface TypographyScaleSystem {
 	modes: Array<TypographyMode & { name: string }>;
 }
 
@@ -362,7 +383,7 @@ export type TimeReference =
 /** A portable cubic Bézier curve shared by CSS and JavaScript motion engines. */
 export type MotionEasing = readonly [number, number, number, number];
 
-export interface MotionRecipeBase {
+export interface MotionCompositeBase {
 	duration: TimeReference;
 	easing: string;
 	/** Omitted delay resolves to a literal zero milliseconds. */
@@ -373,13 +394,13 @@ export interface MotionRecipeBase {
  * A named alternative inherits omitted easing and delay decisions from base.
  * Duration may also be inherited, although a variant normally changes it.
  */
-export type MotionRecipeVariant = Partial<MotionRecipeBase>;
+export type MotionCompositeVariant = Partial<MotionCompositeBase>;
 
 /**
  * A reduced-motion override may resolve duration or delay to literal zero.
- * Omitted fields preserve the corresponding authored recipe decision.
+ * Omitted fields preserve the corresponding authored composite decision.
  */
-export interface ReducedMotionRecipeVariant {
+export interface ReducedMotionCompositeVariant {
 	duration?: 0 | TimeReference;
 	easing?: string;
 	delay?: 0 | TimeReference;
@@ -387,35 +408,35 @@ export interface ReducedMotionRecipeVariant {
 
 /**
  * Reduced-motion is an explicit semantic decision, not a global duration
- * multiplier. A recipe can preserve its motion when it is essential, or
+ * multiplier. A composite can preserve its motion when it is essential, or
  * provide a base override inherited by every variant. Individual variants may
  * override that reduced value or opt back into their original motion.
  */
-export type ReducedMotionRecipe =
+export type ReducedMotionComposite =
 	| 'preserve'
 	| {
-			base: ReducedMotionRecipeVariant;
-			variants?: Record<string, ReducedMotionRecipeVariant | 'preserve'>;
+			base: ReducedMotionCompositeVariant;
+			variants?: Record<string, ReducedMotionCompositeVariant | 'preserve'>;
 	  };
 
-export interface MotionRecipe {
-	/** Unsuffixed/default fragment, emitted as --motion-{recipe}. */
-	base: MotionRecipeBase;
+export interface MotionComposite {
+	/** Unsuffixed/default fragment, emitted as --motion-{composite}. */
+	base: MotionCompositeBase;
 	/** Arbitrarily named alternatives such as min, lo, hi and max. */
-	variants?: Record<string, MotionRecipeVariant>;
+	variants?: Record<string, MotionCompositeVariant>;
 	/** Optional review order containing base and every variant exactly once. */
 	displayOrder?: string[];
 	/** Required behavior for the user's reduced-motion preference. */
-	reducedMotion: ReducedMotionRecipe;
+	reducedMotion: ReducedMotionComposite;
 }
 
 /**
- * Semantic transition fragments. Recipe names describe interactions or motion
+ * Semantic transition fragments. Composite names describe interactions or motion
  * intent; call sites continue to own selectors and animated CSS properties.
  */
 export interface MotionSystem {
 	easings: Record<string, MotionEasing>;
-	recipes: Record<string, MotionRecipe>;
+	composites: Record<string, MotionComposite>;
 }
 
 // SHADOWS ---------------------------------------------- //
@@ -440,7 +461,7 @@ export interface BoxShadowLayer extends ShadowLayerBase {
 
 export interface TextShadowLayer extends ShadowLayerBase {}
 
-export interface ShadowRecipe<Layer extends ShadowLayerBase> {
+export interface ShadowComposite<Layer extends ShadowLayerBase> {
 	/** Ordered layers; earlier layers are painted on top, matching CSS. */
 	base: readonly Layer[];
 	/** Arbitrarily named complete alternatives such as min, lo, hi and max. */
@@ -455,8 +476,8 @@ export interface ShadowRecipe<Layer extends ShadowLayerBase> {
  */
 export interface ShadowSystem {
 	unit: string;
-	box?: Record<string, ShadowRecipe<BoxShadowLayer>>;
-	text?: Record<string, ShadowRecipe<TextShadowLayer>>;
+	box?: Record<string, ShadowComposite<BoxShadowLayer>>;
+	text?: Record<string, ShadowComposite<TextShadowLayer>>;
 }
 
 // MAIN CONFIG ------------------------------------------ //
@@ -466,11 +487,14 @@ export interface ShadowSystem {
  * Use this when generating a complete design system.
  */
 export interface DesignSystem {
+	alpha?: AlphaSystem;
 	colors: {
 		modes: Array<ColorMode & { name: string }>;
-		alphaSchedule: AlphaSchedule;
+		/** Opaque project taxonomy; TFS validates and expands membership. */
+		groups?: Readonly<Record<string, IdentityGroup>>;
+		/** Named alpha scale consumed by color ramps. Defaults to alpha.defaultScale. */
+		alphaScale?: string;
 		luminance?: LuminancePolicy;
-		runtimeThemes?: RuntimeColorThemesPolicy;
 	};
 	spacing: {
 		modes: Array<SpacingMode & { name: string }>;
@@ -497,19 +521,25 @@ export interface DesignSystem {
  * ```ts
  * // Generate only colors
  * const ir = generate({
+ *   alpha: defineAlpha({
+ *     defaultScale: 'standard',
+ *     scales: { standard: { values: alphaValues } },
+ *   }),
  *   colors: {
  *     modes: [{ name: 'default', isDefault: true, tokens: { bg, primary, ink } }],
- *     alphaSchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 },
  *   },
  * });
  * ```
  */
 export interface PartialDesignSystem {
+	alpha?: AlphaSystem;
 	colors?: {
 		modes: Array<ColorMode & { name: string }>;
-		alphaSchedule: AlphaSchedule;
+		/** Opaque project taxonomy; TFS validates and expands membership. */
+		groups?: Readonly<Record<string, IdentityGroup>>;
+		/** Named alpha scale consumed by color ramps. Defaults to alpha.defaultScale. */
+		alphaScale?: string;
 		luminance?: LuminancePolicy;
-		runtimeThemes?: RuntimeColorThemesPolicy;
 	};
 	spacing?: {
 		modes: Array<SpacingMode & { name: string }>;

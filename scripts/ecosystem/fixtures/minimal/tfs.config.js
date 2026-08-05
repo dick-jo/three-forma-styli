@@ -1,12 +1,17 @@
 import { defineTfsProject } from '@three-forma-styli/compiler';
+import { defineAlpha } from '@three-forma-styli/core';
 
 export default defineTfsProject({
 	system: {
-		colors: {
-			alphaSchedule: {
-				quiet: 0.16,
-				loud: 0.72,
+		alpha: defineAlpha({
+			defaultScale: 'standard',
+			scales: {
+				standard: {
+					values: { min: 0.08, 'lo-x': 0.16, lo: 0.28, hi: 0.48, 'hi-x': 0.72, max: 0.88 },
+				},
 			},
+		}),
+		colors: {
 			modes: [
 				{
 					name: 'paper',

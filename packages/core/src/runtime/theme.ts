@@ -1,5 +1,6 @@
 import { validateLuminance } from '../constraints/luminance.js';
 import { formatNativeOklch, formatNativeOklchWithAlpha } from '../color-css.js';
+import { ALPHA_POSITIONS_WITH_NON } from '../alpha/grammar.js';
 import type {
 	RuntimeColorTheme,
 	RuntimeColorThemeConfig,
@@ -58,14 +59,17 @@ function requireTokenName(value: unknown, path: string): string {
 	return value;
 }
 
-function validateColorNames(value: unknown): readonly string[] {
+function validateColorIdentities(value: unknown): readonly string[] {
 	if (!Array.isArray(value) || value.length === 0) {
-		fail('config.colorNames', 'must be a non-empty array');
+		fail('config.colorIdentities', 'must be a non-empty array');
 	}
 
-	const names = value.map((name, index) => requireTokenName(name, `config.colorNames[${index}]`));
+	const names = value.map((name, index) =>
+		requireTokenName(name, `config.colorIdentities[${index}]`)
+	);
 	const uniqueNames = new Set(names);
-	if (uniqueNames.size !== names.length) fail('config.colorNames', 'must not contain duplicates');
+	if (uniqueNames.size !== names.length)
+		fail('config.colorIdentities', 'must not contain duplicates');
 	return names;
 }
 
@@ -93,27 +97,27 @@ function parsePolarity(value: unknown): RuntimeColorTheme['polarity'] {
 }
 
 /** Strictly parse an unknown JSON-compatible runtime color theme. */
-export function parseRuntimeColorTheme<const ColorNames extends readonly string[]>(
+export function parseRuntimeColorTheme<const ColorIdentities extends readonly string[]>(
 	input: unknown,
-	schema: RuntimeColorThemeSchema<ColorNames>
-): RuntimeColorTheme<ColorNames> {
-	const colorNames = validateColorNames(
-		(schema as RuntimeColorThemeSchema | undefined)?.colorNames
+	schema: RuntimeColorThemeSchema<ColorIdentities>
+): RuntimeColorTheme<ColorIdentities> {
+	const colorIdentities = validateColorIdentities(
+		(schema as RuntimeColorThemeSchema | undefined)?.colorIdentities
 	);
 	const root = requirePlainRecord(input, 'theme');
 	requireExactKeys(root, rootKeys, 'theme');
 	const inputColors = requirePlainRecord(root.colors, 'theme.colors');
-	requireExactKeys(inputColors, colorNames, 'theme.colors');
+	requireExactKeys(inputColors, colorIdentities, 'theme.colors');
 
 	const colors = Object.create(null) as Record<string, RuntimeOklchColor>;
-	for (const colorName of colorNames) {
-		colors[colorName] = parseColor(inputColors[colorName], `theme.colors.${colorName}`);
+	for (const colorIdentity of colorIdentities) {
+		colors[colorIdentity] = parseColor(inputColors[colorIdentity], `theme.colors.${colorIdentity}`);
 	}
 
 	return Object.freeze({
 		polarity: parsePolarity(root.polarity),
 		colors: Object.freeze(colors),
-	}) as RuntimeColorTheme<ColorNames>;
+	}) as RuntimeColorTheme<ColorIdentities>;
 }
 
 function validateAlphaSchedule(
@@ -121,14 +125,19 @@ function validateAlphaSchedule(
 ): readonly (readonly [string, number])[] {
 	if (value === undefined) return [];
 	const schedule = requirePlainRecord(value, 'config.alphaSchedule');
+	requireExactKeys(schedule, ALPHA_POSITIONS_WITH_NON, 'config.alphaSchedule');
 	const entries: Array<readonly [string, number]> = [];
-	for (const [level, unknownAlpha] of Object.entries(schedule)) {
-		requireTokenName(level, `config.alphaSchedule.${level}`);
+	let previous = -1;
+	for (const level of ALPHA_POSITIONS_WITH_NON) {
+		const unknownAlpha = schedule[level];
 		const alpha = requireFiniteNumber(unknownAlpha, `config.alphaSchedule.${level}`);
-		if (alpha < 0 || alpha > 1) {
-			fail(`config.alphaSchedule.${level}`, 'must be between 0 and 1');
+		if (level === 'non') {
+			if (alpha !== 0) fail('config.alphaSchedule.non', 'must be exactly 0');
+		} else if (alpha <= previous || alpha >= 1) {
+			fail(`config.alphaSchedule.${level}`, `must be greater than ${previous} and below 1`);
 		}
 		entries.push([level, alpha]);
+		previous = alpha;
 	}
 	return entries;
 }
@@ -136,13 +145,13 @@ function validateAlphaSchedule(
 function validateColorGroup(
 	value: unknown,
 	path: string,
-	colorNames: ReadonlySet<string>
+	colorIdentities: ReadonlySet<string>
 ): readonly string[] {
 	if (!Array.isArray(value) || value.length === 0) fail(path, 'must be a non-empty array');
 	const names = value.map((name, index) => requireTokenName(name, `${path}[${index}]`));
 	if (new Set(names).size !== names.length) fail(path, 'must not contain duplicates');
 	for (const name of names) {
-		if (!colorNames.has(name)) fail(path, `references undeclared color "${name}"`);
+		if (!colorIdentities.has(name)) fail(path, `references undeclared color "${name}"`);
 	}
 	return names;
 }
@@ -154,19 +163,22 @@ function validateColorGroup(
  * through sRGB, so authored Display-P3-capable colors retain their chroma until
  * the browser performs display-aware rendering.
  */
-export function generateRuntimeColorTheme<const ColorNames extends readonly string[]>(
+export function generateRuntimeColorTheme<const ColorIdentities extends readonly string[]>(
 	input: unknown,
-	config: RuntimeColorThemeConfig<ColorNames>
-): RuntimeColorThemeResult<ColorNames> {
+	config: RuntimeColorThemeConfig<ColorIdentities>
+): RuntimeColorThemeResult<ColorIdentities> {
 	const theme = parseRuntimeColorTheme(input, config);
-	const colorNames = Object.keys(theme.colors) as Array<ColorNames[number]>;
-	const declaredColors = new Set(colorNames);
+	const colorIdentities = Object.keys(theme.colors) as Array<ColorIdentities[number]>;
+	const declaredColors = new Set(colorIdentities);
 	const alphaSchedule = validateAlphaSchedule(config.alphaSchedule);
 	const prefix = requireTokenName(config.prefixes?.color ?? 'clr', 'config.prefixes.color');
 	const alphaModifier = requireTokenName(
 		config.colorFormat?.alphaModifier ?? 'a',
 		'config.colorFormat.alphaModifier'
 	);
+	if (alphaModifier !== 'a') {
+		fail('config.colorFormat.alphaModifier', 'must be "a" in the v0.5 alpha grammar');
+	}
 
 	const minimumLuminanceDelta = requireFiniteNumber(
 		config.luminance?.minimumLuminanceDelta,
@@ -185,9 +197,9 @@ export function generateRuntimeColorTheme<const ColorNames extends readonly stri
 		'config.luminance.foregroundColors',
 		declaredColors
 	);
-	for (const colorName of backgroundColors) {
-		if (foregroundColors.includes(colorName)) {
-			fail('config.luminance', `color "${colorName}" cannot belong to both groups`);
+	for (const colorIdentity of backgroundColors) {
+		if (foregroundColors.includes(colorIdentity)) {
+			fail('config.luminance', `color "${colorIdentity}" cannot belong to both groups`);
 		}
 	}
 
@@ -201,21 +213,21 @@ export function generateRuntimeColorTheme<const ColorNames extends readonly stri
 		customProperties[name] = value;
 	};
 
-	for (const colorName of colorNames) {
-		const color = theme.colors[colorName];
-		addProperty(`--${prefix}-${colorName}`, formatNativeOklch(color));
+	for (const colorIdentity of colorIdentities) {
+		const color = theme.colors[colorIdentity];
+		addProperty(`--${prefix}-${colorIdentity}`, formatNativeOklch(color));
 		for (const [level, alpha] of alphaSchedule) {
 			addProperty(
-				`--${prefix}-${colorName}-${alphaModifier}-${level}`,
+				`--${prefix}-${colorIdentity}-${alphaModifier}-${level}`,
 				formatNativeOklchWithAlpha(color, alpha)
 			);
 		}
 	}
 
 	const emittedColors = Object.create(null) as Record<string, RuntimeOklchColor>;
-	for (const colorName of colorNames) {
-		const color = theme.colors[colorName]!;
-		emittedColors[colorName] = { ...color, l: Number(color.l.toFixed(4)) };
+	for (const colorIdentity of colorIdentities) {
+		const color = theme.colors[colorIdentity]!;
+		emittedColors[colorIdentity] = { ...color, l: Number(color.l.toFixed(4)) };
 	}
 	const diagnostics = validateLuminance(emittedColors, {
 		polarity: theme.polarity,
@@ -251,10 +263,10 @@ export function generateRuntimeColorTheme<const ColorNames extends readonly stri
  * state in an editor. Use this explicit enforcing boundary before persistence
  * or application when the host requires the constraint.
  */
-export function enforceRuntimeColorTheme<const ColorNames extends readonly string[]>(
+export function enforceRuntimeColorTheme<const ColorIdentities extends readonly string[]>(
 	input: unknown,
-	config: RuntimeColorThemeConfig<ColorNames>
-): RuntimeColorThemeResult<ColorNames> {
+	config: RuntimeColorThemeConfig<ColorIdentities>
+): RuntimeColorThemeResult<ColorIdentities> {
 	const result = generateRuntimeColorTheme(input, config);
 	if (!result.luminance.deltaValid) throw new RuntimeLuminanceConstraintError(result);
 	return result;

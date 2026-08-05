@@ -25,7 +25,7 @@ import typographyClasses from '@repo/design-system/typography.module.css';
 import { typographyClassName, type TypographySelection } from '@repo/design-system/typography';
 
 const className = typographyClassName(
-	{ role: 'heading', variant: 'max', weight: 'max' },
+	{ role: 'heading', size: 'max', weight: 'max' },
 	typographyClasses
 );
 ```
@@ -42,6 +42,7 @@ That is the stable seam for a local component:
 export function Text({
 	as: Element = 'span',
 	kind = 'prose',
+	size,
 	variant,
 	fontStyle,
 	weight,
@@ -51,7 +52,7 @@ export function Text({
 	return (
 		<Element
 			className={[
-				typographyClassName({ role: kind, variant, fontStyle, weight }, typographyClasses),
+				typographyClassName({ role: kind, size, variant, fontStyle, weight }, typographyClasses),
 				className,
 			]
 				.filter(Boolean)

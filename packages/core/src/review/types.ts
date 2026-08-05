@@ -1,7 +1,7 @@
 import type {
 	MotionContract,
 	ShadowContractLayer,
-	TypographyContractRecipe,
+	TypographyContractComposite,
 } from '../generator/types.js';
 import type { FontSizeReference } from '../types.js';
 
@@ -103,9 +103,12 @@ export interface ReviewCaseBase {
 
 export interface TypographyReviewCase extends ReviewCaseBase {
 	kind: 'typography';
-	/** Typography mode whose resolved recipe and authoring path this case represents. */
+	/** Typography mode whose resolved composite and authoring path this case represents. */
 	mode: string;
 	role: string;
+	/** Role-local semantic size; null selects the unsuffixed base. */
+	size: string | null;
+	/** Optional unordered categorical treatment composed over the size. */
 	variant: string | null;
 	font: {
 		id: string;
@@ -121,7 +124,7 @@ export interface TypographyReviewCase extends ReviewCaseBase {
 	availableStyles: string[];
 	availableWeights: Array<{ alias: string; value: number }>;
 	styleWeights: Record<string, Array<{ alias: string; value: number }>>;
-	recipe: TypographyContractRecipe;
+	composite: TypographyContractComposite;
 }
 
 export interface TypographyReviewLab {
@@ -134,7 +137,7 @@ export interface TypographyReviewLab {
 export interface ShadowReviewCase extends ReviewCaseBase {
 	kind: 'shadow';
 	shadowKind: 'box' | 'text';
-	recipe: string;
+	composite: string;
 	variant: string | null;
 	token: string;
 	css: string;
@@ -184,7 +187,7 @@ export interface ColorReviewLab {
 
 export interface MotionReviewCase extends ReviewCaseBase {
 	kind: 'motion';
-	recipe: string;
+	composite: string;
 	variant: string | null;
 	token: string;
 	duration: { token: string | null; milliseconds: number };

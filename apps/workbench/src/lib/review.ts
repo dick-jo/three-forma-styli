@@ -92,8 +92,8 @@ export function typographyStyle(
 		`font-family:${(options.forceFallback ? fallbackStack : primaryStack)
 			.map(cssFamily)
 			.join(',')}`,
-		`font-size:${sizeOption?.css ?? `var(--${reviewCase.recipe.atomicFontSizeToken})`}`,
-		`font-style:${reviewCase.style}`,
+		`font-size:${sizeOption?.css ?? `var(--${reviewCase.composite.atomicFontSizeToken})`}`,
+		`font-style:${values.fontStyle ?? reviewCase.style}`,
 		`font-weight:${weight}`,
 		'font-synthesis:none',
 		`line-height:${options.wcagSpacing ? 1.5 : values.lineHeight}`,
@@ -105,18 +105,18 @@ export function typographyStyle(
 					: `${values.letterSpacing}em`
 		}`,
 		...(options.wcagSpacing ? ['word-spacing:0.16em'] : []),
-		`text-transform:${reviewCase.recipe.textTransform ?? 'none'}`,
-		...(reviewCase.recipe.fontKerningToken
-			? [`font-kerning:var(--${reviewCase.recipe.fontKerningToken})`]
+		`text-transform:${reviewCase.composite.textTransform ?? 'none'}`,
+		...(reviewCase.composite.fontKerningToken
+			? [`font-kerning:var(--${reviewCase.composite.fontKerningToken})`]
 			: []),
-		...(reviewCase.recipe.fontOpticalSizingToken
-			? [`font-optical-sizing:var(--${reviewCase.recipe.fontOpticalSizingToken})`]
+		...(reviewCase.composite.fontOpticalSizingToken
+			? [`font-optical-sizing:var(--${reviewCase.composite.fontOpticalSizingToken})`]
 			: []),
-		...(reviewCase.recipe.fontFeatureSettingsToken
-			? [`font-feature-settings:var(--${reviewCase.recipe.fontFeatureSettingsToken})`]
+		...(reviewCase.composite.fontFeatureSettingsToken
+			? [`font-feature-settings:var(--${reviewCase.composite.fontFeatureSettingsToken})`]
 			: []),
-		...(reviewCase.recipe.fontVariationSettingsToken
-			? [`font-variation-settings:var(--${reviewCase.recipe.fontVariationSettingsToken})`]
+		...(reviewCase.composite.fontVariationSettingsToken
+			? [`font-variation-settings:var(--${reviewCase.composite.fontVariationSettingsToken})`]
 			: []),
 	].join(';');
 }

@@ -1,9 +1,8 @@
 import {
-	deriveTypographyRange,
-	type DesignSystem,
+	deriveTypographySizes,
+	defineTypography,
 	type TypographyFont,
 	type TypographyMode,
-	type TypographyRole,
 } from '@three-forma-styli/core';
 
 /**
@@ -57,9 +56,8 @@ export const TYPOGRAPHY_FONTS: Record<string, TypographyFont> = {
 
 const scale = TYPOGRAPHY_MODES.default.tokens;
 
-const proseRange = deriveTypographyRange({
+const proseSizes = deriveTypographySizes({
 	scale,
-	order: ['min', 's', 'base', 'l', 'max'],
 	anchors: {
 		min: { fontSize: 'min', weight: 'min', lineHeight: 1.35, letterSpacing: 0.01 },
 		base: { fontSize: 2, weight: 'min', lineHeight: 1.25, letterSpacing: 0 },
@@ -71,9 +69,8 @@ const proseRange = deriveTypographyRange({
 	},
 });
 
-const headingRange = deriveTypographyRange({
+const headingSizes = deriveTypographySizes({
 	scale,
-	order: ['min', 's', 'base', 'l', 'max'],
 	anchors: {
 		min: { fontSize: 1, weight: 'min', lineHeight: 1.1, letterSpacing: 0 },
 		base: { fontSize: 4, weight: 'min', lineHeight: 1, letterSpacing: -0.01 },
@@ -85,9 +82,8 @@ const headingRange = deriveTypographyRange({
 	},
 });
 
-const labelRange = deriveTypographyRange({
+const labelSizes = deriveTypographySizes({
 	scale,
-	order: ['min', 's', 'base', 'l', 'max'],
 	anchors: {
 		min: { fontSize: 'min', weight: 'min', lineHeight: 1.3, letterSpacing: 0.02 },
 		base: { fontSize: 2, weight: 'min', lineHeight: 1.2, letterSpacing: 0.01 },
@@ -103,29 +99,35 @@ const labelRange = deriveTypographyRange({
  * Every default-theme opinion is inspectable here. Core knows none of these role
  * names, variant names, curves, font assignments, or weight selections.
  */
-export const TYPOGRAPHY_ROLES: Record<string, TypographyRole> = {
-	prose: {
-		font: 'sans',
-		textTransform: 'none',
-		...proseRange,
-		weights: { min: 400, max: 700 },
-	},
-	heading: {
-		font: 'sans',
-		textTransform: 'none',
-		...headingRange,
-		weights: { min: 700, max: 800 },
-	},
-	label: {
-		font: 'mono',
-		textTransform: 'uppercase',
-		...labelRange,
-		weights: { min: 400, max: 700 },
-	},
-};
-
-export const typography = {
+export const typography = defineTypography({
 	modes: Object.entries(TYPOGRAPHY_MODES).map(([name, mode]) => ({ name, ...mode })),
 	fonts: TYPOGRAPHY_FONTS,
-	roles: TYPOGRAPHY_ROLES,
-} satisfies DesignSystem['typography'];
+	roles: {
+		prose: {
+			font: 'sans',
+			textTransform: 'none',
+			weight: 'min',
+			weights: { min: 400, max: 700 },
+			sizes: proseSizes,
+		},
+		heading: {
+			font: 'sans',
+			textTransform: 'none',
+			weight: 'min',
+			weights: { min: 700, max: 800 },
+			sizes: headingSizes,
+			variants: {
+				emphatic: { weight: 'max', letterSpacing: -0.02 },
+			},
+		},
+		label: {
+			font: 'mono',
+			textTransform: 'uppercase',
+			weight: 'min',
+			weights: { min: 400, max: 700 },
+			sizes: labelSizes,
+		},
+	},
+});
+
+export const TYPOGRAPHY_ROLES = typography.roles;

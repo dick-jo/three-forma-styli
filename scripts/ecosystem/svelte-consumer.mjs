@@ -128,10 +128,10 @@ export async function buildSvelteConsumer({ temporaryRoot, designSystemTarball }
 	import Text from './Text.svelte';
 </script>
 
-<Text as="h2" kind="heading" variant="max" weight="max">
+<Text as="h2" kind="heading" size="max" variant="emphatic">
 	Svelte host-owned Text ready
 </Text>
-<Text kind="label" variant="s">Typed label</Text>
+<Text kind="label" size="s">Typed label</Text>
 `
 	);
 

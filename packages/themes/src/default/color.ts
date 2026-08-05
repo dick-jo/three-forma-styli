@@ -1,9 +1,14 @@
 // Color system configuration
-import { ColorMode, DesignSystem, AlphaSchedule, oklch } from '@three-forma-styli/core';
+import {
+	ColorMode,
+	DesignSystem,
+	AlphaScaleValues,
+	defineAlpha,
+	oklch,
+} from '@three-forma-styli/core';
 
-// Define alpha schedule (least opaque to most opaque)
-export const ALPHA_SCHEDULE: AlphaSchedule = {
-	non: 0,
+/** Canonical active alpha values. `non: 0` is compiler-owned. */
+export const ALPHA_VALUES: AlphaScaleValues = {
 	min: 0.07,
 	'lo-x': 0.125,
 	lo: 0.25,
@@ -11,6 +16,13 @@ export const ALPHA_SCHEDULE: AlphaSchedule = {
 	'hi-x': 0.85,
 	max: 0.93,
 };
+
+export const alpha = defineAlpha({
+	defaultScale: 'standard',
+	scales: {
+		standard: { values: ALPHA_VALUES },
+	},
+});
 
 // Export color themes directly as an object
 export const COLOR_MODES: Record<string, ColorMode> = {
@@ -26,7 +38,6 @@ export const COLOR_MODES: Record<string, ColorMode> = {
 			pos: oklch(0.7625, 0.203, 150.49), // Green
 			neg: oklch(0.6875, 0.2113, 7.38), // Red
 		},
-		alphaSchedule: ALPHA_SCHEDULE,
 	},
 };
 
@@ -36,13 +47,9 @@ export const color: DesignSystem['colors'] = {
 		name,
 		...mode,
 	})),
-	alphaSchedule: ALPHA_SCHEDULE,
 	luminance: {
 		minimumLuminanceDelta: 0.33,
 		backgroundColors: ['bg', 'ev', 'shadow'],
 		foregroundColors: ['pri', 'neu', 'ink', 'pos', 'neg'],
-	},
-	runtimeThemes: {
-		colorNames: ['bg', 'ev', 'shadow', 'pri', 'neu', 'ink', 'pos', 'neg'],
 	},
 };

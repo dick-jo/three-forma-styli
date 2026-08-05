@@ -1,7 +1,7 @@
 import type { TypographyContract } from '../generator/types.js';
 
 export interface TypographyRoleClassKeys {
-	base: string;
+	sizes: Record<string, string>;
 	variants: Record<string, string>;
 	styleWeights: Record<string, Record<string, string>>;
 }
@@ -14,9 +14,14 @@ export function typographyRoleClassKeys(
 		Object.entries(contract.roles).map(([roleName, role]) => [
 			roleName,
 			{
-				base: roleName,
+				sizes: Object.fromEntries(
+					Object.keys(role.sizes).map((size) => [
+						size,
+						size === 'base' ? roleName : `${roleName}-${size}`,
+					])
+				),
 				variants: Object.fromEntries(
-					Object.keys(role.variants).map((variant) => [variant, `${roleName}-${variant}`])
+					Object.keys(role.variants).map((variant) => [variant, `${roleName}-variant-${variant}`])
 				),
 				styleWeights: Object.fromEntries(
 					Object.entries(role.styles).map(([style, capability]) => [
@@ -36,7 +41,7 @@ export function typographyRoleClassKeys(
 
 export function typographyClassKeys(contract: TypographyContract): string[] {
 	return Object.values(typographyRoleClassKeys(contract)).flatMap((role) => [
-		role.base,
+		...Object.values(role.sizes),
 		...Object.values(role.variants),
 		...Object.values(role.styleWeights).flatMap((weights) => Object.values(weights)),
 	]);

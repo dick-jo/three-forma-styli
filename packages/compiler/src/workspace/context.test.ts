@@ -2,12 +2,17 @@ import { describe, expect, it } from 'vitest';
 import type { TfsProject } from '../project.js';
 import { workspacePlanContext } from './context.js';
 
-function project(system: TfsProject['system'], fonts: TfsProject['fonts'] = {}): TfsProject {
+function project(
+	system: TfsProject['system'],
+	fonts: TfsProject['fonts'] = {},
+	runtime?: TfsProject['runtime']
+): TfsProject {
 	return {
 		kind: 'three-forma-styli/project',
 		schemaVersion: 1,
 		fonts,
 		system,
+		runtime,
 		output: { directory: './generated' },
 	};
 }
@@ -15,41 +20,45 @@ function project(system: TfsProject['system'], fonts: TfsProject['fonts'] = {}):
 describe('workspacePlanContext', () => {
 	it('derives one capability model for every compiler entrypoint', () => {
 		const context = workspacePlanContext(
-			project({
-				colors: {
-					modes: [
-						{
-							name: 'default',
-							tokens: {
-								canvas: { mode: 'oklch', l: 0.1, c: 0, h: 0 },
-								ink: { mode: 'oklch', l: 0.9, c: 0, h: 0 },
+			project(
+				{
+					colors: {
+						modes: [
+							{
+								name: 'default',
+								tokens: {
+									canvas: { mode: 'oklch', l: 0.1, c: 0, h: 0 },
+									ink: { mode: 'oklch', l: 0.9, c: 0, h: 0 },
+								},
+							},
+						],
+						luminance: {
+							minimumLuminanceDelta: 0.4,
+							backgroundColors: ['canvas'],
+							foregroundColors: ['ink'],
+						},
+					},
+					shadows: {
+						unit: 'px',
+						box: {
+							focus: {
+								base: [
+									{
+										x: 0,
+										y: 0,
+										blur: 4,
+										color: { color: 'ink' },
+									},
+								],
 							},
 						},
-					],
-					alphaSchedule: {},
-					luminance: {
-						minimumLuminanceDelta: 0.4,
-						backgroundColors: ['canvas'],
-						foregroundColors: ['ink'],
-					},
-					runtimeThemes: { colorNames: ['canvas', 'ink'] },
-				},
-				shadows: {
-					unit: 'px',
-					box: {
-						focus: {
-							base: [
-								{
-									x: 0,
-									y: 0,
-									blur: 4,
-									color: { color: 'ink' },
-								},
-							],
-						},
 					},
 				},
-			})
+				{},
+				{
+					colorThemes: { colors: { include: ['canvas', 'ink'] }, enforce: ['luminance'] },
+				}
+			)
 		);
 
 		expect(context).toEqual({
@@ -66,7 +75,6 @@ describe('workspacePlanContext', () => {
 			project({
 				colors: {
 					modes: [{ name: 'default', tokens: { ink: { mode: 'oklch', l: 0.9 } } }],
-					alphaSchedule: {},
 					luminance: {
 						minimumLuminanceDelta: 0.4,
 						backgroundColors: ['ink'],

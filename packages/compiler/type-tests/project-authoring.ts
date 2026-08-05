@@ -46,8 +46,8 @@ const splitSystem = {
 		roles: {
 			prose: {
 				font: 'prose',
-				base: { fontSize: 2, weight: 'base', lineHeight: 1.4, letterSpacing: 0 },
-				weights: { base: 400 },
+				weights: 400,
+				sizes: { base: { fontSize: 2, lineHeight: 1.4, letterSpacing: 0 } },
 			},
 		},
 	},
@@ -76,8 +76,9 @@ defineTfsProject({
 			roles: {
 				heading: {
 					font: 'editorial',
-					base: { fontSize: 6, weight: 'strong', lineHeight: 1, letterSpacing: -0.01 },
-					weights: { strong: 700, max: 800 },
+					weights: { min: 700, max: 800 },
+					weight: 'min',
+					sizes: { base: { fontSize: 6, lineHeight: 1, letterSpacing: -0.01 } },
 				},
 			},
 		},
@@ -112,8 +113,8 @@ defineTfsProject({
 			roles: {
 				heading: {
 					font: 'editorial',
-					base: { fontSize: 6, weight: 'max', lineHeight: 1, letterSpacing: -0.01 },
-					weights: { max: 800 },
+					weights: 800,
+					sizes: { base: { fontSize: 6, lineHeight: 1, letterSpacing: -0.01 } },
 				},
 			},
 		},
@@ -154,14 +155,14 @@ defineTfsProject({
 defineTfsProject({
 	fonts,
 	system: {
-		// @ts-expect-error project font IDs remain literal and typo-safe
 		typography: {
 			modes: [mode],
 			roles: {
 				heading: {
+					// @ts-expect-error project font IDs remain literal and typo-safe
 					font: 'editoriall',
-					base: { fontSize: 6, weight: 'strong', lineHeight: 1, letterSpacing: -0.01 },
-					weights: { strong: 700 },
+					weights: 700,
+					sizes: { base: { fontSize: 6, lineHeight: 1, letterSpacing: -0.01 } },
 				},
 			},
 		},
@@ -177,8 +178,8 @@ defineTfsProject({
 			roles: {
 				heading: {
 					font: 'editorial',
-					base: { fontSize: 6, weight: 'strong', lineHeight: 1, letterSpacing: 0 },
-					weights: { strong: 700 },
+					weights: 700,
+					sizes: { base: { fontSize: 6, lineHeight: 1, letterSpacing: 0 } },
 				},
 			},
 		},

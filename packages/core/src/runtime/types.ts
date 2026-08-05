@@ -1,4 +1,5 @@
 import type { LuminancePolicy, LuminanceValidation } from '../constraints/types.js';
+import type { ResolvedAlphaScaleValues } from '../types.js';
 
 /** Storage-friendly OKLCH color accepted by the browser runtime API. */
 export interface RuntimeOklchColor {
@@ -11,32 +12,37 @@ export interface RuntimeOklchColor {
 }
 
 /** The deliberately small, serializable shape accepted from an untrusted source. */
-export interface RuntimeColorTheme<ColorNames extends readonly string[] = readonly string[]> {
+export interface RuntimeColorTheme<ColorIdentities extends readonly string[] = readonly string[]> {
 	readonly polarity: 'negative' | 'positive';
-	readonly colors: Readonly<Record<ColorNames[number], RuntimeOklchColor>>;
+	readonly colors: Readonly<Record<ColorIdentities[number], RuntimeOklchColor>>;
 }
 
-export interface RuntimeColorThemeSchema<ColorNames extends readonly string[] = readonly string[]> {
+export interface RuntimeColorThemeSchema<
+	ColorIdentities extends readonly string[] = readonly string[],
+> {
 	/** Exact color keys that the runtime payload must contain. */
-	readonly colorNames: ColorNames;
+	readonly colorIdentities: ColorIdentities;
 }
 
-export type RuntimeLuminanceConfig<ColorName extends string = string> = LuminancePolicy<ColorName>;
+export type RuntimeLuminanceConfig<ColorIdentity extends string = string> =
+	LuminancePolicy<ColorIdentity>;
 
 export interface RuntimeColorThemeConfig<
-	ColorNames extends readonly string[] = readonly string[],
-> extends RuntimeColorThemeSchema<ColorNames> {
+	ColorIdentities extends readonly string[] = readonly string[],
+> extends RuntimeColorThemeSchema<ColorIdentities> {
 	/** Optional alpha variants. No variants are generated when omitted. */
-	readonly alphaSchedule?: Readonly<Record<string, number>>;
-	readonly luminance: RuntimeLuminanceConfig<NoInfer<ColorNames[number]>>;
+	readonly alphaSchedule?: ResolvedAlphaScaleValues;
+	readonly luminance: RuntimeLuminanceConfig<NoInfer<ColorIdentities[number]>>;
 	/** Mirrors the color member of TFS's build-time generator prefixes. */
 	readonly prefixes?: Readonly<{ color?: string }>;
 	/** Native OKLCH is fixed; alpha naming mirrors the build-time generator option. */
-	readonly colorFormat?: Readonly<{ alphaModifier?: string }>;
+	readonly colorFormat?: Readonly<{ alphaModifier?: 'a' }>;
 }
 
-export interface RuntimeColorThemeResult<ColorNames extends readonly string[] = readonly string[]> {
-	readonly theme: RuntimeColorTheme<ColorNames>;
+export interface RuntimeColorThemeResult<
+	ColorIdentities extends readonly string[] = readonly string[],
+> {
+	readonly theme: RuntimeColorTheme<ColorIdentities>;
 	/** Null-prototype, frozen record ready for DOM assignment. */
 	readonly customProperties: Readonly<Record<string, string>>;
 	/** TFS palette-separation diagnostics measured from the emitted 4dp OKLCH L values. */
@@ -59,11 +65,11 @@ export class RuntimeColorThemeValidationError extends TypeError {
  * OKLCH-L separation constraint. This is distinct from malformed input.
  */
 export class RuntimeLuminanceConstraintError<
-	ColorNames extends readonly string[] = readonly string[],
+	ColorIdentities extends readonly string[] = readonly string[],
 > extends Error {
-	readonly result: RuntimeColorThemeResult<ColorNames>;
+	readonly result: RuntimeColorThemeResult<ColorIdentities>;
 
-	constructor(result: RuntimeColorThemeResult<ColorNames>) {
+	constructor(result: RuntimeColorThemeResult<ColorIdentities>) {
 		const { actualDelta, requiredDelta, metric } = result.luminance;
 		super(
 			`Runtime theme violates the ${metric} luminance constraint: measured delta ${actualDelta}, requires at least ${requiredDelta}.`

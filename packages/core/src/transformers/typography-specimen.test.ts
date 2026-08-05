@@ -25,30 +25,31 @@ const typography: DesignSystem['typography'] = {
 	roles: {
 		reading: {
 			font: 'editorial',
-			base: { fontSize: 2, weight: 'regular', lineHeight: 1.3, letterSpacing: 0 },
-			variants: {
-				legal: { fontSize: 'min', weight: 'strong', lineHeight: 1.4, letterSpacing: 0.01 },
+			sizes: {
+				min: { fontSize: 'min', weight: 'max', lineHeight: 1.4, letterSpacing: 0.01 },
+				base: { fontSize: 2, weight: 'min', lineHeight: 1.3, letterSpacing: 0 },
 			},
 			modeOverrides: {
 				display: {
-					base: { fontSize: 6, weight: 'strong', lineHeight: 0.9, letterSpacing: -0.02 },
+					sizes: {
+						base: { fontSize: 6, weight: 'max', lineHeight: 0.9, letterSpacing: -0.02 },
+					},
 				},
 			},
-			displayOrder: ['legal', 'base'],
-			weights: { regular: 400, strong: 700 },
+			weights: { min: 400, max: 700 },
 		},
 	},
 };
 
 describe('toTypographySpecimen', () => {
-	it('generates a generic interactive role and variant calibration workbench', () => {
+	it('generates a generic interactive role and size calibration specimen', () => {
 		const html = toTypographySpecimen(generate({ typography }), { title: 'Example system' });
 		expect(html).toContain('<!doctype html>');
 		expect(html).toContain('<title>Example system</title>');
 		expect(html).toContain('data-type-role="reading"');
-		expect(html).toContain('data-type-variant="legal"');
+		expect(html).toContain('data-type-size="min"');
 		expect(html).toContain('font-size: var(--text-reading-font-size)');
-		expect(html).toContain('font-size: var(--text-reading-legal-font-size)');
+		expect(html).toContain('font-size: var(--text-reading-min-font-size)');
 		expect(html).toContain('Draft configuration patch');
 		expect(html).toContain('data-control="lineHeight"');
 		expect(html.match(/step="any"/g)).toHaveLength(4);
@@ -58,19 +59,20 @@ describe('toTypographySpecimen', () => {
 		expect(html).toContain('body[data-size-mode="display"]');
 		expect(html).toContain('--text-reading-line-height: 0.9;');
 		expect(html).toContain('const defaultSizeMode="default"');
-		expect(html).toContain('"display":{"reading":{"base":{"fontSize":6');
+		expect(html).toContain('"display":{"reading":{"min":');
+		expect(html).toContain('"base":{"fontSize":6');
 		expect(html).toContain('roles[role].modeOverrides[mode]');
 		expect(html).toContain('sizeModeSelect?.addEventListener');
 		expect(html).toContain("querySelectorAll('.sample-preview,.sample-copy')");
-		expect(html).toContain('weight strong · 700');
+		expect(html).toContain('weight max · 700');
 		expect(html).toContain('weight:controls.weight.value');
-		expect(html.indexOf('<strong>legal</strong>')).toBeLessThan(
+		expect(html.indexOf('<strong>min</strong>')).toBeLessThan(
 			html.indexOf('<strong>base</strong>')
 		);
 		expect(html).toContain('class="metric-probe"');
 		expect(html).toContain("CSS.supports('height','1cap')");
 		expect(html).toContain("control.addEventListener('dblclick'");
-		expect(html).toContain('Reset recipe');
+		expect(html).toContain('Reset composite');
 		expect(html).not.toContain('calc(1em - 1px)');
 		expect(html).toContain('No @font-face CSS was supplied');
 		expect(html).not.toContain('Collection activity');
@@ -107,7 +109,7 @@ describe('toTypographySpecimen', () => {
 		expect(html).toContain('residual reflow—not a pass/fail score or approval state');
 		expect(html.match(/data-fallback-measure=/g)).toHaveLength(5);
 		expect(html.match(/data-fallback-diagnostic=/g)).toHaveLength(5);
-		expect(html).toContain('reading::recipe::legal');
+		expect(html).toContain('reading::composite::min');
 		expect(html).toContain('reading::stress::narrow');
 		expect(html).toContain('reading::stress::glyphs');
 		expect(html).toContain('const primaryFamilyStacks={"reading":"\\"Editorial\\", \\"serif\\""}');

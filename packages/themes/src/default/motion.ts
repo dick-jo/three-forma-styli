@@ -1,6 +1,6 @@
-import type { DesignSystem, MotionRecipe } from '@three-forma-styli/core';
+import type { DesignSystem, MotionComposite } from '@three-forma-styli/core';
 
-const interactionRange = (easing: string): MotionRecipe => ({
+const interactionRange = (easing: string): MotionComposite => ({
 	base: { duration: 2, easing },
 	variants: {
 		min: { duration: 'min' },
@@ -24,7 +24,7 @@ export const motion: NonNullable<DesignSystem['motion']> = {
 		enter: [0, 0, 0.38, 0.9],
 		exit: [0.2, 0, 1, 0.9],
 	},
-	recipes: {
+	composites: {
 		hover: interactionRange('standard'),
 		press: interactionRange('standard'),
 		focus: interactionRange('standard'),

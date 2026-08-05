@@ -4424,18 +4424,18 @@ function typographyStyle(reviewCase, draft, options = {}) {
   ];
   return [
     `font-family:${(options.forceFallback ? fallbackStack : primaryStack).map(cssFamily).join(",")}`,
-    `font-size:${(sizeOption == null ? void 0 : sizeOption.css) ?? `var(--${reviewCase.recipe.atomicFontSizeToken})`}`,
-    `font-style:${reviewCase.style}`,
+    `font-size:${(sizeOption == null ? void 0 : sizeOption.css) ?? `var(--${reviewCase.composite.atomicFontSizeToken})`}`,
+    `font-style:${values.fontStyle ?? reviewCase.style}`,
     `font-weight:${weight}`,
     "font-synthesis:none",
     `line-height:${options.wcagSpacing ? 1.5 : values.lineHeight}`,
     `letter-spacing:${options.wcagSpacing ? "0.12em" : values.letterSpacing === 0 ? "0" : `${values.letterSpacing}em`}`,
     ...options.wcagSpacing ? ["word-spacing:0.16em"] : [],
-    `text-transform:${reviewCase.recipe.textTransform ?? "none"}`,
-    ...reviewCase.recipe.fontKerningToken ? [`font-kerning:var(--${reviewCase.recipe.fontKerningToken})`] : [],
-    ...reviewCase.recipe.fontOpticalSizingToken ? [`font-optical-sizing:var(--${reviewCase.recipe.fontOpticalSizingToken})`] : [],
-    ...reviewCase.recipe.fontFeatureSettingsToken ? [`font-feature-settings:var(--${reviewCase.recipe.fontFeatureSettingsToken})`] : [],
-    ...reviewCase.recipe.fontVariationSettingsToken ? [`font-variation-settings:var(--${reviewCase.recipe.fontVariationSettingsToken})`] : []
+    `text-transform:${reviewCase.composite.textTransform ?? "none"}`,
+    ...reviewCase.composite.fontKerningToken ? [`font-kerning:var(--${reviewCase.composite.fontKerningToken})`] : [],
+    ...reviewCase.composite.fontOpticalSizingToken ? [`font-optical-sizing:var(--${reviewCase.composite.fontOpticalSizingToken})`] : [],
+    ...reviewCase.composite.fontFeatureSettingsToken ? [`font-feature-settings:var(--${reviewCase.composite.fontFeatureSettingsToken})`] : [],
+    ...reviewCase.composite.fontVariationSettingsToken ? [`font-variation-settings:var(--${reviewCase.composite.fontVariationSettingsToken})`] : []
   ].join(";");
 }
 function shadowStyle(reviewCase, draft) {
@@ -4509,8 +4509,8 @@ function CaseMatrix($$anchor, $$props) {
         template_effect(
           ($0) => {
             set_style(span, $0);
-            set_text(text_3, `--${get(reviewCase).recipe.atomicFontSizeToken ?? ""} · ${get(reviewCase).weight.alias ?? ""} ·
-					${get(reviewCase).recipe.lineHeight ?? ""}`);
+            set_text(text_3, `--${get(reviewCase).composite.atomicFontSizeToken ?? ""} · ${get(reviewCase).weight.alias ?? ""} ·
+					${get(reviewCase).composite.lineHeight ?? ""}`);
           },
           [() => typographyStyle(get(reviewCase), $$props.draft)]
         );
@@ -5101,7 +5101,7 @@ function TypographyCase($$anchor, $$props) {
   template_effect(
     ($0, $1, $2, $3) => {
       classes = set_class(div, 1, "typography-stage", null, classes, { "light-surface": get(lightSurface) });
-      set_text(text_2, `${$$props.reviewCase.role ?? ""} · ${$$props.reviewCase.variant ?? "base" ?? ""}`);
+      set_text(text_2, `${$$props.reviewCase.role ?? ""} · ${$$props.reviewCase.size ?? "base" ?? ""}${$$props.reviewCase.variant ? ` · ${$$props.reviewCase.variant}` : ""}`);
       classes_1 = set_class(div_3, 1, "metric-sample", null, classes_1, { diagnostics: get(lineDiagnostics) });
       set_style(p_1, $0);
       set_style(span, $1);
@@ -5541,7 +5541,7 @@ function App($$anchor, $$props) {
     var _a3, _b3;
     if (((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) !== "typography" || ((_b3 = get(activeCase)) == null ? void 0 : _b3.kind) !== "typography") return;
     if (get(activeCase).mode === get(visibleTypographyMode)) return;
-    const replacement = get(activeLab).cases.find((reviewCase) => reviewCase.mode === get(visibleTypographyMode) && reviewCase.role === get(activeCase).role && reviewCase.variant === get(activeCase).variant) ?? get(activeLab).cases.find((reviewCase) => reviewCase.mode === get(visibleTypographyMode));
+    const replacement = get(activeLab).cases.find((reviewCase) => reviewCase.mode === get(visibleTypographyMode) && reviewCase.role === get(activeCase).role && reviewCase.size === get(activeCase).size && reviewCase.variant === get(activeCase).variant) ?? get(activeLab).cases.find((reviewCase) => reviewCase.mode === get(visibleTypographyMode));
     if (replacement) set(activeCaseId, replacement.id, true);
   });
   function selectLab(lab) {

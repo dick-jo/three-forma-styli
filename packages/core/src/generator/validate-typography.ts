@@ -1,7 +1,7 @@
 import type {
 	PartialDesignSystem,
 	TypographyFontStyle,
-	TypographyRecipe,
+	TypographyComposite,
 	TypographyRole,
 	TypographyRoleStyle,
 } from '../types.js';
@@ -105,22 +105,23 @@ function describeTypographyWeights(
 		.join('; ');
 }
 
-function resolvedRecipeSettings(role: TypographyRole, recipe: TypographyRecipe) {
+function resolvedCompositeSettings(role: TypographyRole, composite: TypographyComposite) {
+	const base = role.sizes.base;
 	return {
 		features: {
 			...(role.features ?? {}),
-			...(role.base.features ?? {}),
-			...(recipe.features ?? {}),
+			...(base.features ?? {}),
+			...(composite.features ?? {}),
 		},
 		variations: {
 			...(role.variations ?? {}),
-			...(role.base.variations ?? {}),
-			...(recipe.variations ?? {}),
+			...(base.variations ?? {}),
+			...(composite.variations ?? {}),
 		},
 		fontOpticalSizing:
-			recipe.fontOpticalSizing ?? role.base.fontOpticalSizing ?? role.fontOpticalSizing,
-		fontKerning: recipe.fontKerning ?? role.base.fontKerning ?? role.fontKerning,
-		textTransform: recipe.textTransform ?? role.base.textTransform ?? role.textTransform,
+			composite.fontOpticalSizing ?? base.fontOpticalSizing ?? role.fontOpticalSizing,
+		fontKerning: composite.fontKerning ?? base.fontKerning ?? role.fontKerning,
+		textTransform: composite.textTransform ?? base.textTransform ?? role.textTransform,
 	};
 }
 
@@ -134,6 +135,19 @@ const typographyTextTransforms = new Set([
 	'full-size-kana',
 	'math-auto',
 ]);
+const typographySemanticVariantFields = new Set([
+	'weight',
+	'fontStyle',
+	'lineHeight',
+	'letterSpacing',
+	'features',
+	'variations',
+	'fontKerning',
+	'fontOpticalSizing',
+	'textTransform',
+]);
+const typographySizeOrder = ['min', 's', 'base', 'l', 'max'] as const;
+const typographyWeightOrder = ['min', 'lo', 'hi', 'max'] as const;
 
 function validateTypographySemanticLayer(
 	typography: NonNullable<PartialDesignSystem['typography']>
@@ -237,15 +251,15 @@ function validateTypographySemanticLayer(
 		}
 	}
 
-	const generatedRecipeNames = new Map<string, string>();
-	const registerGeneratedRecipeName = (name: string, source: string) => {
-		const previous = generatedRecipeNames.get(name);
+	const generatedCompositeNames = new Map<string, string>();
+	const registerGeneratedCompositeName = (name: string, source: string) => {
+		const previous = generatedCompositeNames.get(name);
 		if (previous) {
 			throw new ValidationError(
 				`Typography generated name "${name}" collides between ${previous} and ${source}`
 			);
 		}
-		generatedRecipeNames.set(name, source);
+		generatedCompositeNames.set(name, source);
 	};
 	for (const [roleName, role] of Object.entries(typography.roles ?? {})) {
 		if (!tokenNamePattern.test(roleName)) {
@@ -259,8 +273,23 @@ function validateTypographySemanticLayer(
 		}
 
 		const exposedWeights = role.weights;
-		if (Object.keys(exposedWeights).length === 0) {
+		const weightIdentities = Object.keys(exposedWeights);
+		if (weightIdentities.length === 0) {
 			throw new ValidationError(`Typography role "${roleName}" must expose at least one weight`);
+		}
+		const isScalarWeight = weightIdentities.length === 1 && weightIdentities[0] === 'base';
+		if (
+			!isScalarWeight &&
+			(weightIdentities.some(
+				(identity) =>
+					!typographyWeightOrder.includes(identity as (typeof typographyWeightOrder)[number])
+			) ||
+				exposedWeights.min === undefined ||
+				exposedWeights.max === undefined)
+		) {
+			throw new ValidationError(
+				`Typography role "${roleName}" weights must be one scalar base or a sparse min / lo / hi / max range with real endpoints`
+			);
 		}
 		for (const [alias, weight] of Object.entries(exposedWeights)) {
 			if (!tokenNamePattern.test(alias)) {
@@ -289,6 +318,17 @@ function validateTypographySemanticLayer(
 			throw new ValidationError(
 				`Typography role "${roleName}" weight max must be its actual maximum`
 			);
+		}
+		let previousWeight = 0;
+		for (const identity of typographyWeightOrder) {
+			const value = exposedWeights[identity];
+			if (value === undefined) continue;
+			if (value <= previousWeight) {
+				throw new ValidationError(
+					`Typography role "${roleName}" weights must increase through min, lo, hi, max`
+				);
+			}
+			previousWeight = value;
 		}
 		const styles: Partial<Record<TypographyFontStyle, TypographyRoleStyle>> =
 			role.styles ??
@@ -339,96 +379,123 @@ function validateTypographySemanticLayer(
 				}
 			}
 		}
-		const defaultStyleSelection = styles[defaultStyle]!;
-
-		if (!role.base) throw new ValidationError(`Typography role "${roleName}" must define base`);
-		const smallestModeRange = Math.min(...typography.modes.map((mode) => mode.tokens.range));
-		const recipes = [['base', role.base] as const, ...Object.entries(role.variants ?? {})];
-		if (role.variants && 'base' in role.variants) {
-			throw new ValidationError(
-				`Typography role "${roleName}" variant "base" is reserved for the unsuffixed role recipe`
+		for (const variantName of Object.keys(role.variants ?? {})) {
+			registerGeneratedCompositeName(
+				`${roleName}-variant-${variantName}`,
+				`role "${roleName}" categorical variant "${variantName}"`
 			);
 		}
-		if (role.displayOrder) {
-			const expectedNames = ['base', ...Object.keys(role.variants ?? {})];
-			const actualNames = role.displayOrder;
-			if (
-				new Set(actualNames).size !== actualNames.length ||
-				actualNames.length !== expectedNames.length ||
-				expectedNames.some((name) => !actualNames.includes(name))
-			) {
+		const defaultStyleSelection = styles[defaultStyle]!;
+
+		if (!role.sizes?.base) {
+			throw new ValidationError(`Typography role "${roleName}" must define size base`);
+		}
+		const smallestModeRange = Math.min(...typography.modes.map((mode) => mode.tokens.range));
+		const composites = Object.entries(role.sizes);
+		const sizeIdentities = Object.keys(role.sizes);
+		if (
+			sizeIdentities.some(
+				(identity) =>
+					!typographySizeOrder.includes(identity as (typeof typographySizeOrder)[number])
+			)
+		) {
+			throw new ValidationError(
+				`Typography role "${roleName}" sizes must use only min / s / base / l / max`
+			);
+		}
+		if (role.sizes.s && !role.sizes.min) {
+			throw new ValidationError(`Typography role "${roleName}" size s requires min`);
+		}
+		if (role.sizes.l && !role.sizes.max) {
+			throw new ValidationError(`Typography role "${roleName}" size l requires max`);
+		}
+		const defaultScale = (typography.modes.find((mode) => mode.isDefault) ?? typography.modes[0])!
+			.tokens;
+		const sizeValue = (reference: TypographyComposite['fontSize']) =>
+			reference === 'min'
+				? defaultScale.min
+				: reference === 1
+					? defaultScale.base
+					: defaultScale.base + defaultScale.increment * (reference - 1);
+		let previousSize = Number.NEGATIVE_INFINITY;
+		for (const identity of typographySizeOrder) {
+			const composite = role.sizes[identity];
+			if (!composite) continue;
+			const value = sizeValue(composite.fontSize);
+			if (value <= previousSize) {
 				throw new ValidationError(
-					`Typography role "${roleName}" displayOrder must contain base and every variant exactly once`
+					`Typography role "${roleName}" sizes must strictly increase through min, s, base, l, max`
 				);
 			}
+			previousSize = value;
 		}
-		registerGeneratedRecipeName(roleName, `role "${roleName}" base`);
-		for (const variantName of Object.keys(role.variants ?? {})) {
-			registerGeneratedRecipeName(
-				`${roleName}-${variantName}`,
-				`role "${roleName}" variant "${variantName}"`
+		registerGeneratedCompositeName(roleName, `role "${roleName}" base`);
+		for (const sizeName of Object.keys(role.sizes).filter((name) => name !== 'base')) {
+			registerGeneratedCompositeName(
+				`${roleName}-${sizeName}`,
+				`role "${roleName}" size "${sizeName}"`
 			);
 		}
 		for (const [style, selection] of Object.entries(styles)) {
 			for (const alias of selection!.weights) {
-				registerGeneratedRecipeName(
+				registerGeneratedCompositeName(
 					`${roleName}-style-${style}-weight-${alias}`,
 					`role "${roleName}" style "${style}" weight "${alias}" helper`
 				);
 			}
 		}
-		for (const [variantName, recipe] of recipes) {
+		for (const [sizeName, composite] of composites) {
 			if (
-				variantName !== 'base' &&
-				(!tokenNamePattern.test(variantName) ||
-					variantName.startsWith('weight-') ||
-					variantName.startsWith('style-'))
+				sizeName !== 'base' &&
+				(!tokenNamePattern.test(sizeName) ||
+					sizeName.startsWith('weight-') ||
+					sizeName.startsWith('style-'))
 			) {
 				throw new ValidationError(
-					`Typography role "${roleName}" variant "${variantName}" is not safe for generated tokens and classes`
+					`Typography role "${roleName}" size "${sizeName}" is not safe for generated tokens and classes`
 				);
 			}
-			if (!(recipe.weight in exposedWeights)) {
+			if (!(composite.weight in exposedWeights)) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} weight "${recipe.weight}" must be exposed by the role`
+					`Typography role "${roleName}" size "${sizeName}" weight "${composite.weight}" must be exposed by the role`
 				);
 			}
-			if (!defaultStyleSelection.weights.includes(recipe.weight)) {
+			if (!defaultStyleSelection.weights.includes(composite.weight)) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} weight "${recipe.weight}" is unavailable for defaultStyle "${defaultStyle}"`
+					`Typography role "${roleName}" size "${sizeName}" weight "${composite.weight}" is unavailable for defaultStyle "${defaultStyle}"`
 				);
 			}
 			if (
-				recipe.fontSize !== 'min' &&
-				(!Number.isInteger(recipe.fontSize) || recipe.fontSize < 1)
+				composite.fontSize !== 'min' &&
+				(!Number.isInteger(composite.fontSize) || composite.fontSize < 1)
 			) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} fontSize must be "min" or a positive integer`
+					`Typography role "${roleName}" size "${sizeName}" fontSize must be "min" or a positive integer`
 				);
 			}
-			if (recipe.fontSize !== 'min' && recipe.fontSize > smallestModeRange) {
+			if (composite.fontSize !== 'min' && composite.fontSize > smallestModeRange) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} references fs-${recipe.fontSize}, but a typography mode only generates through fs-${smallestModeRange}`
+					`Typography role "${roleName}" size "${sizeName}" references fs-${composite.fontSize}, but a typography mode only generates through fs-${smallestModeRange}`
 				);
 			}
-			if (!Number.isFinite(recipe.lineHeight) || recipe.lineHeight <= 0) {
+			if (!Number.isFinite(composite.lineHeight) || composite.lineHeight <= 0) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} lineHeight must be positive and finite`
+					`Typography role "${roleName}" size "${sizeName}" lineHeight must be positive and finite`
 				);
 			}
-			if (!Number.isFinite(recipe.letterSpacing)) {
+			if (!Number.isFinite(composite.letterSpacing)) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} letterSpacing must be finite`
+					`Typography role "${roleName}" size "${sizeName}" letterSpacing must be finite`
 				);
 			}
 
-			const settings = resolvedRecipeSettings(role, recipe);
+			const settings = resolvedCompositeSettings(role, composite);
 			if (
 				settings.fontKerning !== undefined &&
 				!['auto', 'normal', 'none'].includes(settings.fontKerning)
 			) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} fontKerning must be "auto", "normal", or "none"`
+					`Typography role "${roleName}" size "${sizeName}" fontKerning must be "auto", "normal", or "none"`
 				);
 			}
 			if (
@@ -436,7 +503,7 @@ function validateTypographySemanticLayer(
 				!['auto', 'none'].includes(settings.fontOpticalSizing)
 			) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} fontOpticalSizing must be "auto" or "none"`
+					`Typography role "${roleName}" size "${sizeName}" fontOpticalSizing must be "auto" or "none"`
 				);
 			}
 			if (
@@ -444,7 +511,7 @@ function validateTypographySemanticLayer(
 				!typographyTextTransforms.has(settings.textTransform)
 			) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} textTransform is unsupported`
+					`Typography role "${roleName}" size "${sizeName}" textTransform is unsupported`
 				);
 			}
 			for (const [tag, value] of Object.entries(settings.features)) {
@@ -453,19 +520,19 @@ function validateTypographySemanticLayer(
 					(typeof value !== 'boolean' && (!Number.isInteger(value) || value < 0))
 				) {
 					throw new ValidationError(
-						`Typography role "${roleName}" ${variantName} contains invalid OpenType feature "${tag}"`
+						`Typography role "${roleName}" size "${sizeName}" contains invalid OpenType feature "${tag}"`
 					);
 				}
 			}
 			for (const [axis, value] of Object.entries(settings.variations)) {
 				if (!openTypeTagPattern.test(axis) || !Number.isFinite(value)) {
 					throw new ValidationError(
-						`Typography role "${roleName}" ${variantName} contains invalid variation axis "${axis}"`
+						`Typography role "${roleName}" size "${sizeName}" contains invalid variation axis "${axis}"`
 					);
 				}
 				if (managedVariationAxes.has(axis)) {
 					throw new ValidationError(
-						`Typography role "${roleName}" ${variantName} variation axis "${axis}" is managed separately or is not supported by typography roles yet`
+						`Typography role "${roleName}" size "${sizeName}" variation axis "${axis}" is managed separately or is not supported by typography roles yet`
 					);
 				}
 			}
@@ -484,7 +551,7 @@ function validateTypographySemanticLayer(
 						for (const feature of Object.keys(settings.features)) {
 							if (!face.features?.includes(feature)) {
 								throw new ValidationError(
-									`Typography role "${roleName}" ${variantName} feature "${feature}" is unavailable for ${style} weight ${weight}`
+									`Typography role "${roleName}" size "${sizeName}" feature "${feature}" is unavailable for ${style} weight ${weight}`
 								);
 							}
 						}
@@ -492,7 +559,7 @@ function validateTypographySemanticLayer(
 							const range = face.axes?.[axis];
 							if (!range || value < range.min || value > range.max) {
 								throw new ValidationError(
-									`Typography role "${roleName}" ${variantName} variation "${axis}" (${value}) is unavailable for ${style} weight ${weight}`
+									`Typography role "${roleName}" size "${sizeName}" variation "${axis}" (${value}) is unavailable for ${style} weight ${weight}`
 								);
 							}
 						}
@@ -503,7 +570,106 @@ function validateTypographySemanticLayer(
 				(Object.keys(settings.features).length > 0 || Object.keys(settings.variations).length > 0)
 			) {
 				throw new ValidationError(
-					`Typography role "${roleName}" ${variantName} cannot verify features or variations for external font "${role.font}"`
+					`Typography role "${roleName}" size "${sizeName}" cannot verify features or variations for external font "${role.font}"`
+				);
+			}
+		}
+
+		for (const [variantName, variant] of Object.entries(role.variants ?? {})) {
+			const path = `Typography role "${roleName}" categorical variant "${variantName}"`;
+			if (!tokenNamePattern.test(variantName)) {
+				throw new ValidationError(`${path} is not safe for generated tokens and classes`);
+			}
+			if (!variant || typeof variant !== 'object' || Array.isArray(variant)) {
+				throw new ValidationError(`${path} must be an object`);
+			}
+			if (Object.keys(variant).length === 0) {
+				throw new ValidationError(`${path} must override at least one property`);
+			}
+			const unknownFields = Object.keys(variant).filter(
+				(field) => !typographySemanticVariantFields.has(field)
+			);
+			if (unknownFields.length > 0) {
+				throw new ValidationError(
+					`${path} contains unsupported ${unknownFields.length === 1 ? 'field' : 'fields'}: ${unknownFields.join(', ')}`
+				);
+			}
+			const weight = variant.weight ?? role.sizes.base.weight;
+			const style = variant.fontStyle ?? defaultStyle;
+			if (!(weight in exposedWeights)) {
+				throw new ValidationError(`${path} weight "${weight}" must be exposed by the role`);
+			}
+			if (!styles[style]?.weights.includes(weight)) {
+				throw new ValidationError(
+					`${path} requests unavailable style "${style}" at weight "${weight}"`
+				);
+			}
+			if (
+				variant.lineHeight !== undefined &&
+				(!Number.isFinite(variant.lineHeight) || variant.lineHeight <= 0)
+			) {
+				throw new ValidationError(`${path} lineHeight must be positive and finite`);
+			}
+			if (variant.letterSpacing !== undefined && !Number.isFinite(variant.letterSpacing)) {
+				throw new ValidationError(`${path} letterSpacing must be finite`);
+			}
+			if (variant.textTransform && !typographyTextTransforms.has(variant.textTransform)) {
+				throw new ValidationError(`${path} textTransform is unsupported`);
+			}
+			for (const [tag, value] of Object.entries(variant.features ?? {})) {
+				if (
+					!openTypeTagPattern.test(tag) ||
+					(typeof value !== 'boolean' && (!Number.isInteger(value) || value < 0))
+				) {
+					throw new ValidationError(`${path} contains invalid OpenType feature "${tag}"`);
+				}
+			}
+			for (const [axis, value] of Object.entries(variant.variations ?? {})) {
+				if (
+					!openTypeTagPattern.test(axis) ||
+					!Number.isFinite(value) ||
+					managedVariationAxes.has(axis)
+				) {
+					throw new ValidationError(`${path} contains invalid or managed variation axis "${axis}"`);
+				}
+			}
+			if (
+				font.capabilities &&
+				(Object.keys(variant.features ?? {}).length > 0 ||
+					Object.keys(variant.variations ?? {}).length > 0)
+			) {
+				const numericWeight = exposedWeights[weight];
+				const face = font.capabilities.faces.find(
+					(candidate) =>
+						candidate.style === style && supportsTypographyWeight(candidate.weights, numericWeight)
+				);
+				if (!face) {
+					throw new ValidationError(
+						`${path} cannot validate font capabilities for ${style} weight ${numericWeight}`
+					);
+				}
+				for (const feature of Object.keys(variant.features ?? {})) {
+					if (!face.features?.includes(feature)) {
+						throw new ValidationError(
+							`${path} feature "${feature}" is unavailable for ${style} weight ${numericWeight}`
+						);
+					}
+				}
+				for (const [axis, value] of Object.entries(variant.variations ?? {})) {
+					const range = face.axes?.[axis];
+					if (!range || value < range.min || value > range.max) {
+						throw new ValidationError(
+							`${path} variation "${axis}" (${value}) is unavailable for ${style} weight ${numericWeight}`
+						);
+					}
+				}
+			} else if (
+				!font.capabilities &&
+				(Object.keys(variant.features ?? {}).length > 0 ||
+					Object.keys(variant.variations ?? {}).length > 0)
+			) {
+				throw new ValidationError(
+					`${path} cannot verify features or variations for external font "${role.font}"`
 				);
 			}
 		}
@@ -526,7 +692,7 @@ function validateTypographySemanticLayer(
 			}
 			if (mode === defaultTypographyMode) {
 				throw new ValidationError(
-					`Typography role "${roleName}" modeOverrides must not redefine default mode "${modeName}"; author the base recipes instead`
+					`Typography role "${roleName}" modeOverrides must not redefine default mode "${modeName}"; author the base composites instead`
 				);
 			}
 			if (!modeOverride || typeof modeOverride !== 'object' || Array.isArray(modeOverride)) {
@@ -535,33 +701,32 @@ function validateTypographySemanticLayer(
 				);
 			}
 			for (const key of Object.keys(modeOverride)) {
-				if (key !== 'base' && key !== 'variants') {
+				if (key !== 'sizes') {
 					throw new ValidationError(
 						`Typography role "${roleName}" modeOverrides.${modeName} contains unknown field "${key}"`
 					);
 				}
 			}
 
-			const overrideRecipes = [
-				...(modeOverride.base ? [['base', role.base, modeOverride.base] as const] : []),
-				...Object.entries(modeOverride.variants ?? {}).map(([variantName, override]) => {
-					const recipe = role.variants?.[variantName];
-					if (!recipe) {
+			const overrideComposites = Object.entries(modeOverride.sizes ?? {}).map(
+				([sizeName, override]) => {
+					const composite = role.sizes[sizeName as (typeof typographySizeOrder)[number]];
+					if (!composite) {
 						throw new ValidationError(
-							`Typography role "${roleName}" modeOverrides.${modeName} references unknown variant "${variantName}"`
+							`Typography role "${roleName}" modeOverrides.${modeName} references unknown size "${sizeName}"`
 						);
 					}
-					return [variantName, recipe, override] as const;
-				}),
-			];
-			if (overrideRecipes.length === 0) {
+					return [sizeName, composite, override] as const;
+				}
+			);
+			if (overrideComposites.length === 0) {
 				throw new ValidationError(
-					`Typography role "${roleName}" modeOverrides.${modeName} must override base or at least one variant`
+					`Typography role "${roleName}" modeOverrides.${modeName} must override at least one size`
 				);
 			}
 
-			for (const [variantName, recipe, override] of overrideRecipes) {
-				const path = `Typography role "${roleName}" modeOverrides.${modeName}.${variantName}`;
+			for (const [sizeName, composite, override] of overrideComposites) {
+				const path = `Typography role "${roleName}" modeOverrides.${modeName}.sizes.${sizeName}`;
 				if (!override || typeof override !== 'object' || Array.isArray(override)) {
 					throw new ValidationError(`${path} must be an object`);
 				}
@@ -574,7 +739,7 @@ function validateTypographySemanticLayer(
 						throw new ValidationError(`${path} contains unsupported field "${field}"`);
 					}
 				}
-				const resolved = { ...recipe, ...override };
+				const resolved = { ...composite, ...override };
 				if (!(resolved.weight in exposedWeights)) {
 					throw new ValidationError(
 						`${path} weight "${resolved.weight}" must be exposed by the role`

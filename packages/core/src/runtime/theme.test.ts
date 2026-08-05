@@ -17,15 +17,23 @@ const theme = {
 } as const;
 
 const config = {
-	colorNames: ['canvas', 'ink'],
-	alphaSchedule: { non: 0, lo: 0.125, max: 1 },
+	colorIdentities: ['canvas', 'ink'],
+	alphaSchedule: {
+		non: 0,
+		min: 0.07,
+		'lo-x': 0.125,
+		lo: 0.25,
+		hi: 0.68,
+		'hi-x': 0.85,
+		max: 0.93,
+	},
 	luminance: {
 		minimumLuminanceDelta: 0.6,
 		backgroundColors: ['canvas'],
 		foregroundColors: ['ink'],
 	},
 	prefixes: { color: 'color' },
-	colorFormat: { alphaModifier: 'alpha' },
+	colorFormat: { alphaModifier: 'a' },
 } as const;
 
 describe('parseRuntimeColorTheme', () => {
@@ -139,7 +147,7 @@ describe('parseRuntimeColorTheme', () => {
 				'{"polarity":"negative","colors":{"canvas":{"l":0.1,"c":0,"h":0},"constructor":{"l":0.9,"c":0,"h":0}}}'
 			),
 			{
-				colorNames: ['canvas', 'constructor'],
+				colorIdentities: ['canvas', 'constructor'],
 				luminance: {
 					minimumLuminanceDelta: 0.5,
 					backgroundColors: ['canvas'],
@@ -154,9 +162,9 @@ describe('parseRuntimeColorTheme', () => {
 	});
 
 	it.each([
-		[{ colorNames: [] }, 'config.colorNames must be a non-empty array'],
-		[{ colorNames: ['ink', 'ink'] }, 'config.colorNames must not contain duplicates'],
-		[{ colorNames: ['not safe'] }, 'config.colorNames[0] must be a CSS-token-safe name'],
+		[{ colorIdentities: [] }, 'config.colorIdentities must be a non-empty array'],
+		[{ colorIdentities: ['ink', 'ink'] }, 'config.colorIdentities must not contain duplicates'],
+		[{ colorIdentities: ['not safe'] }, 'config.colorIdentities[0] must be a CSS-token-safe name'],
 	])('rejects an invalid schema', (schema, message) => {
 		expect(() => parseRuntimeColorTheme(theme, schema)).toThrowError(message);
 	});
@@ -168,13 +176,21 @@ describe('generateRuntimeColorTheme', () => {
 
 		expect(result.customProperties).toEqual({
 			'--color-canvas': 'oklch(0.1800 0.0120 260.00)',
-			'--color-canvas-alpha-non': 'oklch(0.1800 0.0120 260.00 / 0.0000)',
-			'--color-canvas-alpha-lo': 'oklch(0.1800 0.0120 260.00 / 0.1250)',
-			'--color-canvas-alpha-max': 'oklch(0.1800 0.0120 260.00 / 1.0000)',
+			'--color-canvas-a-non': 'oklch(0.1800 0.0120 260.00 / 0.0000)',
+			'--color-canvas-a-min': 'oklch(0.1800 0.0120 260.00 / 0.0700)',
+			'--color-canvas-a-lo-x': 'oklch(0.1800 0.0120 260.00 / 0.1250)',
+			'--color-canvas-a-lo': 'oklch(0.1800 0.0120 260.00 / 0.2500)',
+			'--color-canvas-a-hi': 'oklch(0.1800 0.0120 260.00 / 0.6800)',
+			'--color-canvas-a-hi-x': 'oklch(0.1800 0.0120 260.00 / 0.8500)',
+			'--color-canvas-a-max': 'oklch(0.1800 0.0120 260.00 / 0.9300)',
 			'--color-ink': 'oklch(0.9100 0.3000 145.25)',
-			'--color-ink-alpha-non': 'oklch(0.9100 0.3000 145.25 / 0.0000)',
-			'--color-ink-alpha-lo': 'oklch(0.9100 0.3000 145.25 / 0.1250)',
-			'--color-ink-alpha-max': 'oklch(0.9100 0.3000 145.25 / 1.0000)',
+			'--color-ink-a-non': 'oklch(0.9100 0.3000 145.25 / 0.0000)',
+			'--color-ink-a-min': 'oklch(0.9100 0.3000 145.25 / 0.0700)',
+			'--color-ink-a-lo-x': 'oklch(0.9100 0.3000 145.25 / 0.1250)',
+			'--color-ink-a-lo': 'oklch(0.9100 0.3000 145.25 / 0.2500)',
+			'--color-ink-a-hi': 'oklch(0.9100 0.3000 145.25 / 0.6800)',
+			'--color-ink-a-hi-x': 'oklch(0.9100 0.3000 145.25 / 0.8500)',
+			'--color-ink-a-max': 'oklch(0.9100 0.3000 145.25 / 0.9300)',
 		});
 		expect(Object.getPrototypeOf(result.customProperties)).toBeNull();
 		expect(Object.isFrozen(result.customProperties)).toBe(true);
@@ -193,12 +209,12 @@ describe('generateRuntimeColorTheme', () => {
 		const staticInk = { mode: 'oklch' as const, ...preciseTheme.colors.ink };
 
 		expect(result.customProperties['--color-ink']).toBe(oklchToCss(staticInk));
-		expect(result.customProperties['--color-ink-alpha-lo']).toBe(applyAlpha(staticInk, 0.125));
+		expect(result.customProperties['--color-ink-a-lo-x']).toBe(applyAlpha(staticInk, 0.125));
 	});
 
 	it('uses stable CSS defaults and emits no alpha variants when no schedule is supplied', () => {
 		const result = generateRuntimeColorTheme(theme, {
-			colorNames: config.colorNames,
+			colorIdentities: config.colorIdentities,
 			luminance: config.luminance,
 		});
 
@@ -239,7 +255,7 @@ describe('generateRuntimeColorTheme', () => {
 				},
 			},
 			{
-				colorNames: ['canvas', 'ink'],
+				colorIdentities: ['canvas', 'ink'],
 				luminance: {
 					minimumLuminanceDelta: 0.330005,
 					backgroundColors: ['canvas'],
@@ -266,7 +282,7 @@ describe('generateRuntimeColorTheme', () => {
 				},
 			},
 			{
-				colorNames: ['canvas', 'ink'],
+				colorIdentities: ['canvas', 'ink'],
 				luminance: {
 					minimumLuminanceDelta: 0.33,
 					backgroundColors: ['canvas'],
@@ -301,14 +317,19 @@ describe('generateRuntimeColorTheme', () => {
 
 	it.each([
 		[
-			'an invalid alpha level',
-			{ ...config, alphaSchedule: { 'not safe': 0.5 } },
-			'config.alphaSchedule.not safe must be a CSS-token-safe name',
+			'an invalid alpha identity',
+			{ ...config, alphaSchedule: { ...config.alphaSchedule, surprise: 0.5 } },
+			'config.alphaSchedule.surprise is not allowed',
 		],
 		[
 			'an invalid alpha value',
-			{ ...config, alphaSchedule: { lo: 1.1 } },
-			'config.alphaSchedule.lo must be between 0 and 1',
+			{ ...config, alphaSchedule: { ...config.alphaSchedule, lo: 1.1 } },
+			'config.alphaSchedule.lo must be greater than 0.125 and below 1',
+		],
+		[
+			'a non-zero non boundary',
+			{ ...config, alphaSchedule: { ...config.alphaSchedule, non: 0.01 } },
+			'config.alphaSchedule.non must be exactly 0',
 		],
 		[
 			'an unsafe prefix',
@@ -355,8 +376,8 @@ describe('generateRuntimeColorTheme', () => {
 		};
 		expect(() =>
 			generateRuntimeColorTheme(collidingTheme, {
-				colorNames: ['ink', 'ink-a-lo', 'canvas'],
-				alphaSchedule: { lo: 0.25 },
+				colorIdentities: ['ink', 'ink-a-lo', 'canvas'],
+				alphaSchedule: config.alphaSchedule,
 				luminance: {
 					minimumLuminanceDelta: 0.5,
 					backgroundColors: ['canvas'],

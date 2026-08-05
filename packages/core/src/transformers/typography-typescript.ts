@@ -5,28 +5,50 @@ function variable(name: string): string {
 	return `var(--${name})`;
 }
 
-function recipeManifest(recipe: TypographyContract['roles'][string]['base']) {
+function recipeManifest(composite: TypographyContract['roles'][string]['sizes'][string]) {
 	return {
-		fontSize: variable(recipe.fontSizeToken),
-		fontWeight: variable(recipe.fontWeightToken),
-		weight: recipe.weight,
-		lineHeight: variable(recipe.lineHeightToken),
-		letterSpacing: variable(recipe.letterSpacingToken),
-		...(recipe.textTransformToken
+		fontSize: variable(composite.fontSizeToken),
+		fontWeight: variable(composite.fontWeightToken),
+		weight: composite.weight,
+		lineHeight: variable(composite.lineHeightToken),
+		letterSpacing: variable(composite.letterSpacingToken),
+		...(composite.textTransformToken
 			? {
-					textTransform: variable(recipe.textTransformToken),
-					textTransformValue: recipe.textTransform,
+					textTransform: variable(composite.textTransformToken),
+					textTransformValue: composite.textTransform,
 				}
 			: {}),
-		...(recipe.fontKerningToken ? { fontKerning: variable(recipe.fontKerningToken) } : {}),
-		...(recipe.fontOpticalSizingToken
-			? { fontOpticalSizing: variable(recipe.fontOpticalSizingToken) }
+		...(composite.fontKerningToken ? { fontKerning: variable(composite.fontKerningToken) } : {}),
+		...(composite.fontOpticalSizingToken
+			? { fontOpticalSizing: variable(composite.fontOpticalSizingToken) }
 			: {}),
-		...(recipe.fontFeatureSettingsToken
-			? { fontFeatureSettings: variable(recipe.fontFeatureSettingsToken) }
+		...(composite.fontFeatureSettingsToken
+			? { fontFeatureSettings: variable(composite.fontFeatureSettingsToken) }
 			: {}),
-		...(recipe.fontVariationSettingsToken
-			? { fontVariationSettings: variable(recipe.fontVariationSettingsToken) }
+		...(composite.fontVariationSettingsToken
+			? { fontVariationSettings: variable(composite.fontVariationSettingsToken) }
+			: {}),
+	};
+}
+
+function semanticVariantManifest(variant: TypographyContract['roles'][string]['variants'][string]) {
+	return {
+		...(variant.weight ? { weight: variant.weight } : {}),
+		...(variant.fontStyle ? { fontStyle: variant.fontStyle } : {}),
+		...(variant.fontWeightToken ? { fontWeight: variable(variant.fontWeightToken) } : {}),
+		...(variant.fontStyleToken ? { fontStyleValue: variable(variant.fontStyleToken) } : {}),
+		...(variant.lineHeightToken ? { lineHeight: variable(variant.lineHeightToken) } : {}),
+		...(variant.letterSpacingToken ? { letterSpacing: variable(variant.letterSpacingToken) } : {}),
+		...(variant.textTransformToken ? { textTransform: variable(variant.textTransformToken) } : {}),
+		...(variant.fontKerningToken ? { fontKerning: variable(variant.fontKerningToken) } : {}),
+		...(variant.fontOpticalSizingToken
+			? { fontOpticalSizing: variable(variant.fontOpticalSizingToken) }
+			: {}),
+		...(variant.fontFeatureSettingsToken
+			? { fontFeatureSettings: variable(variant.fontFeatureSettingsToken) }
+			: {}),
+		...(variant.fontVariationSettingsToken
+			? { fontVariationSettings: variable(variant.fontVariationSettingsToken) }
 			: {}),
 	};
 }
@@ -35,13 +57,18 @@ function recipeManifest(recipe: TypographyContract['roles'][string]['base']) {
 export function typographyContractData(contract: TypographyContract) {
 	const roleClassKeys = typographyRoleClassKeys(contract);
 	return {
+		schemaVersion: 1,
 		roles: Object.fromEntries(
 			Object.entries(contract.roles).map(([roleName, role]) => [
 				roleName,
 				{
 					fontFamily: variable(role.fontFamilyToken),
 					defaultStyle: role.defaultStyle,
-					classes: roleClassKeys[roleName]!,
+					classes: {
+						sizes: roleClassKeys[roleName]!.sizes,
+						variants: roleClassKeys[roleName]!.variants,
+						styleWeights: roleClassKeys[roleName]!.styleWeights,
+					},
 					weights: Object.fromEntries(
 						Object.keys(role.weights).map((weight) => [weight, variable(role.weightTokens[weight])])
 					),
@@ -56,10 +83,15 @@ export function typographyContractData(contract: TypographyContract) {
 							},
 						])
 					),
-					base: recipeManifest(role.base),
 					displayOrder: [...role.displayOrder],
+					sizes: Object.fromEntries(
+						Object.entries(role.sizes).map(([name, composite]) => [name, recipeManifest(composite)])
+					),
 					variants: Object.fromEntries(
-						Object.entries(role.variants).map(([name, recipe]) => [name, recipeManifest(recipe)])
+						Object.entries(role.variants).map(([name, variant]) => [
+							name,
+							semanticVariantManifest(variant),
+						])
 					),
 				},
 			])
@@ -73,12 +105,12 @@ function selectionTypes(contract: TypographyContract): string {
 			const role = JSON.stringify(roleName);
 			const defaultStyle = JSON.stringify(contractRole.defaultStyle);
 			const branches = [
-				`    | { role: ${role}; variant?: TypographyVariant<${role}>; fontStyle?: ${defaultStyle}; weight?: TypographyWeightForStyle<${role}, ${defaultStyle}> }`,
+				`    | { role: ${role}; size?: TypographySize<${role}>; variant?: TypographyVariant<${role}>; fontStyle?: ${defaultStyle}; weight?: TypographyWeightForStyle<${role}, ${defaultStyle}> }`,
 				...Object.keys(contractRole.styles)
 					.filter((style) => style !== contractRole.defaultStyle)
 					.map(
 						(style) =>
-							`    | { role: ${role}; variant?: TypographyVariant<${role}>; fontStyle: ${JSON.stringify(style)}; weight: TypographyWeightForStyle<${role}, ${JSON.stringify(style)}> }`
+							`    | { role: ${role}; size?: TypographySize<${role}>; variant?: TypographyVariant<${role}>; fontStyle: ${JSON.stringify(style)}; weight: TypographyWeightForStyle<${role}, ${JSON.stringify(style)}> }`
 					),
 			];
 			return `  ${role}:\n${branches.join('\n')};`;
@@ -93,6 +125,7 @@ export function typographyContractTypes(contract: TypographyContract): string {
 	const classKeyType = classKeys.map((key) => JSON.stringify(key)).join(' | ');
 	return (
 		`export type TypographyRole = keyof typeof typography.roles;\n` +
+		`export type TypographySize<R extends TypographyRole> = keyof typeof typography.roles[R]["sizes"];\n` +
 		`export type TypographyVariant<R extends TypographyRole> = keyof typeof typography.roles[R]["variants"];\n` +
 		`export type TypographyWeight<R extends TypographyRole> = keyof typeof typography.roles[R]["weights"];\n` +
 		`export type TypographyStyle<R extends TypographyRole> = keyof typeof typography.roles[R]["styles"];\n` +
@@ -111,10 +144,10 @@ function resolverBody(typescript = false): string {
 	const roles = typescript
 		? `  const roles = typography.roles as Readonly<Record<string, {
     readonly defaultStyle: string;
-    readonly base: { readonly weight: string };
-    readonly variants: Readonly<Record<string, { readonly weight: string }>>;
+    readonly sizes: Readonly<Record<string, { readonly weight: string }>>;
+    readonly variants: Readonly<Record<string, { readonly weight?: string; readonly fontStyle?: string }>>;
     readonly classes: {
-      readonly base: string;
+      readonly sizes: Readonly<Record<string, string>>;
       readonly variants: Readonly<Record<string, string>>;
       readonly styleWeights: Readonly<Record<string, Readonly<Record<string, string>>>>;
     };
@@ -123,23 +156,30 @@ function resolverBody(typescript = false): string {
 	return `${roles}
   const role = roles[selection.role];
   if (!role) throw new Error(\`Unknown typography role "\${selection.role}".\`);
-  const recipe = selection.variant === undefined ? role.base : role.variants[selection.variant];
-  const recipeClass =
-    selection.variant === undefined ? role.classes.base : role.classes.variants[selection.variant];
-  if (!recipe || !recipeClass) {
+	const size = selection.size ?? "base";
+  const composite = role.sizes[size];
+  const recipeClass = role.classes.sizes[size];
+  if (!composite || !recipeClass) {
+    throw new Error(\`Unknown typography size "\${String(selection.size)}" for role "\${selection.role}".\`);
+  }
+  const variant = selection.variant === undefined ? undefined : role.variants[selection.variant];
+  const variantClass = selection.variant === undefined ? undefined : role.classes.variants[selection.variant];
+  if (selection.variant !== undefined && (!variant || !variantClass)) {
     throw new Error(\`Unknown typography variant "\${String(selection.variant)}" for role "\${selection.role}".\`);
   }
-  const fontStyle = selection.fontStyle ?? role.defaultStyle;
-  const weight = selection.weight ?? recipe.weight;
+  const fontStyle = selection.fontStyle ?? variant?.fontStyle ?? role.defaultStyle;
+  const weight = selection.weight ?? variant?.weight ?? composite.weight;
   const styleClass = role.classes.styleWeights[fontStyle]?.[weight];
   if (!styleClass) {
     throw new Error(
       \`Typography role "\${selection.role}" does not expose style "\${fontStyle}" at weight "\${weight}".\`
     );
   }
-  const resolved = [recipeClass, styleClass].map((key) => classes[key]);
+  const resolved = [recipeClass, variantClass, styleClass]
+    .filter((key) => key !== undefined)
+    .map((key) => classes[key]);
   if (resolved.some((className) => typeof className !== "string" || className.length === 0)) {
-    throw new Error("Typography class map is missing a generated recipe class.");
+    throw new Error("Typography class map is missing a generated composite class.");
   }
   return resolved.join(" ");`;
 }
@@ -158,7 +198,7 @@ function typographyClassResolverTypescript(): string {
   classes: TypographyClassMap
 ): string;
 export function typographyClassName(
-  selection: { role: string; variant?: string; fontStyle?: string; weight?: string },
+  selection: { role: string; size?: string; variant?: string; fontStyle?: string; weight?: string },
   classes: Readonly<Record<string, string>>
 ): string {
 ${resolverBody(true)}

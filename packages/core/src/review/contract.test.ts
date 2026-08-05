@@ -4,8 +4,15 @@ import type { PartialDesignSystem } from '../types.js';
 import { createWorkbenchContract } from './contract.js';
 
 const system: PartialDesignSystem = {
+	alpha: {
+		defaultScale: 'standard',
+		scales: {
+			standard: {
+				values: { min: 0.07, 'lo-x': 0.125, lo: 0.25, hi: 0.75, 'hi-x': 0.85, max: 0.93 },
+			},
+		},
+	},
 	colors: {
-		alphaSchedule: { min: 0.07, lo: 0.25, hi: 0.75, max: 0.93 },
 		modes: [
 			{
 				name: 'default',
@@ -55,21 +62,25 @@ const system: PartialDesignSystem = {
 			prose: {
 				font: 'sans',
 				weights: { min: 300, max: 700 },
-				base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0, weight: 'min' },
-				variants: {
+				sizes: {
+					base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0, weight: 'min' },
 					max: { fontSize: 4, lineHeight: 1.1, letterSpacing: -0.01, weight: 'max' },
+				},
+				variants: {
+					emphatic: { weight: 'max', letterSpacing: -0.02 },
 				},
 				modeOverrides: {
 					compact: {
-						base: {
-							fontSize: 1,
-							lineHeight: 1.2,
-							letterSpacing: 0.005,
-							weight: 'max',
+						sizes: {
+							base: {
+								fontSize: 1,
+								lineHeight: 1.2,
+								letterSpacing: 0.005,
+								weight: 'max',
+							},
 						},
 					},
 				},
-				displayOrder: ['base', 'max'],
 			},
 		},
 	},
@@ -111,9 +122,13 @@ describe('workbench review contract', () => {
 		const typography = contract.labs.find((lab) => lab.kind === 'typography');
 		expect(typography?.cases.map((reviewCase) => reviewCase.id)).toEqual([
 			'typography--prose--base',
+			'typography--prose--base--variant--emphatic',
 			'typography--prose--max',
+			'typography--prose--max--variant--emphatic',
 			'typography--compact--prose--base',
+			'typography--compact--prose--base--variant--emphatic',
 			'typography--compact--prose--max',
+			'typography--compact--prose--max--variant--emphatic',
 		]);
 		expect(typography?.cases[0]?.controls.map((control) => control.id)).toEqual([
 			'fontSize',
@@ -121,12 +136,20 @@ describe('workbench review contract', () => {
 			'letterSpacing',
 			'weight',
 		]);
-		expect(typography?.cases[0]?.sourcePath).toBe('/typography/roles/prose/base');
-		expect(typography?.cases[2]).toMatchObject({
-			mode: 'compact',
-			sourcePath: '/typography/roles/prose/modeOverrides/compact/base',
+		expect(typography?.cases[0]?.sourcePath).toBe('/typography/roles/prose/sizes/base');
+		expect(typography?.cases[1]).toMatchObject({
+			size: null,
+			variant: 'emphatic',
+			sourcePath: '/typography/roles/prose/variants/emphatic',
 			weight: { alias: 'max', value: 700 },
-			recipe: {
+			composite: { letterSpacingEm: -0.02 },
+		});
+		expect(typography?.cases[2]).toMatchObject({ size: 'max', variant: null });
+		expect(typography?.cases[4]).toMatchObject({
+			mode: 'compact',
+			sourcePath: '/typography/roles/prose/modeOverrides/compact/sizes/base',
+			weight: { alias: 'max', value: 700 },
+			composite: {
 				fontSizeReference: 1,
 				atomicFontSizeToken: 'fs-1',
 				lineHeight: 1.2,
@@ -134,11 +157,11 @@ describe('workbench review contract', () => {
 				weight: 'max',
 			},
 		});
-		expect(typography?.cases[2]?.controls.map((control) => control.path)).toEqual([
-			'/typography/roles/prose/modeOverrides/compact/base/fontSize',
-			'/typography/roles/prose/modeOverrides/compact/base/lineHeight',
-			'/typography/roles/prose/modeOverrides/compact/base/letterSpacing',
-			'/typography/roles/prose/modeOverrides/compact/base/weight',
+		expect(typography?.cases[4]?.controls.map((control) => control.path)).toEqual([
+			'/typography/roles/prose/modeOverrides/compact/sizes/base/fontSize',
+			'/typography/roles/prose/modeOverrides/compact/sizes/base/lineHeight',
+			'/typography/roles/prose/modeOverrides/compact/sizes/base/letterSpacing',
+			'/typography/roles/prose/modeOverrides/compact/sizes/base/weight',
 		]);
 
 		const shadows = contract.labs.find((lab) => lab.kind === 'shadows');
@@ -237,12 +260,16 @@ describe('workbench review contract', () => {
 
 	it('preserves arbitrary author vocabulary while emitting safe, collision-free case IDs', () => {
 		const authored: PartialDesignSystem = {
+			alpha: system.alpha,
 			colors: {
 				modes: [
 					{
 						name: 'a--b',
 						isDefault: true,
-						tokens: { c: { mode: 'oklch', l: 0.2, c: 0.03, h: 30 } },
+						tokens: {
+							c: { mode: 'oklch', l: 0.2, c: 0.03, h: 30 },
+							'b--c': { mode: 'oklch', l: 0.7, c: 0.04, h: 210 },
+						},
 					},
 					{
 						name: 'a',
@@ -269,17 +296,16 @@ describe('workbench review contract', () => {
 				roles: {
 					'editorial-copy': {
 						font: 'editorial',
-						weights: { book: 350, black: 800 },
-						base: { fontSize: 2, lineHeight: 1.4, letterSpacing: 0, weight: 'book' },
-						variants: {
-							'hero--wide': {
+						weights: { min: 350, max: 800 },
+						sizes: {
+							base: { fontSize: 2, lineHeight: 1.4, letterSpacing: 0, weight: 'min' },
+							max: {
 								fontSize: 4,
 								lineHeight: 0.95,
 								letterSpacing: -0.02,
-								weight: 'black',
+								weight: 'max',
 							},
 						},
-						displayOrder: ['base', 'hero--wide'],
 					},
 				},
 			},
@@ -296,11 +322,9 @@ describe('workbench review contract', () => {
 		expect(ids.every((id) => /^[A-Za-z0-9]+(?:--[A-Za-z0-9_]+)+$/.test(id))).toBe(true);
 		expect(ids).toContain('color--a_2D__2D_b--c');
 		expect(ids).toContain('color--a--b_2D__2D_c');
-		expect(ids).toContain('typography--editorial_2D_copy--hero_2D__2D_wide');
+		expect(ids).toContain('typography--editorial_2D_copy--max');
 		expect(
-			cases.find(
-				(reviewCase) => reviewCase.id === 'typography--editorial_2D_copy--hero_2D__2D_wide'
-			)?.label
-		).toBe('editorial-copy / hero--wide');
+			cases.find((reviewCase) => reviewCase.id === 'typography--editorial_2D_copy--max')?.label
+		).toBe('editorial-copy / max');
 	});
 });

@@ -38,22 +38,22 @@ const semanticTypography: DesignSystem['typography'] = {
 		copy: {
 			font: 'editorial',
 			textTransform: 'uppercase',
-			base: {
-				fontSize: 2,
-				weight: 'min',
-				lineHeight: 1.3,
-				letterSpacing: 0,
-				features: { liga: true },
-			},
-			variants: {
-				compact: {
+			sizes: {
+				min: {
 					fontSize: 1,
 					weight: 'min',
 					lineHeight: 1.2,
 					letterSpacing: 0.01,
 					textTransform: 'lowercase',
 				},
-				display: { fontSize: 7, weight: 'max', lineHeight: 1, letterSpacing: -0.02 },
+				base: {
+					fontSize: 2,
+					weight: 'min',
+					lineHeight: 1.3,
+					letterSpacing: 0,
+					features: { liga: true },
+				},
+				max: { fontSize: 7, weight: 'max', lineHeight: 1, letterSpacing: -0.02 },
 			},
 			weights: { min: 400, max: 700 },
 			styles: {
@@ -92,7 +92,7 @@ describe('generateTypographyTokens', () => {
 		);
 	});
 
-	it('emits an unsuffixed base and arbitrary role-local variants', () => {
+	it('emits an unsuffixed base and the fixed role-local size range', () => {
 		const result = generateTypographyTokens(semanticTypography, defaultGeneratorConfig);
 		const tokens = Object.fromEntries(
 			result.defaultTokens.map((token) => [token.name, token.value])
@@ -104,9 +104,9 @@ describe('generateTypographyTokens', () => {
 		expect(tokens['text-copy-line-height']).toBe('1.3');
 		expect(tokens['text-copy-letter-spacing']).toBe('0');
 		expect(tokens['text-copy-text-transform']).toBe('uppercase');
-		expect(tokens['text-copy-compact-font-size']).toBe('var(--fs-1)');
-		expect(tokens['text-copy-compact-text-transform']).toBe('lowercase');
-		expect(tokens['text-copy-display-letter-spacing']).toBe('-0.02em');
+		expect(tokens['text-copy-min-font-size']).toBe('var(--fs-1)');
+		expect(tokens['text-copy-min-text-transform']).toBe('lowercase');
+		expect(tokens['text-copy-max-letter-spacing']).toBe('-0.02em');
 		expect(tokens['text-copy-m-font-size']).toBeUndefined();
 		expect(tokens['ff-editorial']).toBeUndefined();
 	});
@@ -127,8 +127,8 @@ describe('generateTypographyTokens', () => {
 			Object.fromEntries(result.overrideTokens.compact.map((token) => [token.name, token.value]))
 		).toMatchObject({
 			'text-copy-font-size': 'var(--fs-2)',
-			'text-copy-compact-font-size': 'var(--fs-1)',
-			'text-copy-display-font-size': 'var(--fs-7)',
+			'text-copy-min-font-size': 'var(--fs-1)',
+			'text-copy-max-font-size': 'var(--fs-7)',
 		});
 		expect(
 			result.overrideTokens.compact.filter((token) => token.name.startsWith('text-'))
@@ -148,15 +148,15 @@ describe('generateTypographyTokens', () => {
 		});
 		typography.roles!.copy.modeOverrides = {
 			display: {
-				base: {
-					fontSize: 4,
-					weight: 'max',
-					lineHeight: 0.85,
-					letterSpacing: -0.015,
-					textTransform: 'capitalize',
-				},
-				variants: {
-					display: { fontSize: 10, lineHeight: 0.8, letterSpacing: -0.03 },
+				sizes: {
+					base: {
+						fontSize: 4,
+						weight: 'max',
+						lineHeight: 0.85,
+						letterSpacing: -0.015,
+						textTransform: 'capitalize',
+					},
+					max: { fontSize: 10, lineHeight: 0.8, letterSpacing: -0.03 },
 				},
 			},
 		};
@@ -171,11 +171,11 @@ describe('generateTypographyTokens', () => {
 			'text-copy-line-height': '0.85',
 			'text-copy-letter-spacing': '-0.015em',
 			'text-copy-text-transform': 'capitalize',
-			'text-copy-compact-font-size': 'var(--fs-1)',
-			'text-copy-display-font-size': 'var(--fs-10)',
-			'text-copy-display-font-weight': 'var(--text-copy-font-weight-max)',
-			'text-copy-display-line-height': '0.8',
-			'text-copy-display-letter-spacing': '-0.03em',
+			'text-copy-min-font-size': 'var(--fs-1)',
+			'text-copy-max-font-size': 'var(--fs-10)',
+			'text-copy-max-font-weight': 'var(--text-copy-font-weight-max)',
+			'text-copy-max-line-height': '0.8',
+			'text-copy-max-letter-spacing': '-0.03em',
 		});
 	});
 
@@ -190,28 +190,30 @@ describe('generateTypographyTokens', () => {
 		};
 
 		const unknownMode = withMode();
-		unknownMode.roles!.copy.modeOverrides = { stage: { base: { lineHeight: 0.8 } } };
+		unknownMode.roles!.copy.modeOverrides = { stage: { sizes: { base: { lineHeight: 0.8 } } } };
 		expect(() => generate({ typography: unknownMode })).toThrow(
 			'references unknown typography mode "stage"'
 		);
 
 		const defaultMode = withMode();
-		defaultMode.roles!.copy.modeOverrides = { default: { base: { lineHeight: 0.8 } } };
+		defaultMode.roles!.copy.modeOverrides = {
+			default: { sizes: { base: { lineHeight: 0.8 } } },
+		};
 		expect(() => generate({ typography: defaultMode })).toThrow(
 			'must not redefine default mode "default"'
 		);
 
 		const unknownVariant = withMode();
 		unknownVariant.roles!.copy.modeOverrides = {
-			display: { variants: { billboard: { lineHeight: 0.8 } } },
+			display: { sizes: { billboard: { lineHeight: 0.8 } } as never },
 		};
 		expect(() => generate({ typography: unknownVariant })).toThrow(
-			'references unknown variant "billboard"'
+			'references unknown size "billboard"'
 		);
 
 		const unavailableWeight = withMode();
 		unavailableWeight.roles!.copy.modeOverrides = {
-			display: { base: { weight: 'ultra' } },
+			display: { sizes: { base: { weight: 'ultra' } } },
 		};
 		expect(() => generate({ typography: unavailableWeight })).toThrow(
 			'weight "ultra" must be exposed by the role'
@@ -219,7 +221,7 @@ describe('generateTypographyTokens', () => {
 
 		const beyondMode = withMode();
 		beyondMode.roles!.copy.modeOverrides = {
-			display: { base: { fontSize: 13 } },
+			display: { sizes: { base: { fontSize: 13 } } },
 		};
 		expect(() => generate({ typography: beyondMode })).toThrow(
 			'mode "display" only generates through fs-12'
@@ -228,8 +230,8 @@ describe('generateTypographyTokens', () => {
 		const invalidTransform = withMode();
 		invalidTransform.roles!.copy.modeOverrides = {
 			display: {
-				base: {
-					textTransform: 'sideways' as never,
+				sizes: {
+					base: { textTransform: 'sideways' as never },
 				},
 			},
 		};
@@ -276,7 +278,7 @@ describe('generateTypographyTokens', () => {
 			weights: ['min'],
 		};
 		expect(() => generate({ typography })).toThrow(
-			'display weight "max" is unavailable for defaultStyle "italic"'
+			'size "max" weight "max" is unavailable for defaultStyle "italic"'
 		);
 	});
 
@@ -297,78 +299,50 @@ describe('generateTypographyTokens', () => {
 
 	it('enforces honest min and max aliases without requiring a fixed schedule', () => {
 		const typography = structuredClone(semanticTypography);
-		typography.roles!.copy.weights = { min: 700, strong: 400 };
-		typography.roles!.copy.styles = { normal: { weights: ['min', 'strong'] } };
+		typography.roles!.copy.weights = { min: 700, max: 400 };
+		typography.roles!.copy.styles = { normal: { weights: ['min', 'max'] } };
 		expect(() => generate({ typography })).toThrow('weight min must be its actual minimum');
 	});
 
-	it('rejects unsafe variant names and references beyond the smallest mode', () => {
+	it('rejects non-grammar size identities and references beyond the smallest mode', () => {
 		const unsafe = structuredClone(semanticTypography);
-		unsafe.roles!.copy.variants!['weight-max'] = {
+		(unsafe.roles!.copy.sizes as Record<string, unknown>)['weight-max'] = {
 			fontSize: 2,
 			weight: 'min',
 			lineHeight: 1.2,
 			letterSpacing: 0,
 		};
-		expect(() => generate({ typography: unsafe })).toThrow('not safe for generated tokens');
+		expect(() => generate({ typography: unsafe })).toThrow(
+			'sizes must use only min / s / base / l / max'
+		);
 
 		const beyond = structuredClone(semanticTypography);
-		beyond.roles!.copy.variants!.display.fontSize = 9;
+		beyond.roles!.copy.sizes.max!.fontSize = 9;
 		expect(() => generate({ typography: beyond })).toThrow('only generates through fs-8');
 	});
 
 	it('rejects flattened role and variant names that would overwrite output', () => {
 		const typography = structuredClone(semanticTypography);
-		typography.roles!['copy-compact'] = {
+		typography.roles!['copy-min'] = {
 			...structuredClone(typography.roles!.copy),
-			variants: {},
 		};
-		expect(() => generate({ typography })).toThrow('generated name "copy-compact" collides');
+		expect(() => generate({ typography })).toThrow('generated name "copy-min" collides');
 	});
 
-	it('reserves base for the unsuffixed role recipe', () => {
-		const typography = structuredClone(semanticTypography);
-		typography.roles!.copy.variants!.base = {
-			fontSize: 3,
-			weight: 'min',
-			lineHeight: 1.2,
-			letterSpacing: 0,
-		};
-		expect(() => generate({ typography })).toThrow(
-			'variant "base" is reserved for the unsuffixed role recipe'
-		);
-	});
-
-	it('validates explicit role-local presentation order without interpreting variant names', () => {
-		const valid = structuredClone(semanticTypography);
-		valid.roles!.copy.displayOrder = ['display', 'base', 'compact'];
-		expect(generate({ typography: valid }).typography?.roles.copy.displayOrder).toEqual([
-			'display',
-			'base',
-			'compact',
-		]);
-
-		for (const displayOrder of [
-			['base', 'compact'],
-			['base', 'compact', 'compact'],
-			['base', 'compact', 'unknown'],
-		]) {
-			const invalid = structuredClone(semanticTypography);
-			invalid.roles!.copy.displayOrder = displayOrder;
-			expect(() => generate({ typography: invalid })).toThrow(
-				'displayOrder must contain base and every variant exactly once'
-			);
-		}
+	it('derives canonical role-local size presentation order', () => {
+		expect(
+			generate({ typography: semanticTypography }).typography?.roles.copy.displayOrder
+		).toEqual(['min', 'base', 'max']);
 	});
 
 	it('validates OpenType features and custom axes against every exposed face', () => {
 		const unsupported = structuredClone(semanticTypography);
-		unsupported.roles!.copy.base.features = { ss01: true };
+		unsupported.roles!.copy.sizes.base.features = { ss01: true };
 		expect(() => generate({ typography: unsupported })).toThrow('feature "ss01" is unavailable');
 
 		const axis = structuredClone(semanticTypography);
 		axis.roles!.copy.styles = { normal: { weights: ['min', 'max'] } };
-		axis.roles!.copy.base.variations = { GRAD: 200 };
+		axis.roles!.copy.sizes.base.variations = { GRAD: 200 };
 		expect(() => generate({ typography: axis })).toThrow('variation "GRAD" (200) is unavailable');
 	});
 
@@ -382,15 +356,15 @@ describe('generateTypographyTokens', () => {
 		);
 
 		const invalidKerning = structuredClone(semanticTypography) as unknown as {
-			roles: Record<string, { base: Record<string, unknown> }>;
+			roles: Record<string, { sizes: { base: Record<string, unknown> } }>;
 		};
-		invalidKerning.roles.copy.base.fontKerning = 'banana';
+		invalidKerning.roles.copy.sizes.base.fontKerning = 'banana';
 		expect(() => generate({ typography: invalidKerning as never })).toThrow('fontKerning must be');
 
 		const invalidOpticalSizing = structuredClone(semanticTypography) as unknown as {
-			roles: Record<string, { base: Record<string, unknown> }>;
+			roles: Record<string, { sizes: { base: Record<string, unknown> } }>;
 		};
-		invalidOpticalSizing.roles.copy.base.fontOpticalSizing = 'banana';
+		invalidOpticalSizing.roles.copy.sizes.base.fontOpticalSizing = 'banana';
 		expect(() => generate({ typography: invalidOpticalSizing as never })).toThrow(
 			'fontOpticalSizing must be'
 		);

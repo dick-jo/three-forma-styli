@@ -5,6 +5,14 @@ import { createReviewCapturePlan } from './capture.js';
 import { createWorkbenchContract } from './contract.js';
 
 const system: PartialDesignSystem = {
+	alpha: {
+		defaultScale: 'standard',
+		scales: {
+			standard: {
+				values: { min: 0.08, 'lo-x': 0.125, lo: 0.2, hi: 0.6, 'hi-x': 0.8, max: 0.9 },
+			},
+		},
+	},
 	colors: {
 		modes: [
 			{
@@ -41,7 +49,9 @@ const system: PartialDesignSystem = {
 			prose: {
 				font: 'sans',
 				weights: { base: 400 },
-				base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0, weight: 'base' },
+				sizes: {
+					base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0, weight: 'base' },
+				},
 			},
 		},
 	},
@@ -122,7 +132,7 @@ describe('createReviewCapturePlan', () => {
 			},
 			motion: {
 				easings: { standard: [0.2, 0, 0.38, 0.9] },
-				recipes: {
+				composites: {
 					hover: {
 						base: { duration: 1, easing: 'standard' },
 						reducedMotion: { base: { duration: 0, delay: 0 } },

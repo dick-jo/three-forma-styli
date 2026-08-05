@@ -355,8 +355,9 @@ reference evidence, not hardcoded policy.
   longer the only place where its framework and monorepo assumptions are
   exercised.
 - **2026-07-23 — generated runtime-theme policy.** `colors.luminance` owns
-  reusable separation constraints while `colors.runtimeThemes.colorNames`
-  explicitly identifies the user-editable subset. Both receive exact
+  reusable separation constraints while the project-level
+  `runtime.colorThemes.colors.include` selection explicitly identifies the
+  user-editable subset. Both receive exact
   default-palette validation. The workspace compiler emits literal editable
   names, alpha schedule, generator naming and separation groups as
   `runtime-color-theme`; browser consumers pass that generated contract directly

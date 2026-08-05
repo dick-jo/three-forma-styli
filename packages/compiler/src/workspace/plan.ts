@@ -54,6 +54,7 @@ export interface WorkspacePlan {
 		separateFonts: boolean;
 	};
 	contracts: {
+		tokens: boolean;
 		system: boolean;
 		typography: boolean;
 		nativeColorModes: boolean;
@@ -192,10 +193,10 @@ export function planWorkspacePackage(
 		throw new Error('runtime.css.module requires semantic typography roles.');
 	}
 	if (css && css.shadows && !context.hasShadows) {
-		throw new Error('runtime.css.shadows requires shadow recipes.');
+		throw new Error('runtime.css.shadows requires shadow composites.');
 	}
 	if (css && css.shadowModule && !context.hasShadows) {
-		throw new Error('runtime.css.shadowModule requires shadow recipes.');
+		throw new Error('runtime.css.shadowModule requires shadow composites.');
 	}
 	const tokensRequested = Boolean(css && css.tokens !== undefined ? css.tokens : allCss);
 	const entryRequested = Boolean(css && css.entry !== undefined ? css.entry : allCss);
@@ -206,6 +207,9 @@ export function planWorkspacePackage(
 	const runtimeFontUrls = css?.fontUrls ?? ({ mode: 'relative' } as const);
 	const separateFonts = context.hasFonts && moduleRequested && !typographyRequested;
 
+	const tokensContract = Boolean(
+		contracts && contracts.tokens !== undefined ? contracts.tokens : false
+	);
 	const systemContract = Boolean(
 		contracts && contracts.system !== undefined ? contracts.system : allContracts
 	);
@@ -232,7 +236,7 @@ export function planWorkspacePackage(
 	}
 	if (contracts && contracts.runtimeColorTheme && !context.hasRuntimeColorPolicy) {
 		throw new Error(
-			'runtime.contracts.runtimeColorTheme requires colors.luminance and colors.runtimeThemes.'
+			'runtime.contracts.runtimeColorTheme requires colors.luminance and project.runtime.colorThemes.'
 		);
 	}
 
@@ -250,7 +254,7 @@ export function planWorkspacePackage(
 	const shadowSpecimenOption = review.shadowSpecimen;
 	const shadowSpecimen = Boolean(shadowSpecimenOption);
 	if (shadowSpecimen && !context.hasShadows) {
-		throw new Error('review.shadowSpecimen requires shadow recipes.');
+		throw new Error('review.shadowSpecimen requires shadow composites.');
 	}
 	const shadowSpecimenConfig =
 		shadowSpecimenOption && shadowSpecimenOption !== true ? shadowSpecimenOption : {};
@@ -340,6 +344,7 @@ export function planWorkspacePackage(
 	}
 
 	for (const [enabled, name] of [
+		[tokensContract, 'tokens'],
 		[systemContract, 'system'],
 		[typographyContract, 'typography'],
 		[nativeColorModes, 'native-color-modes'],
@@ -356,9 +361,14 @@ export function planWorkspacePackage(
 	}
 	if (
 		rootExport &&
-		(systemContract || typographyContract || nativeColorModes || runtimeColorTheme)
+		(tokensContract ||
+			systemContract ||
+			typographyContract ||
+			nativeColorModes ||
+			runtimeColorTheme)
 	) {
 		const modules = [
+			...(tokensContract ? ['tokens'] : []),
 			...(systemContract ? ['system'] : []),
 			...(typographyContract ? ['typography'] : []),
 			...(nativeColorModes ? ['native-color-modes'] : []),
@@ -468,6 +478,7 @@ export function planWorkspacePackage(
 			separateFonts,
 		},
 		contracts: {
+			tokens: tokensContract,
 			system: systemContract,
 			typography: typographyContract,
 			nativeColorModes,
@@ -513,12 +524,14 @@ export function requiredPackageExports(
 			},
 		});
 	if (
+		plan.contracts.tokens ||
 		plan.contracts.system ||
 		plan.contracts.typography ||
 		plan.contracts.nativeColorModes ||
 		plan.contracts.runtimeColorTheme
 	) {
 		if (plan.host.rootExport) contract('.', 'index');
+		if (plan.contracts.tokens) contract('./tokens', 'tokens');
 		if (plan.contracts.system) contract('./system', 'system');
 		if (plan.contracts.typography) contract('./typography', 'typography');
 		if (plan.contracts.nativeColorModes) contract('./native-color-modes', 'native-color-modes');
