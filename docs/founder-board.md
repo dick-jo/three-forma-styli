@@ -171,6 +171,14 @@ not dependencies of generated consumer packages.
   luminance-delta model.
 - Figma plugin work is decoupled from the v0.5 runtime/type foundation.
 
+The preserved prototype lives on `codex/figma-plugin-wip` in the sibling
+`tfs-figma-wip` worktree. It is explicitly dormant and does not participate in
+v0.5 builds, package graphs, or release gates.
+
+The current evidence and recommended decision order for the remaining mature
+domains is recorded in [the v0.5 domain audit](./v05-domain-audit.md). It is a
+decision surface, not a second implementation source of truth.
+
 ## Review map
 
 Morning review should inspect, in this order:
