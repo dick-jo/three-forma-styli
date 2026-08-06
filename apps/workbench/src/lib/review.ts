@@ -1,4 +1,6 @@
 import type {
+	AlphaReviewCase,
+	AlphaReviewValue,
 	ColorReviewCase,
 	ReviewControl,
 	ReviewModeGroup,
@@ -30,6 +32,17 @@ function cssFamily(value: string): string {
 export function controlValue(control: ReviewControl, draft: DraftValues): string | number {
 	const value = draft[control.path];
 	return typeof value === 'string' || typeof value === 'number' ? value : control.value;
+}
+
+export function alphaValue(
+	reviewCase: AlphaReviewCase,
+	position: AlphaReviewValue['position'],
+	draft: DraftValues
+): number {
+	const value = reviewCase.values.find((entry) => entry.position === position);
+	if (!value) return 0;
+	const control = reviewCase.controls.find((entry) => entry.id === position);
+	return control ? Number(controlValue(control, draft)) : value.value;
 }
 
 export function colorStyle(reviewCase: ColorReviewCase, draft: DraftValues, alpha = 1): string {

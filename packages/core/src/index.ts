@@ -176,6 +176,9 @@ export { createWorkbenchContract } from './review/contract.js';
 export { createReviewCapturePlan } from './review/capture.js';
 export { resolveIdentityGroups } from './groups.js';
 export type {
+	AlphaReviewCase,
+	AlphaReviewLab,
+	AlphaReviewValue,
 	ReviewAssetContract,
 	ReviewCapturePolicy,
 	ReviewCaptureState,

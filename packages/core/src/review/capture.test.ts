@@ -80,9 +80,10 @@ describe('createReviewCapturePlan', () => {
 			systemFingerprint: 'abc123',
 			entrypoint: './index.html',
 		});
-		expect(plan.states).toHaveLength(7);
+		expect(plan.states).toHaveLength(8);
 		expect(plan.states.map((state) => state.id)).toEqual([
 			'overview--viewport-desktop--color-default--size-default',
+			'alpha--standard--viewport-desktop--color-default--size-default',
 			'color--default--ink--viewport-desktop--color-default--size-default',
 			'color--light--ink--viewport-desktop--color-light--size-default',
 			'typography--prose--base--viewport-desktop--color-default--size-default',
@@ -90,7 +91,7 @@ describe('createReviewCapturePlan', () => {
 			'shadows--box--elevation--base--viewport-desktop--color-default--size-default',
 			'shadows--box--elevation--base--viewport-desktop--color-light--size-default',
 		]);
-		expect(plan.states[4]).toEqual({
+		expect(plan.states[5]).toEqual({
 			id: 'typography--display--prose--base--viewport-desktop--color-default--size-display',
 			lab: 'typography',
 			caseId: 'typography--display--prose--base',

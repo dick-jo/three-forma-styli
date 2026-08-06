@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ReviewCase } from '@three-forma-styli/core';
+	import AlphaCase from './AlphaCase.svelte';
 	import ColorCase from './ColorCase.svelte';
 	import type { DraftValues } from './draft';
 	import FoundationCase from './FoundationCase.svelte';
@@ -15,7 +16,9 @@
 	let { reviewCase, draft }: Props = $props();
 </script>
 
-{#if reviewCase?.kind === 'color'}
+{#if reviewCase?.kind === 'alpha'}
+	<AlphaCase {reviewCase} {draft} />
+{:else if reviewCase?.kind === 'color'}
 	<ColorCase {reviewCase} {draft} />
 {:else if reviewCase?.kind === 'typography'}
 	<TypographyCase {reviewCase} {draft} />

@@ -106,10 +106,37 @@ describe('workbench review contract', () => {
 		expect(contract.systemFingerprint).toBe('abc123');
 		expect(contract.labs.map((lab) => lab.id)).toEqual([
 			'overview',
+			'alpha',
 			'color',
 			'typography',
 			'shadows',
 			'foundations',
+		]);
+
+		const alpha = contract.labs.find((lab) => lab.kind === 'alpha');
+		expect(alpha?.cases).toHaveLength(1);
+		expect(alpha?.cases[0]).toMatchObject({
+			id: 'alpha--standard',
+			scale: 'standard',
+			isDefault: true,
+			sourcePath: '/alpha/scales/standard/values',
+		});
+		expect(alpha?.cases[0]?.values.map((value) => value.position)).toEqual([
+			'non',
+			'min',
+			'lo-x',
+			'lo',
+			'hi',
+			'hi-x',
+			'max',
+		]);
+		expect(alpha?.cases[0]?.controls.map((control) => control.path)).toEqual([
+			'/alpha/scales/standard/values/min',
+			'/alpha/scales/standard/values/lo-x',
+			'/alpha/scales/standard/values/lo',
+			'/alpha/scales/standard/values/hi',
+			'/alpha/scales/standard/values/hi-x',
+			'/alpha/scales/standard/values/max',
 		]);
 
 		const color = contract.labs.find((lab) => lab.kind === 'color');

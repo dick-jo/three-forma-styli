@@ -11,6 +11,7 @@ import type {
 	TypographyRole,
 } from '../types.js';
 import type {
+	AlphaReviewCase,
 	ReviewCapturePolicy,
 	ColorReviewCase,
 	MotionReviewCase,
@@ -24,6 +25,41 @@ import type {
 	TypographySizeOption,
 	WorkbenchContractOptions,
 } from './types.js';
+
+function alphaCases(ir: IR): AlphaReviewCase[] {
+	if (!ir.alpha) return [];
+	return Object.entries(ir.alpha.scales).map(([scaleName, scale]) => {
+		const sourcePath = `/alpha/scales/${pointerSegment(scaleName)}/values`;
+		const values = Object.entries(scale.values).map(([position, value]) => ({
+			position: position as AlphaReviewCase['values'][number]['position'],
+			value: value.value,
+			token: value.token,
+			css: value.css,
+		}));
+		return {
+			kind: 'alpha',
+			id: `alpha--${caseIdSegment(scaleName)}`,
+			label: `${scaleName}${scaleName === ir.alpha!.defaultScale ? ' / default' : ''}`,
+			sourcePath,
+			scale: scaleName,
+			isDefault: scaleName === ir.alpha!.defaultScale,
+			values,
+			controls: values
+				.filter((value) => value.position !== 'non')
+				.map((value) => ({
+					kind: 'number' as const,
+					id: value.position,
+					label: value.position,
+					path: `${sourcePath}/${pointerSegment(value.position)}`,
+					value: value.value,
+					min: 0.001,
+					max: 0.999,
+					step: 0.001,
+				})),
+			capture: capturePolicy(),
+		};
+	});
+}
 
 function capturePolicy(
 	overrides: Partial<
@@ -755,6 +791,7 @@ export function createWorkbenchContract(
 	ir: IR,
 	options: WorkbenchContractOptions
 ): TfsWorkbenchContract {
+	const alpha = alphaCases(ir);
 	const typography = typographyCases(system, ir, options.adjustedFallbackFamilies ?? {});
 	const colors = colorCases(system, ir);
 	const shadows = shadowCases(ir);
@@ -783,6 +820,7 @@ export function createWorkbenchContract(
 				label: 'overview',
 				summary: {
 					tokenCount: Object.keys(ir.tokens).length,
+					alphaScales: alpha.length,
 					colorModes: modes.find((mode) => mode.category === 'color')?.modes.length ?? 0,
 					colorCases: colors.length,
 					sizeModes: modes.find((mode) => mode.category === 'size')?.modes.length ?? 0,
@@ -792,6 +830,9 @@ export function createWorkbenchContract(
 					foundationCases: foundations.length,
 				},
 			},
+			...(alpha.length > 0
+				? [{ kind: 'alpha' as const, id: 'alpha' as const, label: 'alpha', cases: alpha }]
+				: []),
 			...(colors.length > 0
 				? [{ kind: 'color' as const, id: 'color' as const, label: 'color', cases: colors }]
 				: []),

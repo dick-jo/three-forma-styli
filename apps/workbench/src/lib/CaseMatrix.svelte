@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type {
+		AlphaReviewCase,
 		ColorReviewCase,
 		FoundationReviewCase,
 		MotionReviewCase,
@@ -7,9 +8,10 @@
 		TypographyReviewCase,
 	} from '@three-forma-styli/core';
 	import type { DraftValues } from './draft';
-	import { colorStyle, shadowStyle, typographyStyle } from './review';
+	import { alphaValue, colorStyle, shadowStyle, typographyStyle } from './review';
 
 	type MatrixReviewCase =
+		| AlphaReviewCase
 		| ColorReviewCase
 		| TypographyReviewCase
 		| ShadowReviewCase
@@ -34,7 +36,14 @@
 				<strong>{reviewCase.label}</strong>
 				<code>{reviewCase.sourcePath}</code>
 			</header>
-			{#if reviewCase.kind === 'color'}
+			{#if reviewCase.kind === 'alpha'}
+				<div class="matrix-alpha">
+					{#each reviewCase.values as value}
+						<span style={`opacity:${alphaValue(reviewCase, value.position, draft)}`}></span>
+					{/each}
+				</div>
+				<code>{reviewCase.values.map((value) => value.value).join(' → ')}</code>
+			{:else if reviewCase.kind === 'color'}
 				<div class="matrix-color" style={`--review-color:${colorStyle(reviewCase, draft)}`}></div>
 				<code>{colorStyle(reviewCase, draft)}</code>
 			{:else if reviewCase.kind === 'typography'}

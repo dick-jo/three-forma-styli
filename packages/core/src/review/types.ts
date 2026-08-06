@@ -6,7 +6,7 @@ import type {
 import type { FontSizeReference } from '../types.js';
 
 export type ReviewLabId =
-	'overview' | 'color' | 'typography' | 'shadows' | 'motion' | 'foundations';
+	'overview' | 'alpha' | 'color' | 'typography' | 'shadows' | 'motion' | 'foundations';
 export type ReviewModeCategory = 'color' | 'size';
 
 export interface ReviewAssetContract {
@@ -158,6 +158,7 @@ export interface OverviewReviewLab {
 	label: string;
 	summary: {
 		tokenCount: number;
+		alphaScales: number;
 		colorModes: number;
 		colorCases: number;
 		sizeModes: number;
@@ -166,6 +167,27 @@ export interface OverviewReviewLab {
 		motionCases: number;
 		foundationCases: number;
 	};
+}
+
+export interface AlphaReviewValue {
+	position: 'non' | import('../types.js').AlphaPosition;
+	value: number;
+	token: string;
+	css: string;
+}
+
+export interface AlphaReviewCase extends ReviewCaseBase {
+	kind: 'alpha';
+	scale: string;
+	isDefault: boolean;
+	values: AlphaReviewValue[];
+}
+
+export interface AlphaReviewLab {
+	kind: 'alpha';
+	id: 'alpha';
+	label: string;
+	cases: AlphaReviewCase[];
 }
 
 export interface ColorReviewCase extends ReviewCaseBase {
@@ -232,6 +254,7 @@ export interface FoundationReviewLab {
 }
 
 export type ReviewCase =
+	| AlphaReviewCase
 	| ColorReviewCase
 	| TypographyReviewCase
 	| ShadowReviewCase
@@ -240,6 +263,7 @@ export type ReviewCase =
 
 export type ReviewLab =
 	| OverviewReviewLab
+	| AlphaReviewLab
 	| ColorReviewLab
 	| TypographyReviewLab
 	| ShadowReviewLab

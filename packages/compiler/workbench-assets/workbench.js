@@ -4386,6 +4386,12 @@ function controlValue(control, draft) {
   const value = draft[control.path];
   return typeof value === "string" || typeof value === "number" ? value : control.value;
 }
+function alphaValue(reviewCase, position, draft) {
+  const value = reviewCase.values.find((entry) => entry.position === position);
+  if (!value) return 0;
+  const control = reviewCase.controls.find((entry) => entry.id === position);
+  return control ? Number(controlValue(control, draft)) : value.value;
+}
 function colorStyle(reviewCase, draft, alpha = 1) {
   const values = Object.fromEntries(
     reviewCase.controls.map((control) => [control.id, Number(controlValue(control, draft))])
@@ -4459,13 +4465,15 @@ function shadowStyle(reviewCase, draft) {
   }).join(", ");
   return `${reviewCase.shadowKind === "box" ? "box-shadow" : "text-shadow"}:${css}`;
 }
-var root$7 = /* @__PURE__ */ from_html(`<div class="matrix-color"></div> <code> </code>`, 1);
-var root_1$6 = /* @__PURE__ */ from_html(`<span class="matrix-type">Sphinx of black quartz, judge my vow.</span> <code> </code>`, 1);
-var root_2$3 = /* @__PURE__ */ from_html(`<div class="matrix-shadow"><span>Aa</span></div> <code> </code>`, 1);
-var root_3$3 = /* @__PURE__ */ from_html(`<div class="matrix-motion"><span></span></div> <code> </code>`, 1);
-var root_4$2 = /* @__PURE__ */ from_html(`<div class="matrix-foundation"><strong> </strong> <span>generated tokens</span></div> <code> </code>`, 1);
-var root_5$2 = /* @__PURE__ */ from_html(`<button class="matrix-card"><header><strong> </strong> <code> </code></header> <!></button>`);
-var root_6$2 = /* @__PURE__ */ from_html(`<div></div>`);
+var root$8 = /* @__PURE__ */ from_html(`<span></span>`);
+var root_1$7 = /* @__PURE__ */ from_html(`<div class="matrix-alpha"></div> <code> </code>`, 1);
+var root_2$4 = /* @__PURE__ */ from_html(`<div class="matrix-color"></div> <code> </code>`, 1);
+var root_3$3 = /* @__PURE__ */ from_html(`<span class="matrix-type">Sphinx of black quartz, judge my vow.</span> <code> </code>`, 1);
+var root_4$2 = /* @__PURE__ */ from_html(`<div class="matrix-shadow"><span>Aa</span></div> <code> </code>`, 1);
+var root_5$2 = /* @__PURE__ */ from_html(`<div class="matrix-motion"><span></span></div> <code> </code>`, 1);
+var root_6$2 = /* @__PURE__ */ from_html(`<div class="matrix-foundation"><strong> </strong> <span>generated tokens</span></div> <code> </code>`, 1);
+var root_7$2 = /* @__PURE__ */ from_html(`<button class="matrix-card"><header><strong> </strong> <code> </code></header> <!></button>`);
+var root_8$2 = /* @__PURE__ */ from_html(`<div></div>`);
 function CaseMatrix($$anchor, $$props) {
   push($$props, true);
   let compact = prop($$props, "compact", 3, false);
@@ -4473,10 +4481,10 @@ function CaseMatrix($$anchor, $$props) {
     var _a2;
     return ((_a2 = $$props.cases[0]) == null ? void 0 : _a2.kind) ?? "empty";
   });
-  var div = root_6$2();
+  var div = root_8$2();
   let classes;
   each(div, 21, () => $$props.cases, index, ($$anchor2, reviewCase) => {
-    var button = root_5$2();
+    var button = root_7$2();
     var header = child(button);
     var strong = child(header);
     var text = child(strong);
@@ -4485,54 +4493,56 @@ function CaseMatrix($$anchor, $$props) {
     var node = sibling(header, 2);
     {
       var consequent = ($$anchor3) => {
-        var fragment = root$7();
+        var fragment = root_1$7();
         var div_1 = first_child(fragment);
+        each(div_1, 21, () => get(reviewCase).values, index, ($$anchor4, value) => {
+          var span = root$8();
+          template_effect(($0) => set_style(span, $0), [
+            () => `opacity:${alphaValue(get(reviewCase), get(value).position, $$props.draft)}`
+          ]);
+          append($$anchor4, span);
+        });
         var code_1 = sibling(div_1, 2);
         var text_2 = child(code_1);
+        template_effect(($0) => set_text(text_2, $0), [
+          () => get(reviewCase).values.map((value) => value.value).join(" → ")
+        ]);
+        append($$anchor3, fragment);
+      };
+      var consequent_1 = ($$anchor3) => {
+        var fragment_1 = root_2$4();
+        var div_2 = first_child(fragment_1);
+        var code_2 = sibling(div_2, 2);
+        var text_3 = child(code_2);
         template_effect(
           ($0, $1) => {
-            set_style(div_1, $0);
-            set_text(text_2, $1);
+            set_style(div_2, $0);
+            set_text(text_3, $1);
           },
           [
             () => `--review-color:${colorStyle(get(reviewCase), $$props.draft)}`,
             () => colorStyle(get(reviewCase), $$props.draft)
           ]
         );
-        append($$anchor3, fragment);
-      };
-      var consequent_1 = ($$anchor3) => {
-        var fragment_1 = root_1$6();
-        var span = first_child(fragment_1);
-        var code_2 = sibling(span, 2);
-        var text_3 = child(code_2);
-        template_effect(
-          ($0) => {
-            set_style(span, $0);
-            set_text(text_3, `--${get(reviewCase).composite.atomicFontSizeToken ?? ""} · ${get(reviewCase).weight.alias ?? ""} ·
-					${get(reviewCase).composite.lineHeight ?? ""}`);
-          },
-          [() => typographyStyle(get(reviewCase), $$props.draft)]
-        );
         append($$anchor3, fragment_1);
       };
       var consequent_2 = ($$anchor3) => {
-        var fragment_2 = root_2$3();
-        var div_2 = first_child(fragment_2);
-        var span_1 = child(div_2);
-        var code_3 = sibling(div_2, 2);
+        var fragment_2 = root_3$3();
+        var span_1 = first_child(fragment_2);
+        var code_3 = sibling(span_1, 2);
         var text_4 = child(code_3);
         template_effect(
           ($0) => {
             set_style(span_1, $0);
-            set_text(text_4, get(reviewCase).css);
+            set_text(text_4, `--${get(reviewCase).composite.atomicFontSizeToken ?? ""} · ${get(reviewCase).weight.alias ?? ""} ·
+					${get(reviewCase).composite.lineHeight ?? ""}`);
           },
-          [() => shadowStyle(get(reviewCase), $$props.draft)]
+          [() => typographyStyle(get(reviewCase), $$props.draft)]
         );
         append($$anchor3, fragment_2);
       };
       var consequent_3 = ($$anchor3) => {
-        var fragment_3 = root_3$3();
+        var fragment_3 = root_4$2();
         var div_3 = first_child(fragment_3);
         var span_2 = child(div_3);
         var code_4 = sibling(div_3, 2);
@@ -4540,40 +4550,56 @@ function CaseMatrix($$anchor, $$props) {
         template_effect(
           ($0) => {
             set_style(span_2, $0);
-            set_text(text_5, `${get(reviewCase).duration.milliseconds ?? ""}ms · ${get(reviewCase).easing.name ?? ""}`);
+            set_text(text_5, get(reviewCase).css);
+          },
+          [() => shadowStyle(get(reviewCase), $$props.draft)]
+        );
+        append($$anchor3, fragment_3);
+      };
+      var consequent_4 = ($$anchor3) => {
+        var fragment_4 = root_5$2();
+        var div_4 = first_child(fragment_4);
+        var span_3 = child(div_4);
+        var code_5 = sibling(div_4, 2);
+        var text_6 = child(code_5);
+        template_effect(
+          ($0) => {
+            set_style(span_3, $0);
+            set_text(text_6, `${get(reviewCase).duration.milliseconds ?? ""}ms · ${get(reviewCase).easing.name ?? ""}`);
           },
           [
             () => `width:${Math.max(8, Math.min(100, get(reviewCase).duration.milliseconds / 4))}%`
           ]
         );
-        append($$anchor3, fragment_3);
+        append($$anchor3, fragment_4);
       };
-      var consequent_4 = ($$anchor3) => {
-        var fragment_4 = root_4$2();
-        var div_4 = first_child(fragment_4);
-        var strong_1 = child(div_4);
-        var text_6 = child(strong_1);
-        var code_5 = sibling(div_4, 2);
-        var text_7 = child(code_5);
+      var consequent_5 = ($$anchor3) => {
+        var fragment_5 = root_6$2();
+        var div_5 = first_child(fragment_5);
+        var strong_1 = child(div_5);
+        var text_7 = child(strong_1);
+        var code_6 = sibling(div_5, 2);
+        var text_8 = child(code_6);
         template_effect(
           ($0) => {
             var _a2;
-            set_text(text_6, get(reviewCase).tokens.length);
-            set_text(text_7, `${((_a2 = get(reviewCase).tokens[0]) == null ? void 0 : _a2.value) ?? ""} → ${$0 ?? ""}`);
+            set_text(text_7, get(reviewCase).tokens.length);
+            set_text(text_8, `${((_a2 = get(reviewCase).tokens[0]) == null ? void 0 : _a2.value) ?? ""} → ${$0 ?? ""}`);
           },
           [() => {
             var _a2;
             return (_a2 = get(reviewCase).tokens.at(-1)) == null ? void 0 : _a2.value;
           }]
         );
-        append($$anchor3, fragment_4);
+        append($$anchor3, fragment_5);
       };
       if_block(node, ($$render) => {
-        if (get(reviewCase).kind === "color") $$render(consequent);
-        else if (get(reviewCase).kind === "typography") $$render(consequent_1, 1);
-        else if (get(reviewCase).kind === "shadow") $$render(consequent_2, 2);
-        else if (get(reviewCase).kind === "motion") $$render(consequent_3, 3);
-        else if (get(reviewCase).kind === "foundation") $$render(consequent_4, 4);
+        if (get(reviewCase).kind === "alpha") $$render(consequent);
+        else if (get(reviewCase).kind === "color") $$render(consequent_1, 1);
+        else if (get(reviewCase).kind === "typography") $$render(consequent_2, 2);
+        else if (get(reviewCase).kind === "shadow") $$render(consequent_3, 3);
+        else if (get(reviewCase).kind === "motion") $$render(consequent_4, 4);
+        else if (get(reviewCase).kind === "foundation") $$render(consequent_5, 5);
       });
     }
     template_effect(() => {
@@ -4591,11 +4617,11 @@ function CaseMatrix($$anchor, $$props) {
   pop();
 }
 delegate(["click"]);
-var root$6 = /* @__PURE__ */ from_html(`<article><div class="alpha-chip"></div> <strong> </strong> <small> </small> <code> </code></article>`);
-var root_1$5 = /* @__PURE__ */ from_html(`<div class="color-stage"><div class="color-hero"><div class="color-chip"><strong> </strong> <span> </span> <code> </code></div></div> <div class="alpha-ramp"></div></div>`);
+var root$7 = /* @__PURE__ */ from_html(`<article><div class="alpha-chip"></div> <strong> </strong> <small> </small> <code> </code></article>`);
+var root_1$6 = /* @__PURE__ */ from_html(`<div class="color-stage"><div class="color-hero"><div class="color-chip"><strong> </strong> <span> </span> <code> </code></div></div> <div class="alpha-ramp"></div></div>`);
 function ColorCase($$anchor, $$props) {
   push($$props, true);
-  var div = root_1$5();
+  var div = root_1$6();
   var div_1 = child(div);
   var div_2 = child(div_1);
   var strong = child(div_2);
@@ -4606,7 +4632,7 @@ function ColorCase($$anchor, $$props) {
   var text_2 = child(code);
   var div_3 = sibling(div_1, 2);
   each(div_3, 21, () => $$props.reviewCase.alphaVariants, index, ($$anchor2, alpha) => {
-    var article = root$6();
+    var article = root$7();
     var div_4 = child(article);
     var strong_1 = sibling(div_4, 2);
     var text_3 = child(strong_1);
@@ -4749,6 +4775,56 @@ function downloadJson(name, value) {
   link2.download = name;
   link2.click();
   URL.revokeObjectURL(url);
+}
+var root$6 = /* @__PURE__ */ from_html(`<small>default · unqualified --a-* namespace</small>`);
+var root_1$5 = /* @__PURE__ */ from_html(`<article><div class="alpha-atomic-sample"><span></span></div> <div><strong> </strong> <small> </small></div> <code> </code></article>`);
+var root_2$3 = /* @__PURE__ */ from_html(`<div class="alpha-stage"><header><div><span>atomic scale</span> <strong> </strong></div> <!></header> <div class="alpha-scale"></div></div>`);
+function AlphaCase($$anchor, $$props) {
+  push($$props, true);
+  var div = root_2$3();
+  var header = child(div);
+  var div_1 = child(header);
+  var strong = sibling(child(div_1), 2);
+  var text = child(strong);
+  var node = sibling(div_1, 2);
+  {
+    var consequent = ($$anchor2) => {
+      var small = root$6();
+      append($$anchor2, small);
+    };
+    if_block(node, ($$render) => {
+      if ($$props.reviewCase.isDefault) $$render(consequent);
+    });
+  }
+  var div_2 = sibling(header, 2);
+  each(div_2, 21, () => $$props.reviewCase.values, index, ($$anchor2, value) => {
+    var article = root_1$5();
+    var div_3 = child(article);
+    var span = child(div_3);
+    var div_4 = sibling(div_3, 2);
+    var strong_1 = child(div_4);
+    var text_1 = child(strong_1);
+    var small_1 = sibling(strong_1, 2);
+    var text_2 = child(small_1);
+    var code = sibling(div_4, 2);
+    var text_3 = child(code);
+    template_effect(
+      ($0, $1) => {
+        set_style(span, $0);
+        set_text(text_1, get(value).position);
+        set_text(text_2, `${$1 ?? ""}%`);
+        set_text(text_3, `--${get(value).token ?? ""}`);
+      },
+      [
+        () => `opacity:${alphaValue($$props.reviewCase, get(value).position, $$props.draft)}`,
+        () => Math.round(alphaValue($$props.reviewCase, get(value).position, $$props.draft) * 1e3) / 10
+      ]
+    );
+    append($$anchor2, article);
+  });
+  template_effect(() => set_text(text, $$props.reviewCase.scale));
+  append($$anchor, div);
+  pop();
 }
 var root$5 = /* @__PURE__ */ from_html(`<article class="foundation-item"><div class="foundation-sample"></div> <strong> </strong> <code> </code></article>`);
 var root_1$4 = /* @__PURE__ */ from_html(`<div class="foundation-stage"></div>`);
@@ -5144,7 +5220,7 @@ function CaseView($$anchor, $$props) {
   var node = first_child(fragment);
   {
     var consequent = ($$anchor2) => {
-      ColorCase($$anchor2, {
+      AlphaCase($$anchor2, {
         get reviewCase() {
           return $$props.reviewCase;
         },
@@ -5154,7 +5230,7 @@ function CaseView($$anchor, $$props) {
       });
     };
     var consequent_1 = ($$anchor2) => {
-      TypographyCase($$anchor2, {
+      ColorCase($$anchor2, {
         get reviewCase() {
           return $$props.reviewCase;
         },
@@ -5164,7 +5240,7 @@ function CaseView($$anchor, $$props) {
       });
     };
     var consequent_2 = ($$anchor2) => {
-      ShadowCase($$anchor2, {
+      TypographyCase($$anchor2, {
         get reviewCase() {
           return $$props.reviewCase;
         },
@@ -5174,8 +5250,18 @@ function CaseView($$anchor, $$props) {
       });
     };
     var consequent_3 = ($$anchor2) => {
-      var fragment_4 = comment();
-      var node_1 = first_child(fragment_4);
+      ShadowCase($$anchor2, {
+        get reviewCase() {
+          return $$props.reviewCase;
+        },
+        get draft() {
+          return $$props.draft;
+        }
+      });
+    };
+    var consequent_4 = ($$anchor2) => {
+      var fragment_5 = comment();
+      var node_1 = first_child(fragment_5);
       key(node_1, () => $$props.reviewCase.id, ($$anchor3) => {
         MotionCase($$anchor3, {
           get reviewCase() {
@@ -5183,9 +5269,9 @@ function CaseView($$anchor, $$props) {
           }
         });
       });
-      append($$anchor2, fragment_4);
+      append($$anchor2, fragment_5);
     };
-    var consequent_4 = ($$anchor2) => {
+    var consequent_5 = ($$anchor2) => {
       FoundationCase($$anchor2, {
         get reviewCase() {
           return $$props.reviewCase;
@@ -5193,12 +5279,13 @@ function CaseView($$anchor, $$props) {
       });
     };
     if_block(node, ($$render) => {
-      var _a2, _b2, _c2, _d, _e;
-      if (((_a2 = $$props.reviewCase) == null ? void 0 : _a2.kind) === "color") $$render(consequent);
-      else if (((_b2 = $$props.reviewCase) == null ? void 0 : _b2.kind) === "typography") $$render(consequent_1, 1);
-      else if (((_c2 = $$props.reviewCase) == null ? void 0 : _c2.kind) === "shadow") $$render(consequent_2, 2);
-      else if (((_d = $$props.reviewCase) == null ? void 0 : _d.kind) === "motion") $$render(consequent_3, 3);
-      else if (((_e = $$props.reviewCase) == null ? void 0 : _e.kind) === "foundation") $$render(consequent_4, 4);
+      var _a2, _b2, _c2, _d, _e, _f;
+      if (((_a2 = $$props.reviewCase) == null ? void 0 : _a2.kind) === "alpha") $$render(consequent);
+      else if (((_b2 = $$props.reviewCase) == null ? void 0 : _b2.kind) === "color") $$render(consequent_1, 1);
+      else if (((_c2 = $$props.reviewCase) == null ? void 0 : _c2.kind) === "typography") $$render(consequent_2, 2);
+      else if (((_d = $$props.reviewCase) == null ? void 0 : _d.kind) === "shadow") $$render(consequent_3, 3);
+      else if (((_e = $$props.reviewCase) == null ? void 0 : _e.kind) === "motion") $$render(consequent_4, 4);
+      else if (((_f = $$props.reviewCase) == null ? void 0 : _f.kind) === "foundation") $$render(consequent_5, 5);
     });
   }
   append($$anchor, fragment);
@@ -5445,7 +5532,7 @@ function App($$anchor, $$props) {
   var _a2, _b2;
   push($$props, true);
   function contractControls(value) {
-    return value.labs.flatMap((lab) => lab.kind === "color" || lab.kind === "typography" || lab.kind === "shadows" || lab.kind === "motion" || lab.kind === "foundation" ? lab.cases.flatMap((reviewCase) => reviewCase.controls) : []);
+    return value.labs.flatMap((lab) => lab.kind === "alpha" || lab.kind === "color" || lab.kind === "typography" || lab.kind === "shadows" || lab.kind === "motion" || lab.kind === "foundation" ? lab.cases.flatMap((reviewCase) => reviewCase.controls) : []);
   }
   function storedDraft(value) {
     const raw = localStorage.getItem(`tfs-workbench:${value.systemFingerprint}`);
@@ -5480,8 +5567,8 @@ function App($$anchor, $$props) {
   let patchInput = /* @__PURE__ */ state(void 0);
   let activeLab = /* @__PURE__ */ user_derived(() => $$props.contract.labs.find((lab) => lab.id === get(activeLabId)) ?? $$props.contract.labs[0]);
   let cases = /* @__PURE__ */ user_derived(() => {
-    var _a3, _b3, _c2, _d, _e;
-    return ((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) === "color" || ((_b3 = get(activeLab)) == null ? void 0 : _b3.kind) === "typography" || ((_c2 = get(activeLab)) == null ? void 0 : _c2.kind) === "shadows" || ((_d = get(activeLab)) == null ? void 0 : _d.kind) === "motion" || ((_e = get(activeLab)) == null ? void 0 : _e.kind) === "foundation" ? get(activeLab).cases : [];
+    var _a3, _b3, _c2, _d, _e, _f;
+    return ((_a3 = get(activeLab)) == null ? void 0 : _a3.kind) === "alpha" || ((_b3 = get(activeLab)) == null ? void 0 : _b3.kind) === "color" || ((_c2 = get(activeLab)) == null ? void 0 : _c2.kind) === "typography" || ((_d = get(activeLab)) == null ? void 0 : _d.kind) === "shadows" || ((_e = get(activeLab)) == null ? void 0 : _e.kind) === "motion" || ((_f = get(activeLab)) == null ? void 0 : _f.kind) === "foundation" ? get(activeLab).cases : [];
   });
   let activeCase = /* @__PURE__ */ user_derived(() => get(cases).find((reviewCase) => reviewCase.id === get(activeCaseId)) ?? get(cases)[0]);
   let visibleTypographyMode = /* @__PURE__ */ user_derived(() => {
@@ -5497,7 +5584,7 @@ function App($$anchor, $$props) {
   let baseValues = /* @__PURE__ */ user_derived(() => {
     const entries = [];
     for (const lab of $$props.contract.labs) {
-      if (lab.kind !== "color" && lab.kind !== "typography" && lab.kind !== "shadows" && lab.kind !== "motion" && lab.kind !== "foundation") continue;
+      if (lab.kind !== "alpha" && lab.kind !== "color" && lab.kind !== "typography" && lab.kind !== "shadows" && lab.kind !== "motion" && lab.kind !== "foundation") continue;
       for (const reviewCase of lab.cases) {
         for (const control of reviewCase.controls) entries.push([control.path, control.value]);
       }
@@ -5549,7 +5636,7 @@ function App($$anchor, $$props) {
     set(activeLabId, lab.id, true);
     set(caseQuery, "");
     set(viewMode, lab.kind === "overview" ? "case" : "matrix", true);
-    set(activeCaseId, lab.kind === "color" || lab.kind === "typography" || lab.kind === "shadows" || lab.kind === "motion" || lab.kind === "foundation" ? ((_a3 = lab.cases[0]) == null ? void 0 : _a3.id) ?? "" : "", true);
+    set(activeCaseId, lab.kind === "alpha" || lab.kind === "color" || lab.kind === "typography" || lab.kind === "shadows" || lab.kind === "motion" || lab.kind === "foundation" ? ((_a3 = lab.cases[0]) == null ? void 0 : _a3.id) ?? "" : "", true);
     if (lab.kind === "color" && lab.cases[0]) set(colorMode, lab.cases[0].mode, true);
   }
   function selectCase(id) {
@@ -5812,7 +5899,7 @@ ${JSON.stringify(handoff, null, 2)}
         append($$anchor3, small_1);
       };
       if_block(node_3, ($$render) => {
-        if (get(lab).kind === "color" || get(lab).kind === "typography" || get(lab).kind === "shadows" || get(lab).kind === "motion" || get(lab).kind === "foundation") $$render(consequent_3);
+        if (get(lab).kind === "alpha" || get(lab).kind === "color" || get(lab).kind === "typography" || get(lab).kind === "shadows" || get(lab).kind === "motion" || get(lab).kind === "foundation") $$render(consequent_3);
       });
     }
     template_effect(() => {

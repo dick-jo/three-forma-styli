@@ -36,6 +36,7 @@
 
 	function contractControls(value: TfsWorkbenchContract): ReviewControl[] {
 		return value.labs.flatMap((lab) =>
+			lab.kind === 'alpha' ||
 			lab.kind === 'color' ||
 			lab.kind === 'typography' ||
 			lab.kind === 'shadows' ||
@@ -99,7 +100,8 @@
 
 	let activeLab = $derived(contract.labs.find((lab) => lab.id === activeLabId) ?? contract.labs[0]);
 	let cases = $derived(
-		activeLab?.kind === 'color' ||
+		activeLab?.kind === 'alpha' ||
+			activeLab?.kind === 'color' ||
 			activeLab?.kind === 'typography' ||
 			activeLab?.kind === 'shadows' ||
 			activeLab?.kind === 'motion' ||
@@ -135,6 +137,7 @@
 		const entries: Array<[string, WorkbenchDraftOperation['previous']]> = [];
 		for (const lab of contract.labs) {
 			if (
+				lab.kind !== 'alpha' &&
 				lab.kind !== 'color' &&
 				lab.kind !== 'typography' &&
 				lab.kind !== 'shadows' &&
@@ -220,6 +223,7 @@
 		caseQuery = '';
 		viewMode = lab.kind === 'overview' ? 'case' : 'matrix';
 		activeCaseId =
+			lab.kind === 'alpha' ||
 			lab.kind === 'color' ||
 			lab.kind === 'typography' ||
 			lab.kind === 'shadows' ||
@@ -478,7 +482,7 @@
 			{#each contract.labs as lab}
 				<button class:active={lab.id === activeLabId} onclick={() => selectLab(lab)}>
 					<span>{lab.label}</span>
-					{#if lab.kind === 'color' || lab.kind === 'typography' || lab.kind === 'shadows' || lab.kind === 'motion' || lab.kind === 'foundation'}
+					{#if lab.kind === 'alpha' || lab.kind === 'color' || lab.kind === 'typography' || lab.kind === 'shadows' || lab.kind === 'motion' || lab.kind === 'foundation'}
 						<small>{lab.cases.length}</small>
 					{/if}
 				</button>
