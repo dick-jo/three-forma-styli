@@ -190,7 +190,7 @@ export default defineTfsProject({
       modes: [{
         name: 'default',
         isDefault: true,
-        tokens: { unit: 'rem', base: 1, min: 0.5, increment: 0.25, range: 2 },
+        tokens: { unit: 'rem', base: 1, min: 0.5, range: 2 },
       }],
     },
   },

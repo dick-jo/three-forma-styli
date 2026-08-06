@@ -181,6 +181,7 @@ async function exerciseScaffolds() {
 	);
 	assert.equal(workbench.kind, 'three-forma-styli/workbench');
 	assert.equal(workbench.schemaVersion, 2);
+	assert.ok(workbench.labs.some((lab) => lab.kind === 'alpha' && lab.cases.length > 0));
 	assert.ok(workbench.labs.some((lab) => lab.kind === 'color' && lab.cases.length > 0));
 	assert.ok(workbench.labs.some((lab) => lab.kind === 'typography' && lab.cases.length > 0));
 	assert.ok(workbench.labs.some((lab) => lab.kind === 'shadows' && lab.cases.length > 0));
@@ -542,9 +543,16 @@ async function runWorkbenchBrowserProof(workspaceRoot) {
 
 		const systemOverview = page.locator('.system-overview');
 		await systemOverview.waitFor();
-		assert.equal(await systemOverview.locator('.overview-section').count(), 5);
+		assert.equal(await systemOverview.locator('.overview-section').count(), 6);
 		assert.ok((await systemOverview.locator('.matrix-card').count()) > 5);
 		const labNavigation = page.locator('.navigation > nav');
+
+		await labNavigation.getByRole('button', { name: /alpha/i }).click();
+		const alphaMatrix = page.locator('.case-matrix[data-lab="alpha"]');
+		await alphaMatrix.waitFor();
+		assert.ok((await alphaMatrix.locator('.matrix-card').count()) > 0);
+		await alphaMatrix.locator('.matrix-card').first().click();
+		await page.getByText('atomic scale', { exact: true }).waitFor();
 
 		await labNavigation.getByRole('button', { name: /color/i }).click();
 		const colorMatrix = page.locator('.case-matrix[data-lab="color"]');
