@@ -8,6 +8,8 @@ evidence.
 
 - The ratified Family → Domain → Identity grammar is implemented.
 - Alpha, Color groups, runtime-theme policy, and Typography use the new model.
+- Alpha has a first-class Workbench matrix, focused editor, draft/reset flow,
+  capture state, and packed-browser proof.
 - The reference project builds one deterministic, package-shaped output tree.
 - Generated application contracts are split by capability and contain no
   framework runtime.
@@ -64,10 +66,11 @@ facts remain in the manifest and Workbench rather than bloating ordinary imports
 
 ## Scatter proof
 
-A disposable copy of Scatter's current `packages/design-system` was migrated
-against this worktree using its real Supreme and JetBrains Mono sources. It
-generated 34 files and passed byte-for-byte drift checking and a strict external
-consumer typecheck.
+A durable sibling review project at `../../tfs-v05-scatter-review` was migrated
+from Scatter's current `packages/design-system` against this worktree using its
+real Supreme and JetBrains Mono sources. It generates 34 files and passes
+byte-for-byte drift checking and a strict external consumer typecheck. It is a
+local review surface, not a deployable package or production source of truth.
 
 The required authored migration is deliberately small:
 
@@ -92,7 +95,7 @@ were preserved while only their v0.5 structure changed.
 
 - formatting, coordinated versions, builds, package-boundary checks, and all
   unit/type tests;
-- 251 core tests, 102 compiler tests, and 29 CLI tests;
+- 253 core tests, 102 compiler tests, and 29 CLI tests;
 - Svelte Workbench source diagnostics and byte equality with compiler-owned
   assets;
 - `publint` for every public package;
@@ -101,6 +104,10 @@ were preserved while only their v0.5 structure changed.
   package packing;
 - production browser, Next 16, Svelte 5, and pnpm/Turborepo consumers;
 - Chromium runtime-theme and Workbench interaction tests.
+
+The release browser proof now enters the Alpha lab as well as Color, Typography,
+Motion, and overview flows; adding a visual lab without updating release evidence
+therefore fails CI.
 
 The packed-browser test also guards two public-boundary regressions caught during
 this pass: core declarations no longer leak Culori's ambient types, and generated
