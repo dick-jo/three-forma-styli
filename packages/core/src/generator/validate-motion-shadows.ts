@@ -2,6 +2,7 @@ import type { PartialDesignSystem, TimeReference } from '../types.js';
 import {
 	ValidationError,
 	tokenNamePattern,
+	validateAllowedKeys,
 	validateCssUnit,
 	validateFiniteNumber,
 	validateNamedModes,
@@ -11,12 +12,22 @@ function validateTimeTokens(
 	tokens: { unit: string; base: number; min: number; range: number },
 	path: string
 ): void {
-	validateCssUnit(tokens.unit, `${path}.unit`);
-	if (typeof tokens.base !== 'number' || !Number.isFinite(tokens.base) || tokens.base < 0) {
-		throw new ValidationError(`${path}.base must be a non-negative number`);
+	validateAllowedKeys(
+		tokens as unknown as Record<string, unknown>,
+		path,
+		new Set(['unit', 'base', 'min', 'range'])
+	);
+	if (tokens.unit !== 'ms' && tokens.unit !== 's') {
+		throw new ValidationError(`${path}.unit must be "ms" or "s"`);
+	}
+	if (typeof tokens.base !== 'number' || !Number.isFinite(tokens.base) || tokens.base <= 0) {
+		throw new ValidationError(`${path}.base must be a positive number`);
 	}
 	if (typeof tokens.min !== 'number' || !Number.isFinite(tokens.min) || tokens.min < 0) {
 		throw new ValidationError(`${path}.min must be a non-negative number`);
+	}
+	if (tokens.min >= tokens.base) {
+		throw new ValidationError(`${path}.min must be lower than base`);
 	}
 	if (typeof tokens.range !== 'number' || tokens.range < 1 || !Number.isInteger(tokens.range)) {
 		throw new ValidationError(`${path}.range must be a positive integer`);

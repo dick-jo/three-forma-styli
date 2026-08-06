@@ -214,31 +214,6 @@ describe('generateTimeTokens', () => {
 	});
 
 	describe('edge cases', () => {
-		it('handles base of 0 (for reduced-motion scenarios)', () => {
-			const zeroBaseTime: DesignSystem['time'] = {
-				scales: [
-					{
-						name: 'default',
-						isDefault: true,
-						tokens: {
-							unit: 'ms',
-							base: 0,
-							min: 0,
-							range: 3,
-						},
-					},
-				],
-			};
-
-			const result = generateTimeTokens(zeroBaseTime, defaultGeneratorConfig);
-
-			const t1 = result.defaultTokens.find((t) => t.name === 't-1');
-			const t2 = result.defaultTokens.find((t) => t.name === 't-2');
-
-			expect(t1?.value).toBe('0ms');
-			expect(t2?.value).toBe('0ms');
-		});
-
 		it('handles seconds unit', () => {
 			const secondsTime: DesignSystem['time'] = {
 				scales: [

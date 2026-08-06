@@ -240,6 +240,69 @@ describe('generator input validation', () => {
 		).toThrowError(/CSS-safe unit/);
 	});
 
+	it('requires spacing modes to expose one ordered and stable atomic scale', () => {
+		expect(() =>
+			generate({
+				spacing: {
+					modes: [
+						{ name: 'default', isDefault: true, tokens: { unit: 'px', base: 8, min: 8, range: 4 } },
+					],
+				},
+			})
+		).toThrowError(/min must be lower than base/);
+
+		expect(() =>
+			generate({
+				spacing: {
+					modes: [
+						...spacing.modes,
+						{ name: 'small', tokens: { unit: 'px', base: 6, min: 3, range: 3 } },
+					],
+				},
+			})
+		).toThrowError(/same scale identities/);
+	});
+
+	it('rejects unknown atomic fields and invalid time scales', () => {
+		expect(() =>
+			generate({
+				spacing: {
+					modes: [
+						{
+							name: 'default',
+							isDefault: true,
+							tokens: { unit: 'px', base: 8, min: 4, range: 4, mystery: 2 },
+						} as never,
+					],
+				},
+			})
+		).toThrowError(/unsupported key "mystery"/);
+
+		expect(() =>
+			generate({
+				time: {
+					scales: [
+						{
+							name: 'default',
+							isDefault: true,
+							tokens: { unit: 'px', base: 100, min: 50, range: 4 },
+						},
+					],
+				},
+			})
+		).toThrowError(/unit must be "ms" or "s"/);
+
+		expect(() =>
+			generate({
+				time: {
+					scales: [
+						{ name: 'default', isDefault: true, tokens: { unit: 'ms', base: 0, min: 0, range: 4 } },
+					],
+				},
+			})
+		).toThrowError(/base must be a positive number/);
+	});
+
 	it('rejects unknown explicit spacing modes and out-of-range spacing references', () => {
 		expect(() =>
 			generate({
@@ -270,6 +333,38 @@ describe('generator input validation', () => {
 				},
 			})
 		).toThrowError(/integer from 1 to 4/);
+	});
+
+	it('rejects dimension relabelling and unordered spacing-derived ranges', () => {
+		expect(() =>
+			generate({
+				spacing,
+				gap: {
+					modes: [
+						{
+							name: 'default',
+							isDefault: true,
+							tokens: { unit: 'rem', min: 'min', s: 1, l: 2, max: 3 },
+						},
+					],
+				},
+			})
+		).toThrowError(/cannot relabel spacing unit "px" as "rem"/);
+
+		expect(() =>
+			generate({
+				spacing,
+				gap: {
+					modes: [
+						{
+							name: 'default',
+							isDefault: true,
+							tokens: { min: 'min', s: 2, l: 1, max: 3 },
+						},
+					],
+				},
+			})
+		).toThrowError(/strictly increasing min \/ s \/ l \/ max range/);
 	});
 
 	it('rejects generated token collisions caused by authored names or custom prefixes', () => {

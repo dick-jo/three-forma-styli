@@ -49,3 +49,15 @@ export function validateFiniteNumber(value: unknown, path: string): asserts valu
 		throw new ValidationError(`${path} must be a finite number`);
 	}
 }
+
+export function validateAllowedKeys(
+	value: Record<string, unknown>,
+	path: string,
+	allowed: ReadonlySet<string>
+): void {
+	for (const key of Object.keys(value)) {
+		if (!allowed.has(key)) {
+			throw new ValidationError(`${path} contains unsupported key "${key}"`);
+		}
+	}
+}

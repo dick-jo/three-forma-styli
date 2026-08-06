@@ -9,6 +9,7 @@ import type { AlphaSystem, DesignSystem, PartialDesignSystem } from '../types.js
 import {
 	ValidationError,
 	tokenNamePattern,
+	validateAllowedKeys,
 	validateCssUnit,
 	validateFiniteNumber,
 	validateNamedModes,
@@ -342,23 +343,38 @@ function validateSpacingPartial(spacing: NonNullable<PartialDesignSystem['spacin
 		throw new ValidationError('spacing.modes must have at least one mode');
 	}
 	validateNamedModes(spacing.modes, 'spacing.modes', 'Spacing');
+	const defaultMode = spacing.modes.find((mode) => mode.isDefault) ?? spacing.modes[0]!;
 
 	spacing.modes.forEach((mode) => {
 		if (!mode.tokens) {
 			throw new ValidationError(`Spacing mode "${mode.name}" must have tokens`);
 		}
 
+		const path = `spacing.modes["${mode.name}"].tokens`;
+		validateAllowedKeys(
+			mode.tokens as unknown as Record<string, unknown>,
+			path,
+			new Set(['unit', 'base', 'min', 'range'])
+		);
 		const { unit, base, min, range } = mode.tokens;
 
-		validateCssUnit(unit, `spacing.modes["${mode.name}"].tokens.unit`);
+		validateCssUnit(unit, `${path}.unit`);
 		if (typeof base !== 'number' || !Number.isFinite(base) || base <= 0) {
 			throw new ValidationError(`Spacing mode "${mode.name}" base must be a positive number`);
 		}
 		if (typeof min !== 'number' || !Number.isFinite(min) || min < 0) {
 			throw new ValidationError(`Spacing mode "${mode.name}" min must be a non-negative number`);
 		}
+		if (min >= base) {
+			throw new ValidationError(`Spacing mode "${mode.name}" min must be lower than base`);
+		}
 		if (typeof range !== 'number' || range < 1 || !Number.isInteger(range)) {
 			throw new ValidationError(`Spacing mode "${mode.name}" range must be a positive integer`);
+		}
+		if (range !== defaultMode.tokens.range) {
+			throw new ValidationError(
+				`Spacing mode "${mode.name}" range must equal default mode "${defaultMode.name}" range ${defaultMode.tokens.range} so every mode exposes the same scale identities`
+			);
 		}
 	});
 }
@@ -369,12 +385,7 @@ function validateSpacingDerivedTokens(
 	spacing: NonNullable<PartialDesignSystem['spacing']>,
 	path: string
 ): void {
-	const allowedKeys = new Set(['unit', 'spacingMode', 'min', 's', 'l', 'max']);
-	for (const key of Object.keys(tokens)) {
-		if (!allowedKeys.has(key)) {
-			throw new ValidationError(`${path} contains unsupported key "${key}"`);
-		}
-	}
+	validateAllowedKeys(tokens, path, new Set(['unit', 'spacingMode', 'min', 's', 'l', 'max']));
 	if (tokens.unit !== undefined) validateCssUnit(tokens.unit, `${path}.unit`);
 	if (tokens.spacingMode !== undefined && typeof tokens.spacingMode !== 'string') {
 		throw new ValidationError(`${path}.spacingMode must be a mode name`);
@@ -391,10 +402,19 @@ function validateSpacingDerivedTokens(
 			`${path}.spacingMode references unknown spacing mode "${requestedSpacingMode}"`
 		);
 	}
+	if (tokens.unit !== undefined && tokens.unit !== spacingMode.tokens.unit) {
+		throw new ValidationError(
+			`${path}.unit cannot relabel spacing unit "${spacingMode.tokens.unit}" as "${String(tokens.unit)}"; use the referenced spacing unit or author an independent domain`
+		);
+	}
 
+	const resolvedValues: number[] = [];
 	for (const key of ['min', 's', 'l', 'max'] as const) {
 		const value = tokens[key];
-		if (value === 'min') continue;
+		if (value === 'min') {
+			resolvedValues.push(spacingMode.tokens.min);
+			continue;
+		}
 		if (
 			!Number.isInteger(value) ||
 			(value as number) < 1 ||
@@ -402,6 +422,14 @@ function validateSpacingDerivedTokens(
 		) {
 			throw new ValidationError(
 				`${path}.${key} must be "min" or an integer from 1 to ${spacingMode.tokens.range} for spacing mode "${spacingMode.name}"`
+			);
+		}
+		resolvedValues.push((value as number) * spacingMode.tokens.base);
+	}
+	for (let index = 1; index < resolvedValues.length; index += 1) {
+		if (resolvedValues[index]! <= resolvedValues[index - 1]!) {
+			throw new ValidationError(
+				`${path} must resolve to a strictly increasing min / s / l / max range`
 			);
 		}
 	}
@@ -480,9 +508,15 @@ function validateBorderPartial(
 				throw new ValidationError(`Border width mode "${mode.name}" must have tokens`);
 			}
 
+			const path = `border.width.modes["${mode.name}"].tokens`;
+			validateAllowedKeys(
+				mode.tokens as unknown as Record<string, unknown>,
+				path,
+				new Set(['unit', 'value'])
+			);
 			const { unit, value } = mode.tokens;
 
-			validateCssUnit(unit, `border.width.modes["${mode.name}"].tokens.unit`);
+			validateCssUnit(unit, `${path}.unit`);
 			if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
 				throw new ValidationError(
 					`Border width mode "${mode.name}" value must be a non-negative number`
