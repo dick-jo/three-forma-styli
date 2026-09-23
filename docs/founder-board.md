@@ -1,8 +1,82 @@
 # TFS Founder Board
 
 This is the small ownership surface for Three Forma Styli. It records product
-grammar and public boundaries; implementation details remain authoritative in
-types, validators, generated evidence, and tests.
+grammar and public boundaries. Ratified contracts describe the intended product;
+types, validators, generated evidence, and tests show what is implemented today.
+An implementation gap does not reopen a ratified verdict.
+
+## Overhaul milestones
+
+Ratified workflow clarification on 2026-09-09. The current milestone is **1:
+blueprint and ratification**.
+
+1. **Plan and ratify the blueprint.** Settle the major domain grammars, authoring
+   and consumer experience, cross-domain relationships, and output boundaries.
+   Explicitly defer anything outside this overhaul. Record accepted decisions
+   separately from proposals and existing implementation evidence.
+2. **Strategise and triage the work.** Review the codebase against that blueprint
+   with the founder, including architecture, package ownership, code hygiene,
+   obsolete code, migration needs, and dependencies between changes. Agree on
+   an implementation runbook with bounded increments, review surfaces, and
+   verification criteria before development begins.
+3. **Implement in reviewable increments.** Work through the agreed runbook,
+   explaining each change against its review baseline and presenting the
+   relevant code and generated behaviour for review.
+
+Ratifying one domain does not start its implementation while the broader
+blueprint workshop is still underway. Moving between milestones is a deliberate,
+agreed transition; a request to proceed within the workshop continues that
+milestone. Read-only code inspection and decision-document updates support the
+blueprint, but adapting source, building Workbench controls, and changing
+generated contracts belong to implementation.
+
+Time and Easing authoring contracts are ratified. Shadow's representative mock
+and consumer boundary are also ratified; its domain workshop is complete.
+Implementation of these overhaul contracts remains pending. Motion composites
+are explicitly deferred. The remaining domain mocks and cross-domain decisions
+still need review or explicit deferral. A coded Time/Easing preview is not a
+prerequisite for those discussions.
+This clarification supersedes earlier suggestions to implement the foundations
+or adapt the inherited Motion composites before continuing the workshop.
+
+The [workshop progress list](./v05-workshop-progress.md) tracks current readiness
+and the recommended review sequence. Keep a compact progress line visible in
+workshop replies and update the list when a decision changes. This Board remains
+the authority for ratified product contracts.
+
+### Representative mocks for every domain
+
+Founder workflow requirement, 2026-09-10:
+
+- Each domain workshop needs a representative authoring mock reviewed before
+  agreeing that the domain is ready to move on. A prose verdict or type sketch
+  alone does not establish that the authoring experience works.
+- Shape the main example around gold-standard TFS usage: useful, elegant, easy
+  to read, and pleasant to author. Show the ordinary experience first and cover
+  the meaningful additional cases the founder needs to understand and assess.
+  Focused companion examples can cover cases that would overwhelm that main view.
+- Make identities, chosen values, references, and generated results tangible.
+  Include the relevant token names and consumer examples so the founder can see
+  what the authored decisions produce. Explain distinctions in plain language.
+- Put the main domain declaration immediately after its imports. Prefer inline
+  values and helper calls at the point where their resulting entries belong.
+  A reader should be able to eyeball the domain as a catalogue of design choices
+  without first working through intermediary calculations or declarations.
+- Keep supporting types and mock machinery out of that primary authoring view.
+  Shared definitions remain possible when their value justifies the reading
+  indirection; extracting code merely because it can be reused is not the default
+  presentation of gold-standard usage.
+- Review both capability and digestibility. If a mock is awkward to read or
+  reason about, refine the proposal before accepting it. Mocks are evidence for
+  product design, not a requirement to implement the library during milestone 1.
+- Mark illustrative values, declarations, and expected output accurately. Check
+  types and example expansions where useful without presenting them as working
+  compiler support.
+
+Previously ratified contracts retain their verdicts. Their representative mocks
+still need to be reviewed before the overall blueprint is declared ready for the
+architecture/runbook milestone. This adds a review requirement, not an instruction
+to begin implementation or reopen settled decisions without evidence.
 
 ## Product thesis
 
@@ -11,6 +85,40 @@ portable design-system package. It fixes a coherent grammar, derives repetitive
 facts, validates authored intent, and emits framework-neutral CSS, compact typed
 contracts, design-tool interchange, and visual evidence. It does not understand
 application components such as Button or Chip.
+
+Simple is best; less is more. Keep the public grammar and helper surface small,
+covering recurring design decisions. The existence of a CSS capability does not
+by itself justify a TFS token type or Workbench control.
+
+Ergonomics, digestibility, and ease of reasoning are core product requirements.
+An author should immediately recognise the domain's identities and values and
+understand what to change. The authored design-system definition is the primary
+reading experience; helper machinery must support that experience rather than
+take over the file. Inline authoring is the preferred starting point.
+
+Founder clarification on 2026-09-09:
+
+- TFS began as a designer's compact, defensive shorthand: establish deliberate
+  values once so consumers use consistent tokens instead of introducing stray
+  colors, measurements, and other design decisions. Spacing relationships and
+  shared Color/Alpha schedules are central examples of that value.
+- Programmatic authoring earns its place by removing repetitive manual work and
+  letting one deliberate change propagate coherently through the system.
+- This overhaul restores a comprehensible, opinionated system used in production
+  every day. A small scope must still be dependable and complete for its intended
+  uses; this is not a disposable MVP or a feature-expansion exercise.
+- Consistent patterns across domains are a product requirement. Reuse the same
+  concepts and meanings wherever they fit, and justify domain differences through
+  actual design needs. Avoid both ad hoc domain APIs and extra concepts introduced
+  solely to make every domain structurally identical.
+- Strong standard-theme opinions reduce recurring creative decisions. The
+  ratified identity vocabulary is part of that promise; speculative flexibility
+  should not dominate the ordinary authoring experience.
+- Existing production uses, including Scatter's custom theme building and
+  luminance-delta enforcement reported by the founder, are requirements to account
+  for in the overhaul. Review their actual dependencies during triage and plan any
+  migration deliberately; existing implementation complexity is not itself a
+  product requirement.
 
 The authoring promise is progressive complexity:
 
@@ -31,6 +139,7 @@ The authoring promise is progressive complexity:
 | Scale      | Ordered atomic values available simultaneously     | `--a-*`, `--fs-*`          |
 | Range      | Ordered semantic choices owned by one identity     | heading sizes              |
 | Ramp       | A resulting progression, usually derived           | `--clr-pri-a-*`            |
+| Position   | One named place in a Scale, Range, or Ramp         | `lo`, `s`, or `3`          |
 | Composite  | Several coupled values applied together            | typography size or shadow  |
 | Variant    | An unordered categorical alternative               | `emphatic`, `italic`       |
 | Group      | Project-authored taxonomy over identities          | Scatter network colors     |
@@ -42,21 +151,53 @@ The authoring promise is progressive complexity:
 The grammar is fixed. Domain identities, project groups, numerical values,
 composites, axes, and modes remain authored vocabulary.
 
+### Position patterns
+
+Ratified catalogue and cross-domain design policy, 2026-09-10. Position is the
+shared term. This gathers existing domain contracts; it does not change their
+positions or turn a Scale into a Range. Implementation remains pending.
+
+| Ordered positions                   | Current intended uses                                | Domain-specific completeness                                                                                                                   |
+| ----------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `min / 1 / 2 / … / n`               | Spacing and atomic Font size Scales                  | The configured numbered scale plus its minimum boundary                                                                                        |
+| `min / s / l / max`                 | Gap and Border radius Ranges                         | All four required                                                                                                                              |
+| `min / lo / hi / max`               | Time Scales; Shadow Ranges; Typography weight Ranges | Time and Shadow require all four; weight ranges require endpoints and allow omitted middle positions; a role may instead use one scalar weight |
+| `min / lo-x / lo / hi / hi-x / max` | Alpha Scales, consumed by Color alpha Ramps          | All six active positions required; compiler-owned `non: 0` is a separate boundary                                                              |
+| `min / s / base / l / max`          | Typography role size Ranges                          | Required `base`; `s` requires `min`, and `l` requires `max`                                                                                    |
+
+Each domain deliberately records whether it uses a Scale or
+Range, its ordered position pattern, completeness rules, what ordering means,
+and whether any position receives an unsuffixed name. Reuse an existing pattern
+where its meaning fits; justify additions through a concrete design need.
+Sharing position names does not impose identical validation: Time values increase
+numerically, whereas a Shadow progression need not increase any one layer field.
+
+The founder also flags repeated spelling of position vocabularies as a concern.
+The recommendation for architecture/triage is one canonical definition of each
+ordered pattern, reused by types, validation, generation, and Workbench. Authors
+should not have to redeclare a list of allowed positions or their order. Named
+entries such as `lo: ...` still identify the values they are choosing; they do
+not redefine the pattern. Exact internal names and public helper/type exports
+remain architecture decisions, not new authoring requirements.
+
+Typography's required `base` and Alpha's `non` do not establish universal rules.
+
 ## Capability matrix
 
-| Family / domain      |           Scale |             Range | Composite | Variant |            Groups |                     Axes |                References |
-| -------------------- | --------------: | ----------------: | --------: | ------: | ----------------: | -----------------------: | ------------------------: |
-| Alpha                |             yes |                no |        no |      no |   later if needed |                       no |    source for color ramps |
-| Color                |              no |                no |        no |      no |               yes |                    theme |            consumes Alpha |
-| Spacing              |             yes |                no |        no |      no | not yet justified |                     size |     source for gap/radius |
-| Gap                  |              no |               yes |        no |      no | not yet justified |             follows size |          consumes spacing |
-| Border radius        |              no |               yes |        no |      no | not yet justified |             follows size |          consumes spacing |
-| Border width         | scale or scalar |                no |        no |      no | not yet justified |                 optional |                      none |
-| Typography/font size |             yes |                no |        no |      no | not yet justified |                     size |          source for roles |
-| Typography/role      |              no |               yes |       yes |     yes | not yet justified |         sparse overrides | consumes font size + font |
-| Time                 |             yes |                no |        no |      no | not yet justified |                       no |         source for motion |
-| Motion               |              no | ranges may emerge |       yes |     yes | not yet justified |   environment conditions |             consumes time |
-| Shadow               |              no |               yes |       yes |      no | not yet justified | follows color references |    consumes color + alpha |
+| Family / domain      |           Scale |    Range | Composite |  Variant |            Groups |                     Axes |                References |
+| -------------------- | --------------: | -------: | --------: | -------: | ----------------: | -----------------------: | ------------------------: |
+| Alpha                |             yes |       no |        no |       no |   later if needed |                       no |    source for color ramps |
+| Color                |              no |       no |        no |       no |               yes |                    theme |            consumes Alpha |
+| Spacing              |             yes |       no |        no |       no | not yet justified |                     size |     source for gap/radius |
+| Gap                  |              no |      yes |        no |       no | not yet justified |             follows size |          consumes spacing |
+| Border radius        |              no |      yes |        no |       no | not yet justified |             follows size |          consumes spacing |
+| Border width         | scale or scalar |       no |        no |       no | not yet justified |                 optional |                      none |
+| Typography/font size |             yes |       no |        no |       no | not yet justified |                     size |          source for roles |
+| Typography/role      |              no |      yes |       yes |      yes | not yet justified |         sparse overrides | consumes font size + font |
+| Time                 |             yes |       no |        no |       no | not yet justified |                       no |                      none |
+| Easing               |              no |       no |        no |       no | not yet justified |                       no |                      none |
+| Motion composites    |        deferred | deferred |  deferred | deferred |          deferred |                 deferred |                  deferred |
+| Shadow               |              no |      yes |       yes | deferred | not yet justified | follows color references |    consumes color + alpha |
 
 “Not yet justified” is deliberate. TFS implements generic grouping only where a
 real authoring case establishes the grouping level; it does not expose speculative
@@ -72,7 +213,8 @@ flowchart LR
   spacing --> radius["Border-radius range"]
   fontFiles["Prepared font capabilities"] --> roles["Typography role composites"]
   fontSize["Atomic font-size scale"] --> roles
-  time["Time scales"] --> motion["Motion composites"]
+  time["Time scales"] -. deferred .-> motion["Motion composites (deferred)"]
+  easing["Easing identities"] -. deferred .-> motion
   color --> shadow["Shadow composites"]
   alpha --> shadow
   system["Authored system"] --> evidence["Resolved manifest + Workbench"]
@@ -81,6 +223,42 @@ flowchart LR
 
 ## Ratified v0.5 contracts
 
+### Axis selection
+
+Founder ruling, 2026-09-23: the application chooses the active mode and supplies
+the resulting attribute. Application policy owns OS preferences, manual choices,
+and remembered selections; TFS supplies the values for that selection. A direct
+media-activation API is not required to settle this attribute-based contract.
+Earlier media sketches remain proposals, not an approved additional API.
+
+The founder also reconfirms that referenced Color and Spacing changes must flow
+through dependent Shadow and Radius values automatically. Correct generated CSS
+in nested scopes is an implementation responsibility, not an additional authoring
+choice to ask the founder to make.
+
+The ordinary separate-file authoring direction remains endorsed. Exclusivity
+between axes, the shared-default explanation, and complete Shadow-list replacement
+are being reviewed in the [current Axis proposal](./blueprints/axes/authoring-options.md#current-recommendation-2026-09-23).
+They are not newly ratified by this entry.
+
+### Standard-theme identity vocabulary
+
+Ratified on 2026-09-09; theme implementation and contract tests remain pending:
+
+- Where standard TFS themes offer neutral and accent identities, their shared
+  vocabulary is `neu / pri / duo / tri / tet / pen`: neutral, then primary through
+  fifth accent. This is a documented, tested product contract of the standard
+  themes, rather than an incidental starter naming preference.
+- Domains use the identities they need; the vocabulary does not require every
+  domain to contain all six entries or replace domain-specific names.
+- Core continues to accept custom authored identities. Standard-theme opinions
+  do not become a closed, mandatory identity list for every project.
+- An identity owns its chosen value directly. Its role does not prescribe that
+  value: an Easing identity named `pri` may contain a bounce curve when bounce is
+  the product's primary accent easing. Another theme may choose a different curve.
+- A separate preset registry or alias layer is not required. Reusable definitions
+  and authoring helpers may remove repetition without adding compulsory names.
+
 ### Alpha
 
 - Every scale uses `min / lo-x / lo / hi / hi-x / max`; `non: 0` is compiler-owned.
@@ -88,6 +266,164 @@ flowchart LR
 - The default scale emits `--a-*`; other scales emit `--a-{identity}-*`.
 - Color consumes one selected scale and derives `--clr-{identity}-a-*`.
 - `deriveAlphaScale({ distribution: "linear", ... })` is authoring sugar only.
+
+### Time
+
+Ratified on 2026-09-09; implementation remains pending:
+
+- Authoring uses `time: { defaultScale, scales }`. `scales` is keyed by authored
+  identity; each scale contains `unit` and `values`.
+- Every scale has four required, explicit, strictly increasing values:
+  `min / lo / hi / max`. Authors choose the values; numerical generation inputs
+  such as `base` and `range` are not part of this shape.
+- `defaultScale` selects the authored scale that emits
+  `--t-min / --t-lo / --t-hi / --t-max`. It does not create a default position
+  or an unsuffixed `--t` token.
+- Additional scales emit `--t-{identity}-{position}` and are available
+  simultaneously. `anim` is an optional Time scale identity, not a Family or Mode.
+- The same Time tokens serve duration or delay; no separate delay domain is
+  required. Units remain authored per scale, supporting `ms` and `s`.
+
+Ratified authoring shape, with illustrative values pending theme calibration:
+
+```ts
+time: {
+  defaultScale: 'neu',
+  scales: {
+    neu: {
+      unit: 'ms',
+      values: { min: 50, lo: 100, hi: 200, max: 400 },
+    },
+    anim: {
+      unit: 'ms',
+      values: { min: 500, lo: 1000, hi: 2000, max: 4000 },
+    },
+  },
+}
+```
+
+### Easing
+
+Ratified on 2026-09-09; implementation remains pending:
+
+- An independent `easings` map assigns one structured, inspectable value to each
+  authored identity and emits `--ease-{identity}`. It requires neither Time nor
+  Motion composites, and generates no ordered positions or default alias.
+- Support two conventional forms: cubic Bézier control coordinates and Linear
+  input/output points. Cubic Bézier is the main authoring path and maps to DTCG's
+  `cubicBezier` type. Linear follows CSS easing semantics; it is not an additional
+  standard DTCG token type.
+- Small authoring constructors return plain typed data, following `oklch()`.
+  Every definition uses `{ type, value }`. `cubicBezier(x1, y1, x2, y2)` returns
+  a `cubicBezier` value containing those four numbers. `linear(points)` returns
+  a `linear` value containing explicit `[input, output]` pairs; `linear()`
+  supplies the constant-speed identity curve. Inputs are ordered, equal inputs
+  are allowed for jumps, and output values may overshoot.
+  CSS strings are generated output; the Workbench edits the authored values.
+- Steps is outside the TFS token contract. Authors can use CSS `steps()` directly
+  for a local need such as a sprite animation. This supersedes the earlier
+  three-form verdict; there is no Steps helper, value type, or Workbench editor.
+- Repeated bounce can be represented by Linear point data supplied by a theme.
+  Do not introduce a bespoke bounce value type or physics parameter model.
+  A Bézier overshoot remains distinct from a repeated-bounce curve.
+- Standard themes own calibrated values under the ratified semantic vocabulary;
+  custom identities remain allowed. No preset registry is required.
+- Implement constructors, validation, and serialization in TFS, and use browser
+  playback for the Workbench. Add no easing dependency for this scope. A future
+  need for numerical evaluation can justify a focused library separately;
+  generated token modules remain dependency-free.
+
+The [Time/Easing authoring contract](./v05-time-easing-contract.md) records the
+accepted helper signatures, return shapes, and Linear coordinate convention.
+Numerical theme calibration remains open; the example curve values are
+illustrative.
+
+### Motion composites — deferred
+
+Founder verdict on 2026-09-09:
+
+- There is no immediate need for Motion composites. Park their product design
+  and implementation for this overhaul; reconsider them when a concrete use case
+  justifies combining Time and Easing decisions.
+- Time scales and the independent Easing pool remain in scope and usable on their
+  own. Their contracts do not need a speculative composite extension mechanism.
+- The inherited composite `base`, variants, and Reduced Motion override API are
+  not ratified future grammar. Parking them does not authorize removing existing
+  code or changing production behavior during the blueprint workshop.
+- Decide the disposition of existing composite code and its consumers in the
+  architecture/triage milestone, before implementing the agreed runbook.
+
+### Shadow — flat catalogue
+
+Blueprint ratified on 2026-09-10, including the
+[representative Shadow mock](./blueprints/shadow/README.md) and the final
+consumer-responsibility boundary. This domain workshop is complete;
+implementation remains pending. Shared Axis syntax will be reviewed separately.
+
+- One Shadow catalogue owns `unit`, optional `defaultRange`, and named `ranges`.
+  The main domain declaration comes first, with values and helper calls inline.
+  There are no separate Box/Text source sections.
+- Every identity supplies all four ordered positions, `min / lo / hi / max`.
+  Each position is a complete nonempty layer list; counts may differ. The author
+  chooses the progression through color/Alpha, offsets, blur, or spread. No one
+  measured field must increase in every possible Shadow design.
+- A selected `defaultRange` emits `--shd-min / --shd-lo / --shd-hi / --shd-max`.
+  Other identities emit `--shd-{identity}-{position}`. There is no base position,
+  unsuffixed `--shd`, or extra alias set. With no selection, every range retains
+  its identity in its names. The catalogue must contain at least one range.
+- `text` and `inset` can be ordinary authored identities beside `neu`. An identity
+  does not select a CSS property. Names such as `--shd-text-glow-pri-lo` remain
+  expressible through an authored identity `text-glow-pri`, not a special Text
+  namespace. This replaces the earlier independent Text-default interpretation.
+- A layer contains x/y offsets, blur, a Color reference, and optional spread and
+  inset. `inset: true` creates an inner box shadow; omission/false means outer.
+  This is a per-layer setting. Inner-shadow treatments have their own authored
+  values and can occupy an optional named range.
+- Author the length unit once; `unit: 'px'` makes `blur: 8` mean `8px`. Other
+  supported CSS length units remain possible. Values must be finite; blur is
+  nonnegative, while offsets/spread may be negative. Invalid fields, references,
+  default selections, and generated-name collisions fail validation.
+- Color owns the swatches. Optional Alpha selects an existing Color-ramp member;
+  omission uses the referenced Color directly. No separate Shadow opacity
+  schedule or compulsory darkness constraint is introduced.
+- Color references follow the active mode, including nested and runtime scopes.
+  Keeping dependent variables correctly bound is a generation responsibility.
+  Authors do not repeat unchanged Shadow values. Real mode-specific changes to
+  offsets, blur, or spread use the shared Axis model, whose syntax remains open.
+- No dedicated no-shadow token or extra position is needed: consumers omit the
+  property or use CSS `none`. Alpha's ratified zero boundary is unaffected.
+- Additional looks use named ranges. Categorical Shadow variants and helpers for
+  interpolating layer measurements remain outside this overhaul.
+
+The color-expansion helper supplies one complete range for every selected Color.
+Its inline input contains `prefix`, `colors`, and a four-position `range` of
+measurements and optional Alpha choices. It inserts the selected Color reference
+into every layer of that copy and returns ordinary named ranges. The rejected
+`replaceColor` proposal is superseded: input layers do not name a Color merely
+for it to be replaced. A shared glow is authored once and can be consumed wherever
+its emitted value is valid. Public supporting type names and implementation are
+later architecture/runbook work.
+
+Ratified consumer boundary:
+
+- TFS validates and faithfully emits its authored Shadow values, references,
+  identities, and names. Consumers choose appropriate CSS properties.
+- Add no required `targets`, `validFor`, or equivalent declaration. An optional
+  target assertion could catch an authoring mismatch, but no concrete need
+  justifies adding it now; it would not enforce arbitrary handwritten CSS usage.
+- A generated compatibility registry, property-specific token subset, or typed
+  target selector is not a prerequisite for this scope. This supersedes the prior
+  recommendation that flattening require derived CSS-compatibility machinery.
+  Typed output still describes the real token names and values accurately.
+- Never silently strip spread/inset to make a value fit `text-shadow`. CSS's
+  property restrictions remain real; applying a variable to the right property
+  is the consumer's responsibility. Export adapters still honour their own
+  target constraints under the separately ratified output policy.
+
+The mock now contains twenty example tokens: the sixteen existing elevation,
+inset, and shared-glow values plus four illustrative values under the authored
+`text` identity. The eight duplicate Text-glow examples are removed. This is a
+review-example change only; migration of actual consumer names belongs to triage.
 
 ### Typography
 
@@ -102,6 +438,18 @@ flowchart LR
 - Variants are categorical and cannot change font family or font size.
 - Resolution order is role defaults → size → variant → explicit style/weight.
 - Physical style/weight/features/axes are checked against prepared font facts.
+
+### Gap and Border radius
+
+Ratified on 2026-09-09:
+
+- Each domain retains four ordered positions: `min / s / l / max`.
+- Neither domain has a `base` position or a generated unsuffixed `--gap` or
+  `--bdr` token.
+- Both continue referencing Spacing; this verdict preserves the existing
+  authored mappings, CSS names, and generated identity unions.
+- A Range does not universally require a default position. Consumers may select
+  their own default from the domain's available positions.
 
 ### Groups
 
@@ -133,6 +481,25 @@ flowchart LR
   Culori declarations.
 - framework Text components remain application-owned.
 
+### Output priority and Figma scope
+
+Ratified on 2026-09-09:
+
+- CSS and TypeScript are the primary outputs. Their correctness and completeness
+  determine the core model and its validation requirements.
+- Figma export covers useful, directly supported capabilities. Complete parity
+  with CSS and TypeScript is not required, and native transition/easing playback
+  is not a product requirement for this overhaul.
+- Unsupported capabilities may be clearly reported as unavailable for Figma
+  export. A target limitation must not invalidate otherwise valid core data or
+  silently change its meaning.
+- Figma capability handling and diagnostics belong in the export adapter or
+  bridge. Keep platform-specific exceptions out of core domain grammar and the
+  CSS/TypeScript generation paths.
+- The bridge still consumes the shared resolved system; it does not maintain a
+  separate authored truth. This narrows export scope without cancelling the
+  planned first-party bridge.
+
 ## Package boundaries
 
 | Package          | Owns                                                       | Must not own                                        |
@@ -140,7 +507,7 @@ flowchart LR
 | `core`           | grammar, validation, IR, CSS/runtime transforms            | filesystem orchestration or interactive prompts     |
 | `compiler`       | projects, fonts, output planning, atomic builds, contracts | application semantics                               |
 | `cli`            | human command surface                                      | compiler business logic                             |
-| `themes`         | inspectable starter opinions                               | hidden core defaults                                |
+| `themes`         | inspectable standard themes and their vocabulary contract  | hidden core defaults                                |
 | Workbench source | visual review UI compiled into review output               | framework runtime dependencies in consumer packages |
 
 ## Workflow contract
@@ -161,9 +528,26 @@ not dependencies of generated consumer packages.
 
 - The fully generic multi-axis source model and collision-resolution syntax is
   ratified in direction but must not be faked through today’s legacy category IR.
-- Formal ordered-range grammar for Motion and Shadow remains a separate domain
-  audit. v0.5 uses the ratified `composites` name but preserves their existing
-  author-named variants and review ordering rather than inventing new positions.
+  The [Axis authoring comparison](./blueprints/axes/authoring-options.md) is in
+  founder review as of 2026-09-15. The conditional `when / set` layout is
+  unratified; a named mode-catalogue alternative is proposed. Validate the
+  preferred layout across the domain mocks, including Typography, before
+  settling the shared source contract. Explicit combined-mode authoring may be
+  deferred if the founder instead adopts the proposed exclusivity rule.
+  On 2026-09-16 the founder endorsed the ordinary separate-file direction:
+  one `axes.ts` registry, readable domain catalogues, and a final assembly file.
+  The [separate-file mock](./blueprints/axes/separate-files/README.md) supplies
+  editor-completion and typo evidence derived from authored source, acyclic
+  imports, and a missing-mode-value example. Application-owned attribute selection
+  is now ratified above. Exclusivity versus combined-mode syntax, exact public
+  types, and standard mode names remain open.
+  The [remaining review](./blueprints/axes/authoring-options.md#remaining-review-after-the-separate-file-mock)
+  separates those product choices from later implementation checks.
+- Time and Easing authoring/helper contracts are ratified above; standard-theme
+  numerical calibration remains open. Motion composites are explicitly deferred,
+  and their existing code requires a disposition decision during triage. Shadow's
+  blueprint and representative mock are ratified; numerical calibration remains
+  later work, and its genuine mode overrides will use the shared Axis model.
 - Runtime theme payload policy supports exact input today. Partial payloads need
   an explicit inheritance source and are not silently filled.
 - Grouping levels outside Color require real authoring cases before public APIs.
@@ -175,9 +559,9 @@ The preserved prototype lives on `codex/figma-plugin-wip` in the sibling
 `tfs-figma-wip` worktree. It is explicitly dormant and does not participate in
 v0.5 builds, package graphs, or release gates.
 
-The current evidence and recommended decision order for the remaining mature
-domains is recorded in [the v0.5 domain audit](./v05-domain-audit.md). It is a
-decision surface, not a second implementation source of truth.
+The [workshop progress list](./v05-workshop-progress.md) records the current review
+sequence. [The v0.5 domain audit](./v05-domain-audit.md) supplies implementation
+evidence and historical proposals; later Board verdicts take precedence.
 
 ## Review map
 

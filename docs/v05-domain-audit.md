@@ -4,17 +4,33 @@ This audit separates proven behaviour from legacy source shape. It deliberately
 does not retrofit the deferred generic-axis model or rename public fields without
 an explicit workshop verdict.
 
+The [Founder Board's overhaul milestones](./founder-board.md#overhaul-milestones)
+govern this audit. We are in blueprint and ratification. Implementation gaps below
+are inputs to the later architecture and runbook milestone, not an instruction
+to begin development as each domain is ratified.
+
+Every domain now requires a reviewed representative authoring mock before its
+workshop is considered ready to move on. The Founder Board records the standard:
+gold-standard usage, immediate readability of the domain definition, inline
+authoring where practical, meaningful case coverage, and visible output. Check
+mock coverage for previously ratified domains before closing the whole blueprint;
+their existing verdicts remain valid.
+
+The [workshop progress list](./v05-workshop-progress.md) records current readiness
+and the recommended sequence across the whole blueprint.
+
 ## Executive status
 
-| Domain        | Keep now                                                                    | Correct before v0.5 migration                                      | Defer behind an explicit verdict                             |
-| ------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Spacing       | multiplicative atomic scale, `min` boundary                                 | exact input validation; ordered-scale and stable-identity checks   | shared `size` axis source shape                              |
-| Gap           | references to Spacing; compact semantic choices                             | reject misleading unit conversion; validate ordered resolved range | final range vocabulary and automatic axis following          |
-| Border radius | references to Spacing; compact semantic choices                             | same unit and ordering issues as Gap                               | final range vocabulary and automatic axis following          |
-| Border width  | one deliberate scalar in the common case                                    | stop requiring duplicate unchanged modes                           | optional axis overrides when width genuinely changes         |
-| Time          | simultaneous named scales; references consumed by Motion                    | require CSS time units and a genuinely ordered atomic scale        | whether numerical step identities remain the lasting grammar |
-| Motion        | property-agnostic composites, easing references, explicit reduced behaviour | distinguish ordered ranges from categorical variants               | exact range vocabulary and derivation helper                 |
-| Shadow        | ordered multi-layer composites and typed Color/Alpha references             | distinguish ordered ranges from categorical variants               | exact range vocabulary and derivation helper contract        |
+| Domain        | Keep now                                                                            | Correct before v0.5 migration                                             | Defer behind an explicit verdict                     |
+| ------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Spacing       | multiplicative atomic scale, `min` boundary                                         | exact input validation; ordered-scale and stable-identity checks          | shared `size` axis source shape                      |
+| Gap           | references to Spacing; ratified `min / s / l / max` range                           | reference, unit, and ordering validation implemented in foundation        | automatic axis following                             |
+| Border radius | references to Spacing; ratified `min / s / l / max` range                           | same validation as Gap, implemented in foundation                         | automatic axis following                             |
+| Border width  | one deliberate scalar in the common case                                            | stop requiring duplicate unchanged modes                                  | optional axis overrides when width genuinely changes |
+| Time          | simultaneous named scales; ratified `min / lo / hi / max` values                    | implement keyed scales with `defaultScale`, `unit`, and explicit `values` | standard-theme numerical calibration                 |
+| Easing        | ratified Bézier and Linear forms, helper contract, semantic vocabulary              | independent structured pool, helpers, and Workbench editing               | theme calibration                                    |
+| Motion        | independent Time/Easing foundations; call sites own animation choices               | triage the inherited composite code and consumer dependencies later       | composites explicitly parked for this overhaul       |
+| Shadow        | ratified flat catalogue, complete ranges, inline Color expansion, consumer boundary | replace the inherited base/variants shape and preserve scoped references  | shared Axis syntax; later standard-theme calibration |
 
 ## Cross-domain finding: today has categories, not axes
 
@@ -73,30 +89,35 @@ machinery.
 - They deliberately reference Spacing rather than inventing another ruler.
 - Reference metadata preserves both the semantic choice and resolved value.
 - Their small semantic ranges prevent arbitrary one-off values in consumers.
+- The foundation validates all four positions, rejects unknown explicit Spacing
+  modes and unit relabelling, and requires strictly increasing resolved values.
 
-### Concrete gaps
+### Ratified verdict — 2026-09-09
 
-- The fixed range is `min / s / l / max`, with no unsuffixed `base`. This may be
-  an intentional compact contract, but it has not yet been reconciled against
-  the ratified Range grammar used by Typography.
+Gap and Border radius each retain `min / s / l / max`, with no `base` position
+and no generated unsuffixed `--gap` or `--bdr` token. A Range does not universally
+require a default position; consumers can choose their own default from its
+available positions.
+
+The approved foundation already implements this shape, so this verdict requires
+no generator change or numerical recalibration. Typography retains its separately
+ratified role-local `min / s / base / l / max` grammar. The five-position
+Gap/Radius implementation preserved on `codex/v05-foundation` is a superseded
+prototype, not the approved contract.
+
+### Remaining axis work
+
 - Every Size mode repeats the same mapping merely to follow a corresponding
   Spacing mode.
 - `spacingMode` selection falls back through matching names and then the default.
-  That is convenient but implicit; a typo can select a different ruler unless
-  validation sees an explicit reference.
-- An optional `unit` can relabel a resolved Spacing number without converting
-  it. For example, Spacing `8px` can become Gap `8rem`. That is not a valid
-  reference operation and should be removed or replaced with an explicit
-  absolute-value escape hatch.
-- Resolved `min / s / l / max` values are not checked to be strictly ordered.
+  This relationship remains implicit when no explicit reference is authored.
 
 ### Recommendation
 
-Preserve the four public CSS identities until the range-vocabulary verdict.
-Remove the misleading unit relabelling. Make ordered resolution mandatory. In
-the eventual Axis model, an unchanged Gap/Radius mapping should be authored once
-and follow the active Spacing mode automatically; only a genuinely different
-mapping should require an override.
+Preserve the ratified four-position contract and existing validation. In the
+eventual Axis model, an unchanged Gap/Radius mapping should be authored once and
+follow the active Spacing mode automatically; only a genuinely different mapping
+should require an override.
 
 ## Border width
 
@@ -128,54 +149,165 @@ when the value actually changes. Continue emitting the existing unsuffixed
 - Motion references a scale and step explicitly and exposes milliseconds and
   seconds in its generated contract.
 
-### Concrete gaps
+### Foundation validation already implemented
 
-- Time accepts any syntactically CSS-like unit until Motion happens to consume
-  it. A standalone Time system can therefore emit an invalid duration such as
-  `100px`.
-- `base: 0` creates an entire scale of duplicate zero values. Reduced Motion now
-  has an explicit semantic override, so zero is no longer a defensible Time
-  Scale.
-- `min` is not required to be lower than `base`.
-- Unknown fields inside a scale token object are not rejected at runtime.
+The current numerical scale requires `ms` or `s`, a finite positive `base`,
+`0 <= min < base`, and a positive integer `range`; unknown token-object fields
+are rejected. This `base` is a scale-generation input, not a ratified universal
+semantic position.
 
-### Recommendation
+### Ratified verdict — 2026-09-09
 
-Keep simultaneous named scales and existing CSS names. Require `ms` or `s`, a
-positive base, and `0 <= min < base`. Keep literal zero as a Motion policy value,
-not an atomic Time scale. Defer changing numerical step identities until a real
-consumer demonstrates that another fixed vocabulary is better.
+Time values are property-agnostic: the same `--t-*` tokens can supply either
+duration or delay. A separate delay domain or token family is unnecessary for
+the stated use case.
 
-## Motion workshop boundary
+Every scale has four required, explicit, strictly increasing values,
+`min / lo / hi / max`, without an unsuffixed base. Authors can add a named scale
+such as `anim`, giving
+`--t-anim-min` and its companion positions alongside the short `--t-*` scale.
+Alpha is the ratified analogue: one selected scale receives short names, while
+additional identities receive namespaced names and remain available together.
+`anim` is a Time scale identity, not a new Family or a switchable Mode.
 
-The conceptual core is strong:
+The ratified authoring shape is `time: { defaultScale, scales }`, with each
+authored scale identity containing `{ unit, values }`. `defaultScale` explicitly
+selects the scale receiving short names; it creates no extra position. This
+replaces the existing array of scales and the numerical `base`/`range` inputs.
+The complete example is recorded in the Founder Board; its numbers remain
+illustrative, pending standard-theme calibration.
 
-- composites are property-agnostic fragments of duration, easing, and delay;
-- call sites own selectors and animated properties;
-- named easings are portable to CSS and JavaScript engines;
-- every composite makes a deliberate Reduced Motion decision.
+Implementation and migration from numerical steps remain pending. They must
+carry the ratified positions through references, generated contracts, CSS,
+resolved evidence, and downstream transforms.
 
-The unresolved mismatch is structural: stock `min / lo / base / hi / max`
-choices are ordered strengths, but the public field calls them `variants`.
-Under the ratified grammar they are a Range, while a true Variant is categorical
-and may change several coupled decisions.
+## Easing and Motion workshop boundary
 
-The next workshop must decide:
+The current workshop supersedes the earlier recommendation to formalise Motion
+composite ranges first. Establish Time and an independent Easing pool before
+deciding what additional value composites provide. Call sites continue to own
+selectors and animated properties.
 
-1. whether every Motion identity owns the fixed sparse range
-   `min / lo / base / hi / max`;
-2. whether `base` is required and unsuffixed, matching Typography and Shadow;
-3. whether derivation interpolates only duration, or may interpolate Bézier
-   control points and delay;
-4. whether categorical variants are needed in v0.5 at all;
-5. whether Reduced Motion overrides the base and range positions independently,
-   or continues inheriting as it does today.
+The standard-theme identity vocabulary is ratified in the Founder Board:
+`neu / pri / duo / tri / tet / pen`, with custom authored identities still
+possible. For Easing, `neu` directly owns the chosen neutral curve, and `pri`
+directly owns the chosen primary accent curve. If that accent is a bounce,
+`pri` contains its definition; it need not reference another identity named
+`bounce`. Neither `default` nor all six accent/neutral entries are required.
+The names describe roles; they do not fix the same curve in every theme.
 
-Recommendation: formalise the ordered Range; retain current explicit Reduced
-Motion inheritance; interpolate duration only by default; require explicit
-easing choices because interpolated curves are rarely meaningful design intent.
+Reusable bounce support is an explicit product requirement. A standard theme
+should provide usable definitions without making authors reconstruct bounce
+behaviour. Optional helpers or shared definitions may help author those values,
+but a separate preset registry is not a required part of the model.
+
+Implementation is still pending: the current Easing type only accepts a
+four-number cubic Bézier tuple, and Motion validation requires composites.
+The exact curve representation must support the intended bounce and preserve
+meaning across CSS, TypeScript, and resolved evidence. Figma exports only its
+supported subset and may report an easing as unavailable; native playback parity
+is not required. The two supported forms, helper signatures, and return shapes
+are ratified below.
+Illustrative `easingPresets.*` notation was not a ratified API.
+
+The later founder verdict explicitly parks Motion composites for this overhaul:
+there is no immediate use case. Their range, categorical variants, and composite
+Reduced Motion authoring are deferred. The inherited `min / lo / base / hi / max`
+shape is implementation evidence, not approval of a required `base` or future
+grammar. The architecture/triage milestone will decide what to do with that code
+and any consumers; the blueprint workshop makes no source changes.
+
+### Ratified conventional Easing forms — 2026-09-09
+
+The founder supports structured, inspectable values and optional authoring
+helpers, but rejects a bespoke `bounce({ count, decay })` value type. That
+unratified proposal is withdrawn. Most authored values will be cubic Bézier
+curves; other support should follow established token or CSS primitives.
+
+The later simplicity verdict removes Steps from the earlier three-form scope.
+Local CSS can express that niche behaviour directly. TFS does not mirror every
+CSS feature as a token type or editor, and does not offer a Steps helper.
+
+The ratified scope is a small typed model covering:
+
+| Form         | Authored data                     | Purpose                                                       |
+| ------------ | --------------------------------- | ------------------------------------------------------------- |
+| Cubic Bézier | Four numbers, `x1 / y1 / x2 / y2` | Ordinary easing and overshoot; the main authoring path        |
+| Linear       | Ordered input/output points       | Constant speed or a custom curve, including a repeated bounce |
+
+The DTCG format standardises `cubicBezier`; Linear is a conventional CSS form,
+not an additional DTCG token type. CSS keywords such as `ease-in` can
+resolve to their defined primitives without creating additional value kinds or
+mandatory semantic identities.
+
+An independent top-level `easings` map directly owns these definitions. Small
+constructors can return plain typed data, following the existing `oklch()`
+helper. A four-number tuple is already structured and editable: the Workbench
+can label its coordinates without requiring four separately named object fields.
+The accepted common shape is `{ type, value }`. The
+[Time/Easing authoring contract](./v05-time-easing-contract.md) specifies
+`cubicBezier(x1, y1, x2, y2)`, `linear()`, and `linear(points)`, their return
+types, the `[input, output]` coordinate convention, and a complete example.
+The authoring/helper verdict is complete; numerical calibration remains open.
+
+Agreed Bézier authoring pattern, not an existing export; values are illustrative:
+
+```ts
+const easings = {
+	neu: cubicBezier(0.2, 0, 0.38, 0.9),
+	pri: cubicBezier(0.34, 1.56, 0.64, 1),
+};
+```
+
+The second curve overshoots and settles; it is not a repeated-bounce curve.
+Reusable multi-bounce support remains available through Linear point data
+supplied by a standard theme, without inventing a bounce-specific grammar or
+physics engine. Themes own those calibrated values. Authoring a curve once
+makes it reusable through its semantic identity.
+
+Generate `--ease-{identity}` independently of Time or Motion composites. Each
+identity has one value; no ordered positions or default alias are generated.
+CSS strings are output. Workbench controls and review patches should edit the
+authored coordinates or points, and preview the same values that
+generation emits. Current Motion review cases have no editing controls; these
+controls and their patch integration remain implementation work.
+
+### Ratified library decision — no dependency added
+
+Implement the small constructors, validation, and serialization in TFS. The
+existing core already validates and formats cubic Bézier tuples. Workbench can
+draw the curve as an SVG path and delegate actual playback to the browser, so
+this scope does not require a JavaScript easing engine.
+
+If a later feature needs numerical Bézier evaluation at a given time progress,
+consider the focused [bezier-easing](https://github.com/gre/bezier-easing)
+library. That operation involves inverting the curve's x coordinate; it is more
+subtle than formatting four values. It is unnecessary solely for token authoring
+or CSS preview, and must not become a dependency of generated token modules.
+
+[d3-ease](https://d3js.org/d3-ease) and
+[Motion's easing functions](https://motion.dev/docs/easing-functions) provide
+evaluators and named behaviours, rather than a serializable token schema.
+Neither is needed for the ratified core grammar. Existing easing definitions
+may inform theme calibration without becoming new public TFS token kinds.
+
+The [CSS Easing specification](https://www.w3.org/TR/css-easing-2/) defines the
+function families and demonstrates a reusable bounce using `linear()`.
+[Figma's prototype Transition API](https://developers.figma.com/docs/plugins/api/Transition/)
+exposes Bézier and spring curves, without an arbitrary piecewise-linear curve
+field. The [DTCG 2025.10 format](https://www.designtokens.org/tr/2025.10/format/#cubic-b%C3%A9zier)
+defines `cubicBezier` values as four numbers. Therefore broader easing support
+must not be constrained to that export type. Keep the complete curve in CSS,
+TypeScript, and TFS evidence; the Figma adapter can report unsupported export.
+Do not label a sampled bounce as a cubic Bézier or silently substitute another
+curve. The founder explicitly accepts limited Figma coverage and does not need
+native transition playback. Any supported mapping and diagnostic belongs in the
+adapter, without Figma-specific branches in core easing validation or generation.
 
 ## Shadow workshop boundary
+
+The opening observations and questions below describe the inherited implementation
+and earlier audit. The ratified workshop update supersedes them.
 
 The conceptual core is also strong:
 
@@ -188,7 +320,8 @@ Again, stock `min / lo / base / hi / max` choices are a Range currently stored
 under `variants`. `deriveShadowRange()` already exposes the real concept while
 returning the older field shape.
 
-The next workshop must decide:
+The earlier audit proposed the following questions; none establishes a required
+feature merely because the current code or helper supports it:
 
 1. whether every Shadow identity owns the same fixed sparse range;
 2. whether sparse authoring follows the same endpoint rules as Typography;
@@ -199,17 +332,82 @@ The next workshop must decide:
 5. whether interpolation remains authoring sugar whose complete resolved layers
    appear in evidence and Workbench.
 
-Recommendation: promote the existing helper's Range concept into the source and
-contract; keep Box/Text separate; keep interpolation optional and inspectable;
-do not add categorical variants until a real coupled alternative requires one.
+### Shadow workshop update — 2026-09-10
 
-## Safe implementation sequence
+The founder has ratified one flat catalogue of complete `min / lo / hi / max`
+ranges and reviewed the representative mock. The Shadow workshop is complete.
+The [current mock and full token expansion](./blueprints/shadow/README.md) put
+`unit`, optional `defaultRange`, and `ranges` directly under `shadows`. Authored
+identities such as `neu`, `inset`, and `text` are siblings; a color-expansion helper
+appears inline and writes a shared glow once for several Color identities.
+There are no separate Box/Text authoring sections or helper overloads.
 
-1. Add exact-object and ordered-scale validation without changing output names.
-2. Resolve the Gap/Radius four-position range verdict.
-3. Resolve Motion and Shadow Range vocabulary together.
-4. Change authored source and generated contracts with a migration guide and
-   golden output fixtures.
-5. Implement shared Axes separately; do not hide them inside this domain cleanup.
-6. Rebuild the stock example and exact Scatter review workspace after each
-   public change.
+The real CSS property differences remain: text-shadow cannot use spread or inset.
+The ratified boundary is that TFS validate its own token definitions and emit
+them faithfully, while the consumer chooses an appropriate CSS property. Add no
+required target declarations or derived compatibility API for this scope. This
+supersedes the previous recommendation to make compatibility machinery a condition
+of flattening. The final consumer boundary is recorded as ratified in the Founder
+Board; no library implementation has begun.
+
+One length unit applies throughout. Color/Alpha references remain structured,
+Color changes follow the active mode, and correct binding within nested scopes
+remains a compiler responsibility. The ordinary no-shadow case uses omission or
+CSS `none`. Inner shadows use the per-layer inset field. No Shadow darkness
+constraint, separate opacity schedule, categorical variants, or layer-interpolation
+helper is required for this blueprint.
+
+The latest mock retains sixteen elevation/inset/shared-glow values and replaces
+eight duplicated Text-glow examples with four values for an independently authored
+`text` treatment. Earlier Text-glow names remain expressible as ordinary authored
+identities. This does not migrate any actual consumers. The source is editor-checked
+with a declaration-only helper; numerical calibration, public implementation,
+package placement, migration, and scoped CSS verification belong to later work.
+
+The shared position-pattern catalogue and per-domain design policy remain accepted.
+Shared labels do not force identical completeness or numeric validation across
+domains. The shared Axis source model still needs its own blueprint workshop.
+
+### Earlier starting proposal — subsequent verdict above takes precedence
+
+Start with the consumer decision: choose a shadow identity, then a degree of that
+shadow's presence. A neutral `neu` range with `min / lo / hi / max` is a candidate
+for the common case, with no required `base` or generated unsuffixed alias.
+Additional identities can use the ratified standard-theme vocabulary when neutral
+and accent roles apply. `pri` owns its authored look directly; it does not
+automatically mean glow or inherit the color named `pri`.
+
+Each choice is one complete, structured shadow value containing one or more
+layers. Keep Color/Alpha references so changes to those foundations propagate.
+Retain the useful distinction between Box and Text layer grammars without
+requiring a project to author both domains.
+
+The immediate workshop should establish whether the ordinary need is that small
+range or a pool of individual looks. Then settle required positions, direct-value
+authoring if needed, reference and unit rules, and public naming. A visual strength
+progression does not imply that every layer coordinate must numerically increase.
+
+Do not carry forward the mandatory `base`, arbitrary variants, explicit review
+order, or interpolation helper solely because they already exist. Range
+derivation can be considered after a concrete authoring example demonstrates
+repetition worth removing. Any accepted helper must leave its resolved values
+inspectable.
+
+## Remaining blueprint decisions
+
+Gap/Radius and Time/Easing contracts are ratified. Their implementation status
+does not hold up the remaining blueprint discussion.
+
+- Motion composites are explicitly deferred. Their existing code and consumers
+  are a later triage item, not an outstanding product workshop prerequisite.
+- Shadow's flat mock and consumer-responsibility boundary are ratified. Its
+  genuine mode overrides participate in the remaining shared Axis workshop.
+- Resolve the remaining Spacing/Border width authoring and shared Axis questions,
+  or explicitly defer them with clear scope boundaries.
+- Identify any remaining decisions across the wider Founder Board needed to
+  complete the overhaul blueprint. This domain audit is not the complete agenda.
+
+The earlier implementation sequence is superseded by the founder's milestone
+clarification. Architecture, cleanup, migration strategy, work ordering, and
+verification belong in a subsequent runbook reviewed with the founder. A coded
+foundation preview is not required to ratify the remaining product decisions.
