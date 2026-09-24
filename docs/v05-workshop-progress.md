@@ -22,9 +22,13 @@ separately agreed architecture and runbook milestone.
   correctness belongs to compiler verification.
 - **Ratified 2026-09-24:** one controlling axis per complete authored value,
   shared top-level defaults, and complete Shadow-position list replacement.
-  The ordinary Axis workshop is ready to carry forward. Combined-mode override
+  Combined-mode override
   syntax is outside this overhaul; no combination workshop remains in the queue.
-- **Now:** [Color and Alpha's first representative mock](./blueprints/color-alpha/README.md):
+- **Now, focused clarification:** review the
+  [ordinary-palette input/output mock](./blueprints/color-alpha/baseline/README.md).
+  The proposal removes `axes.default` and requires a complete ordinary top-level
+  palette. Founder review is pending; no prior verdict is silently replaced.
+- **Resume afterwards:** [Color and Alpha's first representative mock](./blueprints/color-alpha/README.md):
   the readable palette, shared defaults and Theme modes, standard vocabulary,
   two Alpha scales, explicit Groups, and complete expected token names.
   Await founder review of this increment.
@@ -47,7 +51,7 @@ domain retaining its own readiness verdict.
 
 | Order | Workshop                                  | Current readiness                                                                               | What the review should establish                                                                                                                                                                                                             |
 | ----- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1     | Shared Axes and Modes                     | Authoring rules ratified; separate-file mock reviewed                                           | Apply the accepted rules in queued domain mocks. Exact exported types, validation and CSS strategy belong to later implementation.                                                                                                           |
+| 1     | Shared Axes and Modes                     | Rules ratified; initial selection versus complete ordinary values reopened for a focused review | Review the baseline input/output proposal; retain exclusivity, whole-value replacement and application-owned selection. Exact exported types and compiler strategy remain later work.                                                        |
 | 2     | Color and Alpha                           | First representative mock ready for review; policy/runtime companions remain                    | Review swatches, Alpha scales, standard identity vocabulary, explicit Groups, output names and mode changes. Follow with prefix-matched Groups, runtime themes and existing luminance-delta policy.                                          |
 | 3     | Spacing, Gap, Border radius, Border width | Gap/Radius contracts ratified; representative mocks and remaining Spacing/Width choices pending | Generated numbered Spacing, deliberate semantic ranges referencing it, and the ordinary scalar Border width. Show how these respond to Size modes without repeated unchanged values.                                                         |
 | 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending                               | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
@@ -96,8 +100,9 @@ completion as implementation completion or invent implementation increment count
 before the runbook is agreed.
 
 - [x] Blueprint: Shadow workshop and representative mock.
-- [x] Blueprint: Axis authoring rules and separate-file mock.
-- [ ] Blueprint, now: Color + Alpha; first mock ready, policy/runtime companions remain.
+- [x] Blueprint: Axis exclusivity and replacement rules; separate-file mock.
+- [ ] Blueprint, now: ordinary palette versus automatic initial mode — input/output review.
+- [ ] Blueprint: resume Color + Alpha; policy/runtime companions remain.
 - [ ] Blueprint: Spacing + Gap + Border radius/width.
 - [ ] Blueprint: Time + Easing confirmation mock.
 - [ ] Blueprint: Typography representative mocks.

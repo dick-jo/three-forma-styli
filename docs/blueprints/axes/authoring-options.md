@@ -1,5 +1,11 @@
 # Domain authoring across Axes and Modes: alternatives
 
+Focused follow-up, 2026-09-24: the founder requests
+[input/output evidence](../color-alpha/baseline/README.md) for removing
+`axes.default` and requiring complete ordinary values. That narrow proposal is
+pending review; the original shared-data/initial-mode model below is retained
+for comparison. Other ratified Axis rules stand.
+
 Status, 2026-09-24: **catalogue model, shared defaults, one controlling axis per
 authored value, and complete Shadow-list replacement ratified**.
 Application-owned attribute selection was ratified on 2026-09-23.

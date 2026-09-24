@@ -225,6 +225,15 @@ flowchart LR
 
 ### Axis selection
 
+Current review, 2026-09-24: the founder questions the need for automatic initial
+mode selection and requests an input/output mock before deciding. The
+[ordinary-palette proposal](./blueprints/color-alpha/baseline/README.md) removes
+`axes.default`, requires complete ordinary top-level domain data, and treats named
+modes as partial changes activated by the application. It is **not yet ratified**.
+The previously accepted initial-mode clause below remains recorded for comparison;
+do not treat the new proposal as a verdict. Exclusivity, whole-value replacement,
+and application-owned mode selection are not reopened by this narrow review.
+
 Founder ruling, 2026-09-23: the application chooses the active mode and supplies
 the resulting attribute. Application policy owns OS preferences, manual choices,
 and remembered selections; TFS supplies the values for that selection. A direct

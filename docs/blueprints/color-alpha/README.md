@@ -1,6 +1,11 @@
 # Color and Alpha authoring review
 
 Status, 2026-09-24: **first representative mock, awaiting founder review**.
+Current focused review: the [ordinary-palette proposal](./baseline/README.md)
+shows complete top-level values, no `axes.default`, and explicit expected CSS.
+That change is pending founder review. This original mock is preserved for
+comparison and still uses the earlier initial-mode selection model.
+
 Milestone 1 only. The Board's existing Color/Alpha, identity, Group, and Axis
 contracts remain authoritative. No production schema or compiler is changed.
 Numerical colour and opacity choices illustrate authoring, not a calibrated
