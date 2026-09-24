@@ -236,10 +236,29 @@ through dependent Shadow and Radius values automatically. Correct generated CSS
 in nested scopes is an implementation responsibility, not an additional authoring
 choice to ask the founder to make.
 
-The ordinary separate-file authoring direction remains endorsed. Exclusivity
-between axes, the shared-default explanation, and complete Shadow-list replacement
-are being reviewed in the [current Axis proposal](./blueprints/axes/authoring-options.md#current-recommendation-2026-09-23).
-They are not newly ratified by this entry.
+Founder ratification, 2026-09-24, following the
+[concrete explanations](./blueprints/axes/authoring-options.md#current-recommendation-2026-09-23):
+
+- Each complete authored value may vary directly along at most one axis.
+  Reject a second controlling axis, independent of file order or an expectation
+  that the choices will never coincide. Different values within a domain may
+  use different axes. References following upstream values are not competing
+  authorship: a Shadow layer list may change with Size while its Color follows
+  Theme. Whole Color swatches and whole Shadow-position lists are value boundaries;
+  no merging individual Color channels or array indexes across axes.
+- Shared top-level domain data supplies defaults. Selected mode data replaces
+  supplied values; omissions retain shared data. An axis's `default` selects its
+  initial mode and does not turn that mode's data into a parent for its siblings.
+  Missing required values fail validation instead of borrowing another palette.
+- A mode supplying a Shadow position replaces its complete layer list. Omitting
+  that position retains the shared list. Other positions remain unchanged.
+- Combined-mode override syntax and priority machinery are outside this overhaul.
+  An author needing combined palettes can declare explicit choices on one axis;
+  the application chooses one. Revisit the limit only with a concrete need.
+
+The ordinary separate-file registry/catalogue/assembly model and these rules are
+ready to carry into the remaining domain mocks. Implementation remains pending;
+those mocks confirm domain-specific value boundaries without reopening this ruling.
 
 ### Standard-theme identity vocabulary
 
@@ -526,21 +545,17 @@ not dependencies of generated consumer packages.
 
 ## Deliberately open after the first v0.5 foundation
 
-- The fully generic multi-axis source model and collision-resolution syntax is
-  ratified in direction but must not be faked through today’s legacy category IR.
-  The [Axis authoring comparison](./blueprints/axes/authoring-options.md) is in
-  founder review as of 2026-09-15. The conditional `when / set` layout is
-  unratified; a named mode-catalogue alternative is proposed. Validate the
-  preferred layout across the domain mocks, including Typography, before
-  settling the shared source contract. Explicit combined-mode authoring may be
-  deferred if the founder instead adopts the proposed exclusivity rule.
-  On 2026-09-16 the founder endorsed the ordinary separate-file direction:
-  one `axes.ts` registry, readable domain catalogues, and a final assembly file.
+- The ratified Axis rules above require an explicit migration from today's
+  legacy category IR. Do not fake the model by renaming legacy fields.
+  The [Axis authoring comparison](./blueprints/axes/authoring-options.md) preserves
+  earlier alternatives as evidence; its conditional `when / set` and combined-mode
+  sketches are superseded. One `axes.ts` registry, readable domain catalogues,
+  shared defaults, and a final assembly file are the accepted working model.
   The [separate-file mock](./blueprints/axes/separate-files/README.md) supplies
   editor-completion and typo evidence derived from authored source, acyclic
   imports, and a missing-mode-value example. Application-owned attribute selection
-  is now ratified above. Exclusivity versus combined-mode syntax, exact public
-  types, and standard mode names remain open.
+  is ratified above, as is exclusivity. Exact public types, implementation strategy,
+  and standard mode names remain later decisions.
   The [remaining review](./blueprints/axes/authoring-options.md#remaining-review-after-the-separate-file-mock)
   separates those product choices from later implementation checks.
 - Time and Easing authoring/helper contracts are ratified above; standard-theme

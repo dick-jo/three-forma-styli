@@ -2,9 +2,10 @@
 
 Status, 2026-09-16: **ordinary separate-file direction endorsed; typing surface remains illustrative**.
 The founder likes the central `axes.ts` registry and this catalogue organization.
-Update, 2026-09-23: application-owned attribute selection is ratified. The current
-proposal limits each authored value to one controlling axis, which would avoid
-combined-mode syntax for this overhaul; that limitation is not yet ratified.
+Update, 2026-09-24: application-owned attribute selection, shared defaults,
+one controlling axis per authored value, and whole Shadow-position list
+replacement are ratified. Combined-mode override syntax is outside this overhaul.
+The review types are incomplete evidence; they do not enforce all those rules.
 See the
 [remaining review](../authoring-options.md#remaining-review-after-the-separate-file-mock).
 This exercises the preferred named-mode catalogue across separate source files.

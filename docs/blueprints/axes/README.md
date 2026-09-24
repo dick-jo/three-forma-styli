@@ -1,5 +1,13 @@
 # Axes and Modes workshop
 
+Verdict, 2026-09-24: the separate-file catalogue, shared defaults, one controlling
+axis per authored value, and complete Shadow-position list replacement are
+ratified. The application selects mode attributes. See the
+[Founder Board](../../founder-board.md#axis-selection) and the
+[current separate-file mock](./separate-files/README.md).
+Earlier conditional/combined-mode examples below are historical proposals;
+combined-mode override syntax is outside this overhaul.
+
 Latest review, 2026-09-16: the preferred catalogue now has a
 [separate-file authoring mock](./separate-files/README.md), with source-derived
 editor suggestions, deliberate typo checks, and acyclic import evidence. Start

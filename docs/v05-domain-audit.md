@@ -34,6 +34,12 @@ and the recommended sequence across the whole blueprint.
 
 ## Cross-domain finding: today has categories, not axes
 
+Blueprint verdict, 2026-09-24: the Board now ratifies the shared registry and
+catalogue model, shared top-level defaults, one controlling axis per authored
+value, and complete Shadow-position list replacement. The application selects
+mode attributes. Earlier cross-axis combination proposals are superseded; the
+legacy implementation evidence below remains relevant to later migration.
+
 The current IR knows two switchable categories: Color and Size. Spacing,
 Typography, Gap, Border radius, and Border width independently repeat local
 `modes`; the generator merges equally named overrides and the CSS transformer

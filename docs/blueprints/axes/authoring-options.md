@@ -1,10 +1,12 @@
 # Domain authoring across Axes and Modes: alternatives
 
-Status, 2026-09-23: **ordinary catalogue and separate-file direction endorsed;
-application-owned attribute selection ratified; exclusivity proposed**.
-The [current recommendation](#current-recommendation-2026-09-23) supersedes the
-earlier recommendation to develop combined-mode syntax next. Historical examples
-below preserve the comparison; they do not ratify extra features.
+Status, 2026-09-24: **catalogue model, shared defaults, one controlling axis per
+authored value, and complete Shadow-list replacement ratified**.
+Application-owned attribute selection was ratified on 2026-09-23.
+The founder accepted the [2026-09-23 recommendation](#current-recommendation-2026-09-23).
+Earlier conditional/combined-mode examples below preserve the comparison and are
+superseded. There is no remaining combined-mode syntax workshop in this overhaul.
+The [Founder Board](../../founder-board.md#axis-selection) records the current law.
 The founder understands the Axis/Mode concept and has reviewed the separate-file
 catalogue example. The original `overrides / when / set` list has not been accepted.
 This document is the current comparison; the earlier examples remain available
@@ -338,6 +340,9 @@ to reopen the ordinary authoring layout.
 
 ## Current recommendation, 2026-09-23
 
+Ratified on 2026-09-24. The following preserves the recommendation's original
+wording; references to a pending ruling are historical. The Board owns the verdict.
+
 The founder asks whether a sensible limitation can avoid competing axes, approves
 application-owned attribute selection, and asks for plain explanations of shared
 defaults, Shadow replacement, and nested scopes. The activation ruling is recorded
@@ -434,12 +439,10 @@ the later runbook and is not another founder decision.
 
 ## Review and verification boundary
 
-The founder endorses B's ordinary separate-file direction; use upcoming domain mocks to assess its remaining cases. The
-first checks should cover Color/Alpha, Spacing and references, the genuine Shadow
-change, and Typography's scale/role relationship. Final shared-grammar acceptance
-needs a verdict on the proposed exclusivity limit or an explicit combined-mode
-authoring decision, followed by the remaining domain examples.
-The endorsement does not ratify the unresolved features described above.
+The founder has ratified B's ordinary catalogue and the exclusivity/default/list
+rules above. Remaining domain mocks confirm their application, including
+Typography's scale/role relationship. Public types and implementation remain
+later work. The review declarations do not yet enforce every ratified rule.
 
 The candidate is included in the existing local TypeScript check. It checks
 syntax, imports, and Alpha data; it is not a full

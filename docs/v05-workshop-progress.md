@@ -1,6 +1,6 @@
 # v0.5 workshop progress
 
-Updated 2026-09-23. Current milestone: **1 — blueprint and ratification**.
+Updated 2026-09-24. Current milestone: **1 — blueprint and ratification**.
 
 This is the navigation and progress surface. The
 [Founder Board](./founder-board.md) owns ratified contracts; the
@@ -20,16 +20,17 @@ separately agreed architecture and runbook milestone.
 - **Settled:** the application selects the mode and supplies its attribute.
   References follow changing upstream values automatically; nested-scope output
   correctness belongs to compiler verification.
-- **Remaining Axis review:** rule on the proposed limit of one controlling axis
-  per authored value; confirm shared defaults and complete Shadow-list replacement
-  through the concrete explanations. This replaces the previous recommendation
-  to develop combined-mode syntax next. The exclusivity limit is a proposal,
-  not a founder verdict.
-- **Following:** Color and Alpha representative mocks using the preferred
-  candidate. The separate-file example supplies initial typing/reference evidence;
-  Groups, luminance policy, runtime palettes, and full domain review remain.
-  Confirm the Axis pattern through the remaining domain reviews. If exclusivity
-  is accepted, a combined-mode authoring feature is not a prerequisite.
+- **Ratified 2026-09-24:** one controlling axis per complete authored value,
+  shared top-level defaults, and complete Shadow-position list replacement.
+  The ordinary Axis workshop is ready to carry forward. Combined-mode override
+  syntax is outside this overhaul; no combination workshop remains in the queue.
+- **Now:** [Color and Alpha's first representative mock](./blueprints/color-alpha/README.md):
+  the readable palette, shared defaults and Theme modes, standard vocabulary,
+  two Alpha scales, explicit Groups, and complete expected token names.
+  Await founder review of this increment.
+- **Next within Color/Alpha:** focused companions for prefix-matched Groups,
+  luminance policy/diagnostics, and runtime palettes. These preserve existing
+  contracts and real consumer needs; the domain review is not closed yet.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -46,8 +47,8 @@ domain retaining its own readiness verdict.
 
 | Order | Workshop                                  | Current readiness                                                                               | What the review should establish                                                                                                                                                                                                             |
 | ----- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1     | Shared Axes and Modes                     | Separate-file direction endorsed; application selection ratified; exclusivity proposed          | Rule on exclusivity and clarify shared defaults and Shadow-list replacement; confirm the pattern in queued domain mocks, including Typography.                                                                                               |
-| 2     | Color and Alpha                           | Existing verdicts stand; representative mocks pending                                           | Immediately readable swatches and Alpha scales, the standard identity vocabulary, Groups, derived token names, and mode changes. Use focused companion examples for runtime themes and existing luminance-delta policy.                      |
+| 1     | Shared Axes and Modes                     | Authoring rules ratified; separate-file mock reviewed                                           | Apply the accepted rules in queued domain mocks. Exact exported types, validation and CSS strategy belong to later implementation.                                                                                                           |
+| 2     | Color and Alpha                           | First representative mock ready for review; policy/runtime companions remain                    | Review swatches, Alpha scales, standard identity vocabulary, explicit Groups, output names and mode changes. Follow with prefix-matched Groups, runtime themes and existing luminance-delta policy.                                          |
 | 3     | Spacing, Gap, Border radius, Border width | Gap/Radius contracts ratified; representative mocks and remaining Spacing/Width choices pending | Generated numbered Spacing, deliberate semantic ranges referencing it, and the ordinary scalar Border width. Show how these respond to Size modes without repeated unchanged values.                                                         |
 | 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending                               | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
 | 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending                       | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
@@ -95,8 +96,8 @@ completion as implementation completion or invent implementation increment count
 before the runbook is agreed.
 
 - [x] Blueprint: Shadow workshop and representative mock.
-- [ ] Blueprint, now: finish Axis rules; application selection is settled.
-- [ ] Blueprint: Color + Alpha, including runtime themes and luminance policy.
+- [x] Blueprint: Axis authoring rules and separate-file mock.
+- [ ] Blueprint, now: Color + Alpha; first mock ready, policy/runtime companions remain.
 - [ ] Blueprint: Spacing + Gap + Border radius/width.
 - [ ] Blueprint: Time + Easing confirmation mock.
 - [ ] Blueprint: Typography representative mocks.
@@ -104,8 +105,8 @@ before the runbook is agreed.
 - [ ] Architecture, hygiene, consumer migration triage, and agreed runbook.
 - [ ] Implementation increments, verification, and final review.
 
-Motion composites remain deferred. There are five queued blueprint review groups
-after the current Axis review; their size differs. Several retain already ratified
+Motion composites remain deferred. Color/Alpha is the current review; four further
+blueprint review groups follow it. Several retain already ratified
 contracts and need representative confirmation, not a fresh redesign.
 
 Keep the full queue in this file. Update this tracker and the relevant Founder
