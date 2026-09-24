@@ -61,12 +61,9 @@ assert.deepEqual(complete('shadow.ts', "alpha: '"), alphaNames);
 // Simulated editor buffers prove that the vocabulary is derived, not copied.
 const colorFile = path.join(reviewRoot, 'color.ts');
 const originalColor = read(colorFile);
-edit(
-	colorFile,
-	originalColor.replace('tokens: { pri:', 'tokens: { duo: oklch(0.7, 0.1, 90), pri:')
-);
+edit(colorFile, originalColor.replace('pri: oklch', 'duo: oklch(0.7, 0.1, 90), pri: oklch'));
 assert.deepEqual(complete('shadow.ts', "color: '"), [...colorNames, 'duo'].sort());
-edit(colorFile, originalColor.replace('tokens: { pri:', 'tokens: { accent:'));
+edit(colorFile, originalColor.replace('pri: oklch', 'accent: oklch'));
 assert.deepEqual(
 	complete('shadow.ts', "color: '"),
 	['accent', ...colorNames.filter((name) => name !== 'pri')].sort()
@@ -99,6 +96,16 @@ edit(invalidFile, invalidSource);
 console.log(
 	'PASS: real editor completions, source-edit propagation, and six deliberate name errors.'
 );
+
+const incompleteFile = path.join(reviewRoot, 'checks/incomplete-palette.ts');
+const incompleteSource = read(incompleteFile);
+edit(incompleteFile, incompleteSource.replace('@ts-expect-error', 'deliberate-error'));
+const incompleteDiagnostics = service.getSemanticDiagnostics(incompleteFile);
+assert.equal(incompleteDiagnostics.length, 1);
+assert.ok(
+	ts.flattenDiagnosticMessageText(incompleteDiagnostics[0].messageText, ' ').includes('shd')
+);
+edit(incompleteFile, incompleteSource);
 
 // Check both type imports and value imports inside this example for cycles.
 const sourceFiles = service
@@ -163,6 +170,10 @@ function load(file) {
 	return module.exports;
 }
 const { designSystem: system } = load(path.join(reviewRoot, 'system.ts'));
+assert.ok(Object.values(system.axes).every((axis) => !Object.hasOwn(axis, 'default')));
+assert.deepEqual(Object.keys(system.colors.tokens).sort(), colorNames);
+assert.equal(system.spacing.base, 8);
+assert.equal(system.spacing.min, 4);
 const palette = (colors, theme) => ({ ...colors.tokens, ...colors.modes.theme[theme]?.tokens });
 const colorCss = (value, alpha) =>
 	`oklch(${value.l} ${value.c} ${value.h}${alpha === undefined ? '' : ` / ${alpha}`})`;
@@ -238,12 +249,13 @@ console.log(
 const { incompleteColors, knownButUnavailable } = load(
 	path.join(reviewRoot, 'checks/incomplete-palette.ts')
 );
+assert.equal(Object.hasOwn(incompleteColors.tokens, knownButUnavailable.color), false);
 const missing = system.axes.theme.modes.filter(
 	(theme) => !Object.hasOwn(palette(incompleteColors, theme), knownButUnavailable.color)
 );
 assert.deepEqual(missing, ['dark']);
 console.log(
-	'PASS: incomplete palette identifies shd as unavailable in theme=dark, despite its valid spelling.'
+	'PASS: mode-only shd is absent from ordinary values and rejected as a Color reference.'
 );
 console.log(
 	'Review evidence only: no TFS compiler support, general multi-axis resolver, or nested browser behavior is implemented here.'

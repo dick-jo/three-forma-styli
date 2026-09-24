@@ -24,7 +24,7 @@ const modeOnWrongAxis: ModeCatalogue<typeof axes, {}> = {
 };
 
 const invalidColor: ColorReference<typeof colors, typeof alpha> = {
-	// @ts-expect-error identities include common and mode-defined colors, but not this typo
+	// @ts-expect-error the ordinary catalogue does not contain this identity
 	color: 'shaddow',
 	alpha: 'lo',
 };
@@ -43,7 +43,7 @@ const invalidRange: SpacingRange = {
 	maximum: 3,
 };
 
-// Both a shared identity and an identity declared only inside modes are recognised.
+// Unchanged and mode-varying identities both belong to the ordinary catalogue.
 const shared: ColorReference<typeof colors, typeof alpha> = { color: 'pri' };
 const themed: ColorReference<typeof colors, typeof alpha> = { color: 'shd', alpha: 'lo' };
 const transparent: ColorReference<typeof colors, typeof alpha> = { color: 'pri', alpha: 'non' };

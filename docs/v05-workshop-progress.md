@@ -16,22 +16,22 @@ separately agreed architecture and runbook milestone.
   [separate-file catalogue mock](./blueprints/axes/separate-files/README.md),
   including the central `axes.ts` registry. Editor suggestions, six deliberate
   name errors, source-edit propagation, and acyclic imports are checked. The
-  mock also distinguishes a known Color name from a value missing in one mode.
+  current mock requires Color identities in the complete ordinary catalogue.
 - **Settled:** the application selects the mode and supplies its attribute.
   References follow changing upstream values automatically; nested-scope output
   correctness belongs to compiler verification.
 - **Ratified 2026-09-24:** one controlling axis per complete authored value,
   shared top-level defaults, and complete Shadow-position list replacement.
-  Combined-mode override
-  syntax is outside this overhaul; no combination workshop remains in the queue.
-- **Now, focused clarification:** review the
+  Combined-mode override syntax is outside this overhaul.
+- **Baseline clarification complete:** the
   [ordinary-palette input/output mock](./blueprints/color-alpha/baseline/README.md).
-  The proposal removes `axes.default` and requires a complete ordinary top-level
-  palette. Founder review is pending; no prior verdict is silently replaced.
-- **Resume afterwards:** [Color and Alpha's first representative mock](./blueprints/color-alpha/README.md):
+  The founder confirms it is resolved: complete ordinary values, named partial
+  changes, no `axes.default`. The current separate-file and Color/Alpha mocks
+  now follow it; grouping identical CSS selectors is only output formatting.
+- **Now:** [Color and Alpha's representative mock](./blueprints/color-alpha/README.md):
   the readable palette, shared defaults and Theme modes, standard vocabulary,
   two Alpha scales, explicit Groups, and complete expected token names.
-  Await founder review of this increment.
+  Baseline questions are closed. Resume the remaining Color-specific review.
 - **Next within Color/Alpha:** focused companions for prefix-matched Groups,
   luminance policy/diagnostics, and runtime palettes. These preserve existing
   contracts and real consumer needs; the domain review is not closed yet.
@@ -51,7 +51,7 @@ domain retaining its own readiness verdict.
 
 | Order | Workshop                                  | Current readiness                                                                               | What the review should establish                                                                                                                                                                                                             |
 | ----- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1     | Shared Axes and Modes                     | Rules ratified; initial selection versus complete ordinary values reopened for a focused review | Review the baseline input/output proposal; retain exclusivity, whole-value replacement and application-owned selection. Exact exported types and compiler strategy remain later work.                                                        |
+| 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated                                | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
 | 2     | Color and Alpha                           | First representative mock ready for review; policy/runtime companions remain                    | Review swatches, Alpha scales, standard identity vocabulary, explicit Groups, output names and mode changes. Follow with prefix-matched Groups, runtime themes and existing luminance-delta policy.                                          |
 | 3     | Spacing, Gap, Border radius, Border width | Gap/Radius contracts ratified; representative mocks and remaining Spacing/Width choices pending | Generated numbered Spacing, deliberate semantic ranges referencing it, and the ordinary scalar Border width. Show how these respond to Size modes without repeated unchanged values.                                                         |
 | 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending                               | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
@@ -100,9 +100,8 @@ completion as implementation completion or invent implementation increment count
 before the runbook is agreed.
 
 - [x] Blueprint: Shadow workshop and representative mock.
-- [x] Blueprint: Axis exclusivity and replacement rules; separate-file mock.
-- [ ] Blueprint, now: ordinary palette versus automatic initial mode — input/output review.
-- [ ] Blueprint: resume Color + Alpha; policy/runtime companions remain.
+- [x] Blueprint: Axis rules, complete ordinary values, and input/output mock.
+- [ ] Blueprint, now: finish Color + Alpha; Groups, policy/runtime companions remain.
 - [ ] Blueprint: Spacing + Gap + Border radius/width.
 - [ ] Blueprint: Time + Easing confirmation mock.
 - [ ] Blueprint: Typography representative mocks.

@@ -5,6 +5,8 @@ The founder likes the central `axes.ts` registry and this catalogue organization
 Update, 2026-09-24: application-owned attribute selection, shared defaults,
 one controlling axis per authored value, and whole Shadow-position list
 replacement are ratified. Combined-mode override syntax is outside this overhaul.
+The final baseline clarification is ratified too: complete ordinary domain values,
+named partial changes, no `axes.default`. The current files follow it.
 The review types are incomplete evidence; they do not enforce all those rules.
 See the
 [remaining review](../authoring-options.md#remaining-review-after-the-separate-file-mock).
@@ -15,15 +17,15 @@ The [Founder Board](../../../founder-board.md) governs ratified contracts.
 
 ## Read the authored files first
 
-| File                                                          | What to look at                                                                      |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [axes.ts](./axes.ts)                                          | Theme and Size declared once; no imports of project domains                          |
-| [color.ts](./color.ts)                                        | Shared accent, then two readable palettes; mode keys checked against the Axis source |
-| [alpha.ts](./alpha.ts)                                        | The accepted named scale and six active positions                                    |
-| [shadow.ts](./shadow.ts)                                      | References to those Color/Alpha definitions; a genuine optional Size calibration     |
-| [spacing.ts](./spacing.ts)                                    | Named calibrations under Size with shared unit/count                                 |
-| [border-radius.ts](./border-radius.ts) and [gap.ts](./gap.ts) | Short reference mappings; no mode repetition or evaluated Spacing imports            |
-| [system.ts](./system.ts)                                      | Imports and combines the definitions once                                            |
+| File                                                          | What to look at                                                                          |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [axes.ts](./axes.ts)                                          | Theme and Size declared once; no imports of project domains                              |
+| [color.ts](./color.ts)                                        | Complete ordinary palette, then Light changes; mode keys checked against the Axis source |
+| [alpha.ts](./alpha.ts)                                        | The accepted named scale and six active positions                                        |
+| [shadow.ts](./shadow.ts)                                      | References to those Color/Alpha definitions; a genuine optional Size calibration         |
+| [spacing.ts](./spacing.ts)                                    | Complete ordinary calibration, then small/large differences                              |
+| [border-radius.ts](./border-radius.ts) and [gap.ts](./gap.ts) | Short reference mappings; no mode repetition or evaluated Spacing imports                |
+| [system.ts](./system.ts)                                      | Imports and combines the definitions once                                                |
 
 Every file starts its main declaration immediately after imports. The typing
 machinery stays in [support/authoring.d.ts](./support/authoring.d.ts). Read the
@@ -32,8 +34,8 @@ additional authoring work to ask of each project.
 
 This is a focused example. The fuller accepted [Shadow mock](../../shadow/README.md)
 still covers inset, text treatments, and inline Color expansion. Color Groups,
-luminance policy, runtime palettes, typography, and cross-axis conflicts remain
-part of their queued workshops. `regular`, the sample measurements, and the
+luminance policy, runtime palettes, and typography remain in their queued
+workshops. Cross-axis competing authorship is already ruled out. `regular`, the sample measurements, and the
 public type names are not newly ratified by this mock.
 
 ## The small amount of TypeScript around the data
@@ -61,8 +63,8 @@ checking line does not need changing when a Color is added or a mode is renamed.
 [TypeScript documentation](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html#the-satisfies-operator).
 
 The project does not duplicate a `ColorIdentity = 'bg' | 'pri' | ...` list.
-The supporting type collects names from both shared Color data and the named
-palettes. It also derives mode names from the Axis registry and Alpha choices
+The supporting type now takes names directly from the complete ordinary Color
+catalogue. It also derives mode names from the Axis registry and Alpha choices
 from the selected authored Alpha scale, with the ratified compiler-owned `non`.
 
 ## Editor behavior actually checked
@@ -136,17 +138,19 @@ measurements. Selecting regular Size inside that region should restore ordinary
 measurements while retaining the surrounding Theme. These are requirements for
 later compiler/browser verification, not browser behavior tested by this fixture.
 
-## A known name can still be missing from a mode
+## A mode cannot be the only source of an identity
 
 [checks/incomplete-palette.ts](./checks/incomplete-palette.ts) intentionally defines
-`shd` in light but omits it from dark. Its reference has valid spelling, so the
-editor's identity check accepts it. The separate review calculation identifies:
+`shd` in Light but omits it from the ordinary set. Reference suggestions now come
+from the ordinary catalogue, so a reference to this `shd` is rejected by the
+editor. The review script checks that diagnostic and the missing ordinary value:
 
-> Color `shd` is unavailable when Theme is `dark`.
+> Color `shd` has no ordinary value.
 
-This demonstrates the distinction between recognising a name and validating
-resolved data. It does not silently borrow the light value. The incomplete
-palette is an isolated negative example and is not imported by `system.ts`.
+The draft `ColorDraft` shape itself still accepts arbitrary keys inside a mode;
+full source validation must reject additions absent from the ordinary catalogue.
+This is an isolated negative example, not imported by `system.ts`. It replaces
+the earlier fixture where mode-only identities were recognised as valid names.
 
 ## Verify the evidence
 
@@ -164,7 +168,7 @@ constructs plain OKLCH review data and checks expected measurements and coverage
 it is not a general resolver or library implementation.
 
 Limits remain explicit: these review types are not a complete validator for
-units, numeric constraints, default selections, mode coverage, changed range
+units, numeric constraints, mode coverage, changed range
 identities, or cross-axis collisions. Nested CSS behavior, generated consumer
 contracts, runtime themes, and public type/helper design remain later work.
 No production package, theme, compiler, or consumer source has changed.

@@ -1,9 +1,9 @@
 # Ordinary palette and explicit mode selection
 
-Status, 2026-09-24: **proposal awaiting founder review**. This focused mock tests
-the recommendation to remove `axes.default` and require complete ordinary domain
-values. It does not ratify that change or implement a compiler. The earlier
-[Color/Alpha mock](../README.md) remains intact for comparison.
+Status, 2026-09-24: **blueprint and focused input/output mock ratified**.
+Complete ordinary domain values and removal of `axes.default` are accepted.
+The [broader Color/Alpha mock](../README.md) now follows this model. This fixture
+demonstrates the agreed behaviour; compiler implementation remains pending.
 
 ## Inputs
 
@@ -21,7 +21,7 @@ happens to look dark; its appearance is entirely a result of the authored values
 No Alpha system is supplied in this focused example, so its complete expected
 output contains three Color token names. The broader Alpha workshop is unchanged.
 Alpha `defaultScale` and Shadow `defaultRange` still select short token names;
-this proposal concerns only an Axis's automatic initial-mode selection.
+this ruling concerns only an Axis's automatic initial-mode selection.
 
 ## Expected CSS
 
@@ -89,7 +89,8 @@ This verifies the illustration, not production TFS compilation, exported authori
 types, general completeness validation, Alpha/Shadow dependent-variable binding,
 or runtime palette policy. Those remain separate work.
 
-The review decision is whether **complete ordinary values + named partial changes**
-is the desired authoring model, with no `axes.default`. The earlier option allowed
+The accepted model is **complete ordinary values + named partial changes**, with
+no `axes.default`. The earlier option allowed
 the ordinary set to be incomplete and used an initially selected mode to complete
-it. That distinction, not just deleting a field, is what this mock puts up for review.
+it. This fixture supersedes that option and also verifies explicit restoration
+inside a nested scope. Grouping identical selectors is optional output formatting.

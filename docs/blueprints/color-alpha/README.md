@@ -1,10 +1,9 @@
 # Color and Alpha authoring review
 
 Status, 2026-09-24: **first representative mock, awaiting founder review**.
-Current focused review: the [ordinary-palette proposal](./baseline/README.md)
-shows complete top-level values, no `axes.default`, and explicit expected CSS.
-That change is pending founder review. This original mock is preserved for
-comparison and still uses the earlier initial-mode selection model.
+The [ordinary-palette input/output model](./baseline/README.md) is now ratified:
+complete top-level values, no `axes.default`, and application-selected modes.
+This main mock has been updated to match. Previous versions remain in Git.
 
 Milestone 1 only. The Board's existing Color/Alpha, identity, Group, and Axis
 contracts remain authoritative. No production schema or compiler is changed.
@@ -17,7 +16,7 @@ standard theme or accessibility guarantee.
 color-alpha/
   color.ts             Palette, Theme differences, and authored Groups
   alpha.ts             One ordinary Alpha scale and one optional additional scale
-  expected-tokens.txt  Every expected token, with light and dark values side by side
+  expected-tokens.txt  Every token: ordinary, light, and dark values side by side
   review-types.ts      Supporting declarations; not another authoring chore
 ```
 
@@ -30,9 +29,11 @@ builder, mapping loop, generated-package import, or duplicated identity union.
 - **Ten swatches.** The complete standard neutral/accent vocabulary appears as
   `neu / pri / duo / tri / tet / pen`. `bg`, `ev`, `ink`, and `shd` serve the
   particular design system. A project can use fewer accents or custom identities.
-- **Shared defaults.** The five accents stay constant. Light inherits the shared
-  `shd`; Dark explicitly replaces it. The remaining four swatches have named
-  Light/Dark values. Theme is the only axis directly changing any swatch.
+- **Complete ordinary palette.** All ten swatches appear together at the top.
+  Dark needs no entry because it has no differences. Light changes `bg`, `ev`,
+  `ink`, `neu`, and `shd`; the five accents keep their ordinary values. Theme is
+  the only axis directly changing any swatch. No selected mode is needed for a
+  usable palette, and the axis list's order does not choose a mode.
 - **One ordinary Alpha scale.** Six authored active positions, plus the automatic
   `non: 0` boundary. The opaque swatch itself remains available as `--clr-pri`.
 - **An optional second scale.** `pri` uses the existing `deriveAlphaScale` helper
@@ -70,7 +71,7 @@ Every swatch has its own unsuffixed colour plus
 Each Alpha scale has `non / min / lo-x / lo / hi / hi-x / max`.
 
 That is **80 Color variables + 14 Alpha variables = 94 names**, stable across
-both modes. The complete [expected token list](./expected-tokens.txt) shows every
+the ordinary set and both modes. The complete [expected token list](./expected-tokens.txt) shows every
 name and value; it is review evidence, not production compiler output.
 There is no `--a-neu-lo` duplicate, no unsuffixed `--a`, and Groups emit no extra
 Color aliases. No brightness ramp is introduced by this example.
@@ -98,7 +99,8 @@ and real Alpha helper imports. Group-member spelling, value validity, resolved
 palette completeness, and exclusivity are not fully encoded in these draft types.
 The review calculation checks this example's identity coverage, Groups, Alpha
 values, and token output using existing core functions after explicitly resolving
-the two complete palettes. This does not exercise a new generic-axis compiler,
+the ordinary palette and both modes. The individual Light/Dark values are unchanged
+from the earlier mock. This does not exercise a new generic-axis compiler,
 nested CSS, luminance enforcement, or browser runtime integration.
 
 ```sh

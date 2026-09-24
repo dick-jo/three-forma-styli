@@ -8,11 +8,8 @@ export type AxisCatalogue = Readonly<
 	Record<
 		string,
 		{
-			readonly default: string;
 			readonly modes: readonly [string, ...string[]];
-			readonly activation:
-				| { readonly attribute: string; readonly media?: never }
-				| { readonly media: Readonly<Record<string, string>>; readonly attribute?: never };
+			readonly activation: { readonly attribute: string };
 		}
 	>
 >;
@@ -24,19 +21,14 @@ export type ModeCatalogue<Axes extends AxisCatalogue, Fields> = {
 };
 
 export type ColorDraft<Axes extends AxisCatalogue> = {
-	readonly tokens?: Readonly<Record<string, Oklch>>;
+	readonly tokens: Readonly<Record<string, Oklch>>;
 	readonly modes?: ModeCatalogue<Axes, { readonly tokens?: Readonly<Record<string, Oklch>> }>;
 };
 
-/** Distribute over the modes, collecting names from both common and selected data. */
-type Values<T> = T extends object ? T[keyof T] : never;
-type TokenKeys<T> = T extends { readonly tokens: infer Tokens } ? keyof Tokens : never;
-type ModeEntries<T> = T extends { readonly modes: infer Modes } ? Values<Values<Modes>> : never;
-
-export type ColorIdentity<Colors> = Extract<
-	TokenKeys<Colors> | TokenKeys<ModeEntries<Colors>>,
-	string
->;
+/** Every identity belongs to the complete ordinary set. Modes only change values. */
+export type ColorIdentity<Colors> = Colors extends { readonly tokens: infer Tokens }
+	? Extract<keyof Tokens, string>
+	: never;
 export type AlphaIdentity<Alpha extends AlphaSystem> =
 	'non' | Extract<keyof Alpha['scales'][Alpha['defaultScale']]['values'], string>;
 
@@ -45,11 +37,11 @@ export type ColorReference<Colors, Alpha extends AlphaSystem> = {
 	readonly alpha?: AlphaIdentity<Alpha>;
 };
 
-type Calibration = { readonly base?: number; readonly min?: number };
+type Calibration = { readonly base: number; readonly min: number };
 export type SpacingDraft<Axes extends AxisCatalogue> = Calibration & {
 	readonly unit: string;
 	readonly range: number;
-	readonly modes?: ModeCatalogue<Axes, Calibration>;
+	readonly modes?: ModeCatalogue<Axes, Partial<Calibration>>;
 };
 
 /** Numeric derived references retain today's shape; numeric validity is a build check. */

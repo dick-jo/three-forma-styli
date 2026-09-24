@@ -30,14 +30,16 @@ and the recommended sequence across the whole blueprint.
 | Time          | simultaneous named scales; ratified `min / lo / hi / max` values                    | implement keyed scales with `defaultScale`, `unit`, and explicit `values` | standard-theme numerical calibration                 |
 | Easing        | ratified Bézier and Linear forms, helper contract, semantic vocabulary              | independent structured pool, helpers, and Workbench editing               | theme calibration                                    |
 | Motion        | independent Time/Easing foundations; call sites own animation choices               | triage the inherited composite code and consumer dependencies later       | composites explicitly parked for this overhaul       |
-| Shadow        | ratified flat catalogue, complete ranges, inline Color expansion, consumer boundary | replace the inherited base/variants shape and preserve scoped references  | shared Axis syntax; later standard-theme calibration |
+| Shadow        | ratified flat catalogue, complete ranges, inline Color expansion, consumer boundary | replace the inherited base/variants shape and preserve scoped references  | later standard-theme calibration                     |
 
 ## Cross-domain finding: today has categories, not axes
 
 Blueprint verdict, 2026-09-24: the Board now ratifies the shared registry and
 catalogue model, shared top-level defaults, one controlling axis per authored
 value, and complete Shadow-position list replacement. The application selects
-mode attributes. Earlier cross-axis combination proposals are superseded; the
+mode attributes. The final same-day clarification requires complete ordinary
+top-level values and removes `axes.default`; modes contain partial changes.
+Earlier cross-axis combination and automatic initial-mode proposals are superseded; the
 legacy implementation evidence below remains relevant to later migration.
 
 The current IR knows two switchable categories: Color and Size. Spacing,

@@ -8,6 +8,11 @@ ratified. The application selects mode attributes. See the
 Earlier conditional/combined-mode examples below are historical proposals;
 combined-mode override syntax is outside this overhaul.
 
+Final baseline clarification on the same date: complete ordinary domain values
+live at the top; modes contain partial changes; `axes.default` is removed.
+The [input/output fixture](../color-alpha/baseline/README.md) is ratified and
+browser-checked. Older initial-mode examples below are historical proposals.
+
 Latest review, 2026-09-16: the preferred catalogue now has a
 [separate-file authoring mock](./separate-files/README.md), with source-derived
 editor suggestions, deliberate typo checks, and acyclic import evidence. Start

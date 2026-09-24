@@ -225,14 +225,27 @@ flowchart LR
 
 ### Axis selection
 
-Current review, 2026-09-24: the founder questions the need for automatic initial
-mode selection and requests an input/output mock before deciding. The
-[ordinary-palette proposal](./blueprints/color-alpha/baseline/README.md) removes
-`axes.default`, requires complete ordinary top-level domain data, and treats named
-modes as partial changes activated by the application. It is **not yet ratified**.
-The previously accepted initial-mode clause below remains recorded for comparison;
-do not treat the new proposal as a verdict. Exclusivity, whole-value replacement,
-and application-owned mode selection are not reopened by this narrow review.
+Final clarification ratified, 2026-09-24, after reviewing the
+[ordinary-palette input and output](./blueprints/color-alpha/baseline/README.md):
+
+- Each included domain supplies complete ordinary top-level values. Named mode
+  entries supply only changes. A mode does not introduce identities unavailable
+  in the ordinary set.
+- Remove `axes.default`; no automatic initial-mode selection and no per-domain
+  `isDefault`. The application activates named modes. At the document root,
+  no selection uses ordinary values without inferring a named mode.
+- A registered mode with no changes needs no domain entry. Selecting it restores
+  ordinary values for the decisions controlled by that axis, including inside
+  another mode. An unmarked descendant inherits its surrounding values; it does
+  not independently reset to the ordinary set.
+- CSS may group identical `:root` and mode declarations with a comma or emit
+  separate equivalent blocks. That is output formatting, not an authoring rule.
+- Alpha/Time `defaultScale` and Shadow `defaultRange` keep their separate job of
+  selecting short token names. Their contracts are unchanged.
+
+This supersedes the earlier model where the ordinary set could be incomplete
+and an axis's initial mode completed it. Exclusivity, whole-value replacement,
+and application-owned selection remain ratified below. Implementation is pending.
 
 Founder ruling, 2026-09-23: the application chooses the active mode and supplies
 the resulting attribute. Application policy owns OS preferences, manual choices,
@@ -255,10 +268,9 @@ Founder ratification, 2026-09-24, following the
   authorship: a Shadow layer list may change with Size while its Color follows
   Theme. Whole Color swatches and whole Shadow-position lists are value boundaries;
   no merging individual Color channels or array indexes across axes.
-- Shared top-level domain data supplies defaults. Selected mode data replaces
-  supplied values; omissions retain shared data. An axis's `default` selects its
-  initial mode and does not turn that mode's data into a parent for its siblings.
-  Missing required values fail validation instead of borrowing another palette.
+- Complete top-level domain data supplies ordinary values. Selected mode data
+  replaces supplied values; omissions retain ordinary data. Missing required
+  ordinary values fail validation instead of borrowing another palette.
 - A mode supplying a Shadow position replaces its complete layer list. Omitting
   that position retains the shared list. Other positions remain unchanged.
 - Combined-mode override syntax and priority machinery are outside this overhaul.
@@ -386,7 +398,7 @@ Founder verdict on 2026-09-09:
 Blueprint ratified on 2026-09-10, including the
 [representative Shadow mock](./blueprints/shadow/README.md) and the final
 consumer-responsibility boundary. This domain workshop is complete;
-implementation remains pending. Shared Axis syntax will be reviewed separately.
+implementation remains pending. It uses the ratified ordinary-values/Axis model.
 
 - One Shadow catalogue owns `unit`, optional `defaultRange`, and named `ranges`.
   The main domain declaration comes first, with values and helper calls inline.
@@ -417,7 +429,7 @@ implementation remains pending. Shared Axis syntax will be reviewed separately.
 - Color references follow the active mode, including nested and runtime scopes.
   Keeping dependent variables correctly bound is a generation responsibility.
   Authors do not repeat unchanged Shadow values. Real mode-specific changes to
-  offsets, blur, or spread use the shared Axis model, whose syntax remains open.
+  offsets, blur, or spread use the ratified shared Axis model.
 - No dedicated no-shadow token or extra position is needed: consumers omit the
   property or use CSS `none`. Alpha's ratified zero boundary is unaffected.
 - Additional looks use named ranges. Categorical Shadow variants and helpers for
