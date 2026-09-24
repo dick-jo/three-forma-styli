@@ -1,8 +1,15 @@
 # Color Groups: authoring and resolved members
 
-Status, 2026-09-24: **representative companion ready for founder review**.
+Status, 2026-09-24: **representative companion endorsed by the founder**.
 Milestone 1 only. This illustrates the existing Group contract; no new selector
 language, helper API, or production implementation is introduced.
+
+A Group is an optional named selection of identities: for example, “my accent
+colours” or “colours I want glows for.” An Axis describes a condition such as
+Theme, and its Modes select changes such as Light or Dark. A Group selects members;
+it does not switch their values or impose a luminance rule. The luminance policy's
+foreground/background selections are a separate use of identity lists, not the
+reason all Groups exist.
 
 ```text
 groups/

@@ -498,11 +498,12 @@ Ratified on 2026-09-09:
 - Matching resolves at build time to literal, typed tuples.
 - TFS attaches no meaning to project group identities.
 
-The [Groups companion](./blueprints/color-alpha/groups/README.md), added
-2026-09-24, makes these contracts concrete with explicit/prefix input, resolved
-member lists, and Shadow/application usage. The representative mock awaits
-founder review; it does not introduce a new selector or helper API. The existing
-resolver's widened authoring types are recorded for later architecture triage.
+The founder endorsed the [Groups companion](./blueprints/color-alpha/groups/README.md)
+on 2026-09-24: explicit/prefix input, resolved member lists, and Shadow/application
+usage. Groups are optional named selections, independent of Axes/Modes and
+luminance enforcement. This review introduces no new selector or helper API.
+The existing resolver's widened authoring types remain recorded for later
+architecture triage.
 
 ### Runtime themes
 
@@ -514,6 +515,16 @@ resolver's widened authoring types are recorded for later architecture triage.
 - Generated browser contracts remain dependency-light and emit native OKLCH.
 - “Luminance” is the product term; diagnostics state that the metric is OKLCH L,
   not WCAG relative luminance or a contrast ratio.
+
+Workshop question raised 2026-09-24, **not a replacement verdict**: clarify the
+relationship between ordinary token authoring, an optional product luminance
+policy, and runtime palette acceptance. Scatter uses the calculation for editor
+diagnostics and the enforcing API before accepting custom palettes. The current
+TFS runtime-contract generator requires a luminance configuration; whether that
+coupling belongs in the overhaul must be reviewed explicitly. The next mock
+should demonstrate ordinary authoring without a policy alongside Scatter's
+policy-driven custom palette flow. See the
+[Color/Alpha review evidence](./blueprints/color-alpha/README.md#luminance-workshop-starting-point).
 
 ### Generated public surface
 

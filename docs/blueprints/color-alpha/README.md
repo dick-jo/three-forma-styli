@@ -80,14 +80,11 @@ Color aliases. No brightness ramp is introduced by this example.
 ## Still to review before closing Color and Alpha
 
 1. Founder review of these ordinary files and their outputs.
-2. Review the [Groups companion](./groups/README.md): explicit and prefix selections,
-   exact resolved members, inline Shadow usage, and application consumption. Ready
-   for review; the existing resolver's loss of exact member types when resolving a
-   prefix during authoring is noted for later API/architecture triage.
-3. The existing `colors.luminance` policy, its OKLCH-L diagnostics, and the
-   distinction between authoring a policy and enforcing it. No new automatic
-   Shadow darkness rule is proposed.
-4. Runtime palette authoring and application: exact selected payload, invalid or
+2. The existing `colors.luminance` policy, its OKLCH-L diagnostics, and its optional
+   relationship to ordinary token authoring. Review the current coupling to runtime
+   contract generation and distinguish declaring, measuring, and enforcing a rule.
+   No new automatic Shadow darkness rule is proposed.
+3. Runtime palette authoring and application: exact selected payload, invalid or
    incomplete values, reuse of the policy and selected Alpha schedule, and the
    consumer contract. Preserve the current exact-input rule; partial runtime
    payloads need an explicit inheritance source. Authored shared defaults are
@@ -95,6 +92,42 @@ Color aliases. No brightness ramp is introduced by this example.
 
 These are planned companion examples, not permission to implement the overhaul.
 The existing full Shadow mock remains authoritative for Shadow authoring.
+
+The founder endorsed the [Groups companion](./groups/README.md) on 2026-09-24:
+explicit/prefix selections, exact resolved members, inline Shadow usage, and
+application consumption. The existing resolver's loss of exact member types when
+resolving a prefix during authoring remains a later API/architecture triage item.
+
+## Luminance workshop starting point
+
+The founder questions the relationship between minimum lightness separation and
+ordinary design-system authoring. Keep that question visible rather than carrying
+the current configuration placement forward merely because it exists.
+
+Read-only source inspection, 2026-09-24; no Scatter changes or live deployment
+verification:
+
+- Scatter's `packages/design-system/src/design-system.ts` declares a minimum
+  OKLCH-L delta of `0.33`, backgrounds `bg / ev`, and foregrounds `pri / neu / ink`.
+  Its source still uses an earlier TFS shape; it is consumer evidence, not the
+  new authoring blueprint.
+- `apps/main/src/features/theme/themeBuilder/validation.ts` calls
+  `generateRuntimeColorTheme` and reads its diagnostics to report validity and
+  per-colour headroom. An invalid separation is useful editor state.
+- `apps/main/src/features/theme/schema.ts` calls `enforceRuntimeColorTheme` when
+  determining whether a custom palette is applicable. The collection edit route
+  uses that boundary to reject invalid palettes before persistence.
+- In current TFS, ordinary Color generation does not require a luminance policy.
+  If supplied, its configuration and identity references are validated; this is
+  distinct from enforcing the palette's actual separation.
+- `packages/compiler/src/workspace/contracts.ts` currently requires both
+  `colors.luminance` and `project.runtime.colorThemes` to generate a runtime theme
+  contract. That coupling deserves an explicit product decision.
+
+Next representative review: show ordinary token authoring without a policy beside
+Scatter's custom palette diagnostics and acceptance rule. Establish when a policy
+is useful and who requests enforcement, then assess the declaration's placement.
+No new placement, automatic correction, or mandatory rule is ratified here.
 
 ## Verification boundary
 
