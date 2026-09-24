@@ -38,11 +38,15 @@ separately agreed architecture and runbook milestone.
   luminance enforcement. Existing resolution and validation are checked. The current
   resolver loses exact member types for prefix-based authoring; carry that bounded
   ergonomics gap into API/architecture triage, without inventing a new helper now.
-- **Next within Color/Alpha:** establish the purpose and optional authoring role
-  of luminance policy using Scatter's real diagnostics/acceptance flow, then review
-  runtime palettes. Explicitly assess the current requirement for a luminance
-  configuration when generating a runtime theme contract. No replacement policy
-  placement is ratified; the domain review is not closed yet.
+- **Ready for review:** the [luminance companion](./blueprints/color-alpha/luminance/README.md)
+  shows ordinary authoring without a policy, runtime preview with diagnostics,
+  explicit acceptance/rejection, and a customer edit that passes the exact boundary.
+  Existing functions verify both polarities and ordinary/runtime token parity.
+- **Next within Color/Alpha:** settle optional policy and explicit enforcement,
+  then the runtime contract and rule placement. Policy-free runtime generation is
+  recommended but not implemented. Current generated `enforce` metadata is ignored
+  by runtime functions; record its redundancy for architecture triage. No new
+  policy placement is ratified, and the domain review is not closed yet.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -60,7 +64,7 @@ domain retaining its own readiness verdict.
 | Order | Workshop                                  | Current readiness                                                                               | What the review should establish                                                                                                                                                                                                             |
 | ----- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated                                | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
-| 2     | Color and Alpha                           | Groups companion endorsed; main review and policy/runtime companions remain                     | Review swatches, Alpha scales, output names and mode changes. Establish the optional purpose of luminance policy using Scatter's actual consumer flow, then review runtime themes and existing coupling.                                     |
+| 2     | Color and Alpha                           | Groups endorsed; luminance companion ready; main review and runtime contract remain             | Review the optional policy and explicit enforcement demonstrated by verified outputs. Then settle runtime input/output and rule placement, keeping ordinary token authoring simple.                                                          |
 | 3     | Spacing, Gap, Border radius, Border width | Gap/Radius contracts ratified; representative mocks and remaining Spacing/Width choices pending | Generated numbered Spacing, deliberate semantic ranges referencing it, and the ordinary scalar Border width. Show how these respond to Size modes without repeated unchanged values.                                                         |
 | 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending                               | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
 | 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending                       | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
@@ -109,7 +113,7 @@ before the runbook is agreed.
 
 - [x] Blueprint: Shadow workshop and representative mock.
 - [x] Blueprint: Axis rules, complete ordinary values, and input/output mock.
-- [ ] Blueprint, now: finish Color + Alpha; Groups endorsed, policy/runtime companions next.
+- [ ] Blueprint, now: finish Color + Alpha; Groups endorsed, luminance ready, runtime contract next.
 - [ ] Blueprint: Spacing + Gap + Border radius/width.
 - [ ] Blueprint: Time + Easing confirmation mock.
 - [ ] Blueprint: Typography representative mocks.

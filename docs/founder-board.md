@@ -521,10 +521,21 @@ relationship between ordinary token authoring, an optional product luminance
 policy, and runtime palette acceptance. Scatter uses the calculation for editor
 diagnostics and the enforcing API before accepting custom palettes. The current
 TFS runtime-contract generator requires a luminance configuration; whether that
-coupling belongs in the overhaul must be reviewed explicitly. The next mock
-should demonstrate ordinary authoring without a policy alongside Scatter's
-policy-driven custom palette flow. See the
-[Color/Alpha review evidence](./blueprints/color-alpha/README.md#luminance-workshop-starting-point).
+coupling belongs in the overhaul must be reviewed explicitly.
+
+The [luminance companion](./blueprints/color-alpha/luminance/README.md) is now ready
+for founder review: ordinary authoring without a policy, unchanged runtime preview
+with diagnostics, explicit rejection on acceptance, and a deliberate edit that
+passes the exact boundary. Existing core functions verify the outputs. The
+proposed direction is optional policy and deliberate enforcement, including
+allowing runtime generation without a luminance policy. That last capability is
+not implemented; policy placement and its optional runtime contract remain open.
+No replacement verdict is recorded by preparing this mock.
+
+Later architecture triage must also address current generated `enforce` metadata:
+runtime functions do not read it. `generateRuntimeColorTheme` measures;
+`enforceRuntimeColorTheme` rejects a failing separation regardless of the list.
+Do not carry redundant configuration forward merely because it is emitted today.
 
 ### Generated public surface
 

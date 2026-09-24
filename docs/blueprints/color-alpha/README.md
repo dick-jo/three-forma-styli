@@ -19,6 +19,7 @@ color-alpha/
   expected-tokens.txt  Every token: ordinary, light, and dark values side by side
   review-types.ts      Supporting declarations; not another authoring chore
   groups/              Focused explicit/prefix Group input and resolved output
+  luminance/           Ordinary authoring beside optional diagnostics and acceptance
 ```
 
 The files use the accepted [axes.ts](../axes/separate-files/axes.ts) registry.
@@ -83,7 +84,8 @@ Color aliases. No brightness ramp is introduced by this example.
 2. The existing `colors.luminance` policy, its OKLCH-L diagnostics, and its optional
    relationship to ordinary token authoring. Review the current coupling to runtime
    contract generation and distinguish declaring, measuring, and enforcing a rule.
-   No new automatic Shadow darkness rule is proposed.
+   The [side-by-side companion](./luminance/README.md) is ready for review. No new
+   automatic Shadow darkness rule is proposed.
 3. Runtime palette authoring and application: exact selected payload, invalid or
    incomplete values, reuse of the policy and selected Alpha schedule, and the
    consumer contract. Preserve the current exact-input rule; partial runtime
@@ -124,10 +126,20 @@ verification:
   `colors.luminance` and `project.runtime.colorThemes` to generate a runtime theme
   contract. That coupling deserves an explicit product decision.
 
-Next representative review: show ordinary token authoring without a policy beside
-Scatter's custom palette diagnostics and acceptance rule. Establish when a policy
-is useful and who requests enforcement, then assess the declaration's placement.
-No new placement, automatic correction, or mandatory rule is ratified here.
+The [luminance companion](./luminance/README.md) now shows ordinary token authoring
+without a policy beside Scatter-style custom palette diagnostics and acceptance.
+The same five colours compile normally and can be previewed, but fail a requested
+`0.33` separation rule with a measured `0.20` gap. A deliberate customer edit reaches
+`0.33` and passes. Both polarities and all emitted values are verified.
+
+The proposed direction is optional policy, explicit enforcement, and runtime
+generation without compulsory luminance configuration. The last capability is
+not implemented today. Policy placement and the exact optional runtime contract
+remain open; no new placement, automatic correction, or mandatory rule is ratified.
+
+The current generated `enforce` metadata is also recorded for architecture triage:
+the runtime functions ignore it, and the chosen API determines enforcement. The
+review does not present that metadata as an operative switch.
 
 ## Verification boundary
 
@@ -138,10 +150,14 @@ The review calculation checks this example's identity coverage, Groups, Alpha
 values, and token output using existing core functions after explicitly resolving
 the ordinary palette and both modes. The individual Light/Dark values are unchanged
 from the earlier mock. This does not exercise a new generic-axis compiler,
-nested CSS, luminance enforcement, or browser runtime integration.
+nested CSS, or browser application integration.
 The Groups companion also checks the existing resolver/validator against explicit
 and prefix inputs, automatic membership, declaration order, seven invalid inputs,
 and unchanged Color generation. Its Shadow helper remains declaration-only.
+The luminance companion executes existing runtime preview/enforcement functions,
+checks ordinary/runtime output parity, and records all 40 Color variables before
+and after the customer edit. Its configuration is a handwritten contract excerpt;
+no new runtime schema or policy-free runtime generation is implemented.
 
 ```sh
 pnpm exec tsc -p docs/blueprints/color-alpha/tsconfig.json

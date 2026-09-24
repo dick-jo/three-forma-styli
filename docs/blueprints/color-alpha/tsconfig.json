@@ -7,8 +7,9 @@
 		"noEmit": true,
 		"skipLibCheck": true,
 		"paths": {
-			"@three-forma-styli/core": ["../../../packages/core/src/index.ts"]
+			"@three-forma-styli/core": ["../../../packages/core/src/index.ts"],
+			"@three-forma-styli/core/runtime": ["../../../packages/core/src/runtime/index.ts"]
 		}
 	},
-	"include": ["*.ts", "baseline/*.ts", "groups/*.ts"]
+	"include": ["*.ts", "baseline/*.ts", "groups/*.ts", "luminance/*.ts"]
 }
