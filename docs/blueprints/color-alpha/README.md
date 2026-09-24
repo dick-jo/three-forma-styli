@@ -18,6 +18,7 @@ color-alpha/
   alpha.ts             One ordinary Alpha scale and one optional additional scale
   expected-tokens.txt  Every token: ordinary, light, and dark values side by side
   review-types.ts      Supporting declarations; not another authoring chore
+  groups/              Focused explicit/prefix Group input and resolved output
 ```
 
 The files use the accepted [axes.ts](../axes/separate-files/axes.ts) registry.
@@ -79,7 +80,10 @@ Color aliases. No brightness ramp is introduced by this example.
 ## Still to review before closing Color and Alpha
 
 1. Founder review of these ordinary files and their outputs.
-2. A focused companion for prefix-matched Groups and custom identity selections.
+2. Review the [Groups companion](./groups/README.md): explicit and prefix selections,
+   exact resolved members, inline Shadow usage, and application consumption. Ready
+   for review; the existing resolver's loss of exact member types when resolving a
+   prefix during authoring is noted for later API/architecture triage.
 3. The existing `colors.luminance` policy, its OKLCH-L diagnostics, and the
    distinction between authoring a policy and enforcing it. No new automatic
    Shadow darkness rule is proposed.
@@ -102,6 +106,9 @@ values, and token output using existing core functions after explicitly resolvin
 the ordinary palette and both modes. The individual Light/Dark values are unchanged
 from the earlier mock. This does not exercise a new generic-axis compiler,
 nested CSS, luminance enforcement, or browser runtime integration.
+The Groups companion also checks the existing resolver/validator against explicit
+and prefix inputs, automatic membership, declaration order, seven invalid inputs,
+and unchanged Color generation. Its Shadow helper remains declaration-only.
 
 ```sh
 pnpm exec tsc -p docs/blueprints/color-alpha/tsconfig.json

@@ -498,6 +498,12 @@ Ratified on 2026-09-09:
 - Matching resolves at build time to literal, typed tuples.
 - TFS attaches no meaning to project group identities.
 
+The [Groups companion](./blueprints/color-alpha/groups/README.md), added
+2026-09-24, makes these contracts concrete with explicit/prefix input, resolved
+member lists, and Shadow/application usage. The representative mock awaits
+founder review; it does not introduce a new selector or helper API. The existing
+resolver's widened authoring types are recorded for later architecture triage.
+
 ### Runtime themes
 
 - Runtime theme generation is a project consumer capability, not palette data.

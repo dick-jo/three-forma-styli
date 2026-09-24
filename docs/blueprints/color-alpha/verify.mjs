@@ -41,6 +41,7 @@ const { axes } = load(path.join(root, '../axes/separate-files/axes.ts'));
 const { generateAlphaTokens, resolvedAlphaValues } = load(path.join(core, 'generator/alpha.ts'));
 const { generateColorTokens } = load(path.join(core, 'generator/colors.ts'));
 const { resolveIdentityGroups } = load(path.join(core, 'groups.ts'));
+const { validatePartialDesignSystem } = load(path.join(core, 'generator/validate.ts'));
 const alphaTokens = generateAlphaTokens(alpha).defaultTokens;
 const selectedScale = colors.alphaScale ?? alpha.defaultScale;
 const schedule = resolvedAlphaValues(alpha.scales[selectedScale].values);
@@ -109,9 +110,69 @@ const snapshot = [
 const output = path.join(root, 'expected-tokens.txt');
 if (process.argv.includes('--write')) fs.writeFileSync(output, snapshot);
 assert.equal(fs.readFileSync(output, 'utf8'), snapshot, 'Review token snapshot has drifted.');
+
+// Focused Group companion: execute existing resolution/validation, not a new compiler.
+const { colors: groupColors } = load(path.join(root, 'groups/color.ts'));
+const { colorGroups: expectedGroups } = load(path.join(root, 'groups/expected-groups.ts'));
+const groupIdentities = Object.keys(groupColors.tokens);
+assert.deepEqual(resolveIdentityGroups(groupIdentities, groupColors.groups), expectedGroups);
+assert.deepEqual(expectedGroups, {
+	glow: ['pri', 'neu'],
+	network: ['network-base', 'network-optimism'],
+});
+assert.deepEqual(
+	resolveIdentityGroups(
+		[...groupIdentities, 'network-new', 'networking', 'Network-capital'],
+		groupColors.groups
+	),
+	{ ...expectedGroups, network: [...expectedGroups.network, 'network-new'] }
+);
+assert.deepEqual(resolveIdentityGroups([...groupIdentities].reverse(), groupColors.groups), {
+	glow: expectedGroups.glow,
+	network: [...expectedGroups.network].reverse(),
+});
+
+// Adapt only this complete ordinary palette to the existing validator's legacy input.
+const groupSystem = {
+	alpha,
+	colors: {
+		modes: [{ name: 'ordinary', isDefault: true, tokens: groupColors.tokens }],
+		groups: groupColors.groups,
+	},
+};
+validatePartialDesignSystem(groupSystem);
+const invalidGroups = [
+	[{ glow: { identities: ['missing'] } }, /unknown color identity "missing"/],
+	[{ glow: { identities: [] } }, /non-empty unique list/],
+	[{ glow: { identities: ['pri', 'pri'] } }, /non-empty unique list/],
+	[{ network: { match: { prefix: 'absent-' } } }, /does not match any color identity/],
+	[{ glow: { identities: ['pri'], match: { prefix: 'pri' } } }, /exactly one/],
+	[{ 'bad name': { identities: ['pri'] } }, /identity is not CSS-token safe/],
+	[{ network: { match: { prefix: 'network_*' } } }, /CSS-token-safe prefix/],
+];
+for (const [groups, error] of invalidGroups) {
+	assert.throws(
+		() =>
+			validatePartialDesignSystem({ ...groupSystem, colors: { ...groupSystem.colors, groups } }),
+		error
+	);
+}
+const groupGenerator = {
+	prefixes: { color: 'clr' },
+	colorFormat: { base: 'oklch', alpha: 'oklch', alphaModifier: 'a' },
+};
+const groupedTokens = generateColorTokens(groupSystem.colors, groupGenerator, schedule);
+assert.deepEqual(
+	groupedTokens,
+	generateColorTokens({ modes: groupSystem.colors.modes }, groupGenerator, schedule)
+);
+assert.equal(groupedTokens.defaultTokens.length, 32);
 console.log(
 	'PASS: complete ordinary palette, Light/Dark choices, both Groups, two Alpha scales, and 94 stable token names.'
 );
 console.log(
-	'Review evidence only: no generic-Axis compiler, nested CSS, luminance enforcement, or runtime integration.'
+	'PASS: Group companion lists/order, automatic prefix membership, seven invalid inputs, and no extra Color tokens.'
+);
+console.log(
+	'Review evidence only: no generic-Axis compiler, Shadow helper execution, nested CSS, luminance enforcement, or runtime integration.'
 );

@@ -10,5 +10,5 @@
 			"@three-forma-styli/core": ["../../../packages/core/src/index.ts"]
 		}
 	},
-	"include": ["*.ts", "baseline/*.ts"]
+	"include": ["*.ts", "baseline/*.ts", "groups/*.ts"]
 }
