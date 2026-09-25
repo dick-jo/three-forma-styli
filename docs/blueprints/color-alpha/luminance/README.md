@@ -3,8 +3,9 @@
 Status, 2026-09-25: **representative companion and direction endorsed by the founder**.
 Milestone 1 only. The functions exercised here already exist. This review does
 not implement new runtime optionality or relocate the authored policy.
-The subsequent [declaration proposal](../constraints/README.md) makes optional
-constraints visible in the primary authoring flow; its layout remains under review.
+The subsequent endorsed [declaration](../constraints/README.md) makes optional
+constraints visible in the primary authoring flow. Palette polarity remains
+separate from the shared rule.
 
 ```text
 luminance/
@@ -66,11 +67,12 @@ certification.
 The lists select identities for this rule. They do not require named Groups in
 `colors.groups`, and a Group named `background` acquires no automatic behaviour.
 
-The current Board places an optional authored rule at `colors.luminance`.
+The Board now places an optional authored rule at `colors.constraints.luminance`;
+the current implementation still uses the earlier `colors.luminance` field.
 `runtime-contract.ts` shows the portion available to the application after
 generation. It is a review excerpt, not a request to maintain the same rule in
-two files. Whether the authored rule should stay in Color is still under review;
-the calculation and acceptance example do not depend on deciding that now.
+two files. The existing runtime contract and calculation are used here as
+implementation evidence; changing the authoring layout is later work.
 
 ### Preview and report
 
@@ -142,8 +144,8 @@ directions. Diagnostics measure the values at emitted CSS precision.
 
 Policy-free runtime generation would still validate the input shape, identities,
 and colour values. Omit a rule rather than inventing a zero-threshold placeholder.
-The exact optional result types and treatment of `polarity` without a rule belong
-in the next runtime contract mock, after agreement on this direction.
+The exact optional runtime input/output remains for the next mock. The existing
+palette polarity relationship is settled and does not need another design round.
 
 One concrete code-hygiene item follows from the existing behaviour: generated
 contracts include an `enforce` list, but the current runtime functions do not read

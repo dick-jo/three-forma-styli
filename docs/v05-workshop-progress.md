@@ -46,13 +46,15 @@ separately agreed architecture and runbook milestone.
   change; distinguish declaring, checking, and enforcing. Authoring remains the
   primary flow. Runtime generation without a luminance policy is the intended
   direction, not implemented functionality.
-- **Ready for review:** the [constraint declaration comparison](./blueprints/color-alpha/constraints/README.md)
-  recommends `colors.constraints` after the values. This is a proposal, including
-  where polarity sits in its single-palette example.
-- **Next within Color/Alpha:** settle placement, then show how direction follows
-  authored modes and runtime input without duplicate or competing declarations.
-  Complete the runtime contract. Current ignored `enforce` metadata stays in
-  architecture triage. The domain review is not closed yet.
+- **Endorsed 2026-09-25:** the [constraint declaration](./blueprints/color-alpha/constraints/README.md)
+  places optional `colors.constraints` after the values. The founder corrected the
+  reopened polarity question: the theme/mode already supplies that context and
+  the shared rule uses it. The duplicate inside the rule is removed; no further
+  polarity-direction workshop is needed.
+- **Next within Color/Alpha:** complete the runtime input/output contract with
+  optional constraints/diagnostics, preserving the existing polarity relationship.
+  Current ignored `enforce` metadata stays in architecture triage. The domain
+  review is not closed yet.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -70,7 +72,7 @@ domain retaining its own readiness verdict.
 | Order | Workshop                                  | Current readiness                                                                               | What the review should establish                                                                                                                                                                                                             |
 | ----- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated                                | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
-| 2     | Color and Alpha                           | Groups/luminance endorsed; constraint placement proposed; runtime contract remains              | Review the optional rule declaration; settle direction across authored modes and customer palettes, then finish the runtime input/output mock. Keep ordinary token authoring the primary flow.                                               |
+| 2     | Color and Alpha                           | Groups, luminance and constraint placement endorsed; runtime contract remains                   | Finish the runtime input/output mock with optional constraints/diagnostics. Preserve settled palette polarity and keep ordinary token authoring the primary flow.                                                                            |
 | 3     | Spacing, Gap, Border radius, Border width | Gap/Radius contracts ratified; representative mocks and remaining Spacing/Width choices pending | Generated numbered Spacing, deliberate semantic ranges referencing it, and the ordinary scalar Border width. Show how these respond to Size modes without repeated unchanged values.                                                         |
 | 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending                               | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
 | 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending                       | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
@@ -119,7 +121,7 @@ before the runbook is agreed.
 
 - [x] Blueprint: Shadow workshop and representative mock.
 - [x] Blueprint: Axis rules, complete ordinary values, and input/output mock.
-- [ ] Blueprint, now: finish Color + Alpha; constraint placement proposed, direction/runtime next.
+- [ ] Blueprint, now: finish Color + Alpha; constraint placement endorsed, runtime contract next.
 - [ ] Blueprint: Spacing + Gap + Border radius/width.
 - [ ] Blueprint: Time + Easing confirmation mock.
 - [ ] Blueprint: Typography representative mocks.

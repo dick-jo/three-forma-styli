@@ -1,10 +1,12 @@
 # Optional constraints alongside authored values
 
-Status, 2026-09-25: **declaration proposal ready for founder review**.
-The authoring principle is agreed; this property layout and the placement of
-polarity are proposals. No production schema or Workbench code is changed.
+Status, 2026-09-25: **domain-owned declaration endorsed by the founder**.
+The shared rule uses the existing palette/theme-mode polarity. An earlier version
+incorrectly put polarity inside the rule and reopened that settled behaviour;
+this correction restores the established separation. No production schema or
+Workbench code is changed.
 
-## Recommendation
+## Approved placement
 
 Keep the values first, followed by optional `constraints` in the same domain.
 The [complete color.ts](./color.ts) is short enough to read in one glance:
@@ -20,7 +22,6 @@ export const colors = {
 	},
 	constraints: {
 		luminance: {
-			polarity: 'negative',
 			minimumLuminanceDelta: 0.33,
 			backgroundColors: ['bg', 'ev'],
 			foregroundColors: ['pri', 'neu', 'ink'],
@@ -33,7 +34,7 @@ The author can omit `constraints` entirely. Declaring it supplies the relationsh
 that TFS should check during authoring; it adds no tokens and changes no values.
 `constraints` uses the existing TFS vocabulary. There is no separate `rules` API.
 
-This would replace the current direct `colors.luminance` field with
+The approved blueprint replaces the current direct `colors.luminance` field with
 `colors.constraints.luminance`. One optional section gives these relationships a
 clear home without accumulating unrelated settings among the ordinary values.
 No hue rule, callback mechanism, rule registry, severity setting, or general
@@ -62,7 +63,7 @@ not mean “reject this draft”, automatically adjust colours, or enable a runt
 theme-building capability. The same rule data and calculation should serve
 authoring feedback and a consumer such as Scatter.
 
-## Why keep it in the domain?
+## Placement comparison considered
 
 The alternative would give the system a separate constraint catalogue:
 
@@ -71,7 +72,6 @@ The alternative would give the system a separate constraint catalogue:
 export const constraints = {
 	colors: {
 		luminance: {
-			polarity: 'negative',
 			minimumLuminanceDelta: 0.33,
 			backgroundColors: ['bg', 'ev'],
 			foregroundColors: ['pri', 'neu', 'ink'],
@@ -88,33 +88,40 @@ export const system = { colors, constraints };
 | `colors.constraints`      | Values and their intended relationships are visible together; one optional section           |
 | Separate system catalogue | Another declaration and assembly connection; rules are further from the values they describe |
 
-Recommend the first for the current scope. Both luminance separation and the
+The founder endorses the first for the current scope. Both luminance separation and the
 founder's hypothetical hue separation concern Color. Neither establishes a need
 for a system-wide constraint catalogue. File extraction remains ordinary TS
 organisation if a real source file grows; it does not require a new owner for
 the data. Exact exported types remain later architecture work.
 
-## One detail this example does not settle
+## Existing polarity handling
 
-The existing luminance calculation needs a direction. Here, `negative` means
-foregrounds must be lighter than backgrounds; `positive` means the reverse.
-The proposed single-palette declaration includes it explicitly so the check has
-all the information it needs. It does not infer a direction from a Theme name or
-turn polarity into another Axis.
+The palette/theme mode supplies polarity; the shared rule supplies the selected
+identities and minimum delta. The calculation already handles the direction:
 
-How that direction is supplied for multiple authored modes, and how it relates
-to a customer's runtime polarity, is still open. The next example must show that
-without duplicating the shared rule or inventing an override precedence. This
-mock establishes neither generic merging of constraint objects nor a second
-polarity value that silently wins over an existing one.
+| Palette polarity | Required relationship                                          |
+| ---------------- | -------------------------------------------------------------- |
+| `negative`       | Foregrounds are lighter than backgrounds by at least the delta |
+| `positive`       | Backgrounds are lighter than foregrounds by at least the delta |
+
+The same constraint therefore works for both. In the existing authored system,
+mode metadata carries polarity; a customer runtime palette supplies its own
+`polarity` field. TFS consumes that explicit context, not the spelling of a mode's
+name. No polarity field belongs inside the shared rule.
+
+The historical workshop already settled this relationship. Its generic-Axis
+wiring belongs to the overhaul implementation, not another product decision
+about numerical direction. This focused mock shows the constraint declaration;
+the review probe supplies the existing fixture's palette context to the existing
+calculation and verifies both directions.
 
 ## Verification
 
-The parent review script adapts this proposed declaration to the existing core
+The parent review script adapts this blueprint declaration to the existing core
 validator and luminance calculation. It verifies the same failing/passing
 diagnostics as the preceding companion, checks declared identities, and confirms
 identical emitted tokens. The supporting types check the shape, not exact member
-names against the palette. No proposed compiler or live feedback is implemented.
+names against the palette. No new compiler or live feedback is implemented.
 Authoring and runtime diagnostics must agree at emitted precision; these concrete
 values already fit that precision, so this probe does not implement normalization.
 

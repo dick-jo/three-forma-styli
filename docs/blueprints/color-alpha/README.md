@@ -20,7 +20,7 @@ color-alpha/
   review-types.ts      Supporting declarations; not another authoring chore
   groups/              Focused explicit/prefix Group input and resolved output
   luminance/           Ordinary authoring beside optional diagnostics and acceptance
-  constraints/         Proposed inline declaration and comparison with a separate catalogue
+  constraints/         Endorsed inline declaration; shared rule uses palette polarity
 ```
 
 The files use the accepted [axes.ts](../axes/separate-files/axes.ts) registry.
@@ -82,12 +82,7 @@ Color aliases. No brightness ramp is introduced by this example.
 ## Still to review before closing Color and Alpha
 
 1. Founder review of these ordinary files and their outputs.
-2. Review the [constraint declaration proposal](./constraints/README.md). The founder
-   endorsed the [luminance companion](./luminance/README.md) and the principle of
-   optional rules with continuous authoring feedback on 2026-09-25. Placement and
-   direction across authored modes/runtime input remain open. No automatic Shadow
-   darkness rule is proposed.
-3. Runtime palette authoring and application: exact selected payload, invalid or
+2. Runtime palette authoring and application: exact selected payload, invalid or
    incomplete values, reuse of the policy and selected Alpha schedule, and the
    consumer contract. Preserve the current exact-input rule; partial runtime
    payloads need an explicit inheritance source. Authored shared defaults are
@@ -100,6 +95,10 @@ The founder endorsed the [Groups companion](./groups/README.md) on 2026-09-24:
 explicit/prefix selections, exact resolved members, inline Shadow usage, and
 application consumption. The existing resolver's loss of exact member types when
 resolving a prefix during authoring remains a later API/architecture triage item.
+The [luminance companion](./luminance/README.md), continuous authoring-feedback
+principle, and [domain-owned constraint declaration](./constraints/README.md) were
+endorsed on 2026-09-25. Polarity comes from the palette/theme mode as already
+established; the rule does not redeclare it. No new Shadow darkness rule is proposed.
 
 ## Luminance workshop starting point
 
@@ -137,9 +136,11 @@ The founder endorsed optional policy, explicit enforcement, and runtime generati
 without compulsory luminance configuration on 2026-09-25. The last capability is
 not implemented today. The subsequent authoring verdict puts continuous feedback
 inside the primary design-system authoring flow. The
-[placement comparison](./constraints/README.md) proposes a domain-owned
-`constraints` section; that layout and the exact optional runtime contract remain
-open. No automatic correction or mandatory rule is ratified.
+[declaration](./constraints/README.md) now records the endorsed domain-owned
+`constraints` section. The exact optional runtime contract remains for review.
+The mock's accidental duplication of polarity inside the shared rule has been
+corrected: the theme/mode supplies it, and the same rule works in both directions.
+No automatic correction or mandatory rule is ratified.
 
 The current generated `enforce` metadata is also recorded for architecture triage:
 the runtime functions ignore it, and the chosen API determines enforcement. The
@@ -162,10 +163,10 @@ The luminance companion executes existing runtime preview/enforcement functions,
 checks ordinary/runtime output parity, and records all 40 Color variables before
 and after the customer edit. Its configuration is a handwritten contract excerpt;
 no new runtime schema or policy-free runtime generation is implemented.
-The placement proposal is adapted to the same existing core calculation and
+The constraint declaration is adapted to the same existing core calculation and
 validator; its failing/passing diagnostics and token output agree with the preceding
-example. These fixtures do not implement live authoring feedback or mode-varying
-constraint data.
+example. Both palette polarities use the same rule. These fixtures do not implement
+live authoring feedback or a generic-Axis compiler.
 
 ```sh
 pnpm exec tsc -p docs/blueprints/color-alpha/tsconfig.json

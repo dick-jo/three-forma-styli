@@ -510,7 +510,9 @@ architecture triage.
 - Runtime theme generation is a project consumer capability, not palette data.
 - Runtime and native-color generated contracts are schema version 2; they use
   `colorIdentities`, and preserve `non` as the literal zero boundary.
-- `colors.luminance` owns the reusable OKLCH-L separation constraint.
+- `colors.constraints.luminance` owns the optional reusable OKLCH-L separation
+  constraint. This authoring placement was endorsed on 2026-09-25 and supersedes
+  the earlier direct `colors.luminance` field; implementation is pending.
 - `project.runtime.colorThemes` owns the exact accepted runtime color selection.
 - Generated browser contracts remain dependency-light and emit native OKLCH.
 - “Luminance” is the product term; diagnostics state that the metric is OKLCH L,
@@ -521,7 +523,7 @@ and its direction on 2026-09-25: ordinary authoring without a policy, unchanged
 preview with diagnostics when a rule is present, and deliberate enforcement at
 an acceptance boundary. Runtime generation should also work without a luminance
 policy. That capability is not implemented today; input validation remains
-required, and exact optional runtime types and polarity handling remain open.
+required, and the exact optional runtime contract remains for review.
 
 Later architecture triage must also address current generated `enforce` metadata:
 runtime functions do not read it. `generateRuntimeColorTheme` measures;
@@ -547,12 +549,19 @@ Founder-endorsed direction, 2026-09-25:
 - Future hue-separation rules remain a hypothetical extension, not an approved
   implementation scope or reason to build a general constraint framework.
 
-The [declaration comparison](./blueprints/color-alpha/constraints/README.md) proposes
-optional `colors.constraints.luminance`, after `tokens`, instead of the current
-direct `colors.luminance` field. This layout is **not yet ratified**. The
-single-palette mock supplies the existing calculation's polarity explicitly;
-its placement across authored modes and runtime input remains an open design
-question. It establishes no generic rule-merging or override precedence.
+The founder endorsed the [declaration](./blueprints/color-alpha/constraints/README.md)
+on 2026-09-25: optional `colors.constraints.luminance`, after the tokens. The author
+can read the values and their intended relationships together.
+
+Polarity correction, 2026-09-25: the historical workshop already established that
+the theme/mode supplies polarity and the shared luminance rule uses it. The new
+mock incorrectly put polarity inside the rule and reopened that settled behaviour.
+Remove that duplicate declaration. `negative` requires lighter foregrounds;
+`positive` requires darker foregrounds. The same identity lists and delta work in
+both cases. Existing authored mode metadata and customer runtime palette data
+supply the context; TFS does not infer it from a mode name. Carrying that context
+through the generic-Axis implementation is not a new product workshop. This
+correction does not require polarity on every ordinary Color declaration.
 
 ### Generated public surface
 

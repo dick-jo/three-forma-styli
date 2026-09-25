@@ -302,18 +302,17 @@ assert.equal(
 	'Luminance review evidence has drifted.'
 );
 
-// Placement proposal only: adapt the data; do not implement constraint discovery.
+// Blueprint review: adapt the data; do not implement constraint discovery.
 const { colors: constrainedColors } = load(path.join(root, 'constraints/color.ts'));
 const { validateLuminance } = load(path.join(core, 'constraints/luminance.ts'));
 const authoredRule = constrainedColors.constraints.luminance;
-const { polarity: authoredPolarity, ...authoredPolicy } = authoredRule;
-assert.equal(authoredPolarity, customerTheme.polarity);
-assert.deepEqual(authoredPolicy, runtimeColorThemeConfig.luminance);
+assert.equal(Object.hasOwn(authoredRule, 'polarity'), false);
+assert.deepEqual(authoredRule, runtimeColorThemeConfig.luminance);
 const constrainedSystem = {
 	alpha,
 	colors: {
 		modes: [{ name: 'ordinary', isDefault: true, tokens: constrainedColors.tokens }],
-		luminance: authoredPolicy,
+		luminance: authoredRule,
 	},
 };
 validatePartialDesignSystem(constrainedSystem);
@@ -321,7 +320,11 @@ assert.deepEqual(
 	generateColorTokens(constrainedSystem.colors, groupGenerator, schedule),
 	ordinaryGenerated
 );
-const authoredCheck = validateLuminance(constrainedColors.tokens, authoredRule);
+// The existing fixture supplies this palette's context, separately from the rule.
+const authoredCheck = validateLuminance(constrainedColors.tokens, {
+	...authoredRule,
+	polarity: customerTheme.polarity,
+});
 assert.equal(authoredCheck.actualDelta, preview.luminance.actualDelta);
 assert.equal(authoredCheck.deltaValid, false);
 assert.equal(authoredCheck.foregroundConstraint, 0.63);
@@ -331,10 +334,16 @@ const editedCheck = validateLuminance(
 		...constrainedColors.tokens,
 		pri: { ...constrainedColors.tokens.pri, l: correctedTheme.colors.pri.l },
 	},
-	authoredRule
+	{ ...authoredRule, polarity: customerTheme.polarity }
 );
 assert.equal(editedCheck.deltaValid, true);
 assert.equal(editedCheck.actualDelta, accepted.luminance.actualDelta);
+const lightCheck = validateLuminance(positiveTheme.colors, {
+	...authoredRule,
+	polarity: positiveTheme.polarity,
+});
+assert.equal(lightCheck.deltaValid, true);
+assert.equal(lightCheck.actualDelta, editedCheck.actualDelta);
 console.log(
 	'PASS: complete ordinary palette, Light/Dark choices, both Groups, two Alpha scales, and 94 stable token names.'
 );
@@ -344,9 +353,7 @@ console.log(
 console.log(
 	'PASS: ordinary/runtime parity, preview diagnostics, explicit enforcement, both polarities, and 40 Color variables before/after the customer edit.'
 );
-console.log(
-	'PASS: optional constraint placement reuses the same calculation and preserves token output.'
-);
+console.log("PASS: one shared constraint uses each palette's polarity and preserves token output.");
 console.log(
 	'Review evidence only: no generic-Axis compiler, Shadow helper execution, nested CSS, policy-free runtime implementation, or application integration.'
 );
