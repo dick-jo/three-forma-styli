@@ -313,12 +313,13 @@ for (const selection of ['ordinary', ...axes.theme.modes]) {
 	// Resolve just this fixture's supplied fields; no generic-Axis implementation.
 	const change = constrainedColors.modes.theme[selection];
 	const palette = { ...constrainedColors.tokens, ...change?.tokens };
-	const metadata = change?.metadata ?? constrainedColors.metadata;
-	assert.ok(['negative', 'positive'].includes(metadata.polarity));
+	const polarity = change?.polarity ?? constrainedColors.polarity;
+	assert.ok(['negative', 'positive'].includes(polarity));
 	const singlePalette = {
 		alpha,
 		colors: {
-			modes: [{ name: selection, isDefault: true, metadata, tokens: palette }],
+			// Adapt to the current core API only for this evidence probe.
+			modes: [{ name: selection, isDefault: true, metadata: { polarity }, tokens: palette }],
 			luminance: authoredRule,
 		},
 	};
@@ -328,7 +329,7 @@ for (const selection of ['ordinary', ...axes.theme.modes]) {
 		generated.defaultTokens.map(({ name, value }) => [`--${name}`, value])
 	);
 	const input = {
-		polarity: metadata.polarity,
+		polarity,
 		colors: Object.fromEntries(
 			Object.entries(palette).map(([name, { l, c, h }]) => [name, { l, c: c ?? 0, h: h ?? 0 }])
 		),
@@ -338,7 +339,7 @@ for (const selection of ['ordinary', ...axes.theme.modes]) {
 	assert.equal(Object.keys(properties).length, 40);
 	assert.equal(result.luminance.actualDelta, 0.4);
 	constrainedModes[selection] = {
-		polarity: metadata.polarity,
+		polarity,
 		properties,
 		diagnostics: result.luminance,
 	};
@@ -356,7 +357,7 @@ const draftCheck = validateLuminance(
 		...constrainedColors.tokens,
 		pri: { ...constrainedColors.tokens.pri, l: customerTheme.colors.pri.l },
 	},
-	{ ...authoredRule, polarity: constrainedColors.metadata.polarity }
+	{ ...authoredRule, polarity: constrainedColors.polarity }
 );
 assert.equal(draftCheck.deltaValid, false);
 assert.equal(draftCheck.actualDelta, preview.luminance.actualDelta);
@@ -367,13 +368,13 @@ const editedCheck = validateLuminance(
 		...constrainedColors.tokens,
 		pri: { ...constrainedColors.tokens.pri, l: correctedTheme.colors.pri.l },
 	},
-	{ ...authoredRule, polarity: constrainedColors.metadata.polarity }
+	{ ...authoredRule, polarity: constrainedColors.polarity }
 );
 assert.equal(editedCheck.deltaValid, true);
 assert.equal(editedCheck.actualDelta, accepted.luminance.actualDelta);
 const constraintSnapshot = [
 	'REVIEW EVIDENCE — explicit resolution of this authored mock; existing core calculation and generation.',
-	'One shared rule, required OKLCH-L gap: 0.33. Palette metadata supplies polarity.',
+	'One shared rule, required OKLCH-L gap: 0.33. Each palette supplies its polarity directly.',
 	'',
 	'Palette\tPolarity\tMeasured gap\tRule passes',
 	...Object.entries(constrainedModes).map(
@@ -409,7 +410,7 @@ console.log(
 	'PASS: ordinary/runtime parity, preview diagnostics, explicit enforcement, both polarities, and 40 Color variables before/after the customer edit.'
 );
 console.log(
-	'PASS: ordinary/Dark/Light metadata, one shared rule, 40 stable tokens, runtime parity, and customer draft/edit diagnostics.'
+	'PASS: direct ordinary/Dark/Light polarity, one shared rule, 40 stable tokens, runtime parity, and customer draft/edit diagnostics.'
 );
 console.log(
 	'Review evidence only: no generic-Axis compiler, Shadow helper execution, nested CSS, policy-free runtime implementation, or application integration.'

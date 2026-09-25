@@ -1,5 +1,5 @@
 REVIEW EVIDENCE — explicit resolution of this authored mock; existing core calculation and generation.
-One shared rule, required OKLCH-L gap: 0.33. Palette metadata supplies polarity.
+One shared rule, required OKLCH-L gap: 0.33. Each palette supplies its polarity directly.
 
 Palette	Polarity	Measured gap	Rule passes
 ordinary	negative	0.4	true

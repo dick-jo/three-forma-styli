@@ -11,8 +11,7 @@ export const colors = {
 		neu: oklch(0.75, 0, 0),
 		ink: oklch(0.9, 0, 0),
 	},
-	// A fact about the ordinary palette, consumed by the luminance check.
-	metadata: { polarity: 'negative' },
+	polarity: 'negative',
 	constraints: {
 		luminance: {
 			minimumLuminanceDelta: 0.33,
@@ -30,7 +29,7 @@ export const colors = {
 					neu: oklch(0.25, 0, 0),
 					ink: oklch(0.1, 0, 0),
 				},
-				metadata: { polarity: 'positive' },
+				polarity: 'positive',
 			},
 			// Dark has no differences from the ordinary palette, so needs no entry.
 		},

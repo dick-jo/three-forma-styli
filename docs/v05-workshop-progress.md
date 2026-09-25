@@ -51,11 +51,15 @@ separately agreed architecture and runbook milestone.
   reopened polarity question: the theme/mode already supplies that context and
   the shared rule uses it. The duplicate inside the rule is removed; no further
   polarity-direction workshop is needed.
-- **Ready for final Color/Alpha review:** the revised
+- **Direct polarity ratified, 2026-09-25:** a named Color property beside ordinary
+  tokens and mode changes; omission in a mode retains the ordinary polarity.
+  The authoring mock no longer wraps it in `metadata`. Polarity stays optional
+  unless a directional check or consumer needs it; the shared rule stays unchanged.
+- **Complete Color/Alpha mock updated:** the revised
   [complete mock](./blueprints/color-alpha/constraints/README.md) visibly supplies
-  ordinary/Light polarity metadata, one shared rule, and customer input. Existing
+  ordinary/Light polarity, one shared rule, and customer input. Existing
   core functions verify 40 stable outputs and authored/runtime parity.
-- **Closure:** review that mock and two final runtime recommendations: no rule
+- **Closure:** confirm two final runtime recommendations: no rule
   returns `luminance: null`; explicitly enforcing without a rule reports a
   configuration error. Preserve exact input validation and established polarity.
   After founder approval, move to Spacing and borders. Generic-Axis wiring, public
@@ -78,7 +82,7 @@ domain retaining its own readiness verdict.
 | Order | Workshop                                  | Current readiness                                                                               | What the review should establish                                                                                                                                                                                                             |
 | ----- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated                                | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
-| 2     | Color and Alpha                           | Complete revised mock ready; two final runtime details proposed                                 | Review ordinary/Light/customer examples and proposed no-rule result/enforcement error. Preserve settled palette polarity and keep ordinary token authoring the primary flow.                                                                 |
+| 2     | Color and Alpha                           | Direct polarity ratified; two final runtime details proposed                                    | Confirm the proposed no-rule result/enforcement error. The complete mock preserves settled palette polarity and keeps ordinary token authoring the primary flow.                                                                             |
 | 3     | Spacing, Gap, Border radius, Border width | Gap/Radius contracts ratified; representative mocks and remaining Spacing/Width choices pending | Generated numbered Spacing, deliberate semantic ranges referencing it, and the ordinary scalar Border width. Show how these respond to Size modes without repeated unchanged values.                                                         |
 | 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending                               | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
 | 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending                       | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
@@ -127,7 +131,7 @@ before the runbook is agreed.
 
 - [x] Blueprint: Shadow workshop and representative mock.
 - [x] Blueprint: Axis rules, complete ordinary values, and input/output mock.
-- [ ] Blueprint, now: final Color + Alpha review; complete mock and two runtime details ready.
+- [ ] Blueprint, now: close Color + Alpha; direct polarity ratified, two runtime details remain.
 - [ ] Blueprint: Spacing + Gap + Border radius/width.
 - [ ] Blueprint: Time + Easing confirmation mock.
 - [ ] Blueprint: Typography representative mocks.

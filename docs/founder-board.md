@@ -558,13 +558,23 @@ the theme/mode supplies polarity and the shared luminance rule uses it. The new
 mock incorrectly put polarity inside the rule and reopened that settled behaviour.
 Remove that duplicate declaration. `negative` requires lighter foregrounds;
 `positive` requires darker foregrounds. The same identity lists and delta work in
-both cases. Existing authored mode metadata and customer runtime palette data
+both cases. Current implementation mode metadata and customer runtime palette data
 supply the context; TFS does not infer it from a mode name. Carrying that context
 through the generic-Axis implementation is not a new product workshop. This
 correction does not require polarity on every ordinary Color declaration.
 
+Authoring refinement ratified, 2026-09-25: `polarity` is a direct optional Color
+property, alongside `tokens`, both at the ordinary top level and within a mode.
+This supersedes the mock's `metadata.polarity` wrapper. The ordinary definition
+owns its palette and polarity together; a mode may change polarity, and omission
+retains the ordinary value. Require a resolved polarity where a directional
+constraint or consumer needs it; ordinary palettes without such a requirement
+may omit it. The shared constraint does not contain a polarity or mode map.
+Existing runtime payload meaning is preserved. Migrating generated contracts
+and consumers that currently read metadata belongs to the later runbook.
+
 The revised [complete mock](./blueprints/color-alpha/constraints/README.md) now
-shows ordinary palette metadata, Light-mode changes, and one shared constraint.
+shows direct ordinary polarity, Light-mode changes, and one shared constraint.
 Dark needs no entry because it has no differences. The runtime excerpt projects
 that authored rule; each customer palette supplies its own polarity. Existing
 core functions verify both authored directions, 40 stable Color variables, and

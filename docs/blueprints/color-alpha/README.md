@@ -1,6 +1,6 @@
 # Color and Alpha authoring review
 
-Status, 2026-09-25: **complete representative mocks ready for final founder review**.
+Status, 2026-09-25: **direct polarity ratified; two runtime details remain**.
 The [ordinary-palette input/output model](./baseline/README.md) is now ratified:
 complete top-level values, no `axes.default`, and application-selected modes.
 This main mock has been updated to match. Previous versions remain in Git.
@@ -81,12 +81,15 @@ Color aliases. No brightness ramp is introduced by this example.
 
 ## Still to review before closing Color and Alpha
 
-1. Final review of the [complete constraint example](./constraints/README.md),
-   alongside the ordinary palette and Alpha output above. It shows ordinary/Light
-   metadata, one shared rule, the exact customer payload, and resulting diagnostics.
-2. Confirm the two remaining runtime recommendations: generation without a rule
-   returns `luminance: null`; explicitly enforcing without a rule reports a
-   configuration error. Current runtime generation still requires a rule.
+The [complete constraint example](./constraints/README.md) now uses the ratified
+direct `polarity` property for ordinary/Light palettes, alongside one shared rule,
+the exact customer payload, and resulting diagnostics. Two runtime recommendations
+remain to confirm:
+
+1. Generation without a rule returns `luminance: null`.
+2. Explicitly enforcing without a rule reports a configuration error.
+
+Current runtime generation still requires a rule.
 
 After acceptance, close Color/Alpha and move to Spacing and borders. Exact public
 types, source diagnostics, live feedback, and consumer migration belong to the
@@ -141,8 +144,9 @@ not implemented today. The subsequent authoring verdict puts continuous feedback
 inside the primary design-system authoring flow. The
 [declaration](./constraints/README.md) now records the endorsed domain-owned
 `constraints` section. Two final no-rule result/error details remain for review.
-The mock's accidental duplication of polarity inside the shared rule has been
-corrected: the theme/mode supplies it, and the same rule works in both directions.
+The founder also ratified direct `polarity` beside ordinary tokens and mode
+changes. Mode omission retains ordinary polarity; the same shared rule works in
+both directions. The authoring API needs no `metadata` wrapper for this property.
 No automatic correction or mandatory rule is ratified.
 
 The current generated `enforce` metadata is also recorded for architecture triage:
@@ -167,7 +171,7 @@ checks ordinary/runtime output parity, and records all 40 Color variables before
 and after the customer edit. Its configuration is a handwritten contract excerpt;
 no new runtime schema or policy-free runtime generation is implemented.
 The complete constraint declaration is adapted to the same existing core
-calculation and validator. Ordinary/Dark/Light metadata, 40 stable Color variables,
+calculation and validator. Ordinary/Dark/Light polarity, 40 stable Color variables,
 authored/runtime output parity, and customer draft/edit diagnostics are checked
 against one shared rule. These fixtures do not implement live authoring feedback,
 a generic-Axis compiler, or runtime generation without a rule.

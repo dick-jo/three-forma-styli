@@ -1,6 +1,6 @@
 # One shared constraint across authored modes and customer palettes
 
-Status, 2026-09-25: **domain-owned declaration endorsed by the founder**.
+Status, 2026-09-25: **domain-owned constraints and direct palette polarity ratified**.
 This revision makes the complete context visible: ordinary values, their polarity,
 Light-mode changes, and one shared rule. The customer example uses that same rule.
 No production schema or Workbench code is changed.
@@ -19,7 +19,7 @@ export const colors = {
 		neu: oklch(0.75, 0, 0),
 		ink: oklch(0.9, 0, 0),
 	},
-	metadata: { polarity: 'negative' },
+	polarity: 'negative',
 	constraints: {
 		luminance: {
 			minimumLuminanceDelta: 0.33,
@@ -37,7 +37,7 @@ export const colors = {
 					neu: oklch(0.25, 0, 0),
 					ink: oklch(0.1, 0, 0),
 				},
-				metadata: { polarity: 'positive' },
+				polarity: 'positive',
 			},
 		},
 	},
@@ -45,10 +45,17 @@ export const colors = {
 ```
 
 The existing [axes.ts](../../axes/separate-files/axes.ts) registers Light and Dark.
-No selection at the root uses the ordinary palette. Dark has no differences and
-needs no entry; selecting it restores the ordinary values and polarity. Light
-changes its values and polarity. The constraint stays shared. `metadata` carries
-facts about the palette, not CSS tokens; it preserves the existing polarity model.
+With no mode selected at the root, TFS uses the ordinary palette. Dark has no
+differences and needs no entry; selecting it restores ordinary values and polarity. Light
+changes its values and polarity. The constraint stays shared.
+
+`polarity` is a named Color property beside the palette it describes. The top
+level is the complete ordinary Color definition; modes supply changes to it.
+Omitting polarity from a mode retains the ordinary value. A palette can omit
+polarity altogether when neither a directional check nor a consumer needs it.
+There is no authoring `metadata` wrapper or separate constraint-owned mode map.
+This preserves the existing direction and runtime payload meanings. Generated
+contract migration from the current metadata representation belongs to later work.
 
 The author can omit `constraints` entirely. Declaring it supplies the relationships
 that TFS should check during authoring; it adds no tokens and changes no values.
@@ -149,9 +156,9 @@ automatic foreground/background meanings.
 
 ## What remains before leaving Color and Alpha?
 
-The declaration, polarity relationship, optional-rule principle, and distinction
-between feedback and enforcement are settled. This revised complete example is
-ready for founder review.
+The declaration, direct `polarity` property, optional-rule principle, and distinction
+between feedback and enforcement are settled. The complete example reflects the
+founder's authoring decisions.
 
 Only two concrete runtime details remain to confirm. Recommendation:
 
@@ -165,7 +172,7 @@ proposed output/error details for the already agreed optional-rule capability;
 they are not implemented by this mock. The existing runtime still requires a
 luminance configuration. Payload polarity keeps its established meaning and shape.
 
-After review of this example and those two details, Color/Alpha can close and
+After confirmation of those two details, Color/Alpha can close and
 the workshop can move to Spacing/Gap/Border radius/width. The later architecture
 and implementation milestones own generic-Axis resolution, public typings,
 diagnostic refresh, source locations, removal of redundant `enforce` metadata,
@@ -177,10 +184,10 @@ rules remain deferred.
 
 The parent review script adapts this blueprint declaration to the existing core
 validator and luminance calculation. It explicitly resolves this fixture's
-ordinary/Dark/Light palettes and metadata, checks all 40 stable token names and
+ordinary/Dark/Light palettes and polarity, checks all 40 stable token names and
 runtime parity, and exercises the customer draft/edit outcomes. The supporting
 types check the registered Axis/Mode names and polarity vocabulary, not every
-reference or metadata completeness condition. No new compiler or live feedback
+reference or required-polarity condition. No new compiler or live feedback
 is implemented. The no-constraint runtime result above remains proposed.
 Authoring and runtime diagnostics must agree at emitted precision; these concrete
 values already fit that precision, so this probe does not implement normalization.
