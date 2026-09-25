@@ -491,6 +491,12 @@ Ratified on 2026-09-09:
 - A Range does not universally require a default position. Consumers may select
   their own default from the domain's available positions.
 
+The [Spacing and borders workshop](./blueprints/spacing-borders/README.md), prepared
+2026-09-25, now demonstrates the four-position mappings following one Spacing
+scale, including deliberate mapping changes. Its `step`/`count` naming, shared
+Spacing unit/count, and scalar Border width recommendation await founder review.
+The mock is not a new ratified contract or production implementation.
+
 ### Groups
 
 - Groups contain domain `identities`, not arbitrary token strings.
@@ -523,7 +529,7 @@ and its direction on 2026-09-25: ordinary authoring without a policy, unchanged
 preview with diagnostics when a rule is present, and deliberate enforcement at
 an acceptance boundary. Runtime generation should also work without a luminance
 policy. That capability is not implemented today; input validation remains
-required, and the exact optional runtime contract remains for review.
+required. The final optional runtime behaviours are ratified below.
 
 Later architecture triage must also address current generated `enforce` metadata:
 runtime functions do not read it. `generateRuntimeColorTheme` measures;
@@ -580,11 +586,13 @@ that authored rule; each customer palette supplies its own polarity. Existing
 core functions verify both authored directions, 40 stable Color variables, and
 customer draft/edit diagnostics. This is evidence, not a generic-Axis compiler.
 
-Two final runtime recommendations await founder review: generation without a
-configured rule returns `luminance: null`; explicitly requesting enforcement
-without a rule reports a configuration error. Existing exact-input validation
-and payload polarity are preserved. The mock's closure checklist separates these
-details from later architecture and implementation work.
+Final runtime behaviours ratified, 2026-09-25: generation without a configured
+rule returns `luminance: null`; explicitly requesting enforcement without a rule
+reports a configuration error. Existing exact-input validation and payload
+polarity are preserved. These optional-rule behaviours remain unimplemented.
+The Color/Alpha blueprint workshop is complete; the next workshop is Spacing,
+Gap, Border radius and Border width. Public types, generic-Axis resolution,
+live feedback and consumer migration remain for the later architecture/runbook.
 
 ### Generated public surface
 

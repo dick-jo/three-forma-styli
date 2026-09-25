@@ -1,6 +1,6 @@
 # One shared constraint across authored modes and customer palettes
 
-Status, 2026-09-25: **domain-owned constraints and direct palette polarity ratified**.
+Status, 2026-09-25: **authoring and final runtime behaviours ratified; workshop complete**.
 This revision makes the complete context visible: ordinary values, their polarity,
 Light-mode changes, and one shared rule. The customer example uses that same rule.
 No production schema or Workbench code is changed.
@@ -154,27 +154,26 @@ rule must be present in that runtime selection; diagnose a mismatch rather than
 dropping operands. Existing Groups may supply selections, without acquiring
 automatic foreground/background meanings.
 
-## What remains before leaving Color and Alpha?
+## Workshop closure
 
 The declaration, direct `polarity` property, optional-rule principle, and distinction
 between feedback and enforcement are settled. The complete example reflects the
 founder's authoring decisions.
 
-Only two concrete runtime details remain to confirm. Recommendation:
+The final two runtime behaviours were ratified on 2026-09-25:
 
-| Runtime request                                                   | Proposed result                                                      |
+| Runtime request                                                   | Ratified result                                                      |
 | ----------------------------------------------------------------- | -------------------------------------------------------------------- |
 | Generate with no constraint configured                            | Validate the exact input, emit its colours, return `luminance: null` |
 | Explicitly enforce a luminance constraint when none is configured | Report a configuration error; do not claim that enforcement passed   |
 
 `null` makes “no check was requested” distinct from a successful check. These are
-proposed output/error details for the already agreed optional-rule capability;
+ratified output/error details for the agreed optional-rule capability;
 they are not implemented by this mock. The existing runtime still requires a
 luminance configuration. Payload polarity keeps its established meaning and shape.
 
-After confirmation of those two details, Color/Alpha can close and
-the workshop can move to Spacing/Gap/Border radius/width. The later architecture
-and implementation milestones own generic-Axis resolution, public typings,
+Color/Alpha is complete; continue with the [Spacing and borders mock](../../spacing-borders/README.md).
+The later architecture and implementation milestones own generic-Axis resolution, public typings,
 diagnostic refresh, source locations, removal of redundant `enforce` metadata,
 consumer migration, and checks across all supported runtime cases. Those tasks
 do not require another philosophical constraint or polarity workshop. Future hue
@@ -188,7 +187,7 @@ ordinary/Dark/Light palettes and polarity, checks all 40 stable token names and
 runtime parity, and exercises the customer draft/edit outcomes. The supporting
 types check the registered Axis/Mode names and polarity vocabulary, not every
 reference or required-polarity condition. No new compiler or live feedback
-is implemented. The no-constraint runtime result above remains proposed.
+is implemented. The no-constraint runtime result above is ratified but not implemented.
 Authoring and runtime diagnostics must agree at emitted precision; these concrete
 values already fit that precision, so this probe does not implement normalization.
 

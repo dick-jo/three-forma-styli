@@ -28,10 +28,10 @@ separately agreed architecture and runbook milestone.
   The founder confirms it is resolved: complete ordinary values, named partial
   changes, no `axes.default`. The current separate-file and Color/Alpha mocks
   now follow it; grouping identical CSS selectors is only output formatting.
-- **Now:** [Color and Alpha's representative mock](./blueprints/color-alpha/README.md):
+- **Complete:** [Color and Alpha's representative mock](./blueprints/color-alpha/README.md):
   the readable palette, shared defaults and Theme modes, standard vocabulary,
   two Alpha scales, explicit Groups, and complete expected token names.
-  Baseline questions are closed. Resume the remaining Color-specific review.
+  Baseline and Color-specific workshop decisions are closed.
 - **Endorsed 2026-09-24:** the [Groups companion](./blueprints/color-alpha/groups/README.md)
   shows explicit/prefix selection, exact resolved members, inline Shadow authoring,
   and application use. Groups are named selections, separate from Axes/Modes and
@@ -59,12 +59,16 @@ separately agreed architecture and runbook milestone.
   [complete mock](./blueprints/color-alpha/constraints/README.md) visibly supplies
   ordinary/Light polarity, one shared rule, and customer input. Existing
   core functions verify 40 stable outputs and authored/runtime parity.
-- **Closure:** confirm two final runtime recommendations: no rule
+- **Color/Alpha closed, 2026-09-25:** the final runtime behaviours are ratified: no rule
   returns `luminance: null`; explicitly enforcing without a rule reports a
   configuration error. Preserve exact input validation and established polarity.
-  After founder approval, move to Spacing and borders. Generic-Axis wiring, public
-  types, live feedback, ignored `enforce` metadata, and migration remain later
+  Generic-Axis wiring, public types, live feedback, ignored `enforce` metadata, and migration remain later
   implementation work, not additional prerequisite workshops.
+- **Now:** [Spacing, Gap, Border radius and Border width](./blueprints/spacing-borders/README.md).
+  Representative files, all 22 resolved tokens, Size following, rem units, and
+  genuine mapping/width changes are prepared and checked. Recommendations awaiting
+  review: rename Spacing inputs to `step`/`count`, retain one linear scale with
+  shared unit/count, and keep Width scalar with genuine mode changes only.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -79,14 +83,14 @@ The founder has asked to proceed with this workshop order. It is not an
 implementation runbook. Related domains can be reviewed together, with each
 domain retaining its own readiness verdict.
 
-| Order | Workshop                                  | Current readiness                                                                               | What the review should establish                                                                                                                                                                                                             |
-| ----- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated                                | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
-| 2     | Color and Alpha                           | Direct polarity ratified; two final runtime details proposed                                    | Confirm the proposed no-rule result/enforcement error. The complete mock preserves settled palette polarity and keeps ordinary token authoring the primary flow.                                                                             |
-| 3     | Spacing, Gap, Border radius, Border width | Gap/Radius contracts ratified; representative mocks and remaining Spacing/Width choices pending | Generated numbered Spacing, deliberate semantic ranges referencing it, and the ordinary scalar Border width. Show how these respond to Size modes without repeated unchanged values.                                                         |
-| 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending                               | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
-| 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending                       | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
-| 6     | One assembled design system               | Pending the preceding reviews                                                                   | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases.               |
+| Order | Workshop                                  | Current readiness                                                         | What the review should establish                                                                                                                                                                                                             |
+| ----- | ----------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated          | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
+| 2     | Color and Alpha                           | Blueprint complete; implementation remains later                          | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                                      |
+| 3     | Spacing, Gap, Border radius, Border width | Representative mock ready; Spacing/Width recommendations await review     | Review `step`/`count`, one linear scale with shared unit/count, independent Gap/Radius mappings that follow Size, and scalar Width with genuine mode changes only.                                                                           |
+| 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending         | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
+| 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
+| 6     | One assembled design system               | Pending the preceding reviews                                             | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases.               |
 
 The Axes/Modes example should stay grounded in Color and Spacing. Its purpose is
 to settle their shared authoring pattern before other mocks need it. Shadow can
@@ -131,15 +135,15 @@ before the runbook is agreed.
 
 - [x] Blueprint: Shadow workshop and representative mock.
 - [x] Blueprint: Axis rules, complete ordinary values, and input/output mock.
-- [ ] Blueprint, now: close Color + Alpha; direct polarity ratified, two runtime details remain.
-- [ ] Blueprint: Spacing + Gap + Border radius/width.
+- [x] Blueprint: Color + Alpha, Groups, polarity, and optional constraint/runtime contracts.
+- [ ] Blueprint, now: Spacing + Gap + Border radius/width mock and recommendations.
 - [ ] Blueprint: Time + Easing confirmation mock.
 - [ ] Blueprint: Typography representative mocks.
 - [ ] Blueprint: assembled-system and CSS/TS/Figma scope review.
 - [ ] Architecture, hygiene, consumer migration triage, and agreed runbook.
 - [ ] Implementation increments, verification, and final review.
 
-Motion composites remain deferred. Color/Alpha is the current review; four further
+Motion composites remain deferred. Spacing/borders is the current review; three further
 blueprint review groups follow it. Several retain already ratified
 contracts and need representative confirmation, not a fresh redesign.
 

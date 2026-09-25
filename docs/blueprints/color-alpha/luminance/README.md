@@ -145,9 +145,9 @@ directions. Diagnostics measure the values at emitted CSS precision.
 
 Policy-free runtime generation would still validate the input shape, identities,
 and colour values. Omit a rule rather than inventing a zero-threshold placeholder.
-The [complete revised mock](../constraints/README.md) now supplies the final
-closure checklist: proposed `luminance: null` when generating without a rule, and
-a configuration error when explicitly enforcing without one. The existing
+The [complete revised mock](../constraints/README.md) records the final ratified
+behaviours: `luminance: null` when generating without a rule, and a configuration
+error when explicitly enforcing without one. Implementation remains pending. The existing
 palette polarity relationship is settled and does not need another design round.
 
 One concrete code-hygiene item follows from the existing behaviour: generated
