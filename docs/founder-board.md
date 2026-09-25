@@ -563,6 +563,19 @@ supply the context; TFS does not infer it from a mode name. Carrying that contex
 through the generic-Axis implementation is not a new product workshop. This
 correction does not require polarity on every ordinary Color declaration.
 
+The revised [complete mock](./blueprints/color-alpha/constraints/README.md) now
+shows ordinary palette metadata, Light-mode changes, and one shared constraint.
+Dark needs no entry because it has no differences. The runtime excerpt projects
+that authored rule; each customer palette supplies its own polarity. Existing
+core functions verify both authored directions, 40 stable Color variables, and
+customer draft/edit diagnostics. This is evidence, not a generic-Axis compiler.
+
+Two final runtime recommendations await founder review: generation without a
+configured rule returns `luminance: null`; explicitly requesting enforcement
+without a rule reports a configuration error. Existing exact-input validation
+and payload polarity are preserved. The mock's closure checklist separates these
+details from later architecture and implementation work.
+
 ### Generated public surface
 
 - `./tokens` is the compact catalogue: identity tuples, project groups, exact

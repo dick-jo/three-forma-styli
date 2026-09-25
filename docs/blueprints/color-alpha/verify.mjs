@@ -308,42 +308,97 @@ const { validateLuminance } = load(path.join(core, 'constraints/luminance.ts'));
 const authoredRule = constrainedColors.constraints.luminance;
 assert.equal(Object.hasOwn(authoredRule, 'polarity'), false);
 assert.deepEqual(authoredRule, runtimeColorThemeConfig.luminance);
-const constrainedSystem = {
-	alpha,
-	colors: {
-		modes: [{ name: 'ordinary', isDefault: true, tokens: constrainedColors.tokens }],
-		luminance: authoredRule,
-	},
-};
-validatePartialDesignSystem(constrainedSystem);
+const constrainedModes = {};
+for (const selection of ['ordinary', ...axes.theme.modes]) {
+	// Resolve just this fixture's supplied fields; no generic-Axis implementation.
+	const change = constrainedColors.modes.theme[selection];
+	const palette = { ...constrainedColors.tokens, ...change?.tokens };
+	const metadata = change?.metadata ?? constrainedColors.metadata;
+	assert.ok(['negative', 'positive'].includes(metadata.polarity));
+	const singlePalette = {
+		alpha,
+		colors: {
+			modes: [{ name: selection, isDefault: true, metadata, tokens: palette }],
+			luminance: authoredRule,
+		},
+	};
+	validatePartialDesignSystem(singlePalette);
+	const generated = generateColorTokens(singlePalette.colors, groupGenerator, schedule);
+	const properties = Object.fromEntries(
+		generated.defaultTokens.map(({ name, value }) => [`--${name}`, value])
+	);
+	const input = {
+		polarity: metadata.polarity,
+		colors: Object.fromEntries(
+			Object.entries(palette).map(([name, { l, c, h }]) => [name, { l, c: c ?? 0, h: h ?? 0 }])
+		),
+	};
+	const result = enforceRuntimeColorTheme(input, runtimeColorThemeConfig);
+	assert.deepEqual({ ...result.customProperties }, properties);
+	assert.equal(Object.keys(properties).length, 40);
+	assert.equal(result.luminance.actualDelta, 0.4);
+	constrainedModes[selection] = {
+		polarity: metadata.polarity,
+		properties,
+		diagnostics: result.luminance,
+	};
+}
+assert.deepEqual(constrainedModes.ordinary, constrainedModes.dark);
+assert.equal(constrainedModes.ordinary.polarity, 'negative');
+assert.equal(constrainedModes.light.polarity, 'positive');
 assert.deepEqual(
-	generateColorTokens(constrainedSystem.colors, groupGenerator, schedule),
-	ordinaryGenerated
+	Object.keys(constrainedModes.ordinary.properties),
+	Object.keys(constrainedModes.light.properties)
 );
-// The existing fixture supplies this palette's context, separately from the rule.
-const authoredCheck = validateLuminance(constrainedColors.tokens, {
-	...authoredRule,
-	polarity: customerTheme.polarity,
-});
-assert.equal(authoredCheck.actualDelta, preview.luminance.actualDelta);
-assert.equal(authoredCheck.deltaValid, false);
-assert.equal(authoredCheck.foregroundConstraint, 0.63);
-assert.equal(authoredCheck.colors.pri.headroom, -0.13);
+// A temporary author edit and the customer's draft receive the same feedback.
+const draftCheck = validateLuminance(
+	{
+		...constrainedColors.tokens,
+		pri: { ...constrainedColors.tokens.pri, l: customerTheme.colors.pri.l },
+	},
+	{ ...authoredRule, polarity: constrainedColors.metadata.polarity }
+);
+assert.equal(draftCheck.deltaValid, false);
+assert.equal(draftCheck.actualDelta, preview.luminance.actualDelta);
+assert.equal(draftCheck.foregroundConstraint, 0.63);
+assert.equal(draftCheck.colors.pri.headroom, -0.13);
 const editedCheck = validateLuminance(
 	{
 		...constrainedColors.tokens,
 		pri: { ...constrainedColors.tokens.pri, l: correctedTheme.colors.pri.l },
 	},
-	{ ...authoredRule, polarity: customerTheme.polarity }
+	{ ...authoredRule, polarity: constrainedColors.metadata.polarity }
 );
 assert.equal(editedCheck.deltaValid, true);
 assert.equal(editedCheck.actualDelta, accepted.luminance.actualDelta);
-const lightCheck = validateLuminance(positiveTheme.colors, {
-	...authoredRule,
-	polarity: positiveTheme.polarity,
-});
-assert.equal(lightCheck.deltaValid, true);
-assert.equal(lightCheck.actualDelta, editedCheck.actualDelta);
+const constraintSnapshot = [
+	'REVIEW EVIDENCE — explicit resolution of this authored mock; existing core calculation and generation.',
+	'One shared rule, required OKLCH-L gap: 0.33. Palette metadata supplies polarity.',
+	'',
+	'Palette\tPolarity\tMeasured gap\tRule passes',
+	...Object.entries(constrainedModes).map(
+		([name, result]) =>
+			`${name}\t${result.polarity}\t${result.diagnostics.actualDelta}\t${result.diagnostics.deltaValid}`
+	),
+	`customer draft\t${customerTheme.polarity}\t${preview.luminance.actualDelta}\t${preview.luminance.deltaValid}`,
+	`customer edit\t${correctedTheme.polarity}\t${accepted.luminance.actualDelta}\t${accepted.luminance.deltaValid}`,
+	'',
+	'Token\tOrdinary / Dark\tLight',
+	...Object.entries(constrainedModes.ordinary.properties).map(
+		([name, value]) => `${name}\t${value}\t${constrainedModes.light.properties[name]}`
+	),
+	'',
+	'40 stable names per palette; no polarity or constraint tokens are generated.',
+	'Runtime without a rule: intended behaviour only; the current runtime still rejects missing policy.',
+	'',
+].join('\n');
+const constraintOutput = path.join(root, 'constraints/expected-review.txt');
+if (process.argv.includes('--write')) fs.writeFileSync(constraintOutput, constraintSnapshot);
+assert.equal(
+	fs.readFileSync(constraintOutput, 'utf8'),
+	constraintSnapshot,
+	'Complete constraint review has drifted.'
+);
 console.log(
 	'PASS: complete ordinary palette, Light/Dark choices, both Groups, two Alpha scales, and 94 stable token names.'
 );
@@ -353,7 +408,9 @@ console.log(
 console.log(
 	'PASS: ordinary/runtime parity, preview diagnostics, explicit enforcement, both polarities, and 40 Color variables before/after the customer edit.'
 );
-console.log("PASS: one shared constraint uses each palette's polarity and preserves token output.");
+console.log(
+	'PASS: ordinary/Dark/Light metadata, one shared rule, 40 stable tokens, runtime parity, and customer draft/edit diagnostics.'
+);
 console.log(
 	'Review evidence only: no generic-Axis compiler, Shadow helper execution, nested CSS, policy-free runtime implementation, or application integration.'
 );

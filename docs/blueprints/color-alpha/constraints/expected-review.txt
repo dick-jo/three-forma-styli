@@ -1,0 +1,54 @@
+REVIEW EVIDENCE — explicit resolution of this authored mock; existing core calculation and generation.
+One shared rule, required OKLCH-L gap: 0.33. Palette metadata supplies polarity.
+
+Palette	Polarity	Measured gap	Rule passes
+ordinary	negative	0.4	true
+light	positive	0.4	true
+dark	negative	0.4	true
+customer draft	negative	0.2	false
+customer edit	negative	0.33	true
+
+Token	Ordinary / Dark	Light
+--clr-bg	oklch(0.2000 0.0000 0.00)	oklch(0.8000 0.0000 0.00)
+--clr-bg-a-non	oklch(0.2000 0.0000 0.00 / 0.0000)	oklch(0.8000 0.0000 0.00 / 0.0000)
+--clr-bg-a-min	oklch(0.2000 0.0000 0.00 / 0.0700)	oklch(0.8000 0.0000 0.00 / 0.0700)
+--clr-bg-a-lo-x	oklch(0.2000 0.0000 0.00 / 0.1250)	oklch(0.8000 0.0000 0.00 / 0.1250)
+--clr-bg-a-lo	oklch(0.2000 0.0000 0.00 / 0.2500)	oklch(0.8000 0.0000 0.00 / 0.2500)
+--clr-bg-a-hi	oklch(0.2000 0.0000 0.00 / 0.6800)	oklch(0.8000 0.0000 0.00 / 0.6800)
+--clr-bg-a-hi-x	oklch(0.2000 0.0000 0.00 / 0.8500)	oklch(0.8000 0.0000 0.00 / 0.8500)
+--clr-bg-a-max	oklch(0.2000 0.0000 0.00 / 0.9300)	oklch(0.8000 0.0000 0.00 / 0.9300)
+--clr-ev	oklch(0.3000 0.0000 0.00)	oklch(0.7000 0.0000 0.00)
+--clr-ev-a-non	oklch(0.3000 0.0000 0.00 / 0.0000)	oklch(0.7000 0.0000 0.00 / 0.0000)
+--clr-ev-a-min	oklch(0.3000 0.0000 0.00 / 0.0700)	oklch(0.7000 0.0000 0.00 / 0.0700)
+--clr-ev-a-lo-x	oklch(0.3000 0.0000 0.00 / 0.1250)	oklch(0.7000 0.0000 0.00 / 0.1250)
+--clr-ev-a-lo	oklch(0.3000 0.0000 0.00 / 0.2500)	oklch(0.7000 0.0000 0.00 / 0.2500)
+--clr-ev-a-hi	oklch(0.3000 0.0000 0.00 / 0.6800)	oklch(0.7000 0.0000 0.00 / 0.6800)
+--clr-ev-a-hi-x	oklch(0.3000 0.0000 0.00 / 0.8500)	oklch(0.7000 0.0000 0.00 / 0.8500)
+--clr-ev-a-max	oklch(0.3000 0.0000 0.00 / 0.9300)	oklch(0.7000 0.0000 0.00 / 0.9300)
+--clr-pri	oklch(0.7000 0.1600 285.00)	oklch(0.3000 0.1600 285.00)
+--clr-pri-a-non	oklch(0.7000 0.1600 285.00 / 0.0000)	oklch(0.3000 0.1600 285.00 / 0.0000)
+--clr-pri-a-min	oklch(0.7000 0.1600 285.00 / 0.0700)	oklch(0.3000 0.1600 285.00 / 0.0700)
+--clr-pri-a-lo-x	oklch(0.7000 0.1600 285.00 / 0.1250)	oklch(0.3000 0.1600 285.00 / 0.1250)
+--clr-pri-a-lo	oklch(0.7000 0.1600 285.00 / 0.2500)	oklch(0.3000 0.1600 285.00 / 0.2500)
+--clr-pri-a-hi	oklch(0.7000 0.1600 285.00 / 0.6800)	oklch(0.3000 0.1600 285.00 / 0.6800)
+--clr-pri-a-hi-x	oklch(0.7000 0.1600 285.00 / 0.8500)	oklch(0.3000 0.1600 285.00 / 0.8500)
+--clr-pri-a-max	oklch(0.7000 0.1600 285.00 / 0.9300)	oklch(0.3000 0.1600 285.00 / 0.9300)
+--clr-neu	oklch(0.7500 0.0000 0.00)	oklch(0.2500 0.0000 0.00)
+--clr-neu-a-non	oklch(0.7500 0.0000 0.00 / 0.0000)	oklch(0.2500 0.0000 0.00 / 0.0000)
+--clr-neu-a-min	oklch(0.7500 0.0000 0.00 / 0.0700)	oklch(0.2500 0.0000 0.00 / 0.0700)
+--clr-neu-a-lo-x	oklch(0.7500 0.0000 0.00 / 0.1250)	oklch(0.2500 0.0000 0.00 / 0.1250)
+--clr-neu-a-lo	oklch(0.7500 0.0000 0.00 / 0.2500)	oklch(0.2500 0.0000 0.00 / 0.2500)
+--clr-neu-a-hi	oklch(0.7500 0.0000 0.00 / 0.6800)	oklch(0.2500 0.0000 0.00 / 0.6800)
+--clr-neu-a-hi-x	oklch(0.7500 0.0000 0.00 / 0.8500)	oklch(0.2500 0.0000 0.00 / 0.8500)
+--clr-neu-a-max	oklch(0.7500 0.0000 0.00 / 0.9300)	oklch(0.2500 0.0000 0.00 / 0.9300)
+--clr-ink	oklch(0.9000 0.0000 0.00)	oklch(0.1000 0.0000 0.00)
+--clr-ink-a-non	oklch(0.9000 0.0000 0.00 / 0.0000)	oklch(0.1000 0.0000 0.00 / 0.0000)
+--clr-ink-a-min	oklch(0.9000 0.0000 0.00 / 0.0700)	oklch(0.1000 0.0000 0.00 / 0.0700)
+--clr-ink-a-lo-x	oklch(0.9000 0.0000 0.00 / 0.1250)	oklch(0.1000 0.0000 0.00 / 0.1250)
+--clr-ink-a-lo	oklch(0.9000 0.0000 0.00 / 0.2500)	oklch(0.1000 0.0000 0.00 / 0.2500)
+--clr-ink-a-hi	oklch(0.9000 0.0000 0.00 / 0.6800)	oklch(0.1000 0.0000 0.00 / 0.6800)
+--clr-ink-a-hi-x	oklch(0.9000 0.0000 0.00 / 0.8500)	oklch(0.1000 0.0000 0.00 / 0.8500)
+--clr-ink-a-max	oklch(0.9000 0.0000 0.00 / 0.9300)	oklch(0.1000 0.0000 0.00 / 0.9300)
+
+40 stable names per palette; no polarity or constraint tokens are generated.
+Runtime without a rule: intended behaviour only; the current runtime still rejects missing policy.

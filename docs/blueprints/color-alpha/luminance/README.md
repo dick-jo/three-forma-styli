@@ -4,8 +4,9 @@ Status, 2026-09-25: **representative companion and direction endorsed by the fou
 Milestone 1 only. The functions exercised here already exist. This review does
 not implement new runtime optionality or relocate the authored policy.
 The subsequent endorsed [declaration](../constraints/README.md) makes optional
-constraints visible in the primary authoring flow. Palette polarity remains
-separate from the shared rule.
+constraints visible in the primary authoring flow. Its complete ordinary/Light
+palettes supply their own polarity; the runtime excerpt projects the same shared
+rule. Palette polarity remains separate from that rule.
 
 ```text
 luminance/
@@ -144,7 +145,9 @@ directions. Diagnostics measure the values at emitted CSS precision.
 
 Policy-free runtime generation would still validate the input shape, identities,
 and colour values. Omit a rule rather than inventing a zero-threshold placeholder.
-The exact optional runtime input/output remains for the next mock. The existing
+The [complete revised mock](../constraints/README.md) now supplies the final
+closure checklist: proposed `luminance: null` when generating without a rule, and
+a configuration error when explicitly enforcing without one. The existing
 palette polarity relationship is settled and does not need another design round.
 
 One concrete code-hygiene item follows from the existing behaviour: generated

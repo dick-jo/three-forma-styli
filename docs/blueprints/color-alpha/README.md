@@ -1,6 +1,6 @@
 # Color and Alpha authoring review
 
-Status, 2026-09-24: **first representative mock, awaiting founder review**.
+Status, 2026-09-25: **complete representative mocks ready for final founder review**.
 The [ordinary-palette input/output model](./baseline/README.md) is now ratified:
 complete top-level values, no `axes.default`, and application-selected modes.
 This main mock has been updated to match. Previous versions remain in Git.
@@ -20,7 +20,7 @@ color-alpha/
   review-types.ts      Supporting declarations; not another authoring chore
   groups/              Focused explicit/prefix Group input and resolved output
   luminance/           Ordinary authoring beside optional diagnostics and acceptance
-  constraints/         Endorsed inline declaration; shared rule uses palette polarity
+  constraints/         Complete ordinary/Light/customer flow using one shared rule
 ```
 
 The files use the accepted [axes.ts](../axes/separate-files/axes.ts) registry.
@@ -81,15 +81,17 @@ Color aliases. No brightness ramp is introduced by this example.
 
 ## Still to review before closing Color and Alpha
 
-1. Founder review of these ordinary files and their outputs.
-2. Runtime palette authoring and application: exact selected payload, invalid or
-   incomplete values, reuse of the policy and selected Alpha schedule, and the
-   consumer contract. Preserve the current exact-input rule; partial runtime
-   payloads need an explicit inheritance source. Authored shared defaults are
-   not permission to silently fill untrusted runtime input.
+1. Final review of the [complete constraint example](./constraints/README.md),
+   alongside the ordinary palette and Alpha output above. It shows ordinary/Light
+   metadata, one shared rule, the exact customer payload, and resulting diagnostics.
+2. Confirm the two remaining runtime recommendations: generation without a rule
+   returns `luminance: null`; explicitly enforcing without a rule reports a
+   configuration error. Current runtime generation still requires a rule.
 
-These are planned companion examples, not permission to implement the overhaul.
-The existing full Shadow mock remains authoritative for Shadow authoring.
+After acceptance, close Color/Alpha and move to Spacing and borders. Exact public
+types, source diagnostics, live feedback, and consumer migration belong to the
+later architecture/runbook milestone. The existing full Shadow mock remains
+authoritative for Shadow authoring. This review does not authorize implementation.
 
 The founder endorsed the [Groups companion](./groups/README.md) on 2026-09-24:
 explicit/prefix selections, exact resolved members, inline Shadow usage, and
@@ -102,9 +104,10 @@ established; the rule does not redeclare it. No new Shadow darkness rule is prop
 
 ## Luminance workshop starting point
 
-The founder questions the relationship between minimum lightness separation and
-ordinary design-system authoring. Keep that question visible rather than carrying
-the current configuration placement forward merely because it exists.
+The workshop began by questioning the relationship between minimum lightness
+separation and ordinary design-system authoring. The subsequent verdict below
+settles optional constraints and their placement; this evidence explains the
+existing consumer and implementation that the later migration must account for.
 
 Read-only source inspection, 2026-09-24; no Scatter changes or live deployment
 verification:
@@ -124,7 +127,7 @@ verification:
   distinct from enforcing the palette's actual separation.
 - `packages/compiler/src/workspace/contracts.ts` currently requires both
   `colors.luminance` and `project.runtime.colorThemes` to generate a runtime theme
-  contract. That coupling deserves an explicit product decision.
+  contract. The verdict below removes that compulsory coupling in the blueprint.
 
 The [luminance companion](./luminance/README.md) now shows ordinary token authoring
 without a policy beside Scatter-style custom palette diagnostics and acceptance.
@@ -137,7 +140,7 @@ without compulsory luminance configuration on 2026-09-25. The last capability is
 not implemented today. The subsequent authoring verdict puts continuous feedback
 inside the primary design-system authoring flow. The
 [declaration](./constraints/README.md) now records the endorsed domain-owned
-`constraints` section. The exact optional runtime contract remains for review.
+`constraints` section. Two final no-rule result/error details remain for review.
 The mock's accidental duplication of polarity inside the shared rule has been
 corrected: the theme/mode supplies it, and the same rule works in both directions.
 No automatic correction or mandatory rule is ratified.
@@ -163,10 +166,11 @@ The luminance companion executes existing runtime preview/enforcement functions,
 checks ordinary/runtime output parity, and records all 40 Color variables before
 and after the customer edit. Its configuration is a handwritten contract excerpt;
 no new runtime schema or policy-free runtime generation is implemented.
-The constraint declaration is adapted to the same existing core calculation and
-validator; its failing/passing diagnostics and token output agree with the preceding
-example. Both palette polarities use the same rule. These fixtures do not implement
-live authoring feedback or a generic-Axis compiler.
+The complete constraint declaration is adapted to the same existing core
+calculation and validator. Ordinary/Dark/Light metadata, 40 stable Color variables,
+authored/runtime output parity, and customer draft/edit diagnostics are checked
+against one shared rule. These fixtures do not implement live authoring feedback,
+a generic-Axis compiler, or runtime generation without a rule.
 
 ```sh
 pnpm exec tsc -p docs/blueprints/color-alpha/tsconfig.json
