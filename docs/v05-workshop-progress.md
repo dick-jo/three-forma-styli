@@ -69,6 +69,9 @@ separately agreed architecture and runbook milestone.
   genuine mapping/width changes are prepared and checked. Recommendations awaiting
   review: rename Spacing inputs to `step`/`count`, retain one linear scale with
   shared unit/count, and keep Width scalar with genuine mode changes only.
+- **Current question:** justify Spacing's separate `min` below numbered steps.
+  Recommendation is to retain the explicit fine-detail value; no replacement is
+  ratified. Radius and Width now share `border.ts`, following the founder's file convention.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 

@@ -22,3 +22,8 @@ export type BorderWidthDraft<Axes extends AxisCatalogue> = {
 	readonly value: number;
 	readonly modes?: ModeCatalogue<Axes, { readonly value?: number }>;
 };
+
+export type BorderDraft<Axes extends AxisCatalogue> = {
+	readonly radius?: SpacingRangeDraft<Axes>;
+	readonly width?: BorderWidthDraft<Axes>;
+};

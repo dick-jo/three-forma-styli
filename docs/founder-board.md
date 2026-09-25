@@ -497,6 +497,10 @@ scale, including deliberate mapping changes. Its `step`/`count` naming, shared
 Spacing unit/count, and scalar Border width recommendation await founder review.
 The mock is not a new ratified contract or production implementation.
 
+File convention agreed, 2026-09-25: author Radius and Width together in `border.ts`.
+The current workshop mock follows that convention. The separate Spacing minimum
+is under review; no replacement or extra fine-detail positions are ratified.
+
 ### Groups
 
 - Groups contain domain `identities`, not arbitrary token strings.

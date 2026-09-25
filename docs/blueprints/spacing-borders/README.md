@@ -10,8 +10,7 @@ Numerical choices illustrate authoring, not a new standard-theme calibration.
 ```text
 spacing.ts        One generated scale, then optional Size differences
 gap.ts            Four chosen Spacing references
-border-radius.ts  Four independently chosen Spacing references
-border-width.ts   One structural width
+border.ts         Radius references and structural width together
 system.ts         Assembly with the existing central axes.ts
 alternatives.ts   Rem units and genuine mapping/width changes
 expected-tokens.txt  Every resolved token across ordinary/regular/s/l
@@ -20,6 +19,7 @@ expected-tokens.txt  Every resolved token across ordinary/regular/s/l
 The main declarations immediately follow imports. The supporting review types
 reuse the existing Axis catalogue and four-position range type; authors do not
 declare another position list or read another domain's computed values.
+The founder's file convention places Radius and Width together in `border.ts`.
 
 ## Spacing
 
@@ -58,6 +58,32 @@ The application selects Size. This mock does not assume viewport breakpoints.
 simultaneous named Spacing scales or arbitrary authored lists are not proposed
 without a concrete need. The existing linear ruler is the intended foundation.
 
+### Is the separate minimum justified?
+
+The founder is reviewing this choice, not ratifying a replacement. The small
+value addresses a real detail-spacing need. Carbon likewise offers 2px and 4px
+spacing alongside its 8px grid; that is precedent for finer values, not for
+TFS's exact names or generator. See [Carbon spacing](https://carbondesignsystem.com/elements/spacing/overview/)
+and [2x Grid](https://carbondesignsystem.com/elements/2x-grid/overview/).
+
+Recommendation: retain one explicit minimum below the numbered multiples. With
+`min: 4` and `step: 8`, every offered length remains a multiple of four while the
+numbered tokens preserve the easy relationship `sp-n = n × step`. A full 4px
+scale would also offer 12, 20, 28px and so on; that is useful only if those extra
+choices are wanted. Renumbering `4 / 8 / 16 / 24…` loses the direct multiplier
+meaning without changing the available values.
+
+`min` means the smallest offered Spacing value, not the smallest measurement
+allowed anywhere in the design system. Border width may still be 1px. Each
+derived domain chooses its own smallest reference: `gap.min: 'min'` selects
+Spacing's minimum; `gap.min: 1` would select Spacing position 1 instead.
+
+Keep `min` independently authored. Fine-detail spacing need not scale whenever
+the main step changes, so the 3px/5px minima in the Size examples are illustrative,
+not mandatory or a requirement to halve the step. If a product repeatedly needs
+both 2px and 4px below an 8px step, one minimum is insufficient; that concrete need
+would justify revisiting the scale. No extra fine-detail tokens are proposed now.
+
 ## Gap and Radius
 
 ```ts
@@ -68,15 +94,22 @@ export const gap = {
 	max: 6,
 };
 
-export const radius = {
-	min: 'min',
-	s: 1,
-	l: 2,
-	max: 3,
+// border.ts
+export const border = {
+	radius: {
+		min: 'min',
+		s: 1,
+		l: 2,
+		max: 3,
+	},
+	width: {
+		unit: 'px',
+		value: 1,
+	},
 };
 ```
 
-`gap.l: 3` means **use Spacing position 3**, not 3px. `radius.l: 2` means
+`gap.l: 3` means **use Spacing position 3**, not 3px. `border.radius.l: 2` means
 use Spacing position 2. Each domain has its own four deliberate choices. In this
 example a layout gap can be larger than a corner radius without inventing any
 measurements outside Spacing.
@@ -107,10 +140,11 @@ This uses the approved mode pattern; it is an optional authoring example.
 ## Border width
 
 ```ts
-export const width = {
+// The width entry in border.ts:
+width: {
 	unit: 'px',
 	value: 1,
-};
+},
 ```
 
 **Recommendation:** retain one scalar `--bdw`, independent of Spacing. The
@@ -153,8 +187,8 @@ possible; the precise shared unit type belongs to architecture work.
 
 ## What needs a verdict?
 
-1. Spacing's `step` / `count` names and single linear scale, with shared unit/count
-   and mode-specific `min` / `step`.
+1. Review retaining a separate authored Spacing minimum below its numbered scale.
+   Then settle `step` / `count` names, shared unit/count and mode-specific measurements.
 2. Border width stays a scalar, with mode changes only when genuinely needed.
 3. Review the representative files/output to confirm Gap/Radius's already agreed
    mappings and automatic Size following are clear.
