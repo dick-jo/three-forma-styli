@@ -1,6 +1,6 @@
 # v0.5 workshop progress
 
-Updated 2026-09-24. Current milestone: **1 — blueprint and ratification**.
+Updated 2026-09-25. Current milestone: **1 — blueprint and ratification**.
 
 This is the navigation and progress surface. The
 [Founder Board](./founder-board.md) owns ratified contracts; the
@@ -38,15 +38,21 @@ separately agreed architecture and runbook milestone.
   luminance enforcement. Existing resolution and validation are checked. The current
   resolver loses exact member types for prefix-based authoring; carry that bounded
   ergonomics gap into API/architecture triage, without inventing a new helper now.
-- **Ready for review:** the [luminance companion](./blueprints/color-alpha/luminance/README.md)
+- **Endorsed 2026-09-25:** the [luminance companion](./blueprints/color-alpha/luminance/README.md)
   shows ordinary authoring without a policy, runtime preview with diagnostics,
   explicit acceptance/rejection, and a customer edit that passes the exact boundary.
   Existing functions verify both polarities and ordinary/runtime token parity.
-- **Next within Color/Alpha:** settle optional policy and explicit enforcement,
-  then the runtime contract and rule placement. Policy-free runtime generation is
-  recommended but not implemented. Current generated `enforce` metadata is ignored
-  by runtime functions; record its redundancy for architecture triage. No new
-  policy placement is ratified, and the domain review is not closed yet.
+- **Authoring principle agreed:** optional design rules provide feedback as values
+  change; distinguish declaring, checking, and enforcing. Authoring remains the
+  primary flow. Runtime generation without a luminance policy is the intended
+  direction, not implemented functionality.
+- **Ready for review:** the [constraint declaration comparison](./blueprints/color-alpha/constraints/README.md)
+  recommends `colors.constraints` after the values. This is a proposal, including
+  where polarity sits in its single-palette example.
+- **Next within Color/Alpha:** settle placement, then show how direction follows
+  authored modes and runtime input without duplicate or competing declarations.
+  Complete the runtime contract. Current ignored `enforce` metadata stays in
+  architecture triage. The domain review is not closed yet.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -64,7 +70,7 @@ domain retaining its own readiness verdict.
 | Order | Workshop                                  | Current readiness                                                                               | What the review should establish                                                                                                                                                                                                             |
 | ----- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated                                | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
-| 2     | Color and Alpha                           | Groups endorsed; luminance companion ready; main review and runtime contract remain             | Review the optional policy and explicit enforcement demonstrated by verified outputs. Then settle runtime input/output and rule placement, keeping ordinary token authoring simple.                                                          |
+| 2     | Color and Alpha                           | Groups/luminance endorsed; constraint placement proposed; runtime contract remains              | Review the optional rule declaration; settle direction across authored modes and customer palettes, then finish the runtime input/output mock. Keep ordinary token authoring the primary flow.                                               |
 | 3     | Spacing, Gap, Border radius, Border width | Gap/Radius contracts ratified; representative mocks and remaining Spacing/Width choices pending | Generated numbered Spacing, deliberate semantic ranges referencing it, and the ordinary scalar Border width. Show how these respond to Size modes without repeated unchanged values.                                                         |
 | 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending                               | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
 | 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending                       | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
@@ -113,7 +119,7 @@ before the runbook is agreed.
 
 - [x] Blueprint: Shadow workshop and representative mock.
 - [x] Blueprint: Axis rules, complete ordinary values, and input/output mock.
-- [ ] Blueprint, now: finish Color + Alpha; Groups endorsed, luminance ready, runtime contract next.
+- [ ] Blueprint, now: finish Color + Alpha; constraint placement proposed, direction/runtime next.
 - [ ] Blueprint: Spacing + Gap + Border radius/width.
 - [ ] Blueprint: Time + Easing confirmation mock.
 - [ ] Blueprint: Typography representative mocks.

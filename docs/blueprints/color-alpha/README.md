@@ -20,6 +20,7 @@ color-alpha/
   review-types.ts      Supporting declarations; not another authoring chore
   groups/              Focused explicit/prefix Group input and resolved output
   luminance/           Ordinary authoring beside optional diagnostics and acceptance
+  constraints/         Proposed inline declaration and comparison with a separate catalogue
 ```
 
 The files use the accepted [axes.ts](../axes/separate-files/axes.ts) registry.
@@ -81,11 +82,11 @@ Color aliases. No brightness ramp is introduced by this example.
 ## Still to review before closing Color and Alpha
 
 1. Founder review of these ordinary files and their outputs.
-2. The existing `colors.luminance` policy, its OKLCH-L diagnostics, and its optional
-   relationship to ordinary token authoring. Review the current coupling to runtime
-   contract generation and distinguish declaring, measuring, and enforcing a rule.
-   The [side-by-side companion](./luminance/README.md) is ready for review. No new
-   automatic Shadow darkness rule is proposed.
+2. Review the [constraint declaration proposal](./constraints/README.md). The founder
+   endorsed the [luminance companion](./luminance/README.md) and the principle of
+   optional rules with continuous authoring feedback on 2026-09-25. Placement and
+   direction across authored modes/runtime input remain open. No automatic Shadow
+   darkness rule is proposed.
 3. Runtime palette authoring and application: exact selected payload, invalid or
    incomplete values, reuse of the policy and selected Alpha schedule, and the
    consumer contract. Preserve the current exact-input rule; partial runtime
@@ -132,10 +133,13 @@ The same five colours compile normally and can be previewed, but fail a requeste
 `0.33` separation rule with a measured `0.20` gap. A deliberate customer edit reaches
 `0.33` and passes. Both polarities and all emitted values are verified.
 
-The proposed direction is optional policy, explicit enforcement, and runtime
-generation without compulsory luminance configuration. The last capability is
-not implemented today. Policy placement and the exact optional runtime contract
-remain open; no new placement, automatic correction, or mandatory rule is ratified.
+The founder endorsed optional policy, explicit enforcement, and runtime generation
+without compulsory luminance configuration on 2026-09-25. The last capability is
+not implemented today. The subsequent authoring verdict puts continuous feedback
+inside the primary design-system authoring flow. The
+[placement comparison](./constraints/README.md) proposes a domain-owned
+`constraints` section; that layout and the exact optional runtime contract remain
+open. No automatic correction or mandatory rule is ratified.
 
 The current generated `enforce` metadata is also recorded for architecture triage:
 the runtime functions ignore it, and the chosen API determines enforcement. The
@@ -158,6 +162,10 @@ The luminance companion executes existing runtime preview/enforcement functions,
 checks ordinary/runtime output parity, and records all 40 Color variables before
 and after the customer edit. Its configuration is a handwritten contract excerpt;
 no new runtime schema or policy-free runtime generation is implemented.
+The placement proposal is adapted to the same existing core calculation and
+validator; its failing/passing diagnostics and token output agree with the preceding
+example. These fixtures do not implement live authoring feedback or mode-varying
+constraint data.
 
 ```sh
 pnpm exec tsc -p docs/blueprints/color-alpha/tsconfig.json

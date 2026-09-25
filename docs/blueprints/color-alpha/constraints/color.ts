@@ -1,0 +1,22 @@
+import { oklch } from '@three-forma-styli/core';
+import type { ColorDraft } from './review-types.js';
+
+// Proposed declaration for one palette; not an implemented authoring API.
+export const colors = {
+	tokens: {
+		bg: oklch(0.2, 0, 0),
+		ev: oklch(0.3, 0, 0),
+		pri: oklch(0.5, 0.16, 285),
+		neu: oklch(0.75, 0, 0),
+		ink: oklch(0.9, 0, 0),
+	},
+	constraints: {
+		luminance: {
+			// Existing calculation vocabulary: dark backgrounds, light foregrounds.
+			polarity: 'negative',
+			minimumLuminanceDelta: 0.33,
+			backgroundColors: ['bg', 'ev'],
+			foregroundColors: ['pri', 'neu', 'ink'],
+		},
+	},
+} as const satisfies ColorDraft;

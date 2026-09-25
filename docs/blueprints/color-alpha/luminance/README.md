@@ -1,8 +1,10 @@
 # Ordinary colours and an optional luminance rule
 
-Status, 2026-09-24: **representative companion ready for founder review**.
+Status, 2026-09-25: **representative companion and direction endorsed by the founder**.
 Milestone 1 only. The functions exercised here already exist. This review does
 not implement new runtime optionality or relocate the authored policy.
+The subsequent [declaration proposal](../constraints/README.md) makes optional
+constraints visible in the primary authoring flow; its layout remains under review.
 
 ```text
 luminance/
@@ -126,7 +128,7 @@ runtime payload calls dark backgrounds `negative` polarity and light backgrounds
 select a Theme mode or an application attribute. The review verifies both
 directions. Diagnostics measure the values at emitted CSS precision.
 
-## Recommendation to review
+## Endorsed direction
 
 1. **Ordinary token authoring needs no rule.** Keep the existing simple path.
 2. **A luminance rule is optional project policy.** It can be useful for checking
@@ -135,7 +137,7 @@ directions. Diagnostics measure the values at emitted CSS precision.
 3. **The caller deliberately requests enforcement.** Preserve the distinction
    between useful diagnostics and accepting a palette under a rule.
 4. **Runtime colour generation should also work without a luminance policy.**
-   This is the proposed simplification; it is not supported by today's generator
+   This is the agreed simplification; it is not supported by today's generator
    or runtime-contract builder. They currently require the rule even for previews.
 
 Policy-free runtime generation would still validate the input shape, identities,

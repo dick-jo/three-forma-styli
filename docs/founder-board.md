@@ -516,26 +516,43 @@ architecture triage.
 - “Luminance” is the product term; diagnostics state that the metric is OKLCH L,
   not WCAG relative luminance or a contrast ratio.
 
-Workshop question raised 2026-09-24, **not a replacement verdict**: clarify the
-relationship between ordinary token authoring, an optional product luminance
-policy, and runtime palette acceptance. Scatter uses the calculation for editor
-diagnostics and the enforcing API before accepting custom palettes. The current
-TFS runtime-contract generator requires a luminance configuration; whether that
-coupling belongs in the overhaul must be reviewed explicitly.
-
-The [luminance companion](./blueprints/color-alpha/luminance/README.md) is now ready
-for founder review: ordinary authoring without a policy, unchanged runtime preview
-with diagnostics, explicit rejection on acceptance, and a deliberate edit that
-passes the exact boundary. Existing core functions verify the outputs. The
-proposed direction is optional policy and deliberate enforcement, including
-allowing runtime generation without a luminance policy. That last capability is
-not implemented; policy placement and its optional runtime contract remain open.
-No replacement verdict is recorded by preparing this mock.
+The founder endorsed the [luminance companion](./blueprints/color-alpha/luminance/README.md)
+and its direction on 2026-09-25: ordinary authoring without a policy, unchanged
+preview with diagnostics when a rule is present, and deliberate enforcement at
+an acceptance boundary. Runtime generation should also work without a luminance
+policy. That capability is not implemented today; input validation remains
+required, and exact optional runtime types and polarity handling remain open.
 
 Later architecture triage must also address current generated `enforce` metadata:
 runtime functions do not read it. `generateRuntimeColorTheme` measures;
 `enforceRuntimeColorTheme` rejects a failing separation regardless of the list.
 Do not carry redundant configuration forward merely because it is emitted today.
+
+### Constraints in the authoring experience
+
+Founder-endorsed direction, 2026-09-25:
+
+- Authoring the design system is the primary TFS flow. Constraints are optional
+  design rules that supply feedback during that flow, not a mandatory separate
+  validation ceremony after the author finishes.
+- Distinguish the declared rule, the check that reports whether it holds, and a
+  caller's explicit decision to enforce it at a boundary.
+- Workbench feedback should update as relevant values change. Temporary violations
+  are useful editing states; no automatic palette correction is implied.
+- Use TypeScript for names and structural validity. Numerical relationships need
+  calculated diagnostics; do not force them into elaborate type-level arithmetic.
+- Reuse the same rule data and calculation for authoring feedback and applicable
+  runtime consumers. Do not make live Workbench feedback a new implementation
+  task during blueprint ratification.
+- Future hue-separation rules remain a hypothetical extension, not an approved
+  implementation scope or reason to build a general constraint framework.
+
+The [declaration comparison](./blueprints/color-alpha/constraints/README.md) proposes
+optional `colors.constraints.luminance`, after `tokens`, instead of the current
+direct `colors.luminance` field. This layout is **not yet ratified**. The
+single-palette mock supplies the existing calculation's polarity explicitly;
+its placement across authored modes and runtime input remains an open design
+question. It establishes no generic rule-merging or override precedence.
 
 ### Generated public surface
 
