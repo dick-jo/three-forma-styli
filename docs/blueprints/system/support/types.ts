@@ -327,17 +327,38 @@ export declare function defineColors<
 
 // ---- One define…() per domain: identity helpers that check names ----
 
+/** Rejects axis or mode names that axes.ts does not register. */
+type ModesCheck<T> = T extends { readonly modes: infer M }
+	? {
+			readonly modes: {
+				readonly [A in keyof M]: A extends keyof Axes
+					? {
+							readonly [Mode in keyof M[A]]: Mode extends Axes[A]['modes'][number]
+								? M[A][Mode]
+								: never;
+						}
+					: never;
+			};
+		}
+	: unknown;
+
 export declare function defineAxes<const T extends AxisCatalogue>(axes: T): T;
 export declare function defineAlpha<const T extends AlphaDraft>(alpha: T): T;
-export declare function defineSpacing<const T extends SpacingDraft<Axes>>(spacing: T): T;
-export declare function defineGap<const T extends SpacingRangeDraft<Axes>>(gap: T): T;
+export declare function defineSpacing<const T extends SpacingDraft<Axes>>(
+	spacing: T & ModesCheck<T>
+): T;
+export declare function defineGap<const T extends SpacingRangeDraft<Axes>>(
+	gap: T & ModesCheck<T>
+): T;
 export declare function defineBorder<const T extends BorderDraft<Axes>>(border: T): T;
 export declare function defineShadows<const T extends ShadowDraft<Axes, typeof colors>>(
-	shadows: T
+	shadows: T & ModesCheck<T>
 ): T;
 export declare function defineTime<const T extends TimeDraft>(time: T): T;
 export declare function defineEasings<const T extends Readonly<Record<string, EasingValue>>>(
 	easings: T
 ): T;
-export declare function defineFontSize<const T extends FontSizeDraft<Axes>>(fontSize: T): T;
+export declare function defineFontSize<const T extends FontSizeDraft<Axes>>(
+	fontSize: T & ModesCheck<T>
+): T;
 export declare function defineFonts<const T extends FontsDraft>(fonts: T): T;
