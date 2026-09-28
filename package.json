@@ -1,5 +1,6 @@
 {
 	"name": "three-forma-styli-repo",
+	"version": "0.0.0",
 	"private": true,
 	"scripts": {
 		"build": "pnpm --filter three-forma-styli build && pnpm --filter tfs-workbench build",

@@ -5,7 +5,7 @@ TypeScript files of deliberate choices (colours, spacing, type, shadows, motion)
 TFS derives the repetitive scales and emits framework-neutral CSS variables and
 exact TypeScript types for your app.
 
-> **Status: v0.5 rebuilt, on branch `v0.5-rebuild`; not yet published** (npm has 0.4.0).
+> **Status:** `three-forma-styli@0.5.0` is on npm. (0.4.0 was four `@three-forma-styli/*` packages.)
 
 ## Try it
 
@@ -14,7 +14,7 @@ A design system is one folder: config, family files, fonts, and `generated/`.
 **Inside an existing app** (npm shown; pnpm/yarn work the same):
 
 ```sh
-npm install -D ~/project-local/three-forma-styli/tfs   # once published: npm install -D three-forma-styli
+npm install -D three-forma-styli
 npx tfs init        # creates ./design-system/
 npx tfs dev         # finds ./design-system; builds its generated/, serves Workbench
 ```
@@ -25,7 +25,7 @@ The app imports `design-system/generated/styles.css` once, from its entry file.
 
 ```sh
 mkdir my-system && cd my-system && pnpm init
-pnpm add -D ~/project-local/three-forma-styli/tfs typescript
+pnpm add -D three-forma-styli typescript
 pnpm tfs init .     # this folder is the design system
 pnpm tfs dev
 ```
@@ -48,6 +48,12 @@ pnpm tfs dev
 | `workbench/`            | the review UI opened by `tfs dev`; reads TFS's data file only                    |
 | `figma-plugin/` (later) | reads TFS's Figma output only                                                    |
 | `docs/`                 | the Board and the progress file, nothing else                                    |
+
+## Developing TFS itself
+
+`pnpm install && pnpm check` in this repo. To try unreleased changes in another project:
+`pnpm build` here, then `npm install -D ~/project-local/three-forma-styli/tfs` there.
+Publish from `tfs/` (`npm publish`; needs npm 2FA).
 
 ## Recovery
 
