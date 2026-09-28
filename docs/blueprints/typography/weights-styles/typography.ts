@@ -31,6 +31,12 @@ export const typography = defineTypography({
 				l: { fontSize: 6, weight: 'max', lineHeight: 0.8, letterSpacing: -0.0175 },
 				max: { fontSize: 8, weight: 'max', lineHeight: 0.8, letterSpacing: -0.025 },
 			},
+			// Hypothetical: only the changes, like every other domain.
+			modes: {
+				size: {
+					s: { sizes: { max: { lineHeight: 0.9 } } },
+				},
+			},
 		},
 		label: {
 			font: 'jetbrains-mono',

@@ -41,6 +41,51 @@ defineTypography({
 	},
 });
 
+defineTypography({
+	fonts,
+	roles: {
+		badge: {
+			font: 'supreme',
+			weights: { min: 500, max: 700 },
+			sizes: { base: { ...m, weight: 'min' } },
+			modes: {
+				size: {
+					// @ts-expect-error A mode cannot add a size the role does not have.
+					l: { sizes: { l: { lineHeight: 1 } } },
+				},
+			},
+		},
+	},
+});
+
+defineTypography({
+	fonts,
+	roles: {
+		badge: {
+			font: 'supreme',
+			weights: { min: 500, max: 700 },
+			sizes: { base: { ...m, weight: 'min' } },
+			modes: {
+				// @ts-expect-error Unknown mode.
+				size: { huge: { sizes: { base: { lineHeight: 1 } } } },
+			},
+		},
+	},
+});
+
+defineTypography({
+	fonts,
+	roles: {
+		badge: {
+			font: 'supreme',
+			weights: { min: 500, max: 700 },
+			sizes: { base: { ...m, weight: 'min' } },
+			// @ts-expect-error A mode cannot change which weights exist.
+			modes: { size: { s: { weights: { min: 400, max: 700 } } } },
+		},
+	},
+});
+
 // ---- Consumer selections ----
 type Selection = TypographySelection<(typeof typography)['roles']>;
 

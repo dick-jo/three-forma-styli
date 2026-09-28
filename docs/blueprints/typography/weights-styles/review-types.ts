@@ -1,4 +1,5 @@
 // Review-only shapes for the proposed weight/style authoring. Not implemented APIs.
+import type { axes } from '../../axes/separate-files/axes.js';
 
 type WeightName = 'min' | 'lo' | 'hi' | 'max';
 type SizeName = 'min' | 's' | 'base' | 'l' | 'max';
@@ -39,14 +40,46 @@ type RangeRole<FontName, Weights extends RangeWeights> = RoleBase<FontName> & {
 	readonly sizes: Sizes<Measurements & { readonly weight: Extract<keyof Weights, WeightName> }>;
 };
 
+type Axes = typeof axes;
+type Row = Measurements & { readonly weight?: WeightName };
+
+/**
+ * Modes change values in existing sizes; never font, weights, styles or which sizes exist.
+ * Keys are checked against the authored role so unknown modes/sizes are rejected.
+ */
+type RoleModes<Role> = Role extends { readonly modes: infer M }
+	? {
+			readonly modes: {
+				readonly [A in keyof M]: A extends keyof Axes
+					? {
+							readonly [Mode in keyof M[A]]: Mode extends Axes[A]['modes'][number]
+								? M[A][Mode] extends { readonly sizes: infer S }
+									? {
+											readonly sizes: {
+												readonly [K in keyof S]: K extends keyof SizesOf<Role>
+													? Partial<Row>
+													: never;
+											};
+										}
+									: never
+								: never;
+						}
+					: never;
+			};
+		}
+	: { readonly modes?: never };
+
+type SizesOf<Role> = Role extends { readonly sizes: infer S } ? S : never;
+
 type CheckRoles<Roles, FontName> = {
-	[R in keyof Roles]: Roles[R] extends { readonly weights: infer W }
+	[R in keyof Roles]: (Roles[R] extends { readonly weights: infer W }
 		? W extends number
 			? ScalarRole<FontName>
 			: W extends RangeWeights
 				? RangeRole<FontName, W>
 				: never
-		: never;
+		: never) &
+		RoleModes<Roles[R]>;
 };
 
 export type FontsDraft = Record<

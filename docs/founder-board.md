@@ -544,6 +544,11 @@ review-example change only; migration of actual consumer names belongs to triage
   One-off emphasis uses weight/style classes or tokens; a recurring named treatment
   is another role (e.g. `label-loud`). Existing variant code is a removal candidate.
 - Resolution order is size → explicit style/weight.
+- Role modes ratified 2026-09-28: roles use the shared `modes` pattern like every
+  other domain, supplying only changes. A mode may change existing size rows'
+  fontSize, weight, lineHeight or letterSpacing; never font, weights, styles or
+  which sizes exist, so names stay stable. Legacy `modeOverrides` is not carried
+  forward. Roles also follow atomic Size changes through their fontSize references.
 - Physical style/weight/features/axes are checked against prepared font facts.
 
 The [first Typography mock](./blueprints/typography/README.md), prepared
