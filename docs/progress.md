@@ -53,6 +53,7 @@ listed here was not carried over.
 | `packages/core/src/constraints/luminance.ts`                                      | `tfs/src/runtime/luminance.ts`         | same formula and diagnostics; empty-group case removed (rule lists are validated)                           |
 | JetBrains Mono TTFs + `OFL.txt` (from Scatter)                                    | `tfs/tests/fixtures/everything/fonts/` | real test font; OFL permits redistribution with its licence                                                 |
 | `esbuild` config loading (from `packages/cli/src/config/load-module.ts`)          | `tfs/src/session/config.ts`            | same approach; also yields the watch list for `tfs dev`                                                     |
+| `LICENSE`, `.prettierrc`, `.gitattributes`                                        | unchanged                              | repository configuration                                                                                    |
 
 CSS mode re-binding was rewritten in step 4 rather than copied (the old version
 handled one axis only).
@@ -66,14 +67,15 @@ handled one axis only).
 
 ## Finish-line checks
 
-The cleanup is done when all of these pass:
+Run 2026-09-28, after step 9. All pass.
 
-1. **Nothing old by accident**: every carried-over file is in the kept list.
-2. **Old vocabulary gone**: a one-time search of `tfs/` at the final review finds none
-   of `isDefault`, `defaultScale`, `defaultRange`, `modeOverrides`, `variants`,
-   `license`, `verification`, `strategy`, `increment`, `tfsSystem`, `shadow--`.
-3. **No dead code**: `knip` reports no unused files or exports.
-4. **Boundaries**: `workbench/` and `figma-plugin/` import nothing from TFS
-   internals; they read generated files only.
-5. **Final review**: full file tree with line counts vs the ~60k starting point;
-   every folder matches the README's "where things live".
+1. **Nothing old by accident:** the kept list above is complete.
+2. **Old vocabulary gone:** no `isDefault`, `defaultScale`, `defaultRange`,
+   `modeOverrides`, `variants`, `license`, `verification`, `strategy`, `increment`,
+   `tfsSystem`, `shadow--`, `displayOrder`, `defaultStyle` or `dtcg` in any source file.
+3. **No dead code:** `knip` clean (runs in `pnpm check`).
+4. **Boundaries:** Workbench imports only `svelte` and TFS's public `WorkbenchData`
+   type (type-only; no TFS code in its bundle).
+5. **Size:** ~60,200 lines in 384 files → ~7,300 authored lines in 131 files
+   (`tfs/src` 3,981 · tests 1,318 · theme 259 · Workbench 1,311 · docs 393), plus
+   1,199 lines of committed generated snapshots. Every folder matches the README.
