@@ -3,18 +3,25 @@ import { parseArgs } from 'node:util';
 import { buildProject, checkProject } from './session/build.js';
 import { loadConfig } from './session/config.js';
 import { startDev } from './session/dev.js';
-import { initProject } from './session/init.js';
+import { resolve } from 'node:path';
+import { DEFAULT_FOLDER, initProject } from './session/init.js';
 import { describeError, describeFontFiles } from './session/report.js';
+
+/** The command prefix for whichever package manager ran us. */
+function runner(): string {
+	const agent = process.env.npm_config_user_agent ?? '';
+	return agent.startsWith('pnpm') ? 'pnpm' : agent.startsWith('yarn') ? 'yarn' : 'npx';
+}
 
 const HELP = `tfs — Three Forma Styli
 
-  tfs init [dir]                add the standard theme's files to a new project
+  tfs init [dir]                start a design system in dir (default ./design-system; . = this folder)
   tfs dev [dir]                 build, then rebuild on every save
   tfs build [dir]               check everything and write generated/
   tfs check [dir]               fail if generated/ is out of date (for CI)
   tfs fonts inspect <files...>  show what font files offer
 
-[dir] is the folder containing tfs.config.ts (default: current folder).`;
+[dir] is the design-system folder. Default: the current folder, or ./design-system inside it.`;
 
 async function main(argv: string[]): Promise<number> {
 	const { positionals, values } = parseArgs({
@@ -27,8 +34,21 @@ async function main(argv: string[]): Promise<number> {
 	if (!command) return (console.log(HELP), 1);
 
 	if (command === 'init') {
-		const files = await initProject(rest[0] ?? '.');
-		console.log(`✓ added ${files.join(', ')}\n\nNext: pnpm tfs dev`);
+		const folder = rest[0] ?? DEFAULT_FOLDER;
+		const files = await initProject(folder);
+		const run = runner();
+		const here = resolve(folder) === process.cwd();
+		console.log(
+			[
+				`✓ ${here ? 'added' : `created ${folder}/ with`}: ${files.join(', ')}`,
+				'',
+				'Next:',
+				`  ${run} tfs dev      live session: builds ${here ? '' : `${folder}/`}generated/, serves Workbench`,
+				...(here
+					? []
+					: ['', 'In your app, import once:', `  import './${folder}/generated/styles.css';`]),
+			].join('\n')
+		);
 		return 0;
 	}
 	if (command === 'build') {

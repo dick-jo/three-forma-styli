@@ -1,9 +1,11 @@
+import { existsSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { build } from 'esbuild';
 import type { ConfigInput } from '../define/config.js';
 import type { SystemInput } from '../resolve/input.js';
+import { DEFAULT_FOLDER } from './init.js';
 
 export type LoadedConfig = {
 	readonly config: ConfigInput & { readonly system: SystemInput };
@@ -15,11 +17,22 @@ export type LoadedConfig = {
 	readonly inputs: readonly string[];
 };
 
-/** Finds tfs.config.ts in a directory, or accepts a direct path to it. */
+/**
+ * Finds tfs.config.ts: a direct path, the folder itself, or its ./design-system
+ * folder (so `tfs dev` works from an app's root after `tfs init`).
+ */
 function configPathFor(target: string): string {
-	return target.endsWith('.ts') || target.endsWith('.js')
-		? resolve(target)
-		: resolve(target, 'tfs.config.ts');
+	if (target.endsWith('.ts') || target.endsWith('.js')) return resolve(target);
+	const candidates = [
+		resolve(target, 'tfs.config.ts'),
+		resolve(target, DEFAULT_FOLDER, 'tfs.config.ts'),
+	];
+	const found = candidates.find((candidate) => existsSync(candidate));
+	if (!found)
+		throw new Error(
+			`No tfs.config.ts in ${resolve(target)} or ${join(resolve(target), DEFAULT_FOLDER)}. Run tfs init to create one.`
+		);
+	return found;
 }
 
 /**

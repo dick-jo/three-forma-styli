@@ -144,7 +144,24 @@ describe('the standard theme', () => {
 		);
 	});
 
-	it('tfs init adds it to a new project, and refuses one that already has files', async () => {
+	it('tfs init creates ./design-system inside an existing app, which the other commands then find', async () => {
+		const { initProject } = await import('../src/session/init.js');
+		const app = await mkdtemp(join(project, '..', '.tmp-app-'));
+		temporary.push(app);
+		await writeFile(join(app, 'package.json'), '{}');
+		await mkdir(join(app, 'src'));
+		const cwd = process.cwd();
+		process.chdir(app);
+		try {
+			expect(await initProject()).toContain('tfs.config.ts');
+			expect((await loadConfig('.')).configPath).toBe(join(app, 'design-system', 'tfs.config.ts'));
+			await expect(initProject()).rejects.toThrow('already has files');
+		} finally {
+			process.chdir(cwd);
+		}
+	});
+
+	it('tfs init . makes a fresh project folder the design system, but not one with other files', async () => {
 		const { initProject } = await import('../src/session/init.js');
 		const target = await mkdtemp(join(tmpdir(), 'tfs-init-'));
 		temporary.push(target);
@@ -162,5 +179,11 @@ describe('the standard theme', () => {
 			'typography.ts',
 		]);
 		await expect(initProject(target)).rejects.toThrow('already has files (axes.ts');
+	});
+
+	it('explains when there is no design system to find', async () => {
+		const empty = await mkdtemp(join(tmpdir(), 'tfs-none-'));
+		temporary.push(empty);
+		await expect(loadConfig(empty)).rejects.toThrow('No tfs.config.ts in');
 	});
 });
