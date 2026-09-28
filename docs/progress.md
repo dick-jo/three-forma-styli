@@ -25,7 +25,7 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 | 6    | `./tokens`: identity names, exact group types, `var()` helpers                                                    | done   |
 | 7    | Runtime colour themes + luminance copied in; `./runtime`; decide `native-color-modes`                             | done   |
 | 8    | `tfs build`, `tfs check`, `tfs dev` (watch, last valid output), `tfs fonts inspect`; knip in CI                   | done   |
-| 8b   | Workbench: reads the data file `tfs dev` serves; adapt the existing UI                                            |        |
+| 8b   | Workbench rewritten: live read-only view served by `tfs dev`, disposable sliders                                  | done   |
 | 9    | Standard theme ported with unchanged values                                                                       |        |
 | 10   | Scatter upgrade to 0.5: separate agreed scope, values unchanged                                                   |        |
 | 11   | Capstone: Figma (chosen modes; shadows/text as styles)                                                            |        |
@@ -41,7 +41,7 @@ listed here was not carried over.
 | mock `support/types.ts`                                                           | `tfs/src/define/*.ts`                  | review types became the real authoring types                                                                |
 | `packages/core/src/utils.ts` `oklch()`                                            | `tfs/src/define/color.ts`              | 3-line constructor, same output                                                                             |
 | `packages/core/src/alpha/authoring.ts` `deriveAlphaScale`                         | `tfs/src/define/color.ts`              | same maths; test pins 0.4.0 values                                                                          |
-| `apps/workbench/`                                                                 | `workbench/` (outside the workspace)   | kept until 8b, where it is rewritten from scratch                                                           |
+| `apps/workbench/`                                                                 | nothing                                | rewritten from scratch in 8b; no old code kept                                                              |
 | `.github/requirements-fonttools.txt`                                              | unchanged; used by CI                  | FontTools + Brotli for WOFF2 conversion                                                                     |
 | `packages/compiler/src/fonts/inspect.ts` (style/format detection)                 | `tfs/src/fonts/inspect.ts`             | family, style, weight range, container vs extension check; provenance, embedding flags and warnings dropped |
 | `packages/compiler/src/fonts/fonttools.ts` (the two commands)                     | `tfs/src/fonts/convert.ts`             | `ttLib.woff2 compress/decompress`; version/Python provenance dropped                                        |

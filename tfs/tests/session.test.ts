@@ -85,7 +85,7 @@ describe('tfs dev', () => {
 			`import { defineConfig } from 'three-forma-styli';\nimport { spacing } from './spacing.js';\nexport default defineConfig({ system: { axes: {}, spacing } });\n`
 		);
 		const lines: string[] = [];
-		const session = await startDev(dir, (line) => lines.push(line));
+		const session = await startDev(dir, (line) => lines.push(line), 5290);
 		const css = () => readFile(join(dir, 'generated/tokens.css'), 'utf8');
 		const until = async (condition: () => boolean) => {
 			for (let i = 0; i < 100 && !condition(); i++) await new Promise((r) => setTimeout(r, 50));
@@ -94,8 +94,17 @@ describe('tfs dev', () => {
 		try {
 			expect(await css()).toContain('--sp-1: 8px;');
 
+			const workbench = async () => (await fetch(`${session.url}/workbench.json`)).json();
+			expect((await workbench()).problems).toEqual([]);
+			expect(await (await fetch(`${session.url}/generated/tokens.css`)).text()).toContain(
+				'--sp-1: 8px;'
+			);
+
 			await writeFile(join(dir, 'spacing.ts'), spacing(3));
 			await until(() => lines.some((line) => line.startsWith('✗')));
+			expect((await workbench()).problems).toEqual([
+				'spacing.min: must be at least 0 and less than step 3 (got 4)',
+			]);
 			expect(lines.at(-1)).toContain(
 				'spacing.min: must be at least 0 and less than step 3 (got 4)'
 			);

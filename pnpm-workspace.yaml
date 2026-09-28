@@ -1,6 +1,6 @@
 packages:
   - 'tfs'
-  # workbench/ rejoins in runbook step 8, when it reads TFS's data file.
+  - 'workbench'
 
 allowBuilds:
   esbuild: true

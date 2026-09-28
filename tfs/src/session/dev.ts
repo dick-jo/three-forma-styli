@@ -1,38 +1,73 @@
 import { watch } from 'node:fs';
 import { relative, resolve } from 'node:path';
+import { workbenchData } from '../emit/workbench.js';
+import { TfsError } from '../resolve/issues.js';
+import type { ResolvedSystem } from '../resolve/index.js';
 import { buildProject } from './build.js';
 import { loadConfig, type LoadedConfig } from './config.js';
-import { describeError, describeFontFiles, fontFilesOf } from './report.js';
+import { describeError, describeFontFiles } from './report.js';
+import { startWorkbenchServer, type WorkbenchServer } from './server.js';
 
-type DevSession = { readonly close: () => void; readonly settled: () => Promise<void> };
+type DevSession = {
+	readonly url: string;
+	readonly close: () => void;
+	readonly settled: () => Promise<void>;
+};
+
+function problemsOf(error: unknown): string[] {
+	return error instanceof TfsError
+		? error.issues.map((issue) => `${issue.path}: ${issue.message}`)
+		: [describeError(error)];
+}
+
+function fontsOf(loaded: LoadedConfig) {
+	return Object.entries(loaded.config.system.typography?.fonts ?? {}).flatMap(([id, font]) =>
+		font.files
+			? [
+					{
+						id,
+						faces: describeFontFiles(font.files, loaded.projectDir).map((line) =>
+							line.replace(/\n\s+/, ' — ')
+						),
+					},
+				]
+			: []
+	);
+}
 
 /**
- * `tfs dev`: builds, then rebuilds on every save. An invalid edit prints its
- * problems and leaves the last valid output in place.
+ * `tfs dev`: builds, serves Workbench, then rebuilds on every save. An invalid
+ * edit is reported in the terminal and in Workbench; the last valid output stays.
  */
 export async function startDev(
 	target: string,
-	log: (line: string) => void = console.log
+	log: (line: string) => void = console.log,
+	port = 5178
 ): Promise<DevSession> {
 	let loaded: LoadedConfig | undefined;
+	let lastValid: ResolvedSystem | undefined;
+	let server: WorkbenchServer | undefined;
 	let fontsShown = '';
 	let running = Promise.resolve();
 
 	const run = () =>
 		(running = running.then(async () => {
 			const started = Date.now();
+			let fonts: ReturnType<typeof fontsOf> = [];
 			try {
 				loaded = await loadConfig(target);
-				const fonts = describeFontFiles(fontFilesOf(loaded.config.system), loaded.projectDir).join(
-					'\n  '
-				);
-				if (fonts && fonts !== fontsShown) log(`Font files:\n  ${fonts}`);
-				fontsShown = fonts;
-				await buildProject(loaded);
+				server ??= await startWorkbenchServer(loaded.outDir, port);
+				fonts = fontsOf(loaded);
+				const shown = fonts.map((font) => `${font.id}: ${font.faces.join('; ')}`).join('\n  ');
+				if (shown && shown !== fontsShown) log(`Font files:\n  ${shown}`);
+				fontsShown = shown;
+				lastValid = (await buildProject(loaded)).resolved;
+				server.publish(workbenchData(lastValid, [], fonts));
 				log(
 					`✓ built ${relative(process.cwd(), loaded.outDir) || '.'} in ${Date.now() - started}ms`
 				);
 			} catch (error) {
+				server?.publish(workbenchData(lastValid, problemsOf(error), fonts));
 				log(`✗ ${describeError(error)}\n  (previous output kept)`);
 			}
 		}));
@@ -51,8 +86,16 @@ export async function startDev(
 		clearTimeout(timer);
 		timer = setTimeout(run, 100);
 	});
+	const url = server?.url ?? '';
 	log(
-		`Watching ${relative(process.cwd(), projectDir) || '.'} — save a file to rebuild. Ctrl+C to stop.`
+		`Workbench: ${url}\nWatching ${relative(process.cwd(), projectDir) || '.'} — save a file to rebuild. Ctrl+C to stop.`
 	);
-	return { close: () => watcher.close(), settled: () => running };
+	return {
+		url,
+		close: () => {
+			watcher.close();
+			server?.close();
+		},
+		settled: () => running,
+	};
 }

@@ -1,7 +1,6 @@
 import { resolve } from 'node:path';
 import { inspectFontFile, type FontFace } from '../fonts/inspect.js';
 import { TfsError } from '../resolve/issues.js';
-import type { SystemInput } from '../resolve/input.js';
 
 /** A human-readable problem list for the terminal. */
 export function describeError(error: unknown): string {
@@ -25,8 +24,4 @@ export function describeFontFiles(files: readonly string[], projectDir = process
 			return `${file}\n    ${describeError(error)}`;
 		}
 	});
-}
-
-export function fontFilesOf(system: SystemInput): string[] {
-	return Object.values(system.typography?.fonts ?? {}).flatMap((font) => font.files ?? []);
 }

@@ -48,3 +48,4 @@ export {
 	type ColorThemesInput,
 } from './emit/color-theme.js';
 export { defineConfig, type ConfigInput } from './define/config.js';
+export type { WorkbenchData } from './emit/workbench.js';
