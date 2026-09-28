@@ -324,12 +324,11 @@ Ratified on 2026-09-09; implementation remains pending:
 - The same Time tokens serve duration or delay; no separate delay domain is
   required. Units remain authored per scale, supporting `ms` and `s`.
 
-Review question, 2026-09-28: the founder questions the compulsory name for the
-ordinary scale. The [confirmation mock](./blueprints/time-easing/README.md#time-proposed-prefixless-ordinary-scale)
-compares a directly authored prefixless scale with optional additional named
-scales. The founder then requested comparison with Alpha, emphasising consistency;
-the alternative remains unratified and the shape below remains current. CSS
-output and the other Time rules are unchanged by the proposal.
+Reconfirmed on 2026-09-28 after the
+[Alpha/Time comparison](./blueprints/time-easing/README.md#time-named-scales-retained-for-consistency):
+retain the named-scale catalogue and `defaultScale` for consistency. The proposed
+direct prefixless ordinary scale is declined; it is not an additional authoring
+form. This closes Time's representative mock review without changing its contract.
 
 Ratified authoring shape, with illustrative values pending theme calibration:
 
@@ -390,8 +389,8 @@ The [Time/Easing confirmation mock](./blueprints/time-easing/README.md), prepare
 with all 12 expected variables, seconds/direct-data alternatives and CSS/TS
 consumption. TypeScript and bounded headless browser evidence pass. Helper imports
 remain declaration-only; no production overhaul is implemented. The founder
-accepted Easing's representative usage on 2026-09-28. Time's ordinary scale naming
-is the remaining review question above.
+accepted Easing's representative usage and reconfirmed Time's named scales on
+2026-09-28. Both representative mock reviews are complete; continue to Typography.
 
 ### Motion composites — deferred
 
@@ -493,6 +492,14 @@ review-example change only; migration of actual consumer names belongs to triage
 - Variants are categorical and cannot change font family or font size.
 - Resolution order is role defaults → size → variant → explicit style/weight.
 - Physical style/weight/features/axes are checked against prepared font facts.
+
+The [first Typography mock](./blueprints/typography/README.md), prepared
+2026-09-28, shows the atomic Font-size scale and one ordinary scalar-weight prose
+role. It proposes numerical inputs `start / step / count` and shared unit/count
+with `min/start/step` changes through the established Size axis. These refinements
+await founder review; existing role grammar remains ratified. Prepared fonts,
+weight ranges, variants, genuine role mode changes, and full consumer review
+follow in focused passes. No production code is changed.
 
 ### Spacing and borders
 

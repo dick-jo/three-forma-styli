@@ -75,14 +75,18 @@ separately agreed architecture and runbook milestone.
   authored Bézier/Linear values and CSS/TS consumption. The existing TypeScript,
   12-value expansion, and browser evidence remain bounded review checks, not a
   production implementation.
-- **Now — Time ordinary scale naming:** the founder questions naming the
-  prefixless scale `neu`. The mock README compares the current named catalogue
-  with a proposed direct ordinary scale plus optional additional named scales.
-  The founder requested an Alpha/Time comparison before deciding, emphasising
-  consistency. That comparison now shows the same short-name rule in both
-  catalogues; retaining the shared shape is the current recommendation. A ruling
-  remains pending; the checked fixture and ratified contract are unchanged. Four
-  positions, units, simultaneous scales, and duration/delay use remain settled.
+- **Time complete, 2026-09-28:** after comparing Alpha, the founder retains
+  named scales and `defaultScale` for consistency. The directly authored
+  prefixless alternative is declined. Existing mock inputs/output remain
+  unchanged; the Time/Easing workshop is complete.
+- **Now — Typography first pass:** the
+  [Font-size and ordinary-role mock](./blueprints/typography/README.md) shows
+  proposed `start/step/count` inputs, ordinary values and Size differences,
+  and one scalar-weight prose role with five sizes. TypeScript, 37 stable
+  token names, and 27 browser cases pass, including nested restoration. Field
+  naming and scale mode boundaries await review. Weight ranges, variants,
+  prepared fonts, role mode changes and the full consumer surface follow in
+  focused passes; no production implementation has started.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -102,8 +106,8 @@ domain retaining its own readiness verdict.
 | 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated          | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
 | 2     | Color and Alpha                           | Blueprint complete; implementation remains later                          | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                                      |
 | 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                                | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                                  |
-| 4     | Time and Easing                           | Easing complete; Time ordinary scale naming under review                  | Decide whether Time needs a named ordinary scale or directly authors its prefixless values. Other Time rules and Easing are settled; no Motion composite or Axis mechanism is proposed.                                                      |
-| 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
+| 4     | Time and Easing                           | Blueprint and representative mocks complete                              | Carry named Time scales, directly authored Easings, and accepted output/consumption into the later runbook. Motion composites remain deferred.                                                                                                |
+| 5     | Typography                                | First Font-size/prose mock ready; wider representative review pending     | Review proposed scale inputs and ordinary role authoring, then weight ranges, variants, prepared font facts, role mode changes and the complete consumer surface through focused examples.                                                    |
 | 6     | One assembled design system               | Pending the preceding reviews                                             | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases.               |
 
 The Axes/Modes example should stay grounded in Color and Spacing. Its purpose is
@@ -151,16 +155,15 @@ before the runbook is agreed.
 - [x] Blueprint: Axis rules, complete ordinary values, and input/output mock.
 - [x] Blueprint: Color + Alpha, Groups, polarity, and optional constraint/runtime contracts.
 - [x] Blueprint: Spacing + Gap + Border radius/width, independent minimum and combined border.ts.
-- [x] Blueprint: Easing representative mock.
-- [ ] Blueprint, now: Time ordinary scale naming, then mock closure.
-- [ ] Blueprint: Typography representative mocks.
+- [x] Blueprint: Time + Easing representative mocks; named scales retained.
+- [ ] Blueprint, now: Typography Font-size/prose mock, then the remaining focused cases.
 - [ ] Blueprint: assembled-system and CSS/TS/Figma scope review.
 - [ ] Architecture, hygiene, consumer migration triage, and agreed runbook.
 - [ ] Implementation increments, verification, and final review.
 
-Motion composites remain deferred. Time is the current review; two further
-blueprint review groups follow it. Several retain already ratified
-contracts and need representative confirmation, not a fresh redesign.
+Motion composites remain deferred. Typography is the current review; the
+assembled-system review follows it before architecture/triage. Several contracts
+are already ratified and need representative confirmation, not a fresh redesign.
 
 Keep the full queue in this file. Update this tracker and the relevant Founder
 Board verdict when readiness changes, distinguishing a ratified contract from

@@ -1,6 +1,10 @@
 # Typography foundation
 
-This document describes the v0.5 public model. Product grammar is ratified in
+This document describes the implemented typography foundation. Its legacy
+`modes`/`isDefault` and `modeOverrides` authoring below is superseded by the later
+shared Axis/ordinary-values verdict; do not copy those fields into the overhaul.
+The [Typography workshop mocks](./blueprints/typography/README.md) demonstrate
+the proposed replacement in focused passes. Product grammar is ratified in
 [`founder-board.md`](./founder-board.md); migration examples live in
 [`v05-migration.md`](./v05-migration.md).
 

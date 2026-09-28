@@ -8,9 +8,10 @@ illustrative, pending standard-theme calibration.
 
 The [representative confirmation mock](./blueprints/time-easing/README.md), prepared
 2026-09-28, shows separate authored files, complete CSS output, and CSS/TypeScript
-consumer examples. Easing's representative usage is accepted. Time's compulsory
-ordinary scale name is under review, with a prefixless authoring alternative in
-the mock README; that proposal has not yet replaced the Time shape below.
+consumer examples. Both representative reviews are complete. The founder
+reconfirmed Time's named scales and `defaultScale` for consistency with Alpha;
+the alternative prefixless ordinary source shape was declined. The contract below
+is unchanged.
 
 The project remains in the
 [blueprint and ratification milestone](./founder-board.md#overhaul-milestones).
