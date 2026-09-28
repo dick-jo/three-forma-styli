@@ -272,7 +272,7 @@ Final clarification ratified, 2026-09-24, after reviewing the
   not independently reset to the ordinary set.
 - CSS may group identical `:root` and mode declarations with a comma or emit
   separate equivalent blocks. That is output formatting, not an authoring rule.
-- Alpha/Time `defaultScale` and Shadow `defaultRange` keep their separate job of
+- (Superseded 2026-09-28 by the unnamed ordinary scale.) Alpha/Time `defaultScale` and Shadow `defaultRange` keep their separate job of
   selecting short token names. Their contracts are unchanged.
 
 This supersedes the earlier model where the ordinary set could be incomplete
@@ -313,6 +313,24 @@ The ordinary separate-file registry/catalogue/assembly model and these rules are
 ready to carry into the remaining domain mocks. Implementation remains pending;
 those mocks confirm domain-specific value boundaries without reopening this ruling.
 
+### Authoring conventions — ratified 2026-09-28, assembled-system review
+
+- **Unnamed ordinary scale.** Alpha, Time and Shadow put their ordinary scale/range
+  unnamed at the top level (short tokens `--a-*`, `--t-*`, `--shd-*`); named extras
+  go in `scales` / `ranges` (`--a-{name}-*`, `--t-{name}-*`, `--shd-{name}-*`).
+  Same shape as ordinary values plus named `modes`. Removes `defaultScale`,
+  `defaultRange` and placeholder `neu` names; generated tokens are unchanged.
+  Alpha and Time require the ordinary scale; Shadow may have only named ranges.
+  Supersedes the named-scale/`defaultScale` verdicts below where they conflict.
+- **One file per family:** `axes.ts`, `color.ts` (alpha + colours), `spacing.ts`
+  (spacing + gap), `border.ts`, `shadow.ts`, `motion.ts` (time + easing),
+  `typography.ts` (font size + fonts + roles), `tfs.config.ts` assembly. A file
+  name only; Motion composites stay deferred.
+- **One authoring style:** every domain uses an identity helper,
+  `export const x = defineX({...})`, which checks names inside the file and
+  against other files (colours, fonts, modes). No `as const satisfies XDraft`.
+- Reference: `docs/blueprints/system/` (type-checked assembled mock).
+
 ### Standard-theme identity vocabulary
 
 Ratified on 2026-09-09; theme implementation and contract tests remain pending:
@@ -343,7 +361,7 @@ Ratified on 2026-09-09; theme implementation and contract tests remain pending:
 
 Ratified on 2026-09-09; implementation remains pending:
 
-- Authoring uses `time: { defaultScale, scales }`. `scales` is keyed by authored
+- (Shape superseded 2026-09-28: ordinary scale unnamed at top, extras in `scales`.) Authoring uses `time: { defaultScale, scales }`. `scales` is keyed by authored
   identity; each scale contains `unit` and `values`.
 - Every scale has four required, explicit, strictly increasing values:
   `min / lo / hi / max`. Authors choose the values; numerical generation inputs
@@ -446,7 +464,7 @@ Blueprint ratified on 2026-09-10, including the
 consumer-responsibility boundary. This domain workshop is complete;
 implementation remains pending. It uses the ratified ordinary-values/Axis model.
 
-- One Shadow catalogue owns `unit`, optional `defaultRange`, and named `ranges`.
+- (Superseded 2026-09-28: ordinary range unnamed at top, extras in `ranges`.) One Shadow catalogue owns `unit`, optional `defaultRange`, and named `ranges`.
   The main domain declaration comes first, with values and helper calls inline.
   There are no separate Box/Text source sections.
 - Every identity supplies all four ordered positions, `min / lo / hi / max`.

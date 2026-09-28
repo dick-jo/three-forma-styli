@@ -134,6 +134,9 @@ separately agreed architecture and runbook milestone.
   (weight stated per size), `styles` list, plain scalar weight, independent
   style/weight classes, whole-row `--text-{role}[-{size}]` font token. Mock:
   `blueprints/typography/weights-styles/*.ts`. Variants removed. Role modes use the shared pattern (values only). Fonts: `files` vs `name`. **Typography closed 2026-09-28.** Next: assembled-system review.
+- **Assembled review part 1 ratified, 2026-09-28:** unnamed ordinary scale for
+  Alpha/Time/Shadow, one file per family, one `defineX()` style. Mock:
+  `blueprints/system/`. Next: part 2 — app usage, Figma subset, calibration.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
