@@ -6,6 +6,10 @@ Time shape, two Easing forms, and small helper contract. The later simplicity
 verdict removes Steps from the earlier proposal. Numerical values below remain
 illustrative, pending standard-theme calibration.
 
+The [representative confirmation mock](./blueprints/time-easing/README.md), prepared
+2026-09-28, shows separate authored files, complete CSS output, and CSS/TypeScript
+consumer examples. It is ready for founder review; this underlying contract is unchanged.
+
 The project remains in the
 [blueprint and ratification milestone](./founder-board.md#overhaul-milestones).
 Acceptance of this contract does not start development: the broader blueprint

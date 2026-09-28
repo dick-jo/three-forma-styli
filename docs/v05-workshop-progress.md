@@ -1,6 +1,6 @@
 # v0.5 workshop progress
 
-Updated 2026-09-25. Current milestone: **1 — blueprint and ratification**.
+Updated 2026-09-28. Current milestone: **1 — blueprint and ratification**.
 
 This is the navigation and progress surface. The
 [Founder Board](./founder-board.md) owns ratified contracts; the
@@ -64,14 +64,19 @@ separately agreed architecture and runbook milestone.
   configuration error. Preserve exact input validation and established polarity.
   Generic-Axis wiring, public types, live feedback, ignored `enforce` metadata, and migration remain later
   implementation work, not additional prerequisite workshops.
-- **Now:** [Spacing, Gap, Border radius and Border width](./blueprints/spacing-borders/README.md).
-  Representative files, all 22 resolved tokens, Size following, rem units, and
-  genuine mapping/width changes are prepared and checked. Recommendations awaiting
-  review: rename Spacing inputs to `step`/`count`, retain one linear scale with
-  shared unit/count, and keep Width scalar with genuine mode changes only.
-- **Current question:** justify Spacing's separate `min` below numbered steps.
-  Recommendation is to retain the explicit fine-detail value; no replacement is
-  ratified. Radius and Width now share `border.ts`, following the founder's file convention.
+- **Spacing/borders closed, 2026-09-28:** the founder ratified the complete
+  [mock and roundup](./blueprints/spacing-borders/README.md): `step`/`count`, one
+  linear scale with independent `min`, shared unit/count, automatic Gap/Radius
+  references, scalar Width, and combined `border.ts`. Its 22 names, Size following,
+  rem alternative and genuine mapping/width changes are verified. Example numbers
+  are illustrative, not mandatory theme calibrations.
+- **Now:** [Time and Easing confirmation mock](./blueprints/time-easing/README.md).
+  Existing contracts are unchanged: four explicit Time positions, optional longer
+  scale, and directly authored structured Easings. The mock shows Bézier overshoot,
+  constant-speed and repeated-bounce Linear points, seconds, and CSS/TS consumption.
+  TypeScript, all 12 expected values, and browser parsing/computed styles pass.
+  Founder review of the representative usage remains; no new product decision is
+  proposed. The helper declarations and expansion are review evidence only.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -90,8 +95,8 @@ domain retaining its own readiness verdict.
 | ----- | ----------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated          | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
 | 2     | Color and Alpha                           | Blueprint complete; implementation remains later                          | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                                      |
-| 3     | Spacing, Gap, Border radius, Border width | Representative mock ready; Spacing/Width recommendations await review     | Review `step`/`count`, one linear scale with shared unit/count, independent Gap/Radius mappings that follow Size, and scalar Width with genuine mode changes only.                                                                           |
-| 4     | Time and Easing                           | Authoring/helper contracts ratified; representative mocks pending         | A short confirmation through one readable mock: the four-position Time scale, an optional longer scale, directly authored named easings, and their CSS/TS use.                                                                               |
+| 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                                | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                                  |
+| 4     | Time and Easing                           | Contracts ratified; complete confirmation mock ready for review           | Review the four-position Time scales, directly authored Bézier/Linear choices, complete variable output, and CSS/TS consumption. No new Motion composite or Axis mechanism is proposed.                                                      |
 | 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
 | 6     | One assembled design system               | Pending the preceding reviews                                             | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases.               |
 
@@ -139,14 +144,14 @@ before the runbook is agreed.
 - [x] Blueprint: Shadow workshop and representative mock.
 - [x] Blueprint: Axis rules, complete ordinary values, and input/output mock.
 - [x] Blueprint: Color + Alpha, Groups, polarity, and optional constraint/runtime contracts.
-- [ ] Blueprint, now: Spacing + Gap + Border radius/width mock and recommendations.
-- [ ] Blueprint: Time + Easing confirmation mock.
+- [x] Blueprint: Spacing + Gap + Border radius/width, independent minimum and combined border.ts.
+- [ ] Blueprint, now: Time + Easing confirmation mock ready for review.
 - [ ] Blueprint: Typography representative mocks.
 - [ ] Blueprint: assembled-system and CSS/TS/Figma scope review.
 - [ ] Architecture, hygiene, consumer migration triage, and agreed runbook.
 - [ ] Implementation increments, verification, and final review.
 
-Motion composites remain deferred. Spacing/borders is the current review; three further
+Motion composites remain deferred. Time/Easing is the current review; two further
 blueprint review groups follow it. Several retain already ratified
 contracts and need representative confirmation, not a fresh redesign.
 

@@ -1,6 +1,6 @@
 # Spacing, Gap, Border radius and Border width
 
-Status, 2026-09-25: **representative mock and recommendations for founder review**.
+Status, 2026-09-28: **blueprint ratified and representative mock reviewed; workshop complete**.
 Milestone 1 only. No production source, standard theme, or consumer is changed.
 The existing Axis and four-position Gap/Radius contracts remain authoritative.
 Numerical choices illustrate authoring, not a new standard-theme calibration.
@@ -43,7 +43,7 @@ through `--sp-12: 96px`. `min: 4` supplies the separate smaller value
 `--sp-min: 4px`. `count: 12` counts numbered positions; there are 13 Spacing
 tokens including `min`. It does not establish a twelve-token global limit.
 
-**Naming recommendation:** replace the old numerical inputs `base` and `range`
+**Ratified naming:** replace the old numerical inputs `base` and `range`
 with `step` and `count`. The multiplication is unchanged. There is no generated
 `base` position, unsuffixed `--sp`, or `--sp-max`; the final numbered position is
 the endpoint. `min` is an explicit authored value, not automatically half a step.
@@ -53,20 +53,20 @@ selected at the root, ordinary values apply. Selecting `regular` inside `s`
 restores ordinary values; unmarked descendants inherit their surrounding values.
 The application selects Size. This mock does not assume viewport breakpoints.
 
-**Recommendation:** one Spacing scale, with a shared unit and count; modes change
+**Ratified:** one Spacing scale, with a shared unit and count; modes change
 `min` and/or `step`. Keep the same token identities in every mode. Additional
 simultaneous named Spacing scales or arbitrary authored lists are not proposed
 without a concrete need. The existing linear ruler is the intended foundation.
 
 ### Is the separate minimum justified?
 
-The founder is reviewing this choice, not ratifying a replacement. The small
+The founder ratified retaining the separate minimum on 2026-09-28. The small
 value addresses a real detail-spacing need. Carbon likewise offers 2px and 4px
 spacing alongside its 8px grid; that is precedent for finer values, not for
 TFS's exact names or generator. See [Carbon spacing](https://carbondesignsystem.com/elements/spacing/overview/)
 and [2x Grid](https://carbondesignsystem.com/elements/2x-grid/overview/).
 
-Recommendation: retain one explicit minimum below the numbered multiples. With
+Retain one explicit minimum below the numbered multiples. With
 `min: 4` and `step: 8`, every offered length remains a multiple of four while the
 numbered tokens preserve the easy relationship `sp-n = n × step`. A full 4px
 scale would also offer 12, 20, 28px and so on; that is useful only if those extra
@@ -147,7 +147,7 @@ width: {
 },
 ```
 
-**Recommendation:** retain one scalar `--bdw`, independent of Spacing. The
+**Ratified:** retain one scalar `--bdw`, independent of Spacing. The
 ordinary example stays `1px` across all Size modes. Do not introduce a Border
 width scale solely to make its shape resemble another domain.
 
@@ -185,19 +185,18 @@ mappings follow in rem. It assumes no fixed pixels-per-rem conversion. Width
 stays at its independently authored `1px`. Other valid CSS length units remain
 possible; the precise shared unit type belongs to architecture work.
 
-## What needs a verdict?
+## Workshop closure
 
-1. Review retaining a separate authored Spacing minimum below its numbered scale.
-   Then settle `step` / `count` names, shared unit/count and mode-specific measurements.
-2. Border width stays a scalar, with mode changes only when genuinely needed.
-3. Review the representative files/output to confirm Gap/Radius's already agreed
-   mappings and automatic Size following are clear.
+The founder accepted the complete roundup on 2026-09-28: `step`/`count`, one
+numbered scale plus independent `min`, shared unit/count, automatic references,
+four-position Gap/Radius, scalar Width, combined `border.ts`, and the restrained
+output vocabulary. All numerical examples remain illustrative.
 
 Existing numeric rules carry forward: finite `step > 0`, `0 <= min < step`, a
 positive integer count, valid ordered references, and finite nonnegative width.
 The example does not require new helpers, a second scale catalogue, or a base token.
 
-After approval, move to the Time/Easing confirmation mock. Public types, compiler
+Continue with the [Time/Easing confirmation mock](../time-easing/README.md). Public types, compiler
 resolution, migrations from `base`/`range` and repeated old modes, complete CSS
 length-unit validation, and nested-scope output checks belong to the later runbook.
 

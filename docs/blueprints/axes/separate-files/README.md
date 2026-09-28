@@ -15,6 +15,12 @@ It is milestone-1 authoring evidence. The types in `support/` are review-only
 declarations, not new public TFS exports or an implementation of the new compiler.
 The [Founder Board](../../../founder-board.md) governs ratified contracts.
 
+Update, 2026-09-28: the later [Spacing/borders mock](../../spacing-borders/README.md)
+supersedes this earlier excerpt's `base`/`range` inputs with `step`/`count` and
+groups Radius/Width in `border.ts`. This Axis fixture retains its earlier spelling
+as evidence; use the domain mock for the ratified authoring shape. The assembled
+system review will bring the domain mocks together.
+
 ## Read the authored files first
 
 | File                                                          | What to look at                                                                          |

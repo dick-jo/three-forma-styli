@@ -184,20 +184,20 @@ Typography's required `base` and Alpha's `non` do not establish universal rules.
 
 ## Capability matrix
 
-| Family / domain      |           Scale |    Range | Composite |  Variant |            Groups |                     Axes |                References |
-| -------------------- | --------------: | -------: | --------: | -------: | ----------------: | -----------------------: | ------------------------: |
-| Alpha                |             yes |       no |        no |       no |   later if needed |                       no |    source for color ramps |
-| Color                |              no |       no |        no |       no |               yes |                    theme |            consumes Alpha |
-| Spacing              |             yes |       no |        no |       no | not yet justified |                     size |     source for gap/radius |
-| Gap                  |              no |      yes |        no |       no | not yet justified |             follows size |          consumes spacing |
-| Border radius        |              no |      yes |        no |       no | not yet justified |             follows size |          consumes spacing |
-| Border width         | scale or scalar |       no |        no |       no | not yet justified |                 optional |                      none |
-| Typography/font size |             yes |       no |        no |       no | not yet justified |                     size |          source for roles |
-| Typography/role      |              no |      yes |       yes |      yes | not yet justified |         sparse overrides | consumes font size + font |
-| Time                 |             yes |       no |        no |       no | not yet justified |                       no |                      none |
-| Easing               |              no |       no |        no |       no | not yet justified |                       no |                      none |
-| Motion composites    |        deferred | deferred |  deferred | deferred |          deferred |                 deferred |                  deferred |
-| Shadow               |              no |      yes |       yes | deferred | not yet justified | follows color references |    consumes color + alpha |
+| Family / domain      |      Scale |    Range | Composite |  Variant |            Groups |                     Axes |                References |
+| -------------------- | ---------: | -------: | --------: | -------: | ----------------: | -----------------------: | ------------------------: |
+| Alpha                |        yes |       no |        no |       no |   later if needed |                       no |    source for color ramps |
+| Color                |         no |       no |        no |       no |               yes |                    theme |            consumes Alpha |
+| Spacing              |        yes |       no |        no |       no | not yet justified |                     size |     source for gap/radius |
+| Gap                  |         no |      yes |        no |       no | not yet justified |             follows size |          consumes spacing |
+| Border radius        |         no |      yes |        no |       no | not yet justified |             follows size |          consumes spacing |
+| Border width         | no; scalar |       no |        no |       no | not yet justified |                 optional |                      none |
+| Typography/font size |        yes |       no |        no |       no | not yet justified |                     size |          source for roles |
+| Typography/role      |         no |      yes |       yes |      yes | not yet justified |         sparse overrides | consumes font size + font |
+| Time                 |        yes |       no |        no |       no | not yet justified |                       no |                      none |
+| Easing               |         no |       no |        no |       no | not yet justified |                       no |                      none |
+| Motion composites    |   deferred | deferred |  deferred | deferred |          deferred |                 deferred |                  deferred |
+| Shadow               |         no |      yes |       yes | deferred | not yet justified | follows color references |    consumes color + alpha |
 
 “Not yet justified” is deliberate. TFS implements generic grouping only where a
 real authoring case establishes the grouping level; it does not expose speculative
@@ -378,6 +378,13 @@ accepted helper signatures, return shapes, and Linear coordinate convention.
 Numerical theme calibration remains open; the example curve values are
 illustrative.
 
+The [Time/Easing confirmation mock](./blueprints/time-easing/README.md), prepared
+2026-09-28, represents these existing decisions across `time.ts` and `easing.ts`,
+with all 12 expected variables, seconds/direct-data alternatives and CSS/TS
+consumption. TypeScript and bounded headless browser evidence pass. Helper imports
+remain declaration-only; no production overhaul is implemented. Representative
+usage awaits founder review, without reopening the ratified contract.
+
 ### Motion composites — deferred
 
 Founder verdict on 2026-09-09:
@@ -479,7 +486,37 @@ review-example change only; migration of actual consumer names belongs to triage
 - Resolution order is role defaults → size → variant → explicit style/weight.
 - Physical style/weight/features/axes are checked against prepared font facts.
 
-### Gap and Border radius
+### Spacing and borders
+
+Full workshop ratified on 2026-09-28, including the
+[representative mock](./blueprints/spacing-borders/README.md):
+
+- Spacing is one numbered linear scale. `step` and `count` replace the numerical
+  input names `base` and `range`; position `n` resolves to `step * n`.
+- Keep an explicitly authored `min` below the first numbered value. It is not
+  required to equal half a step or change when the step changes. `count` counts
+  numbered positions only. Preserve finite `step > 0`, `0 <= min < step`, and
+  positive integer count.
+- Unit and count are shared across modes; modes may change `min` and/or `step`.
+  Every mode preserves the same token names. Other valid CSS length units remain
+  supported; example calibrations are not mandatory numerical theme defaults.
+- Gap and Radius choose independent four-position mappings into Spacing and
+  inherit its active values and unit. No repeated mappings or `spacingMode` are
+  needed to follow Size. Genuine mapping changes use the agreed mode structure.
+- Each resolved Gap/Radius range is strictly increasing. References are `'min'`
+  or existing integer Spacing positions. A derived domain need not map its own
+  `min` to Spacing's `min`.
+- Border width is one independent nonnegative scalar, emitting `--bdw`. Modes
+  change it only where intended. Zero remains valid; no extra no-border token.
+- Radius and Width are conventionally authored together in `border.ts`.
+- Emit `--sp-min`, `--sp-1…n`, four `--gap-*`, four `--bdr-*`, and `--bdw`.
+  No unsuffixed Spacing/Gap/Radius tokens, extra base positions, `--sp-max`, or
+  automatic intermediate spacing values.
+
+The blueprint workshop is complete. Production changes, exact public types,
+CSS length-unit validation and consumer migration remain for the later runbook.
+
+Earlier Gap/Radius verdict, retained:
 
 Ratified on 2026-09-09:
 
@@ -490,16 +527,6 @@ Ratified on 2026-09-09:
   authored mappings, CSS names, and generated identity unions.
 - A Range does not universally require a default position. Consumers may select
   their own default from the domain's available positions.
-
-The [Spacing and borders workshop](./blueprints/spacing-borders/README.md), prepared
-2026-09-25, now demonstrates the four-position mappings following one Spacing
-scale, including deliberate mapping changes. Its `step`/`count` naming, shared
-Spacing unit/count, and scalar Border width recommendation await founder review.
-The mock is not a new ratified contract or production implementation.
-
-File convention agreed, 2026-09-25: author Radius and Width together in `border.ts`.
-The current workshop mock follows that convention. The separate Spacing minimum
-is under review; no replacement or extra fine-detail positions are ratified.
 
 ### Groups
 

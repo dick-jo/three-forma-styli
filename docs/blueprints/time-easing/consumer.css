@@ -1,0 +1,26 @@
+.host.motion-example {
+	--loc-t-duration: var(--t-hi);
+	--loc-t-delay: var(--t-min);
+	--loc-ease: var(--ease-pri);
+
+	transition-property: transform;
+	transition-duration: var(--loc-t-duration);
+	transition-timing-function: var(--loc-ease);
+	transition-delay: var(--loc-t-delay);
+}
+
+.host.ambient-example {
+	--loc-t-duration: var(--t-anim-max);
+	--loc-ease: var(--ease-duo);
+
+	animation-name: turn;
+	animation-duration: var(--loc-t-duration);
+	animation-iteration-count: infinite;
+	animation-timing-function: var(--loc-ease);
+}
+
+@keyframes turn {
+	to {
+		transform: rotate(1turn);
+	}
+}
