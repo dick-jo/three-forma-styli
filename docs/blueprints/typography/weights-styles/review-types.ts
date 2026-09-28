@@ -11,35 +11,32 @@ type RangeWeights = {
 	readonly max: number;
 };
 
-type Size<Weight> = {
+type Measurements = {
 	readonly fontSize: 'min' | number;
 	readonly lineHeight: number;
 	readonly letterSpacing: number;
-	readonly weight?: Weight;
 };
 
-type Sizes<Weight> = { readonly base: Size<Weight> } & Partial<
-	Record<Exclude<SizeName, 'base'>, Size<Weight>>
->;
+type Sizes<Size> = { readonly base: Size } & Partial<Record<Exclude<SizeName, 'base'>, Size>>;
 
 type RoleBase<FontName> = {
 	readonly font: FontName;
+	/** Role-wide: same for every size. */
+	readonly textTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize';
 	/** Physical styles offered; each comes in every weight the role offers. Omitted → normal. */
 	readonly styles?: readonly FontStyle[];
 };
 
-/** One weight everywhere: nothing to name, nothing to choose. */
+/** One weight: role-wide, like textTransform. Sizes do not mention it. */
 type ScalarRole<FontName> = RoleBase<FontName> & {
 	readonly weights: number;
-	readonly weight?: never;
-	readonly sizes: Sizes<never>;
+	readonly sizes: Sizes<Measurements & { readonly weight?: never }>;
 };
 
-/** Several weights: a named default, optional per-size defaults, explicit consumer choice. */
+/** Several weights: every size states which one it uses. No role-level fallback. */
 type RangeRole<FontName, Weights extends RangeWeights> = RoleBase<FontName> & {
 	readonly weights: Weights;
-	readonly weight: Extract<keyof Weights, WeightName>;
-	readonly sizes: Sizes<Extract<keyof Weights, WeightName>>;
+	readonly sizes: Sizes<Measurements & { readonly weight: Extract<keyof Weights, WeightName> }>;
 };
 
 type CheckRoles<Roles, FontName> = {

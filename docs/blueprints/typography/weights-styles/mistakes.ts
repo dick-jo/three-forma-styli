@@ -3,21 +3,33 @@ import { fonts } from './fonts.js';
 import { defineTypography, type TypographySelection } from './review-types.js';
 import type { typography } from './typography.js';
 
-const base = { fontSize: 3, lineHeight: 1.5, letterSpacing: 0 } as const;
+const m = { fontSize: 3, lineHeight: 1.5, letterSpacing: 0 } as const;
 
 defineTypography({
 	fonts,
 	roles: {
-		// @ts-expect-error A one-weight role has no weight names to select.
-		prose: { font: 'sans', weights: 400, weight: 'lo', sizes: { base } },
+		// @ts-expect-error A one-weight role's sizes cannot name a weight.
+		caption: { font: 'supreme', weights: 400, sizes: { base: { ...m, weight: 'lo' } } },
 	},
 });
 
 defineTypography({
 	fonts,
 	roles: {
-		// @ts-expect-error The default must name a weight this role offers.
-		heading: { font: 'sans', weights: { min: 600, max: 800 }, weight: 'hi', sizes: { base } },
+		// @ts-expect-error A several-weight role's size must state its weight.
+		label: { font: 'supreme', weights: { min: 400, max: 700 }, sizes: { base: m } },
+	},
+});
+
+defineTypography({
+	fonts,
+	roles: {
+		badge: {
+			font: 'supreme',
+			weights: { min: 500, max: 700 },
+			// @ts-expect-error badge offers min and max only; there is no hi.
+			sizes: { base: { ...m, weight: 'hi' } },
+		},
 	},
 });
 
@@ -25,7 +37,7 @@ defineTypography({
 	fonts,
 	roles: {
 		// @ts-expect-error Unknown physical style.
-		code: { font: 'mono', weights: 400, styles: ['oblique'], sizes: { base } },
+		code: { font: 'supreme', weights: 400, styles: ['oblique'], sizes: { base: m } },
 	},
 });
 
@@ -38,6 +50,7 @@ export const valid: Selection[] = [
 	{ role: 'label', size: 's', weight: 'max' },
 	{ role: 'label', fontStyle: 'italic', weight: 'lo' },
 	{ role: 'caption' },
+	{ role: 'badge', size: 'max', weight: 'min' },
 ];
 
 export const invalid: Selection[] = [
@@ -45,6 +58,8 @@ export const invalid: Selection[] = [
 	{ role: 'caption', fontStyle: 'italic' },
 	// @ts-expect-error caption has one weight; nothing to choose.
 	{ role: 'caption', weight: 'max' },
-	// @ts-expect-error unknown weight name.
-	{ role: 'heading', weight: 'bold' },
+	// @ts-expect-error badge offers min and max only.
+	{ role: 'badge', weight: 'lo' },
+	// @ts-expect-error badge has no l size.
+	{ role: 'badge', size: 'l' },
 ];
