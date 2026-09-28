@@ -1,9 +1,33 @@
 {
 	"name": "three-forma-styli",
-	"version": "0.5.0-dev",
-	"private": true,
+	"version": "0.5.0",
 	"description": "A designer's opinionated shorthand for design systems: readable TypeScript in, CSS variables and exact types out.",
+	"keywords": [
+		"design-system",
+		"design-tokens",
+		"css-variables",
+		"oklch",
+		"typography",
+		"theming"
+	],
+	"license": "ISC",
+	"author": "three",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/dick-jo/three-forma-styli.git",
+		"directory": "tfs"
+	},
+	"homepage": "https://github.com/dick-jo/three-forma-styli#readme",
+	"bugs": {
+		"url": "https://github.com/dick-jo/three-forma-styli/issues"
+	},
 	"type": "module",
+	"engines": {
+		"node": ">=24"
+	},
+	"bin": {
+		"tfs": "./dist/cli.js"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -16,31 +40,27 @@
 	},
 	"files": [
 		"dist",
-		"themes/standard"
+		"themes/standard",
+		"README.md",
+		"LICENSE"
 	],
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",
 		"typecheck": "tsc -p tsconfig.json && tsc -p themes/tsconfig.json",
 		"test": "vitest run",
-		"knip": "knip"
+		"knip": "knip",
+		"prepack": "pnpm --dir .. build"
+	},
+	"dependencies": {
+		"@types/fontkit": "2.0.9",
+		"esbuild": "^0.28.2",
+		"fontkit": "2.0.4"
 	},
 	"devDependencies": {
-		"@types/fontkit": "2.0.9",
 		"@types/node": "^24.19.0",
 		"knip": "^5.88.1",
 		"playwright": "1.61.1",
 		"typescript": "^5.8.2",
 		"vitest": "^3.2.7"
-	},
-	"license": "ISC",
-	"engines": {
-		"node": ">=24"
-	},
-	"dependencies": {
-		"esbuild": "^0.28.2",
-		"fontkit": "2.0.4"
-	},
-	"bin": {
-		"tfs": "./dist/cli.js"
 	}
 }
