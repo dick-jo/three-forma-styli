@@ -1,6 +1,8 @@
 import { expect, it } from 'vitest';
 import {
 	emitTokensCss,
+	emitTokensJs,
+	emitTokensTypes,
 	emitTypographyCss,
 	emitTypographyJs,
 	emitTypographyModuleCss,
@@ -12,6 +14,8 @@ import { fonts, resolved } from './everything.js';
 // The full generated output, committed so every change to it is a readable diff.
 const outputs = {
 	'tokens.css': emitTokensCss(resolved, fonts.stacks),
+	'tokens.js': emitTokensJs(resolved, fonts.stacks),
+	'tokens.d.ts': emitTokensTypes(resolved, fonts.stacks),
 	'fonts.css': fonts.css,
 	'typography.css': emitTypographyCss(resolved),
 	'typography.module.css': emitTypographyModuleCss(resolved),

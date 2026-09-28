@@ -22,7 +22,7 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 | 3    | Checks and mode resolution for every family                                                                       | done   |
 | 4    | `tokens.css` with mode blocks and re-binding, verified in a browser                                               | done   |
 | 5    | Typography: classes, whole-row tokens, `./typography`; fonts copied in (no licensing)                             | done   |
-| 6    | `./tokens`: identity names, exact group types, `var()` helpers                                                    |        |
+| 6    | `./tokens`: identity names, exact group types, `var()` helpers                                                    | done   |
 | 7    | Runtime colour themes + luminance copied in; `./runtime`; decide `native-color-modes`                             |        |
 | 8    | `tfs build`, `tfs check`, `tfs dev` (watch, last valid output, Workbench data)                                    |        |
 | 9    | Standard theme ported with unchanged values                                                                       |        |

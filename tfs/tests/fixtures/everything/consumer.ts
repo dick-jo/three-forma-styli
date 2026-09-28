@@ -1,5 +1,25 @@
-// How an app uses the generated ./typography module; typecheck proves the types.
+// How an app uses the generated ./typography and ./tokens modules; typecheck proves the types.
+import { axes, cssVar, type ColorGroup, type Mode } from './expected/tokens.js';
 import { typographyClassName, type TypographySelection } from './expected/typography.js';
+
+// ---- ./tokens ----
+
+type Accent = ColorGroup<'accents'>;
+export const accent: Accent = 'duo';
+// @ts-expect-error neu is not an accent.
+export const notAccent: Accent = 'neu';
+
+export const light: Mode<'theme'> = 'light';
+// @ts-expect-error xl is not a size mode.
+export const xl: Mode<'size'> = 'xl';
+export const themeAttribute: 'data-theme-mode' = axes.theme.attribute;
+
+cssVar('clr-pri-a-lo');
+cssVar('text-label-s');
+// @ts-expect-error no such token.
+cssVar('clr-pri-a-half');
+
+// ---- ./typography ----
 
 export const valid: TypographySelection[] = [
 	{ role: 'label' },

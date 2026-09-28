@@ -41,3 +41,4 @@ export {
 	emitTypographyModuleTypes,
 	emitTypographyTypes,
 } from './emit/typography.js';
+export { emitTokensJs, emitTokensTypes } from './emit/tokens-module.js';
