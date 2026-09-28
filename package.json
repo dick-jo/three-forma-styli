@@ -25,10 +25,7 @@
 		"changeset": "changeset",
 		"release:version": "changeset version",
 		"release:publish": "changeset publish",
-		"typography:review": "pnpm build && node scripts/typography-review.mjs",
-		"review:example": "pnpm build && node packages/cli/dist/index.js build examples/project && node packages/cli/dist/index.js review serve examples/project",
-		"dev": "pnpm --filter @three-forma-styli/cli dev",
-		"preview": "pnpm review:example"
+		"dev": "pnpm --filter @three-forma-styli/cli dev"
 	},
 	"keywords": [
 		"design-tokens",
