@@ -133,7 +133,7 @@ separately agreed architecture and runbook milestone.
 - **Typography weights/styles ratified, 2026-09-28:** no role-level fallbacks
   (weight stated per size), `styles` list, plain scalar weight, independent
   style/weight classes, whole-row `--text-{role}[-{size}]` font token. Mock:
-  `blueprints/typography/weights-styles/*.ts`. Variants removed. Role modes use the shared pattern (values only). Fonts: files vs name only. Next: Typography closing summary.
+  `blueprints/typography/weights-styles/*.ts`. Variants removed. Role modes use the shared pattern (values only). Fonts: `files` vs `name`. **Typography closed 2026-09-28.** Next: assembled-system review.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -154,7 +154,7 @@ domain retaining its own readiness verdict.
 | 2     | Color and Alpha                           | Blueprint complete; implementation remains later                 | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                        |
 | 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                       | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                    |
 | 4     | Time and Easing                           | Blueprint and representative mocks complete                      | Carry named Time scales, directly authored Easings, and accepted output/consumption into the later runbook. Motion composites remain deferred.                                                                                 |
-| 5     | Typography                                | Atomic Font size ratified; role/style review remains open        | First settle atomic scale inputs, then review remaining weight/style cases, variants, role mode changes and complete consumer usage. Carry real fonts through that mock. Licensing is excluded.                                |
+| 5     | Typography                                | Closed 2026-09-28; implementation remains later                  | First settle atomic scale inputs, then review remaining weight/style cases, variants, role mode changes and complete consumer usage. Carry real fonts through that mock. Licensing is excluded.                                |
 | 6     | One assembled design system               | Pending the preceding reviews                                    | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases. |
 
 The Axes/Modes example should stay grounded in Color and Spacing. Its purpose is
