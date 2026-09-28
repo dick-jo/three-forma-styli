@@ -1,11 +1,11 @@
 import type { FontsDraft } from './review-types.js';
 
 export const fonts = {
-	sans: {
-		sources: ['./inter/Inter[opsz,wght].ttf', './inter/Inter-Italic[opsz,wght].ttf'],
+	supreme: {
+		sources: ['./supreme/Supreme-Variable.ttf', './supreme/Supreme-VariableItalic.ttf'],
 		category: 'sans',
 	},
-	mono: {
+	'jetbrains-mono': {
 		sources: [
 			'./jetbrains-mono/JetBrainsMono[wght].ttf',
 			'./jetbrains-mono/JetBrainsMono-Italic[wght].ttf',

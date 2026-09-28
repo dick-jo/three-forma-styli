@@ -1,56 +1,68 @@
 import { fonts } from './fonts.js';
 import { defineTypography } from './review-types.js';
 
+// Scatter's four production roles, values unchanged, in the proposed shape.
+// `caption` is hypothetical: the one-weight case, which Scatter does not use.
 export const typography = defineTypography({
 	fonts,
 	roles: {
-		// 1. One weight, normal only: nothing about weight or style beyond the number.
 		prose: {
-			font: 'sans',
-			weights: 400,
-			sizes: {
-				min: { fontSize: 1, lineHeight: 1.5, letterSpacing: 0 },
-				s: { fontSize: 2, lineHeight: 1.5, letterSpacing: 0 },
-				base: { fontSize: 3, lineHeight: 1.5, letterSpacing: 0 },
-				l: { fontSize: 4, lineHeight: 1.4, letterSpacing: 0 },
-				max: { fontSize: 5, lineHeight: 1.4, letterSpacing: 0 },
-			},
-		},
-
-		// 2. One weight, offered upright and italic.
-		code: {
-			font: 'mono',
-			weights: 400,
-			styles: ['normal', 'italic'],
-			sizes: {
-				min: { fontSize: 'min', lineHeight: 1.4, letterSpacing: 0 },
-				s: { fontSize: 1, lineHeight: 1.4, letterSpacing: 0 },
-				base: { fontSize: 2, lineHeight: 1.5, letterSpacing: 0 },
-			},
-		},
-
-		// 3. Full weight range, upright and italic; larger sizes default heavier.
-		body: {
-			font: 'sans',
+			font: 'supreme',
 			weights: { min: 300, lo: 400, hi: 500, max: 700 },
 			weight: 'lo',
 			styles: ['normal', 'italic'],
 			sizes: {
-				base: { fontSize: 3, lineHeight: 1.5, letterSpacing: 0 },
-				l: { fontSize: 5, lineHeight: 1.4, letterSpacing: 0, weight: 'hi' },
-				max: { fontSize: 7, lineHeight: 1.3, letterSpacing: -0.005, weight: 'hi' },
+				min: { fontSize: 'min', lineHeight: 1.35, letterSpacing: 0.01 },
+				s: { fontSize: 1, lineHeight: 1.3, letterSpacing: 0.005 },
+				base: { fontSize: 2, lineHeight: 1.25, letterSpacing: 0 },
+				l: { fontSize: 3, lineHeight: 1.225, letterSpacing: -0.0025 },
+				max: { fontSize: 4, lineHeight: 1.2, letterSpacing: -0.005 },
 			},
 		},
-
-		// 4. Sparse range: only the two endpoints; the largest size uses the heavier one.
 		heading: {
-			font: 'sans',
-			weights: { min: 600, max: 800 },
-			weight: 'min',
+			font: 'supreme',
+			weights: { min: 500, lo: 600, hi: 700, max: 800 },
+			weight: 'max',
+			styles: ['normal', 'italic'],
 			sizes: {
-				base: { fontSize: 6, lineHeight: 1.25, letterSpacing: -0.01 },
-				l: { fontSize: 9, lineHeight: 1.15, letterSpacing: -0.015 },
-				max: { fontSize: 12, lineHeight: 1.1, letterSpacing: -0.02, weight: 'max' },
+				min: { fontSize: 1, lineHeight: 1, letterSpacing: 0 },
+				s: { fontSize: 2, lineHeight: 0.9, letterSpacing: -0.005 },
+				base: { fontSize: 4, lineHeight: 0.8, letterSpacing: -0.01 },
+				l: { fontSize: 6, lineHeight: 0.8, letterSpacing: -0.0175 },
+				max: { fontSize: 8, lineHeight: 0.8, letterSpacing: -0.025 },
+			},
+		},
+		label: {
+			font: 'jetbrains-mono',
+			weights: { min: 400, lo: 500, hi: 600, max: 700 },
+			weight: 'lo',
+			styles: ['normal', 'italic'],
+			sizes: {
+				min: { fontSize: 'min', lineHeight: 1.3, letterSpacing: 0.02 },
+				s: { fontSize: 1, lineHeight: 1.25, letterSpacing: 0.015 },
+				base: { fontSize: 2, lineHeight: 1.2, letterSpacing: 0.01 },
+				l: { fontSize: 3, lineHeight: 1.175, letterSpacing: 0.005 },
+				max: { fontSize: 4, lineHeight: 1.15, letterSpacing: 0 },
+			},
+		},
+		code: {
+			font: 'jetbrains-mono',
+			weights: { min: 400, lo: 500, hi: 600, max: 700 },
+			weight: 'lo',
+			styles: ['normal', 'italic'],
+			sizes: {
+				min: { fontSize: 'min', lineHeight: 1.3, letterSpacing: 0 },
+				s: { fontSize: 1, lineHeight: 1.25, letterSpacing: 0 },
+				base: { fontSize: 2, lineHeight: 1.2, letterSpacing: 0 },
+				l: { fontSize: 3, lineHeight: 1.175, letterSpacing: 0 },
+				max: { fontSize: 4, lineHeight: 1.15, letterSpacing: 0 },
+			},
+		},
+		caption: {
+			font: 'supreme',
+			weights: 400,
+			sizes: {
+				base: { fontSize: 1, lineHeight: 1.3, letterSpacing: 0 },
 			},
 		},
 	},

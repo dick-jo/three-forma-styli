@@ -33,19 +33,18 @@ defineTypography({
 type Selection = TypographySelection<(typeof typography)['roles']>;
 
 export const valid: Selection[] = [
-	{ role: 'code' },
-	{ role: 'code', fontStyle: 'italic' },
-	{ role: 'body', size: 'l' },
-	{ role: 'body', fontStyle: 'italic' },
-	{ role: 'body', size: 'l', weight: 'max' },
-	{ role: 'heading', weight: 'max' },
+	{ role: 'prose' },
+	{ role: 'prose', fontStyle: 'italic' },
+	{ role: 'label', size: 's', weight: 'max' },
+	{ role: 'label', fontStyle: 'italic', weight: 'lo' },
+	{ role: 'caption' },
 ];
 
 export const invalid: Selection[] = [
-	// @ts-expect-error prose offers only normal.
-	{ role: 'prose', fontStyle: 'italic' },
-	// @ts-expect-error code has one weight; nothing to choose.
-	{ role: 'code', weight: 'max' },
-	// @ts-expect-error heading offers min and max only.
-	{ role: 'heading', weight: 'lo' },
+	// @ts-expect-error caption offers only normal.
+	{ role: 'caption', fontStyle: 'italic' },
+	// @ts-expect-error caption has one weight; nothing to choose.
+	{ role: 'caption', weight: 'max' },
+	// @ts-expect-error unknown weight name.
+	{ role: 'heading', weight: 'bold' },
 ];
