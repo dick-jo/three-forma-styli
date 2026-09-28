@@ -1,3 +1,4 @@
+import { ALPHA_POSITIONS, type POLARITIES } from '../const.js';
 import type { ModeCatalogue } from './axes.js';
 
 /** Structural OKLCH colour; no colour-library types required. */
@@ -13,8 +14,6 @@ export function oklch(l: number, c: number, h: number): Oklch {
 }
 
 // ---- Alpha ----
-
-export const ALPHA_POSITIONS = ['min', 'lo-x', 'lo', 'hi', 'hi-x', 'max'] as const;
 
 type AlphaValues = Readonly<Record<(typeof ALPHA_POSITIONS)[number], number>>;
 
@@ -46,7 +45,7 @@ export function deriveAlphaScale(input: { distribution: 'linear'; min?: number; 
 
 // ---- Colours ----
 
-type Polarity = 'negative' | 'positive';
+type Polarity = (typeof POLARITIES)[number];
 
 export type ColorDraft<Tokens extends Record<string, Oklch>> = {
 	readonly tokens: Tokens;

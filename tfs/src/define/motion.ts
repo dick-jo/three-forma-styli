@@ -1,6 +1,8 @@
+import type { LO_HI_POSITIONS, TIME_UNITS } from '../const.js';
+
 type TimeScale = {
-	readonly unit: 'ms' | 's';
-	readonly values: Readonly<Record<'min' | 'lo' | 'hi' | 'max', number>>;
+	readonly unit: (typeof TIME_UNITS)[number];
+	readonly values: Readonly<Record<(typeof LO_HI_POSITIONS)[number], number>>;
 };
 
 /** Ordinary scale unnamed at the top (--t-*); named extras in `scales` (--t-{name}-*). */

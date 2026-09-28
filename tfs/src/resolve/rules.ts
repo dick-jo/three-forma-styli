@@ -1,29 +1,8 @@
+import { LENGTH_UNITS } from '../const.js';
 import type { Issues } from './issues.js';
 
 /** Identities become parts of CSS custom-property and class names. */
 const IDENTITY = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
-
-export const LENGTH_UNITS = new Set([
-	'px',
-	'rem',
-	'em',
-	'ch',
-	'ex',
-	'lh',
-	'rlh',
-	'vw',
-	'vh',
-	'vmin',
-	'vmax',
-	'svh',
-	'lvh',
-	'dvh',
-	'cqw',
-	'cqh',
-	'cqi',
-	'cqb',
-	'pt',
-]);
 
 export function isFiniteNumber(value: unknown): value is number {
 	return typeof value === 'number' && Number.isFinite(value);
@@ -39,7 +18,7 @@ export function checkIdentity(issues: Issues, path: string, name: string): void 
 
 export function checkUnit(issues: Issues, path: string, unit: unknown): void {
 	issues.check(
-		typeof unit === 'string' && LENGTH_UNITS.has(unit),
+		typeof unit === 'string' && (LENGTH_UNITS as readonly string[]).includes(unit),
 		path,
 		`"${String(unit)}" is not a supported CSS length unit`
 	);

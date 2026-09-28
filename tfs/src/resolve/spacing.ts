@@ -1,3 +1,4 @@
+import { S_L_POSITIONS } from '../const.js';
 import type { SpacingRef, SystemInput } from './input.js';
 import type { Issues } from './issues.js';
 import { allowedKeys, checkModes, selectedEntries, type Selection } from './modes.js';
@@ -15,8 +16,6 @@ export type ResolvedSpacing = {
 };
 export type ResolvedRange = Readonly<Record<'min' | 's' | 'l' | 'max', SpacingRef>>;
 export type ResolvedWidth = { readonly unit: string; readonly value: number };
-
-export const RANGE_POSITIONS = ['min', 's', 'l', 'max'] as const;
 
 // ---- Spacing ----
 
@@ -72,13 +71,13 @@ export function checkRange(
 	for (const key of Object.keys(range)) {
 		if (key === 'modes') continue;
 		issues.check(
-			(RANGE_POSITIONS as readonly string[]).includes(key),
+			(S_L_POSITIONS as readonly string[]).includes(key),
 			`${path}.${key}`,
 			`is not a position (min, s, l, max)`
 		);
 	}
 	checkModes(issues, path, range.modes, axes, (entry, entryPath) =>
-		allowedKeys(issues, entryPath, entry, RANGE_POSITIONS)
+		allowedKeys(issues, entryPath, entry, S_L_POSITIONS)
 	);
 }
 
@@ -96,7 +95,7 @@ export function checkResolvedRange(
 	where: string
 ): void {
 	let previous = -1;
-	for (const position of RANGE_POSITIONS) {
+	for (const position of S_L_POSITIONS) {
 		const ref = range[position];
 		const index = ref === 'min' ? 0 : ref;
 		const valid = ref === 'min' || (Number.isInteger(ref) && ref >= 1 && ref <= spacing.count);

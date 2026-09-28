@@ -2,15 +2,19 @@ import type { SystemInput } from './input.js';
 import type { Issues } from './issues.js';
 import { checkIdentity, checkIncreasing, isFiniteNumber } from './rules.js';
 
-const TIME_POSITIONS = ['min', 'lo', 'hi', 'max'] as const;
+import { LO_HI_POSITIONS, TIME_UNITS } from '../const.js';
 
 function checkTimeScale(
 	issues: Issues,
 	path: string,
 	scale: { unit: string; values: Readonly<Record<string, number>> }
 ): void {
-	issues.check(scale.unit === 'ms' || scale.unit === 's', `${path}.unit`, `must be ms or s`);
-	const entries = TIME_POSITIONS.map((position) => [position, scale.values[position]] as const);
+	issues.check(
+		(TIME_UNITS as readonly string[]).includes(scale.unit),
+		`${path}.unit`,
+		`must be ms or s`
+	);
+	const entries = LO_HI_POSITIONS.map((position) => [position, scale.values[position]] as const);
 	for (const [position, value] of entries) {
 		issues.check(
 			isFiniteNumber(value) && value >= 0,

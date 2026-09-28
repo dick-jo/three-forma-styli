@@ -1,3 +1,4 @@
+import type { S_L_POSITIONS } from '../const.js';
 import type { ModeCatalogue, ModesCheck } from './axes.js';
 
 type SpacingCalibration = { readonly min: number; readonly step: number };
@@ -10,7 +11,7 @@ export type SpacingDraft = SpacingCalibration & {
 };
 
 /** Four positions, each `'min'` or a numbered Spacing position. */
-type SpacingRange = Readonly<Record<'min' | 's' | 'l' | 'max', 'min' | number>>;
+type SpacingRange = Readonly<Record<(typeof S_L_POSITIONS)[number], 'min' | number>>;
 
 export type SpacingRangeDraft = SpacingRange & {
 	readonly modes?: ModeCatalogue<Partial<SpacingRange>>;

@@ -1,5 +1,5 @@
+import { ALPHA_POSITIONS, LO_HI_POSITIONS } from '../const.js';
 import type { AlphaPosition } from '../define/color.js';
-import { ALPHA_POSITIONS } from '../define/color.js';
 import type { Layer, LayerRange, SystemInput } from './input.js';
 import type { Issues } from './issues.js';
 import { checkModes, selectedEntries, type Selection } from './modes.js';
@@ -7,7 +7,6 @@ import { checkIdentity, checkUnit, isFiniteNumber } from './rules.js';
 
 type ShadowsInput = NonNullable<SystemInput['shadows']>;
 
-export const SHADOW_POSITIONS = ['min', 'lo', 'hi', 'max'] as const;
 const ALPHA_NAMES: readonly string[] = ['non', ...ALPHA_POSITIONS] satisfies AlphaPosition[];
 
 /** `ordinary` is the unnamed top-level range, when authored. */
@@ -18,7 +17,7 @@ export type ResolvedShadows = {
 };
 
 function ordinaryOf(shadows: Readonly<Record<string, unknown>>): LayerRange | undefined {
-	const present = SHADOW_POSITIONS.filter((position) => shadows[position] !== undefined);
+	const present = LO_HI_POSITIONS.filter((position) => shadows[position] !== undefined);
 	return present.length === 0
 		? undefined
 		: (Object.fromEntries(present.map((p) => [p, shadows[p]])) as LayerRange);
@@ -32,7 +31,7 @@ export function checkShadows(
 	checkUnit(issues, 'shadows.unit', shadows.unit);
 	for (const key of Object.keys(shadows)) {
 		issues.check(
-			['unit', 'ranges', 'modes', ...SHADOW_POSITIONS].includes(key),
+			['unit', 'ranges', 'modes', ...LO_HI_POSITIONS].includes(key),
 			`shadows.${key}`,
 			`is not a Shadow field (unit, min, lo, hi, max, ranges, modes)`
 		);
@@ -48,7 +47,7 @@ export function checkShadows(
 
 	checkModes(issues, 'shadows', shadows.modes, axes, (entry, path) =>
 		Object.keys(entry).flatMap((key) => {
-			if ((SHADOW_POSITIONS as readonly string[]).includes(key)) {
+			if ((LO_HI_POSITIONS as readonly string[]).includes(key)) {
 				issues.check(
 					ordinary !== undefined,
 					`${path}.${key}`,
@@ -110,7 +109,7 @@ function checkRange(
 	range: LayerRange,
 	colors: readonly string[]
 ): void {
-	for (const position of SHADOW_POSITIONS) {
+	for (const position of LO_HI_POSITIONS) {
 		const layers = range[position];
 		if (
 			!issues.check(

@@ -10,3 +10,8 @@ export function length(value: number, unit: string): string {
 export function cssVar(name: string): string {
 	return `var(--${name})`;
 }
+
+/** Joins name parts with hyphens: name('clr', 'pri', 'a', 'lo') → 'clr-pri-a-lo'. */
+export function name(...parts: readonly (string | number)[]): string {
+	return parts.join('-');
+}

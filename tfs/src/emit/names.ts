@@ -1,5 +1,5 @@
 import type { SizeRow } from '../resolve/input.js';
-import { SIZE_POSITIONS } from '../resolve/typography.js';
+import { ROLE_SIZE_POSITIONS } from '../const.js';
 
 /** A role's size row name: `label` for base, `label-s` otherwise. */
 export function rowName(role: string, size: string): string {
@@ -7,7 +7,7 @@ export function rowName(role: string, size: string): string {
 }
 
 export function rowsInOrder(sizes: Readonly<Record<string, SizeRow>>): [string, SizeRow][] {
-	return SIZE_POSITIONS.flatMap((size) =>
+	return ROLE_SIZE_POSITIONS.flatMap((size) =>
 		sizes[size] ? [[size, sizes[size]!] as [string, SizeRow]] : []
 	);
 }

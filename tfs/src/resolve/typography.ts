@@ -1,3 +1,10 @@
+import {
+	FONT_CATEGORIES,
+	FONT_STYLES,
+	LO_HI_POSITIONS,
+	ROLE_SIZE_POSITIONS,
+	TEXT_TRANSFORMS,
+} from '../const.js';
 import type { FontInput, RoleInput, SizeRow, SpacingRef, SystemInput } from './input.js';
 import type { Issues } from './issues.js';
 import { allowedKeys, checkModes, selectedEntries, type Selection } from './modes.js';
@@ -11,10 +18,6 @@ import {
 
 type FontSizeInput = NonNullable<SystemInput['fontSize']>;
 
-export const SIZE_POSITIONS = ['min', 's', 'base', 'l', 'max'] as const;
-export const WEIGHT_POSITIONS = ['min', 'lo', 'hi', 'max'] as const;
-const STYLES = ['normal', 'italic'];
-const TRANSFORMS = ['none', 'uppercase', 'lowercase', 'capitalize'];
 const FONT_EXTENSIONS = /\.(woff2|woff|ttf|otf)$/i;
 
 export type ResolvedFontSize = {
@@ -87,7 +90,7 @@ export function checkFonts(issues: Issues, fonts: Readonly<Record<string, FontIn
 				);
 			}
 			issues.check(
-				['sans', 'serif', 'mono'].includes(font.category),
+				(FONT_CATEGORIES as readonly string[]).includes(font.category),
 				`${path}.category`,
 				`must be sans, serif or mono`
 			);
@@ -119,14 +122,15 @@ function checkRoleStructure(
 	issues.check(fonts.includes(role.font), `${path}.font`, `"${role.font}" is not a declared font`);
 	if (role.textTransform !== undefined) {
 		issues.check(
-			TRANSFORMS.includes(role.textTransform),
+			(TEXT_TRANSFORMS as readonly string[]).includes(role.textTransform),
 			`${path}.textTransform`,
-			`must be one of ${TRANSFORMS.join(', ')}`
+			`must be one of ${TEXT_TRANSFORMS.join(', ')}`
 		);
 	}
 	const styles = role.styles ?? ['normal'];
 	issues.check(
-		styles.length > 0 && styles.every((style) => STYLES.includes(style)),
+		styles.length > 0 &&
+			styles.every((style) => (FONT_STYLES as readonly string[]).includes(style)),
 		`${path}.styles`,
 		`must list normal and/or italic`
 	);
@@ -140,12 +144,12 @@ function checkRoleStructure(
 		);
 	} else {
 		const weights = role.weights;
-		const entries = WEIGHT_POSITIONS.flatMap((position) =>
+		const entries = LO_HI_POSITIONS.flatMap((position) =>
 			weights[position] === undefined ? [] : [[position, weights[position]!] as const]
 		);
 		for (const key of Object.keys(weights)) {
 			issues.check(
-				(WEIGHT_POSITIONS as readonly string[]).includes(key),
+				(LO_HI_POSITIONS as readonly string[]).includes(key),
 				`${path}.weights.${key}`,
 				`is not a weight position (min, lo, hi, max)`
 			);
@@ -169,7 +173,7 @@ function checkRoleStructure(
 	const sizes = Object.keys(role.sizes);
 	for (const size of sizes) {
 		issues.check(
-			(SIZE_POSITIONS as readonly string[]).includes(size),
+			(ROLE_SIZE_POSITIONS as readonly string[]).includes(size),
 			`${path}.sizes.${size}`,
 			`is not a size position (min, s, base, l, max)`
 		);
@@ -245,7 +249,7 @@ export function checkResolvedRoles(
 ): void {
 	for (const [name, role] of Object.entries(roles)) {
 		const weights = weightNames(role);
-		const rows = SIZE_POSITIONS.flatMap((size) =>
+		const rows = ROLE_SIZE_POSITIONS.flatMap((size) =>
 			resolved[name]?.[size] ? [[size, resolved[name]![size]!] as const] : []
 		);
 		let previous: readonly [string, number] | undefined;

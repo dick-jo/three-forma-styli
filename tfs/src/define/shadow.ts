@@ -1,8 +1,8 @@
+import { LO_HI_POSITIONS } from '../const.js';
 import type { ModeCatalogue, ModesCheck, Register } from './axes.js';
 import type { AlphaPosition, ColorIdentity, Oklch } from './color.js';
 
-const SHADOW_POSITIONS = ['min', 'lo', 'hi', 'max'] as const;
-type ShadowPosition = (typeof SHADOW_POSITIONS)[number];
+type ShadowPosition = (typeof LO_HI_POSITIONS)[number];
 
 /** The project's colours once registered; any colour name before that. */
 type Colors = Register extends { readonly colors: infer C } ? C : { tokens: Record<string, Oklch> };
@@ -54,7 +54,7 @@ export function shadowsForColors<
 		input.colors.map((color) => [
 			`${input.prefix}-${color}`,
 			Object.fromEntries(
-				SHADOW_POSITIONS.map((position) => [
+				LO_HI_POSITIONS.map((position) => [
 					position,
 					input.range[position].map(({ alpha, ...layer }) => ({
 						...layer,

@@ -1,12 +1,10 @@
-import { ALPHA_POSITIONS, type Oklch } from '../define/color.js';
+import { ALPHA_POSITIONS, LO_HI_POSITIONS, PREFIXES as P, S_L_POSITIONS } from '../const.js';
+import type { Oklch } from '../define/color.js';
 import type { Easing, Layer, LayerRange, SpacingRef } from '../resolve/input.js';
 import type { ModalValues, ResolvedSystem } from '../resolve/index.js';
 import { TfsError } from '../resolve/issues.js';
-import { SHADOW_POSITIONS } from '../resolve/shadow.js';
-import { RANGE_POSITIONS } from '../resolve/spacing.js';
-import { cssVar, length, num } from './format.js';
+import { cssVar, length, name, num } from './format.js';
 import { rowName, rowsInOrder } from './names.js';
-import { name, PREFIXES as P } from './prefixes.js';
 
 /** CSS font-family value for each declared font, from prepareFonts(). */
 export type FontStacks = Readonly<Record<string, string>>;
@@ -41,7 +39,7 @@ function layerCss(layer: Layer, unit: string): string {
 }
 
 function shadowTokens(prefix: string, range: LayerRange, unit: string): Token[] {
-	return SHADOW_POSITIONS.map((position) => ({
+	return LO_HI_POSITIONS.map((position) => ({
 		name: `${prefix}-${position}`,
 		value: range[position]!.map((layer) => layerCss(layer, unit)).join(', '),
 	}));
@@ -95,10 +93,10 @@ export function tokensFor(
 		for (let n = 1; n <= count; n++) add(name(P.spacing, n), length(step * n, unit));
 	}
 	if (values.gap)
-		for (const position of RANGE_POSITIONS)
+		for (const position of S_L_POSITIONS)
 			add(name(P.gap, position), spacingRef(values.gap[position]));
 	if (values.radius)
-		for (const position of RANGE_POSITIONS)
+		for (const position of S_L_POSITIONS)
 			add(name(P.radius, position), spacingRef(values.radius[position]));
 	if (values.width) add(P.width, length(values.width.value, values.width.unit));
 	if (values.shadows) {
@@ -115,7 +113,7 @@ export function tokensFor(
 			),
 		];
 		for (const [prefix, scale] of scales) {
-			for (const position of ['min', 'lo', 'hi', 'max'])
+			for (const position of LO_HI_POSITIONS)
 				add(`${prefix}-${position}`, `${num(scale.values[position]!)}${scale.unit}`);
 		}
 	}

@@ -1,3 +1,10 @@
+import type {
+	FONT_CATEGORIES,
+	FONT_STYLES,
+	LO_HI_POSITIONS,
+	ROLE_SIZE_POSITIONS,
+	TEXT_TRANSFORMS,
+} from '../const.js';
 import type { Axes, ModeCatalogue, ModesCheck } from './axes.js';
 
 // ---- Font size ----
@@ -22,7 +29,7 @@ export type FontsDraft = Record<
 	string,
 	| {
 			readonly files: readonly string[];
-			readonly category: 'sans' | 'serif' | 'mono';
+			readonly category: (typeof FONT_CATEGORIES)[number];
 			readonly name?: string;
 			readonly display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional';
 	  }
@@ -35,8 +42,8 @@ export function defineFonts<const T extends FontsDraft>(fonts: T): T {
 
 // ---- Roles ----
 
-type WeightName = 'min' | 'lo' | 'hi' | 'max';
-type SizeName = 'min' | 's' | 'base' | 'l' | 'max';
+type WeightName = (typeof LO_HI_POSITIONS)[number];
+type SizeName = (typeof ROLE_SIZE_POSITIONS)[number];
 
 type RangeWeights = {
 	readonly min: number;
@@ -55,8 +62,8 @@ type Sizes<Row> = { readonly base: Row } & Partial<Record<Exclude<SizeName, 'bas
 
 type RoleBase<FontName> = {
 	readonly font: FontName;
-	readonly textTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize';
-	readonly styles?: readonly ('normal' | 'italic')[];
+	readonly textTransform?: (typeof TEXT_TRANSFORMS)[number];
+	readonly styles?: readonly (typeof FONT_STYLES)[number][];
 };
 
 /** One weight: role-wide; sizes never name it. */

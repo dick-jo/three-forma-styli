@@ -1,5 +1,5 @@
+import { ALPHA_POSITIONS, POLARITIES } from '../const.js';
 import type { Oklch } from '../define/color.js';
-import { ALPHA_POSITIONS } from '../define/color.js';
 import type { SystemInput } from './input.js';
 import type { Issues } from './issues.js';
 import { allowedKeys, checkModes, selectedEntries, type Selection } from './modes.js';
@@ -12,8 +12,6 @@ export type ResolvedColors = {
 	readonly tokens: Readonly<Record<string, Oklch>>;
 	readonly polarity?: string;
 };
-
-const POLARITIES = ['negative', 'positive'];
 
 // ---- Alpha (no modes) ----
 
@@ -77,7 +75,7 @@ export function checkColors(
 	for (const name of names) checkIdentity(issues, `colors.tokens.${name}`, name);
 	if (colors.polarity !== undefined) {
 		issues.check(
-			POLARITIES.includes(colors.polarity),
+			(POLARITIES as readonly string[]).includes(colors.polarity),
 			'colors.polarity',
 			`must be negative or positive`
 		);
@@ -121,7 +119,7 @@ export function checkColors(
 		allowedKeys(issues, entryPath, entry, ['tokens', 'polarity']).flatMap((key) => {
 			if (key === 'polarity') {
 				issues.check(
-					POLARITIES.includes(entry.polarity!),
+					(POLARITIES as readonly string[]).includes(entry.polarity!),
 					`${entryPath}.polarity`,
 					`must be negative or positive`
 				);
