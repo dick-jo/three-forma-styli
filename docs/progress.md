@@ -15,23 +15,23 @@ The agreed runbook and where we are. Decisions live in [founder-board.md](./foun
 
 One reviewable step at a time; each ends with its checks passing and a commit.
 
-| Step | Work                                                                                                              | Status |
-| ---- | ----------------------------------------------------------------------------------------------------------------- | ------ |
-| 1    | Recovery tag; delete stale docs, examples and blueprint mocks; short Board; new README; this runbook              | done   |
-| 2    | Delete old packages/scripts; single-package skeleton; `define*()` + types; everything-project fixture type-checks | done   |
-| 3    | Checks and mode resolution for every family                                                                       | done   |
-| 4    | `tokens.css` with mode blocks and re-binding, verified in a browser                                               | done   |
-| 5    | Typography: classes, whole-row tokens, `./typography`; fonts copied in (no licensing)                             | done   |
-| 6    | `./tokens`: identity names, exact group types, `var()` helpers                                                    | done   |
-| 7    | Runtime colour themes + luminance copied in; `./runtime`; decide `native-color-modes`                             | done   |
-| 8    | `tfs build`, `tfs check`, `tfs dev` (watch, last valid output), `tfs fonts inspect`; knip in CI                   | done   |
-| 8b   | Workbench rewritten: live read-only view served by `tfs dev`, disposable sliders                                  | done   |
-| 9    | Standard theme (0.4.0 values, JetBrains Mono for label) + `tfs init`                                              | done   |
-| 10   | Founder test drive: a new project started with `tfs init`; fix what it finds                                      | done   |
-| 11   | Merge `v0.5-rebuild` to `master`; publish 0.5 to npm                                                              | done   |
-| 12   | Figma, preliminary: sync the new project's tokens (chosen modes; shadows/text as styles)                          |        |
-| 13   | Scatter upgrade to 0.5: separate agreed scope, values unchanged                                                   |        |
-| 14   | Codebase tour (finish-line checks already pass; see below)                                                        |        |
+| Step | Work                                                                                                              | Status                          |
+| ---- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| 1    | Recovery tag; delete stale docs, examples and blueprint mocks; short Board; new README; this runbook              | done                            |
+| 2    | Delete old packages/scripts; single-package skeleton; `define*()` + types; everything-project fixture type-checks | done                            |
+| 3    | Checks and mode resolution for every family                                                                       | done                            |
+| 4    | `tokens.css` with mode blocks and re-binding, verified in a browser                                               | done                            |
+| 5    | Typography: classes, whole-row tokens, `./typography`; fonts copied in (no licensing)                             | done                            |
+| 6    | `./tokens`: identity names, exact group types, `var()` helpers                                                    | done                            |
+| 7    | Runtime colour themes + luminance copied in; `./runtime`; decide `native-color-modes`                             | done                            |
+| 8    | `tfs build`, `tfs check`, `tfs dev` (watch, last valid output), `tfs fonts inspect`; knip in CI                   | done                            |
+| 8b   | Workbench rewritten: live read-only view served by `tfs dev`, disposable sliders                                  | done                            |
+| 9    | Standard theme (0.4.0 values, JetBrains Mono for label) + `tfs init`                                              | done                            |
+| 10   | Founder test drive: a new project started with `tfs init`; fix what it finds                                      | done                            |
+| 11   | Merge `v0.5-rebuild` to `master`; publish 0.5 to npm                                                              | done                            |
+| 12   | Figma: `generated/figma.json` + TFS Token Sync plugin (`figma-plugin/`)                                           | built; awaiting first real sync |
+| 13   | Scatter upgrade to 0.5: separate agreed scope, values unchanged                                                   |                                 |
+| 14   | Codebase tour (finish-line checks already pass; see below)                                                        |                                 |
 
 ## Kept list
 

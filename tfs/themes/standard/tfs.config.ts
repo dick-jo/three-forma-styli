@@ -29,5 +29,6 @@ export default defineConfig({
 		fontSize,
 		typography,
 	},
-	output: { directory: './generated' },
+	// figma: {} also writes generated/figma.json for the TFS Figma plugin (all modes).
+	output: { directory: './generated', figma: {} },
 });

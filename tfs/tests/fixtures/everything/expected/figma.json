@@ -1,0 +1,2003 @@
+{
+	"version": 1,
+	"collections": [
+		{
+			"name": "theme",
+			"modes": [
+				"dark",
+				"light"
+			],
+			"variables": [
+				{
+					"name": "clr/bg",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 1
+						},
+						{
+							"r": 0.960587,
+							"g": 0.960587,
+							"b": 0.960587,
+							"a": 1
+						}
+					]
+				},
+				{
+					"name": "clr/bg/non",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0
+						},
+						{
+							"r": 0.960587,
+							"g": 0.960587,
+							"b": 0.960587,
+							"a": 0
+						}
+					]
+				},
+				{
+					"name": "clr/bg/min",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.07
+						},
+						{
+							"r": 0.960587,
+							"g": 0.960587,
+							"b": 0.960587,
+							"a": 0.07
+						}
+					]
+				},
+				{
+					"name": "clr/bg/lo-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.125
+						},
+						{
+							"r": 0.960587,
+							"g": 0.960587,
+							"b": 0.960587,
+							"a": 0.125
+						}
+					]
+				},
+				{
+					"name": "clr/bg/lo",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.25
+						},
+						{
+							"r": 0.960587,
+							"g": 0.960587,
+							"b": 0.960587,
+							"a": 0.25
+						}
+					]
+				},
+				{
+					"name": "clr/bg/hi",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.68
+						},
+						{
+							"r": 0.960587,
+							"g": 0.960587,
+							"b": 0.960587,
+							"a": 0.68
+						}
+					]
+				},
+				{
+					"name": "clr/bg/hi-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.85
+						},
+						{
+							"r": 0.960587,
+							"g": 0.960587,
+							"b": 0.960587,
+							"a": 0.85
+						}
+					]
+				},
+				{
+					"name": "clr/bg/max",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.93
+						},
+						{
+							"r": 0.960587,
+							"g": 0.960587,
+							"b": 0.960587,
+							"a": 0.93
+						}
+					]
+				},
+				{
+					"name": "clr/ev",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.159882,
+							"g": 0.159882,
+							"b": 0.159882,
+							"a": 1
+						},
+						{
+							"r": 1,
+							"g": 1,
+							"b": 1,
+							"a": 1
+						}
+					]
+				},
+				{
+					"name": "clr/ev/non",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.159882,
+							"g": 0.159882,
+							"b": 0.159882,
+							"a": 0
+						},
+						{
+							"r": 1,
+							"g": 1,
+							"b": 1,
+							"a": 0
+						}
+					]
+				},
+				{
+					"name": "clr/ev/min",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.159882,
+							"g": 0.159882,
+							"b": 0.159882,
+							"a": 0.07
+						},
+						{
+							"r": 1,
+							"g": 1,
+							"b": 1,
+							"a": 0.07
+						}
+					]
+				},
+				{
+					"name": "clr/ev/lo-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.159882,
+							"g": 0.159882,
+							"b": 0.159882,
+							"a": 0.125
+						},
+						{
+							"r": 1,
+							"g": 1,
+							"b": 1,
+							"a": 0.125
+						}
+					]
+				},
+				{
+					"name": "clr/ev/lo",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.159882,
+							"g": 0.159882,
+							"b": 0.159882,
+							"a": 0.25
+						},
+						{
+							"r": 1,
+							"g": 1,
+							"b": 1,
+							"a": 0.25
+						}
+					]
+				},
+				{
+					"name": "clr/ev/hi",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.159882,
+							"g": 0.159882,
+							"b": 0.159882,
+							"a": 0.68
+						},
+						{
+							"r": 1,
+							"g": 1,
+							"b": 1,
+							"a": 0.68
+						}
+					]
+				},
+				{
+					"name": "clr/ev/hi-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.159882,
+							"g": 0.159882,
+							"b": 0.159882,
+							"a": 0.85
+						},
+						{
+							"r": 1,
+							"g": 1,
+							"b": 1,
+							"a": 0.85
+						}
+					]
+				},
+				{
+					"name": "clr/ev/max",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.159882,
+							"g": 0.159882,
+							"b": 0.159882,
+							"a": 0.93
+						},
+						{
+							"r": 1,
+							"g": 1,
+							"b": 1,
+							"a": 0.93
+						}
+					]
+				},
+				{
+					"name": "clr/ink",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.895577,
+							"g": 0.895577,
+							"b": 0.895577,
+							"a": 1
+						},
+						{
+							"r": 0.068692,
+							"g": 0.068692,
+							"b": 0.068692,
+							"a": 1
+						}
+					]
+				},
+				{
+					"name": "clr/ink/non",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.895577,
+							"g": 0.895577,
+							"b": 0.895577,
+							"a": 0
+						},
+						{
+							"r": 0.068692,
+							"g": 0.068692,
+							"b": 0.068692,
+							"a": 0
+						}
+					]
+				},
+				{
+					"name": "clr/ink/min",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.895577,
+							"g": 0.895577,
+							"b": 0.895577,
+							"a": 0.07
+						},
+						{
+							"r": 0.068692,
+							"g": 0.068692,
+							"b": 0.068692,
+							"a": 0.07
+						}
+					]
+				},
+				{
+					"name": "clr/ink/lo-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.895577,
+							"g": 0.895577,
+							"b": 0.895577,
+							"a": 0.125
+						},
+						{
+							"r": 0.068692,
+							"g": 0.068692,
+							"b": 0.068692,
+							"a": 0.125
+						}
+					]
+				},
+				{
+					"name": "clr/ink/lo",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.895577,
+							"g": 0.895577,
+							"b": 0.895577,
+							"a": 0.25
+						},
+						{
+							"r": 0.068692,
+							"g": 0.068692,
+							"b": 0.068692,
+							"a": 0.25
+						}
+					]
+				},
+				{
+					"name": "clr/ink/hi",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.895577,
+							"g": 0.895577,
+							"b": 0.895577,
+							"a": 0.68
+						},
+						{
+							"r": 0.068692,
+							"g": 0.068692,
+							"b": 0.068692,
+							"a": 0.68
+						}
+					]
+				},
+				{
+					"name": "clr/ink/hi-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.895577,
+							"g": 0.895577,
+							"b": 0.895577,
+							"a": 0.85
+						},
+						{
+							"r": 0.068692,
+							"g": 0.068692,
+							"b": 0.068692,
+							"a": 0.85
+						}
+					]
+				},
+				{
+					"name": "clr/ink/max",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.895577,
+							"g": 0.895577,
+							"b": 0.895577,
+							"a": 0.93
+						},
+						{
+							"r": 0.068692,
+							"g": 0.068692,
+							"b": 0.068692,
+							"a": 0.93
+						}
+					]
+				},
+				{
+					"name": "clr/neu",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.681341,
+							"g": 0.681341,
+							"b": 0.681341,
+							"a": 1
+						},
+						{
+							"r": 0.280604,
+							"g": 0.280604,
+							"b": 0.280604,
+							"a": 1
+						}
+					]
+				},
+				{
+					"name": "clr/neu/non",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.681341,
+							"g": 0.681341,
+							"b": 0.681341,
+							"a": 0
+						},
+						{
+							"r": 0.280604,
+							"g": 0.280604,
+							"b": 0.280604,
+							"a": 0
+						}
+					]
+				},
+				{
+					"name": "clr/neu/min",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.681341,
+							"g": 0.681341,
+							"b": 0.681341,
+							"a": 0.07
+						},
+						{
+							"r": 0.280604,
+							"g": 0.280604,
+							"b": 0.280604,
+							"a": 0.07
+						}
+					]
+				},
+				{
+					"name": "clr/neu/lo-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.681341,
+							"g": 0.681341,
+							"b": 0.681341,
+							"a": 0.125
+						},
+						{
+							"r": 0.280604,
+							"g": 0.280604,
+							"b": 0.280604,
+							"a": 0.125
+						}
+					]
+				},
+				{
+					"name": "clr/neu/lo",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.681341,
+							"g": 0.681341,
+							"b": 0.681341,
+							"a": 0.25
+						},
+						{
+							"r": 0.280604,
+							"g": 0.280604,
+							"b": 0.280604,
+							"a": 0.25
+						}
+					]
+				},
+				{
+					"name": "clr/neu/hi",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.681341,
+							"g": 0.681341,
+							"b": 0.681341,
+							"a": 0.68
+						},
+						{
+							"r": 0.280604,
+							"g": 0.280604,
+							"b": 0.280604,
+							"a": 0.68
+						}
+					]
+				},
+				{
+					"name": "clr/neu/hi-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.681341,
+							"g": 0.681341,
+							"b": 0.681341,
+							"a": 0.85
+						},
+						{
+							"r": 0.280604,
+							"g": 0.280604,
+							"b": 0.280604,
+							"a": 0.85
+						}
+					]
+				},
+				{
+					"name": "clr/neu/max",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.681341,
+							"g": 0.681341,
+							"b": 0.681341,
+							"a": 0.93
+						},
+						{
+							"r": 0.280604,
+							"g": 0.280604,
+							"b": 0.280604,
+							"a": 0.93
+						}
+					]
+				},
+				{
+					"name": "clr/pri",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.587228,
+							"g": 0.553292,
+							"b": 0.990952,
+							"a": 1
+						},
+						{
+							"r": 0.316807,
+							"g": 0.230483,
+							"b": 0.699546,
+							"a": 1
+						}
+					]
+				},
+				{
+					"name": "clr/pri/non",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.587228,
+							"g": 0.553292,
+							"b": 0.990952,
+							"a": 0
+						},
+						{
+							"r": 0.316807,
+							"g": 0.230483,
+							"b": 0.699546,
+							"a": 0
+						}
+					]
+				},
+				{
+					"name": "clr/pri/min",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.587228,
+							"g": 0.553292,
+							"b": 0.990952,
+							"a": 0.07
+						},
+						{
+							"r": 0.316807,
+							"g": 0.230483,
+							"b": 0.699546,
+							"a": 0.07
+						}
+					]
+				},
+				{
+					"name": "clr/pri/lo-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.587228,
+							"g": 0.553292,
+							"b": 0.990952,
+							"a": 0.125
+						},
+						{
+							"r": 0.316807,
+							"g": 0.230483,
+							"b": 0.699546,
+							"a": 0.125
+						}
+					]
+				},
+				{
+					"name": "clr/pri/lo",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.587228,
+							"g": 0.553292,
+							"b": 0.990952,
+							"a": 0.25
+						},
+						{
+							"r": 0.316807,
+							"g": 0.230483,
+							"b": 0.699546,
+							"a": 0.25
+						}
+					]
+				},
+				{
+					"name": "clr/pri/hi",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.587228,
+							"g": 0.553292,
+							"b": 0.990952,
+							"a": 0.68
+						},
+						{
+							"r": 0.316807,
+							"g": 0.230483,
+							"b": 0.699546,
+							"a": 0.68
+						}
+					]
+				},
+				{
+					"name": "clr/pri/hi-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.587228,
+							"g": 0.553292,
+							"b": 0.990952,
+							"a": 0.85
+						},
+						{
+							"r": 0.316807,
+							"g": 0.230483,
+							"b": 0.699546,
+							"a": 0.85
+						}
+					]
+				},
+				{
+					"name": "clr/pri/max",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.587228,
+							"g": 0.553292,
+							"b": 0.990952,
+							"a": 0.93
+						},
+						{
+							"r": 0.316807,
+							"g": 0.230483,
+							"b": 0.699546,
+							"a": 0.93
+						}
+					]
+				},
+				{
+					"name": "clr/duo",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.247698,
+							"g": 0.748647,
+							"b": 0.524626,
+							"a": 1
+						},
+						{
+							"r": 0,
+							"g": 0.399707,
+							"b": 0.255192,
+							"a": 1
+						}
+					]
+				},
+				{
+					"name": "clr/duo/non",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.247698,
+							"g": 0.748647,
+							"b": 0.524626,
+							"a": 0
+						},
+						{
+							"r": 0,
+							"g": 0.399707,
+							"b": 0.255192,
+							"a": 0
+						}
+					]
+				},
+				{
+					"name": "clr/duo/min",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.247698,
+							"g": 0.748647,
+							"b": 0.524626,
+							"a": 0.07
+						},
+						{
+							"r": 0,
+							"g": 0.399707,
+							"b": 0.255192,
+							"a": 0.07
+						}
+					]
+				},
+				{
+					"name": "clr/duo/lo-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.247698,
+							"g": 0.748647,
+							"b": 0.524626,
+							"a": 0.125
+						},
+						{
+							"r": 0,
+							"g": 0.399707,
+							"b": 0.255192,
+							"a": 0.125
+						}
+					]
+				},
+				{
+					"name": "clr/duo/lo",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.247698,
+							"g": 0.748647,
+							"b": 0.524626,
+							"a": 0.25
+						},
+						{
+							"r": 0,
+							"g": 0.399707,
+							"b": 0.255192,
+							"a": 0.25
+						}
+					]
+				},
+				{
+					"name": "clr/duo/hi",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.247698,
+							"g": 0.748647,
+							"b": 0.524626,
+							"a": 0.68
+						},
+						{
+							"r": 0,
+							"g": 0.399707,
+							"b": 0.255192,
+							"a": 0.68
+						}
+					]
+				},
+				{
+					"name": "clr/duo/hi-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.247698,
+							"g": 0.748647,
+							"b": 0.524626,
+							"a": 0.85
+						},
+						{
+							"r": 0,
+							"g": 0.399707,
+							"b": 0.255192,
+							"a": 0.85
+						}
+					]
+				},
+				{
+					"name": "clr/duo/max",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.247698,
+							"g": 0.748647,
+							"b": 0.524626,
+							"a": 0.93
+						},
+						{
+							"r": 0,
+							"g": 0.399707,
+							"b": 0.255192,
+							"a": 0.93
+						}
+					]
+				},
+				{
+					"name": "clr/shd",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.002791,
+							"g": 0.002791,
+							"b": 0.002791,
+							"a": 1
+						},
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 1
+						}
+					]
+				},
+				{
+					"name": "clr/shd/non",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.002791,
+							"g": 0.002791,
+							"b": 0.002791,
+							"a": 0
+						},
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0
+						}
+					]
+				},
+				{
+					"name": "clr/shd/min",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.002791,
+							"g": 0.002791,
+							"b": 0.002791,
+							"a": 0.07
+						},
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.07
+						}
+					]
+				},
+				{
+					"name": "clr/shd/lo-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.002791,
+							"g": 0.002791,
+							"b": 0.002791,
+							"a": 0.125
+						},
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.125
+						}
+					]
+				},
+				{
+					"name": "clr/shd/lo",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.002791,
+							"g": 0.002791,
+							"b": 0.002791,
+							"a": 0.25
+						},
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.25
+						}
+					]
+				},
+				{
+					"name": "clr/shd/hi",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.002791,
+							"g": 0.002791,
+							"b": 0.002791,
+							"a": 0.68
+						},
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.68
+						}
+					]
+				},
+				{
+					"name": "clr/shd/hi-x",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.002791,
+							"g": 0.002791,
+							"b": 0.002791,
+							"a": 0.85
+						},
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.85
+						}
+					]
+				},
+				{
+					"name": "clr/shd/max",
+					"type": "COLOR",
+					"scopes": [
+						"ALL_FILLS",
+						"STROKE_COLOR",
+						"EFFECT_COLOR"
+					],
+					"values": [
+						{
+							"r": 0.002791,
+							"g": 0.002791,
+							"b": 0.002791,
+							"a": 0.93
+						},
+						{
+							"r": 0.086104,
+							"g": 0.086104,
+							"b": 0.086104,
+							"a": 0.93
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "size",
+			"modes": [
+				"regular",
+				"s",
+				"l"
+			],
+			"variables": [
+				{
+					"name": "sp/min",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						4,
+						3,
+						5
+					]
+				},
+				{
+					"name": "sp/1",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						8,
+						6,
+						10
+					]
+				},
+				{
+					"name": "sp/2",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						16,
+						12,
+						20
+					]
+				},
+				{
+					"name": "sp/3",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						24,
+						18,
+						30
+					]
+				},
+				{
+					"name": "sp/4",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						32,
+						24,
+						40
+					]
+				},
+				{
+					"name": "sp/5",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						40,
+						30,
+						50
+					]
+				},
+				{
+					"name": "sp/6",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						48,
+						36,
+						60
+					]
+				},
+				{
+					"name": "sp/7",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						56,
+						42,
+						70
+					]
+				},
+				{
+					"name": "sp/8",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						64,
+						48,
+						80
+					]
+				},
+				{
+					"name": "sp/9",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						72,
+						54,
+						90
+					]
+				},
+				{
+					"name": "sp/10",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						80,
+						60,
+						100
+					]
+				},
+				{
+					"name": "sp/11",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						88,
+						66,
+						110
+					]
+				},
+				{
+					"name": "sp/12",
+					"type": "FLOAT",
+					"scopes": [
+						"WIDTH_HEIGHT",
+						"GAP"
+					],
+					"values": [
+						96,
+						72,
+						120
+					]
+				},
+				{
+					"name": "fs/min",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						10,
+						10,
+						11
+					]
+				},
+				{
+					"name": "fs/1",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						12,
+						11,
+						13
+					]
+				},
+				{
+					"name": "fs/2",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						14,
+						13,
+						15
+					]
+				},
+				{
+					"name": "fs/3",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						16,
+						15,
+						17
+					]
+				},
+				{
+					"name": "fs/4",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						18,
+						17,
+						19
+					]
+				},
+				{
+					"name": "fs/5",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						20,
+						19,
+						21
+					]
+				},
+				{
+					"name": "fs/6",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						22,
+						21,
+						23
+					]
+				},
+				{
+					"name": "fs/7",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						24,
+						23,
+						25
+					]
+				},
+				{
+					"name": "fs/8",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						26,
+						25,
+						27
+					]
+				},
+				{
+					"name": "fs/9",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						28,
+						27,
+						29
+					]
+				},
+				{
+					"name": "fs/10",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						30,
+						29,
+						31
+					]
+				},
+				{
+					"name": "fs/11",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						32,
+						31,
+						33
+					]
+				},
+				{
+					"name": "fs/12",
+					"type": "FLOAT",
+					"scopes": [
+						"FONT_SIZE"
+					],
+					"values": [
+						34,
+						33,
+						35
+					]
+				}
+			]
+		},
+		{
+			"name": "base",
+			"modes": [
+				"value"
+			],
+			"variables": [
+				{
+					"name": "gap/min",
+					"type": "FLOAT",
+					"scopes": [
+						"GAP"
+					],
+					"values": [
+						{
+							"alias": "sp/min"
+						}
+					]
+				},
+				{
+					"name": "gap/s",
+					"type": "FLOAT",
+					"scopes": [
+						"GAP"
+					],
+					"values": [
+						{
+							"alias": "sp/1"
+						}
+					]
+				},
+				{
+					"name": "gap/l",
+					"type": "FLOAT",
+					"scopes": [
+						"GAP"
+					],
+					"values": [
+						{
+							"alias": "sp/3"
+						}
+					]
+				},
+				{
+					"name": "gap/max",
+					"type": "FLOAT",
+					"scopes": [
+						"GAP"
+					],
+					"values": [
+						{
+							"alias": "sp/6"
+						}
+					]
+				},
+				{
+					"name": "bdr/min",
+					"type": "FLOAT",
+					"scopes": [
+						"CORNER_RADIUS"
+					],
+					"values": [
+						{
+							"alias": "sp/min"
+						}
+					]
+				},
+				{
+					"name": "bdr/s",
+					"type": "FLOAT",
+					"scopes": [
+						"CORNER_RADIUS"
+					],
+					"values": [
+						{
+							"alias": "sp/1"
+						}
+					]
+				},
+				{
+					"name": "bdr/l",
+					"type": "FLOAT",
+					"scopes": [
+						"CORNER_RADIUS"
+					],
+					"values": [
+						{
+							"alias": "sp/2"
+						}
+					]
+				},
+				{
+					"name": "bdr/max",
+					"type": "FLOAT",
+					"scopes": [
+						"CORNER_RADIUS"
+					],
+					"values": [
+						{
+							"alias": "sp/3"
+						}
+					]
+				},
+				{
+					"name": "bdw",
+					"type": "FLOAT",
+					"scopes": [
+						"STROKE_FLOAT"
+					],
+					"values": [
+						1
+					]
+				}
+			]
+		}
+	],
+	"textStyles": [
+		{
+			"name": "label/min",
+			"family": "JetBrains Mono",
+			"weight": 500,
+			"fontSize": {
+				"px": 10,
+				"variable": "fs/min"
+			},
+			"lineHeightPercent": 130,
+			"letterSpacingPercent": 2,
+			"textCase": "UPPER"
+		},
+		{
+			"name": "label/s",
+			"family": "JetBrains Mono",
+			"weight": 500,
+			"fontSize": {
+				"px": 12,
+				"variable": "fs/1"
+			},
+			"lineHeightPercent": 125,
+			"letterSpacingPercent": 1.5,
+			"textCase": "UPPER"
+		},
+		{
+			"name": "label/base",
+			"family": "JetBrains Mono",
+			"weight": 500,
+			"fontSize": {
+				"px": 14,
+				"variable": "fs/2"
+			},
+			"lineHeightPercent": 120,
+			"letterSpacingPercent": 1,
+			"textCase": "UPPER"
+		},
+		{
+			"name": "label/l",
+			"family": "JetBrains Mono",
+			"weight": 500,
+			"fontSize": {
+				"px": 16,
+				"variable": "fs/3"
+			},
+			"lineHeightPercent": 117.5,
+			"letterSpacingPercent": 0.5,
+			"textCase": "UPPER"
+		},
+		{
+			"name": "label/max",
+			"family": "JetBrains Mono",
+			"weight": 500,
+			"fontSize": {
+				"px": 18,
+				"variable": "fs/4"
+			},
+			"lineHeightPercent": 115,
+			"letterSpacingPercent": 0,
+			"textCase": "UPPER"
+		}
+	],
+	"effectStyles": [
+		{
+			"name": "shd/min",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 1,
+					"blur": 2,
+					"spread": 0,
+					"color": "clr/shd/min"
+				}
+			]
+		},
+		{
+			"name": "shd/lo",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 1,
+					"blur": 2,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": 0,
+					"y": 6,
+					"blur": 18,
+					"spread": -4,
+					"color": "clr/shd/min"
+				}
+			]
+		},
+		{
+			"name": "shd/hi",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 2,
+					"blur": 4,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": 0,
+					"y": 12,
+					"blur": 32,
+					"spread": -6,
+					"color": "clr/shd/lo-x"
+				}
+			]
+		},
+		{
+			"name": "shd/max",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 3,
+					"blur": 6,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": 0,
+					"y": 20,
+					"blur": 48,
+					"spread": -8,
+					"color": "clr/shd/lo"
+				}
+			]
+		},
+		{
+			"name": "shd/glow-pri/min",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 0,
+					"blur": 4,
+					"spread": 0,
+					"color": "clr/pri/min"
+				}
+			]
+		},
+		{
+			"name": "shd/glow-pri/lo",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 0,
+					"blur": 12,
+					"spread": 0,
+					"color": "clr/pri/lo-x"
+				}
+			]
+		},
+		{
+			"name": "shd/glow-pri/hi",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 0,
+					"blur": 24,
+					"spread": 0,
+					"color": "clr/pri/lo"
+				}
+			]
+		},
+		{
+			"name": "shd/glow-pri/max",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 0,
+					"blur": 40,
+					"spread": 0,
+					"color": "clr/pri/lo"
+				}
+			]
+		},
+		{
+			"name": "shd/glow-duo/min",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 0,
+					"blur": 4,
+					"spread": 0,
+					"color": "clr/duo/min"
+				}
+			]
+		},
+		{
+			"name": "shd/glow-duo/lo",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 0,
+					"blur": 12,
+					"spread": 0,
+					"color": "clr/duo/lo-x"
+				}
+			]
+		},
+		{
+			"name": "shd/glow-duo/hi",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 0,
+					"blur": 24,
+					"spread": 0,
+					"color": "clr/duo/lo"
+				}
+			]
+		},
+		{
+			"name": "shd/glow-duo/max",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": 0,
+					"blur": 40,
+					"spread": 0,
+					"color": "clr/duo/lo"
+				}
+			]
+		}
+	],
+	"skipped": [
+		"text styles for prose: font \"sans\" is a system font with no Figma equivalent",
+		"text styles for heading: font \"sans\" is a system font with no Figma equivalent",
+		"label: italic is not exported as separate text styles",
+		"shadows: shapes changed by modes use their ordinary values in Figma",
+		"time (2 scales): Figma has no duration variables",
+		"easing (3): Figma has no easing variables"
+	]
+}

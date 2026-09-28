@@ -264,7 +264,7 @@ label: {
 - No full resolved-value dump for apps; detailed data is for Workbench only.
 - Public colour types are structural (no Culori types required by consumers).
 
-**Figma** — capstone, built last.
+**Figma** — `output.figma` writes `generated/figma.json`; the TFS Token Sync plugin (`figma-plugin/`, a Figma development plugin) applies it. Variables: one collection per axis with the chosen modes, plus `base`; references become aliases; colours converted OKLCH → sRGB. Text and shadows become styles bound to those variables. Name-matched, never deletes; stale items reported.
 
 - The author chooses which modes carry through (plan limit: 4 modes per collection).
 - Unsupported values (e.g. easing) are left out and listed.
@@ -305,7 +305,7 @@ tfs/            the one npm package: three-forma-styli
   themes/standard/
   tests/        including the everything-project fixture
 workbench/      UI; reads the data file TFS writes, nothing else
-figma-plugin/   capstone; reads TFS's Figma output, nothing else
+figma-plugin/   TFS Token Sync; reads generated/figma.json, nothing else
 ```
 
 - Entry points: `three-forma-styli` (authoring), `three-forma-styli/runtime`

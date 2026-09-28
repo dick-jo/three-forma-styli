@@ -29,6 +29,8 @@ async function sendFile(response: ServerResponse, root: string, relative: string
 	response.writeHead(200, {
 		'content-type': TYPES[extname(path)] ?? 'application/octet-stream',
 		'cache-control': 'no-store',
+		// Any origin may read: the Figma plugin fetches generated/figma.json from its sandbox.
+		'access-control-allow-origin': '*',
 	});
 	createReadStream(path).pipe(response);
 }

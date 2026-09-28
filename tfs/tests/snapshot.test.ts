@@ -2,6 +2,7 @@ import { expect, it } from 'vitest';
 import {
 	emitColorThemeJs,
 	emitColorThemeTypes,
+	emitFigmaJson,
 	emitTokensCss,
 	emitTokensJs,
 	emitTokensTypes,
@@ -24,6 +25,7 @@ const outputs = {
 	'typography.module.css.d.ts': emitTypographyModuleTypes(resolved),
 	'typography.js': emitTypographyJs(resolved),
 	'typography.d.ts': emitTypographyTypes(resolved),
+	'figma.json': emitFigmaJson(resolved, fonts.stacks),
 	'color-theme.js': emitColorThemeJs(resolved, config.runtime.colorThemes),
 	'color-theme.d.ts': emitColorThemeTypes(resolved, config.runtime.colorThemes),
 };

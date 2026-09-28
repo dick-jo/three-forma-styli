@@ -18,6 +18,24 @@ importers:
         specifier: ^5.8.2
         version: 5.9.3
 
+  figma-plugin:
+    devDependencies:
+      '@figma/plugin-typings':
+        specifier: ^1.100.0
+        version: 1.139.0
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
+      three-forma-styli:
+        specifier: workspace:*
+        version: link:../tfs
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.7
+        version: 3.2.7(@types/node@24.19.0)(jiti@2.7.0)(yaml@2.9.1)
+
   tfs:
     dependencies:
       '@types/fontkit':
@@ -389,6 +407,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@figma/plugin-typings@1.139.0':
+    resolution: {integrity: sha512-O1lUNRXpBsnODokqnIJW0AawVVrx4FUkm2ShDsLGsInWrxDYX0MIoy0yVKa+MXOy7Wfs3JE+utR+YTcxp6Yihw==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1403,6 +1424,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@figma/plugin-typings@1.139.0': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:

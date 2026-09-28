@@ -2,6 +2,7 @@ import { readdir, readFile, rename, rm, writeFile, mkdir } from 'node:fs/promise
 import { join, relative } from 'node:path';
 import { emitColorThemeJs, emitColorThemeTypes } from '../emit/color-theme.js';
 import { emitTokensCss } from '../emit/css.js';
+import { emitFigmaJson } from '../emit/figma.js';
 import { emitTokensJs, emitTokensTypes } from '../emit/tokens-module.js';
 import {
 	emitTypographyCss,
@@ -52,6 +53,8 @@ function textFiles(
 		files['color-theme.js'] = emitColorThemeJs(resolved, colorThemes);
 		files['color-theme.d.ts'] = emitColorThemeTypes(resolved, colorThemes);
 	}
+	const figma = loaded.config.output?.figma;
+	if (figma) files['figma.json'] = emitFigmaJson(resolved, stacks, figma);
 	files['styles.css'] = GENERATED_HEADER + styles.map((file) => `@import "./${file}";\n`).join('');
 	return files;
 }

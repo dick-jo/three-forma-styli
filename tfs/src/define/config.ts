@@ -8,6 +8,11 @@ export type ConfigInput = {
 	readonly output?: {
 		/** Relative to the config file. Default `./generated`. */
 		readonly directory?: string;
+		/** Also write generated/figma.json for the TFS Figma plugin. */
+		readonly figma?: {
+			/** Modes per axis to carry into Figma (4 per collection). Default: all. */
+			readonly modes?: Readonly<Record<string, readonly string[]>>;
+		};
 	};
 };
 

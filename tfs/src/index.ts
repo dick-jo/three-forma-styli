@@ -49,3 +49,4 @@ export {
 } from './emit/color-theme.js';
 export { defineConfig, type ConfigInput } from './define/config.js';
 export type { WorkbenchData } from './emit/workbench.js';
+export { emitFigmaJson, type FigmaData, type FigmaOptions, type FigmaValue } from './emit/figma.js';

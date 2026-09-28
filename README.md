@@ -20,6 +20,9 @@ npx tfs dev         # finds ./design-system; builds its generated/, serves Workb
 ```
 
 The app imports `design-system/generated/styles.css` once, from its entry file.
+**SvelteKit/Vite:** add `server: { fs: { allow: ['design-system'] } }` to `vite.config.ts`
+(the dev server only serves allowed folders, so fonts would 403), and an alias such as
+`$design` → `design-system/generated` keeps imports tidy.
 
 **As its own project** (a system shared by several apps):
 
@@ -48,6 +51,18 @@ pnpm tfs dev
 | `workbench/`            | the review UI opened by `tfs dev`; reads TFS's data file only                    |
 | `figma-plugin/` (later) | reads TFS's Figma output only                                                    |
 | `docs/`                 | the Board and the progress file, nothing else                                    |
+
+## Figma
+
+`output: { figma: {} }` in `tfs.config.ts` writes `generated/figma.json` (optionally
+`figma: { modes: { size: ['regular'] } }`; Figma allows 4 modes per collection).
+Colours and numbers become variables (one collection per axis, plus `base`); text
+and shadows become styles bound to them. Easing and time are listed as not exported.
+
+Install the plugin once: `pnpm install && pnpm build` in this repo, then Figma desktop
+→ Plugins → Development → **Import plugin from manifest…** →
+`figma-plugin/manifest.json`. Run it, with `tfs dev` running, and press **Sync from
+tfs dev**. It creates and updates by name and never deletes; stale items are listed.
 
 ## Developing TFS itself
 

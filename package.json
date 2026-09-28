@@ -3,11 +3,11 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"build": "pnpm --filter three-forma-styli build && pnpm --filter tfs-workbench build",
+		"build": "pnpm --filter three-forma-styli build && pnpm --filter tfs-workbench build && pnpm --filter tfs-figma-plugin build",
 		"test": "pnpm --filter three-forma-styli test",
 		"typecheck": "pnpm --filter three-forma-styli typecheck",
 		"format": "prettier --write .",
-		"check": "prettier --check . && pnpm typecheck && pnpm build && pnpm --filter tfs-workbench check && pnpm test && pnpm --filter three-forma-styli knip"
+		"check": "prettier --check . && pnpm typecheck && pnpm build && pnpm --filter tfs-workbench check && pnpm --filter tfs-figma-plugin typecheck && pnpm test && pnpm --filter tfs-figma-plugin test && pnpm --filter three-forma-styli knip"
 	},
 	"devDependencies": {
 		"prettier": "^3.6.2",

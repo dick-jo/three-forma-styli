@@ -1,0 +1,19 @@
+{
+	"name": "TFS Token Sync",
+	"id": "tfs-token-sync",
+	"api": "1.0.0",
+	"main": "dist/code.js",
+	"ui": "dist/ui.html",
+	"editorType": ["figma"],
+	"documentAccess": "dynamic-page",
+	"networkAccess": {
+		"allowedDomains": ["none"],
+		"devAllowedDomains": [
+			"http://localhost:5178",
+			"http://localhost:5179",
+			"http://localhost:5180",
+			"http://localhost:5181"
+		],
+		"reasoning": "Reads generated/figma.json from a local `tfs dev` session."
+	}
+}

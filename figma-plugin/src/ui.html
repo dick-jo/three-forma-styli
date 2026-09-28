@@ -1,0 +1,91 @@
+<style>
+	body {
+		margin: 0;
+		padding: 12px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		color: var(--figma-color-text);
+		background-color: var(--figma-color-bg);
+		font:
+			12px/1.4 system-ui,
+			sans-serif;
+	}
+	input[type='text'] {
+		padding: 6px;
+		border: 1px solid var(--figma-color-border);
+		border-radius: 4px;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+	}
+	button {
+		padding: 8px;
+		border: 0;
+		border-radius: 6px;
+		background-color: var(--figma-color-bg-brand);
+		color: var(--figma-color-text-onbrand);
+		font: inherit;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.hint {
+		color: var(--figma-color-text-secondary);
+	}
+	pre {
+		margin: 0;
+		flex: 1;
+		overflow: auto;
+		white-space: pre-wrap;
+		font:
+			11px/1.45 ui-monospace,
+			monospace;
+	}
+</style>
+
+<strong>TFS Token Sync</strong>
+<span class="hint"
+	>With <code>tfs dev</code> running (and <code>output.figma</code> in tfs.config.ts):</span
+>
+<input id="url" type="text" value="http://localhost:5178/generated/figma.json" />
+<button id="fetch">Sync from tfs dev</button>
+<span class="hint">…or pick a figma.json file: <input id="file" type="file" accept=".json" /></span>
+<pre id="out"></pre>
+
+<script>
+	const out = document.getElementById('out');
+	const send = (json) => {
+		out.textContent = 'Syncing…';
+		parent.postMessage({ pluginMessage: { type: 'sync', json } }, '*');
+	};
+	document.getElementById('fetch').onclick = async () => {
+		const url = document.getElementById('url').value;
+		try {
+			const response = await fetch(url, { cache: 'no-store' });
+			if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+			send(await response.text());
+		} catch (error) {
+			out.textContent = `Could not read ${url}: ${error.message}\nIs tfs dev running, and does tfs.config.ts have output.figma?`;
+		}
+	};
+	document.getElementById('file').onchange = async (event) => {
+		const file = event.target.files[0];
+		if (file) send(await file.text());
+	};
+	onmessage = (event) => {
+		const message = event.data.pluginMessage;
+		if (message.type === 'error') {
+			out.textContent = `✗ ${message.message}`;
+			return;
+		}
+		const { created, updated, stale, skipped, errors } = message.report;
+		const section = (title, items) =>
+			items.length ? `${title} (${items.length})\n  ${items.join('\n  ')}\n\n` : '';
+		out.textContent =
+			`✓ ${created.length} created · ${updated.length} updated\n\n` +
+			section('Errors', errors) +
+			section('Stale in Figma (not deleted)', stale) +
+			section('Not exported', skipped) +
+			section('Created', created);
+	};
+</script>

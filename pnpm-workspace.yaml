@@ -1,6 +1,7 @@
 packages:
   - 'tfs'
   - 'workbench'
+  - 'figma-plugin'
 
 allowBuilds:
   esbuild: true
