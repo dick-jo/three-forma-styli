@@ -761,6 +761,19 @@ live feedback and consumer migration remain for the later architecture/runbook.
   Culori declarations.
 - framework Text components remain application-owned.
 
+### Figma — capstone, founder direction 2026-09-28
+
+Figma is the last implementation item, after the ratified model and the cleanup.
+Requirements to carry into it:
+
+- The author chooses exactly which modes carry through to Figma (plan limit:
+  4 modes per collection). No automatic "every mode becomes a Figma mode".
+- Unsupported values are simply not exported (e.g. easing), and reported.
+- **Shadows and text styles are Figma _styles_ (effect / text styles), not
+  variables.** Variables cover colours and numbers/strings only. Keep this
+  distinction explicit in code and docs.
+- Workbench stays largely as-is for now; no product-design pass in this overhaul.
+
 ### Output priority and Figma scope
 
 Ratified on 2026-09-09:

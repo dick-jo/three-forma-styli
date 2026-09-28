@@ -136,7 +136,7 @@ separately agreed architecture and runbook milestone.
   `blueprints/typography/weights-styles/*.ts`. Variants removed. Role modes use the shared pattern (values only). Fonts: `files` vs `name`. **Typography closed 2026-09-28.** Next: assembled-system review.
 - **Assembled review part 1 ratified, 2026-09-28:** unnamed ordinary scale for
   Alpha/Time/Shadow, one file per family, one `defineX()` style. Mock:
-  `blueprints/system/`. Next: part 2 — app usage, Figma subset, calibration.
+  `blueprints/system/`. Figma deferred to a capstone (choose modes; shadows/text as styles). Next: runbook.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
