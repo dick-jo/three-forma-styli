@@ -18,7 +18,7 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 | Step | Work                                                                                                              | Status |
 | ---- | ----------------------------------------------------------------------------------------------------------------- | ------ |
 | 1    | Recovery tag; delete stale docs, examples and blueprint mocks; short Board; new README; this runbook              | done   |
-| 2    | Delete old packages/scripts; single-package skeleton; `define*()` + types; everything-project fixture type-checks |        |
+| 2    | Delete old packages/scripts; single-package skeleton; `define*()` + types; everything-project fixture type-checks | done   |
 | 3    | Checks and mode resolution for every family                                                                       |        |
 | 4    | `tokens.css` with mode blocks and re-binding, verified in a browser                                               |        |
 | 5    | Typography: classes, whole-row tokens, `./typography`; fonts copied in (no licensing)                             |        |
@@ -34,15 +34,28 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 Files deliberately copied from `pre-v05-cleanup`, with the reason. Anything not
 listed here was not carried over.
 
-| From                             | To                                       | Why                         |
-| -------------------------------- | ---------------------------------------- | --------------------------- |
-| `docs/blueprints/system/`        | step 2: `tfs/tests/fixtures/everything/` | the ratified assembled mock |
-| _(filled in as steps copy code)_ |                                          |                             |
+| From                                                      | To                                   | Why                                                       |
+| --------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------- |
+| `docs/blueprints/system/`                                 | `tfs/tests/fixtures/everything/`     | the ratified assembled mock; now imports the real package |
+| mock `support/types.ts`                                   | `tfs/src/define/*.ts`                | review types became the real authoring types              |
+| `packages/core/src/utils.ts` `oklch()`                    | `tfs/src/define/color.ts`            | 3-line constructor, same output                           |
+| `packages/core/src/alpha/authoring.ts` `deriveAlphaScale` | `tfs/src/define/color.ts`            | same maths; test pins 0.4.0 values                        |
+| `apps/workbench/`                                         | `workbench/` (outside the workspace) | kept per runbook; rejoins in step 8 via the data file     |
+| `.github/requirements-fonttools.txt`                      | unchanged                            | needed by FontTools in step 5                             |
 
 Planned copies: font inspection, FontTools conversion, fallback metrics
 (`packages/compiler/src/fonts/`); OKLCH helpers, runtime themes, luminance
 (`packages/core/src/{runtime,constraints}/`); CSS mode re-binding details
 (`packages/core/src/generator/typography.ts`); Workbench UI (`apps/workbench/`).
+
+## Notes
+
+- `Register` (in `tfs.config.ts`) is how `defineX()` checks mode and colour names
+  across files; the stock pattern used by TanStack Router and similar libraries.
+- Release tooling (changesets) was removed with the old packages; the package is
+  `private` until step 10 decides how 0.5 is published.
+- Check 2 (banned words) runs from step 2. Check 3 (`knip`) is added at step 8,
+  once the CLI makes exports reachable.
 
 ## Finish-line checks
 

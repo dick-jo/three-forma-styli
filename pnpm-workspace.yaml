@@ -1,15 +1,6 @@
 packages:
-  - 'packages/*'
-  - 'apps/*'
+  - 'tfs'
+  # workbench/ rejoins in runbook step 8, when it reads TFS's data file.
 
 allowBuilds:
   esbuild: true
-
-overrides:
-  cookie@0.6.0: 0.7.2
-  diff@4.0.2: 4.0.4
-  picomatch@2.3.1: 2.3.2
-  postcss: 8.5.20
-  rollup: ^4.59.0
-  svelte: ^5.56.7
-  vite: ^6.4.3

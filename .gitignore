@@ -1,11 +1,7 @@
 node_modules/
-.env
+dist/
+generated/
 *.log
 *.tgz
-dist/
+.env
 .DS_Store
-
-# Test artifacts
-packages/cli/dist/*.css
-packages/cli/dist/*.ts
-!packages/cli/dist/**/*.d.ts
