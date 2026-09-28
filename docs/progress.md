@@ -54,17 +54,16 @@ Planned copies: font inspection, FontTools conversion, fallback metrics
   across files; the stock pattern used by TanStack Router and similar libraries.
 - Release tooling (changesets) was removed with the old packages; the package is
   `private` until step 10 decides how 0.5 is published.
-- Check 2 (banned words) runs from step 2. Check 3 (`knip`) is added at step 8,
-  once the CLI makes exports reachable.
+- Check 3 (`knip`) is added at step 8, once the CLI makes exports reachable.
 
 ## Finish-line checks
 
 The cleanup is done when all of these pass:
 
 1. **Nothing old by accident**: every carried-over file is in the kept list.
-2. **Banned words**: a test fails if code contains old vocabulary (`isDefault`,
-   `defaultScale`, `defaultRange`, `modeOverrides`, `variants`, `license`,
-   `verification`, `strategy`, `increment`, `tfsSystem`, `shadow--`, …).
+2. **Old vocabulary gone**: a one-time search of `tfs/` at the final review finds none
+   of `isDefault`, `defaultScale`, `defaultRange`, `modeOverrides`, `variants`,
+   `license`, `verification`, `strategy`, `increment`, `tfsSystem`, `shadow--`.
 3. **No dead code**: `knip` reports no unused files or exports.
 4. **Boundaries**: `workbench/` and `figma-plugin/` import nothing from TFS
    internals; they read generated files only.
