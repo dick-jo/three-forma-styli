@@ -525,10 +525,23 @@ review-example change only; migration of actual consumer names belongs to triage
   `min`; `l` requires `max`.
 - Weight is role-local. A role uses either one scalar weight or a sparse,
   increasing `min / lo / hi / max` range whose endpoints are actual endpoints.
-- Every resolved size has a final weight; omitted size weights inherit the role
-  default.
+  Omitted middles are not offered; nothing is interpolated.
+- Revised 2026-09-28 — no fallbacks: a property lives either on the role (same for
+  every size: font, textTransform, styles, weights) or in every size (fontSize,
+  weight, lineHeight, letterSpacing). A range role states `weight` in every size;
+  there is no role-level default weight. A scalar role's `weights: 400` is role-wide
+  and emits the plain number; no `base` weight name. Supersedes role-default
+  inheritance.
+- Ratified 2026-09-28: `styles` is a list such as `['normal', 'italic']`; each
+  style is offered in every role weight, checked against font facts. Omitted means
+  normal. No per-style weight lists, no `defaultStyle`, no style-keyword tokens.
+- Ratified 2026-09-28 output: independent `-style-{style}` and `-weight-{name}`
+  classes replace style×weight combination classes. Each role size also emits a
+  whole-row `font` shorthand token, `--text-{role}` / `--text-{role}-{size}`,
+  built from the granular tokens and rebound in mode scopes; letter-spacing and
+  text-transform remain separate. Generated names must not collide.
 - Variants are categorical and cannot change font family or font size.
-- Resolution order is role defaults → size → variant → explicit style/weight.
+- Resolution order is size → variant → explicit style/weight.
 - Physical style/weight/features/axes are checked against prepared font facts.
 
 The [first Typography mock](./blueprints/typography/README.md), prepared
