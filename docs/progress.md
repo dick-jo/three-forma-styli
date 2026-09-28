@@ -23,7 +23,7 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 | 4    | `tokens.css` with mode blocks and re-binding, verified in a browser                                               | done   |
 | 5    | Typography: classes, whole-row tokens, `./typography`; fonts copied in (no licensing)                             | done   |
 | 6    | `./tokens`: identity names, exact group types, `var()` helpers                                                    | done   |
-| 7    | Runtime colour themes + luminance copied in; `./runtime`; decide `native-color-modes`                             |        |
+| 7    | Runtime colour themes + luminance copied in; `./runtime`; decide `native-color-modes`                             | done   |
 | 8    | `tfs build`, `tfs check`, `tfs dev` (watch, last valid output, Workbench data)                                    |        |
 | 9    | Standard theme ported with unchanged values                                                                       |        |
 | 10   | Scatter upgrade to 0.5: separate agreed scope, values unchanged                                                   |        |
@@ -43,9 +43,8 @@ listed here was not carried over.
 | `apps/workbench/`                                         | `workbench/` (outside the workspace) | kept per runbook; rejoins in step 8 via the data file     |
 | `.github/requirements-fonttools.txt`                      | unchanged                            | needed by FontTools in step 5                             |
 
-Still planned: OKLCH helpers, runtime themes, luminance
-(`packages/core/src/{runtime,constraints}/`). CSS mode re-binding was rewritten
-in step 4 rather than copied (the old version handled one axis only).
+CSS mode re-binding was rewritten in step 4 rather than copied (the old version
+handled one axis only).
 
 ## Notes
 

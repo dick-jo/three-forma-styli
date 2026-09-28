@@ -123,9 +123,13 @@ defineColors({
 - Exact input validation; each customer palette supplies its own polarity.
 - No rule configured → `luminance: null`. Enforcing without a rule is a
   configuration error. No ignored `enforce` metadata.
-- Payload meaning is preserved: schema version 2, `colorIdentities`, literal
-  `non: 0`, native OKLCH output. The existing `native-color-modes` output is
-  reviewed in runbook step 7 (Scatter imports it).
+- Configured as `runtime: { colorThemes: { colors: [...] } }` in `tfs.config.ts`:
+  the colours customers may set. Every colour the contrast rule names must be
+  included. Generated `./color-theme` carries those colours, the alpha steps, the
+  rule and every built-in palette per theme mode (replacing 0.4.0's
+  `runtime-color-theme` and `native-color-modes`). Payloads are exact: polarity
+  plus exactly those colours, channels in range; native OKLCH output identical
+  to `tokens.css`.
 
 ### Spacing and Gap (`spacing.ts`)
 

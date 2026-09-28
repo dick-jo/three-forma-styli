@@ -1,5 +1,7 @@
 import { expect, it } from 'vitest';
 import {
+	emitColorThemeJs,
+	emitColorThemeTypes,
 	emitTokensCss,
 	emitTokensJs,
 	emitTokensTypes,
@@ -9,7 +11,7 @@ import {
 	emitTypographyModuleTypes,
 	emitTypographyTypes,
 } from 'three-forma-styli';
-import { fonts, resolved } from './everything.js';
+import { config, fonts, resolved } from './everything.js';
 
 // The full generated output, committed so every change to it is a readable diff.
 const outputs = {
@@ -22,6 +24,8 @@ const outputs = {
 	'typography.module.css.d.ts': emitTypographyModuleTypes(resolved),
 	'typography.js': emitTypographyJs(resolved),
 	'typography.d.ts': emitTypographyTypes(resolved),
+	'color-theme.js': emitColorThemeJs(resolved, config.runtime.colorThemes),
+	'color-theme.d.ts': emitColorThemeTypes(resolved, config.runtime.colorThemes),
 };
 
 it.each(Object.entries(outputs))('%s', async (file, content) => {

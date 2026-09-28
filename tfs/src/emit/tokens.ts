@@ -1,5 +1,5 @@
 import { ALPHA_POSITIONS, LO_HI_POSITIONS, PREFIXES as P, S_L_POSITIONS } from '../const.js';
-import type { Oklch } from '../define/color.js';
+import { formatOklch } from '../runtime/oklch.js';
 import type { Easing, Layer, LayerRange, SpacingRef } from '../resolve/input.js';
 import type { ModalValues, ResolvedSystem } from '../resolve/index.js';
 import { TfsError } from '../resolve/issues.js';
@@ -13,11 +13,6 @@ export type FontStacks = Readonly<Record<string, string>>;
 export type Token = { readonly name: string; readonly value: string };
 
 const ALPHA_WITH_NON = ['non', ...ALPHA_POSITIONS] as const;
-
-function oklchCss(color: Oklch, alpha?: number): string {
-	const channels = `${num(color.l)} ${num(color.c)} ${num(color.h)}`;
-	return alpha === undefined ? `oklch(${channels})` : `oklch(${channels} / ${num(alpha)})`;
-}
 
 function spacingRef(ref: SpacingRef): string {
 	return cssVar(name(P.spacing, ref));
@@ -82,9 +77,9 @@ export function tokensFor(
 	if (values.colors && input.alpha) {
 		const alpha = { non: 0, ...input.alpha.values } as Record<string, number>;
 		for (const [colorName, color] of Object.entries(values.colors.tokens)) {
-			add(name(P.color, colorName), oklchCss(color));
+			add(name(P.color, colorName), formatOklch(color));
 			for (const position of ALPHA_WITH_NON)
-				add(name(P.color, colorName, P.alpha, position), oklchCss(color, alpha[position]));
+				add(name(P.color, colorName, P.alpha, position), formatOklch(color, alpha[position]));
 		}
 	}
 	if (values.spacing) {

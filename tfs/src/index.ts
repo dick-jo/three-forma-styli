@@ -42,3 +42,8 @@ export {
 	emitTypographyTypes,
 } from './emit/typography.js';
 export { emitTokensJs, emitTokensTypes } from './emit/tokens-module.js';
+export {
+	emitColorThemeJs,
+	emitColorThemeTypes,
+	type ColorThemesInput,
+} from './emit/color-theme.js';

@@ -4,7 +4,10 @@
 		"noEmit": true,
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
-		"paths": { "three-forma-styli": ["./src/index.ts"] }
+		"paths": {
+			"three-forma-styli": ["./src/index.ts"],
+			"three-forma-styli/runtime": ["./src/runtime/index.ts"]
+		}
 	},
 	"include": ["src", "tests"]
 }

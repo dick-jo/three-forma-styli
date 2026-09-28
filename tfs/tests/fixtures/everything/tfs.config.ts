@@ -29,5 +29,9 @@ export default {
 		fontSize,
 		typography,
 	},
+	runtime: {
+		// Colours customers may set in their own themes at runtime.
+		colorThemes: { colors: ['bg', 'ev', 'ink', 'neu', 'pri', 'duo'] },
+	},
 	output: { directory: './generated' },
 };
