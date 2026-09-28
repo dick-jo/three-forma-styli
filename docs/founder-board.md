@@ -269,6 +269,13 @@ label: {
 
 ## Workflow
 
+Where the design system lives is the consumer's choice. TFS writes one output
+folder (`generated/`) and never edits the host `package.json`. Both setups are
+first-class: **its own package** (several apps share one system; the author writes
+the `exports` block once) and **a folder inside one app** (imported by path).
+`generated/` is committed to git: apps build without running TFS or FontTools,
+design changes are visible in review, and `tfs check` catches forgotten rebuilds.
+
 1. Author the family files and `tfs.config.ts`.
 2. Run `tfs dev` once. It opens Workbench and watches files and fonts.
 3. On save: TypeScript has already checked names and shapes; TFS checks numbers
