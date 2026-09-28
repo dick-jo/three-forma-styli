@@ -5,6 +5,12 @@ through more role options. This is an authoring discussion and read-only audit;
 no font regeneration, implementation change, or new product ruling occurs here.
 The first mock's `start/step/count` proposal remains awaiting explicit review.
 
+Following this audit, the founder requested the
+[real-font mock](./real-fonts/README.md). That companion now executes existing
+preparation on read-only local sources, records CSS and calculation evidence,
+and verifies actual primary-font loading. Its inputs are ready for review;
+the recommendation below is not yet a new ratified contract.
+
 ## Names and responsibilities
 
 | Thing                  | Example                                   | Owner                                              |

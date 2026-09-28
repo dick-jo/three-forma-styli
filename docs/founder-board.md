@@ -501,6 +501,15 @@ await founder review; existing role grammar remains ratified. Prepared fonts,
 weight ranges, variants, genuine role mode changes, and full consumer review
 follow in focused passes. No production code is changed.
 
+The [real-font companion](./blueprints/typography/real-fonts/README.md), prepared
+2026-09-28 at the founder's request, connects actual source files, authored font
+identity, role choices and calculated output. Existing preparation inspected and
+converted JetBrains Mono, generated four fallback faces, rejected weight 900,
+and loaded normal/italic at 400/700 in Chromium. It shows complete existing
+font input, including license fields, for ergonomic review rather than silently
+ratifying every current option. The font workflow and atomic input proposals
+remain awaiting review; wider role cases and implementation remain later work.
+
 ### Spacing and borders
 
 Full workshop ratified on 2026-09-28, including the

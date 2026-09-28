@@ -92,9 +92,17 @@ separately agreed architecture and runbook milestone.
   The [font workflow review](./blueprints/typography/font-workflow.md) records
   existing preparation, fallback calculation and committed Scatter evidence.
   Recommendation: one project build connects separate source declarations and
-  role choices, with no manual manifest or percentage copying. This awaits a
-  representative mock and founder ruling. Bring that mock before wider role
-  options; the first scale proposal is not implicitly ratified by this discussion.
+  role choices, with no manual manifest or percentage copying.
+- **Real-font mock ready, 2026-09-28:** the
+  [companion](./blueprints/typography/real-fonts/README.md) shows full source input,
+  a code role and blueprint project wiring. Existing tools inspected/converted
+  the two real JetBrains Mono faces, calculated four exact-instance fallbacks,
+  rejected unsupported 900, verified unchanged WOFF2 copying and explicit
+  fallback opt-out, and loaded all four role treatments in Chromium. TypeScript
+  passes. Source files and Scatter artifacts remain unchanged. Review the
+  font authoring flow before wider role options; the first scale proposal is
+  still open. Scalar weight with additional styles needs a focused check in
+  the wider role pass because current style selections require aliases.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -115,7 +123,7 @@ domain retaining its own readiness verdict.
 | 2     | Color and Alpha                           | Blueprint complete; implementation remains later                          | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                                      |
 | 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                                | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                                  |
 | 4     | Time and Easing                           | Blueprint and representative mocks complete                              | Carry named Time scales, directly authored Easings, and accepted output/consumption into the later runbook. Motion composites remain deferred.                                                                                                |
-| 5     | Typography                                | First Font-size/prose mock ready; wider representative review pending     | Review proposed scale inputs and ordinary role authoring, then weight ranges, variants, prepared font facts, role mode changes and the complete consumer surface through focused examples.                                                    |
+| 5     | Typography                                | Font-size/prose and real-font mocks ready; review pending                 | Review scale inputs and the font preparation/role connection, then the remaining weight/style cases, variants, role mode changes and complete consumer surface.                                                                                 |
 | 6     | One assembled design system               | Pending the preceding reviews                                             | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases.               |
 
 The Axes/Modes example should stay grounded in Color and Spacing. Its purpose is

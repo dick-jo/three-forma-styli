@@ -112,13 +112,19 @@ CSS names and inspected capabilities, and records the existing TFS/Scatter
 preparation evidence. Review that complete workflow before expanding the role
 mock; the basic scale input proposal remains open.
 
+The [real-font companion](./real-fonts/README.md) is now ready: one complete
+source declaration, a role offering normal/italic at 400/700, project wiring,
+actual generated fallback CSS, and a rejected 900 weight. Existing preparation
+functions ran against read-only Scatter files; temporary outputs were loaded in
+Chromium. This is review evidence, not production overhaul implementation.
+
 [fonts.ts](./fonts.ts) uses the existing system-font escape hatch. There is no
 project font file to inspect, so it honestly reports `verification: 'unavailable'`.
-That does not certify the physical font's weights or features. Prepared project
-fonts and their authoring ergonomics need their own focused example.
+That does not certify the physical font's weights or features. The companion
+provides the prepared-font alternative for comparison.
 
-1. **Now:** review the atomic inputs and ordinary prose authoring above.
-2. **Next:** actual-font source/preparation/role/output mock, then sparse role
+1. **Now:** review the actual-font companion and the open atomic input proposal.
+2. **Next:** finish sparse role
    sizes, role-local weight ranges and size-specific weights;
    categorical variants and physical styles; prepared font facts and useful
    derivation helpers. Use focused cases, not one overloaded declaration.
