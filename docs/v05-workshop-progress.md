@@ -133,7 +133,7 @@ separately agreed architecture and runbook milestone.
 - **Typography weights/styles ratified, 2026-09-28:** no role-level fallbacks
   (weight stated per size), `styles` list, plain scalar weight, independent
   style/weight classes, whole-row `--text-{role}[-{size}]` font token. Mock:
-  `blueprints/typography/weights-styles/*.ts`. Variants removed. Role modes use the shared pattern (values only). Next: consumption pass.
+  `blueprints/typography/weights-styles/*.ts`. Variants removed. Role modes use the shared pattern (values only). Fonts: files vs name only. Next: Typography closing summary.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 

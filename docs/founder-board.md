@@ -549,6 +549,12 @@ review-example change only; migration of actual consumer names belongs to triage
   fontSize, weight, lineHeight or letterSpacing; never font, weights, styles or
   which sizes exist, so names stay stable. Legacy `modeOverrides` is not carried
   forward. Roles also follow atomic Size changes through their fontSize references.
+- Fonts ratified 2026-09-28, two kinds told apart by `sources`. With files: TFS
+  inspects, checks roles, prepares WOFF2 (file type decides copy vs convert),
+  emits `@font-face` plus size-matched fallbacks. Name only (`family`, `fallbacks`,
+  no files): TFS writes the family name, emits no loading CSS and cannot check;
+  the OS, app or a font service loads it. Removed: `verification`, `strategy`,
+  `license`. Kept: `sources`, `category`, `family`, `fallbacks`, `display`.
 - Physical style/weight/features/axes are checked against prepared font facts.
 
 The [first Typography mock](./blueprints/typography/README.md), prepared
