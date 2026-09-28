@@ -1,4 +1,4 @@
-import type { ProjectTypographyRole } from '@three-forma-styli/compiler';
+import type { FontRoleDraft } from './review-types.js';
 import type { fonts } from './fonts.js';
 
 export const typography = {
@@ -16,4 +16,4 @@ export const typography = {
 			},
 		},
 	},
-} as const satisfies { roles: Record<string, ProjectTypographyRole<typeof fonts>> };
+} as const satisfies { roles: Record<string, FontRoleDraft<typeof fonts>> };

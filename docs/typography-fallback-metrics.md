@@ -4,14 +4,19 @@ Status: automatic measurement and adjusted-face generation are implemented for p
 and italic prepared faces. TFS emits a factual provenance manifest; it does not model human
 approval states.
 
+2026-09-28 blueprint correction: font licensing machinery is outside TFS's
+scope. The [Founder Board](./founder-board.md#typography) supersedes the existing
+preparation gates. Their production removal belongs to the implementation
+milestone; the authoring shape below omits them deliberately.
+
 ## What the project author supplies
 
 The ordinary authoring contract stays small:
 
 ```ts
 fonts: {
-	supreme: { family: 'Supreme', category: 'sans', /* sources + license */ },
-	jetbrains: { family: 'JetBrains Mono', category: 'mono', /* sources + license */ },
+	supreme: { family: 'Supreme', category: 'sans', /* sources */ },
+	jetbrains: { family: 'JetBrains Mono', category: 'mono', /* sources */ },
 }
 ```
 
@@ -26,8 +31,8 @@ author-owned stack. `typographyCss.fontFaces: 'none'` also leaves all face loadi
 
 One `tfs build` command:
 
-1. copies WOFF/WOFF2 sources or converts licensed TTF/OTF sources to WOFF2;
-2. inspects exact faces, ranges, axes, styles, metrics, coverage, features and embedding flags;
+1. copies WOFF/WOFF2 sources or converts TTF/OTF sources to WOFF2;
+2. inspects exact faces, ranges, axes, styles, metrics, coverage and features;
 3. validates every role selection against those prepared capabilities;
 4. instantiates each exposed variable-font weight exactly;
 5. calculates metric overrides against the style- and weight-matched local fallback profile;

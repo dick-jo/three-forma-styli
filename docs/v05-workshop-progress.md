@@ -93,16 +93,20 @@ separately agreed architecture and runbook milestone.
   existing preparation, fallback calculation and committed Scatter evidence.
   Recommendation: one project build connects separate source declarations and
   role choices, with no manual manifest or percentage copying.
-- **Real-font mock ready, 2026-09-28:** the
-  [companion](./blueprints/typography/real-fonts/README.md) shows full source input,
-  a code role and blueprint project wiring. Existing tools inspected/converted
-  the two real JetBrains Mono faces, calculated four exact-instance fallbacks,
-  rejected unsupported 900, verified unchanged WOFF2 copying and explicit
-  fallback opt-out, and loaded all four role treatments in Chromium. TypeScript
-  passes. Source files and Scatter artifacts remain unchanged. Review the
-  font authoring flow before wider role options; the first scale proposal is
-  still open. Scalar weight with additional styles needs a focused check in
-  the wider role pass because current style selections require aliases.
+- **Font licensing excluded, 2026-09-28:** founder ruling, not another review
+  question. The blueprint/mock no longer requires declarations, attestations,
+  permission gates or license files. Production removal is required later;
+  see the concrete triage scope below. Licensing remains the author's concern.
+- **Real-font workflow corrected, 2026-09-28:** the
+  [companion](./blueprints/typography/real-fonts/README.md) now shows obtaining
+  files, optional pre-authoring inspection, manually writing `fonts.ts` and
+  role declarations, explicit building, and editing/rebuilding. TypeScript
+  checks shapes and identities; execution reads the binary capabilities and
+  validates chosen weights. The source-inspection probe accepts 400/700 in
+  normal/italic and rejects 900 against the measured 100–800 range. Earlier
+  conversion/fallback/browser results are preserved as historical evidence,
+  not represented as output from the revised input. Workflow review remains
+  open. Scalar weight with additional styles still needs its focused pass.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -117,14 +121,14 @@ The founder has asked to proceed with this workshop order. It is not an
 implementation runbook. Related domains can be reviewed together, with each
 domain retaining its own readiness verdict.
 
-| Order | Workshop                                  | Current readiness                                                         | What the review should establish                                                                                                                                                                                                             |
-| ----- | ----------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated          | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
-| 2     | Color and Alpha                           | Blueprint complete; implementation remains later                          | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                                      |
-| 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                                | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                                  |
-| 4     | Time and Easing                           | Blueprint and representative mocks complete                              | Carry named Time scales, directly authored Easings, and accepted output/consumption into the later runbook. Motion composites remain deferred.                                                                                                |
-| 5     | Typography                                | Font-size/prose and real-font mocks ready; review pending                 | Review scale inputs and the font preparation/role connection, then the remaining weight/style cases, variants, role mode changes and complete consumer surface.                                                                                 |
-| 6     | One assembled design system               | Pending the preceding reviews                                             | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases.               |
+| Order | Workshop                                  | Current readiness                                                   | What the review should establish                                                                                                                                                                                               |
+| ----- | ----------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated    | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                             |
+| 2     | Color and Alpha                           | Blueprint complete; implementation remains later                    | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                        |
+| 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                          | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                    |
+| 4     | Time and Easing                           | Blueprint and representative mocks complete                         | Carry named Time scales, directly authored Easings, and accepted output/consumption into the later runbook. Motion composites remain deferred.                                                                                 |
+| 5     | Typography                                | Real-font workflow revised after founder correction; review pending | Review the explicit inspect/author/build loop and scale inputs, then remaining weight/style cases, variants, role mode changes and complete consumer surface. Licensing is excluded.                                           |
+| 6     | One assembled design system               | Pending the preceding reviews                                       | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases. |
 
 The Axes/Modes example should stay grounded in Color and Spacing. Its purpose is
 to settle their shared authoring pattern before other mocks need it. Shadow can
@@ -159,6 +163,27 @@ mocks of the intended overhaul.
 
 Moving between milestones requires a deliberate agreement. Continuing a workshop
 stays within milestone 1.
+
+### Required font cleanup in the later runbook
+
+The licensing removal ruling is settled; this is implementation scope, not a
+request to re-ratify it:
+
+- Remove preparation input types, license-file reads/copies, attestations,
+  transformation/embedding permission gates, and corresponding generated
+  manifest fields from compiler font preparation and project input.
+- Remove licensing-specific inspection/reporting and permission warnings from
+  the font toolchain. Retain technical validation and conversion fidelity checks.
+- Update CLI/config examples, fixtures, tests, documentation and real consumer
+  migration together. No hidden attestations in helpers or compatibility adapters.
+- Handle previously generated license artifacts through an explicit migration;
+  do not delete user-owned files or strip notices from font binaries. The repo's
+  own license and dependency notices are outside this tooling removal.
+
+Current implementation locations include `packages/compiler/src/fonts/prepare.ts`
+and `inspect.ts`, project input/build types, CLI font commands, and their fixtures
+and preparation/provenance checks. The assembled review and architecture audit
+must close this before claiming the revised mock builds on production packages.
 
 ## Keep progress visible
 

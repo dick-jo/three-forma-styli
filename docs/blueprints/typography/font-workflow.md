@@ -6,10 +6,12 @@ no font regeneration, implementation change, or new product ruling occurs here.
 The first mock's `start/step/count` proposal remains awaiting explicit review.
 
 Following this audit, the founder requested the
-[real-font mock](./real-fonts/README.md). That companion now executes existing
-preparation on read-only local sources, records CSS and calculation evidence,
-and verifies actual primary-font loading. Its inputs are ready for review;
-the recommendation below is not yet a new ratified contract.
+[real-font mock](./real-fonts/README.md). Its latest revision explains when the
+author writes each file and runs inspection/build commands. The founder has
+excluded licensing machinery from TFS; the revised input reflects that ruling.
+Current checks verify source inspection and physical weight validation. Earlier
+preparation/browser evidence is preserved separately, not claimed as a current
+build of the revised input. The workflow recommendation still awaits review.
 
 ## Names and responsibilities
 
@@ -36,7 +38,7 @@ and [local face lookup](https://www.w3.org/TR/css-fonts-4/#local-font-fallback).
 The current project compiler already:
 
 - prepares project source files, copying web-ready assets or converting TTF/OTF
-  to WOFF2 when configured and permitted;
+  to WOFF2;
 - inspects names, weights, styles, axes, features and metrics;
 - creates core font capabilities from the prepared manifest and resolves role
   font references without requiring authors to import generated manifests;

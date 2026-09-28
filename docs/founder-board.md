@@ -501,14 +501,30 @@ await founder review; existing role grammar remains ratified. Prepared fonts,
 weight ranges, variants, genuine role mode changes, and full consumer review
 follow in focused passes. No production code is changed.
 
-The [real-font companion](./blueprints/typography/real-fonts/README.md), prepared
-2026-09-28 at the founder's request, connects actual source files, authored font
-identity, role choices and calculated output. Existing preparation inspected and
-converted JetBrains Mono, generated four fallback faces, rejected weight 900,
-and loaded normal/italic at 400/700 in Chromium. It shows complete existing
-font input, including license fields, for ergonomic review rather than silently
-ratifying every current option. The font workflow and atomic input proposals
-remain awaiting review; wider role cases and implementation remain later work.
+**Font licensing is outside TFS's scope — founder ruling, 2026-09-28.** Authors
+handle it independently. Remove licensing declarations, attestations, permission
+gates, license-file requirements/copying, and licensing reports from the intended
+font workflow. Do not carry these forward as optional tooling. This includes
+embedding-rights policy checks; keep technical checks for readable files,
+supported formats, styles, weights and conversion correctness. The repository's
+own license and third-party notices are separate from this feature removal.
+The mock follows this ruling now. Production removal and existing-consumer
+migration belong to the agreed architecture/runbook and implementation milestones.
+
+The [real-font companion](./blueprints/typography/real-fonts/README.md), revised
+2026-09-28, now starts with the complete authoring sequence: obtain source files,
+optionally inspect them, write `fonts.ts` and role choices, then explicitly run
+the project build. `fonts.ts` is authored input, not generated inspection output.
+TypeScript checks declaration shapes and font identities; file inspection and
+role validation check physical capabilities when a command executes. No editor
+discovery or numeric-range checking is implied by a source-path string.
+
+The current probe reads the real files and verifies the existing capability
+validator accepts normal/italic 400/700 and rejects 900 against the measured
+100–800 range. Earlier conversion, four fallback-face calculations and Chromium
+loading evidence is preserved separately as historical output. The revised
+blueprint is not yet accepted by the production compiler. The full font workflow
+and atomic input proposals await review; wider role cases remain later work.
 
 ### Spacing and borders
 
