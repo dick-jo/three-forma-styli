@@ -10,6 +10,13 @@ separately agreed architecture and runbook milestone.
 
 ## Current position
 
+- **Handover / cleanup mandate, 2026-09-28:** resume at Typography's open atomic
+  size proposal. The founder wants substantial code/documentation reduction
+  after completing the blueprint. Ratified product decisions are protected;
+  inherited implementation is subject to explicit keep/simplify/replace/remove
+  triage. Finish Typography and assembled-system review, then agree and execute
+  a concrete cleanup/architecture runbook. This does not authorize a blind wipe
+  or reset completed domain workshops. See the Founder Board's cleanup mandate.
 - **Complete:** Shadow blueprint, representative authoring mock, expected token
   output, and consumer-responsibility boundary.
 - **Reviewed direction:** the founder endorses the ordinary

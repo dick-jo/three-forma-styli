@@ -44,6 +44,38 @@ and the recommended review sequence. Keep a compact progress line visible in
 workshop replies and update the list when a decision changes. This Board remains
 the authority for ratified product contracts.
 
+### Cleanup mandate — 2026-09-28
+
+The founder requests a substantial reduction of the overengineered codebase and
+stale documentation while retaining the ratified product model. This strengthens
+the purpose of milestones 2 and 3; it does not skip the remaining blueprint review
+or authorize an immediate repository wipe.
+
+- Preserve ratified domain shapes, terminology, position patterns, Axes/Modes,
+  authoring principles and output promises. Implementation gaps do not reopen them.
+- Existing code, abstraction layers, compatibility paths, generated surfaces and
+  documentation must justify their place against that model or a demonstrated
+  current consumer need. Their age, size or test coverage alone is no justification.
+- Prefer the smallest complete implementation. Consider keeping, simplifying,
+  replacing or removing each substantial area; do not merely wrap old machinery
+  in a new API. Useful production behaviour needs a deliberate migration, not
+  indefinite preservation of every implementation detail.
+- Finish Typography and one assembled-system review, then propose a concrete
+  cleanup/architecture runbook for the founder's ruling. State the removal scope,
+  remaining structure, production dependencies, recovery point and verification.
+  Once that scope is agreed, carry it out in reviewable increments without
+  repeatedly seeking approval for the same work.
+- Make documentation cleanup a deliverable: one clear current entry point,
+  canonical decisions and progress, and recoverable historical evidence separated
+  from the active reading path. Do not create another competing specification.
+- Preserve recovery paths and authored consumer data. Do not delete working
+  production requirements, fonts, notices or other worktrees under a vague
+  interpretation of “scorched earth.” No cleanup is performed by this mandate alone.
+
+The outcome is restored founder control: readable authoring, understandable
+implementation, dependable outputs, and a clear reason for what remains. Fewer
+lines are useful only when they serve that outcome.
+
 ### Representative mocks for every domain
 
 Founder workflow requirement, 2026-09-10:
