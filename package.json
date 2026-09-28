@@ -6,7 +6,7 @@
 		"test": "pnpm --filter three-forma-styli test",
 		"typecheck": "pnpm --filter three-forma-styli typecheck",
 		"format": "prettier --write .",
-		"check": "prettier --check . && pnpm typecheck && pnpm test"
+		"check": "prettier --check . && pnpm typecheck && pnpm build && pnpm test && pnpm --filter three-forma-styli knip"
 	},
 	"devDependencies": {
 		"prettier": "^3.6.2",

@@ -24,7 +24,8 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 | 5    | Typography: classes, whole-row tokens, `./typography`; fonts copied in (no licensing)                             | done   |
 | 6    | `./tokens`: identity names, exact group types, `var()` helpers                                                    | done   |
 | 7    | Runtime colour themes + luminance copied in; `./runtime`; decide `native-color-modes`                             | done   |
-| 8    | `tfs build`, `tfs check`, `tfs dev` (watch, last valid output, Workbench data)                                    |        |
+| 8    | `tfs build`, `tfs check`, `tfs dev` (watch, last valid output), `tfs fonts inspect`; knip in CI                   | done   |
+| 8b   | Workbench: reads the data file `tfs dev` serves; adapt the existing UI                                            |        |
 | 9    | Standard theme ported with unchanged values                                                                       |        |
 | 10   | Scatter upgrade to 0.5: separate agreed scope, values unchanged                                                   |        |
 | 11   | Capstone: Figma (chosen modes; shadows/text as styles)                                                            |        |
@@ -52,7 +53,6 @@ handled one axis only).
   across files; the stock pattern used by TanStack Router and similar libraries.
 - Release tooling (changesets) was removed with the old packages; the package is
   `private` until step 10 decides how 0.5 is published.
-- Check 3 (`knip`) is added at step 8, once the CLI makes exports reachable.
 
 ## Finish-line checks
 

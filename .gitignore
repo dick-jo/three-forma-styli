@@ -5,3 +5,4 @@ generated/
 *.tgz
 .env
 .DS_Store
+.tmp-*

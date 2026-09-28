@@ -22,7 +22,7 @@ type ShadowLayer = LayerShape & {
 type ShadowRange<Layer> = Readonly<Record<ShadowPosition, readonly [Layer, ...Layer[]]>>;
 
 /** Ordinary range unnamed at the top (--shd-*); named extras in `ranges` (--shd-{name}-*). */
-export type ShadowDraft = {
+type ShadowDraft = {
 	readonly unit: string;
 	readonly ranges?: Readonly<Record<string, ShadowRange<ShadowLayer>>>;
 	readonly modes?: ModeCatalogue<

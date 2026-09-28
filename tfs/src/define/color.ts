@@ -21,7 +21,7 @@ type AlphaValues = Readonly<Record<(typeof ALPHA_POSITIONS)[number], number>>;
 export type AlphaPosition = 'non' | (typeof ALPHA_POSITIONS)[number];
 
 /** Ordinary scale unnamed at the top (--a-*); named extras in `scales` (--a-{name}-*). */
-export type AlphaDraft = {
+type AlphaDraft = {
 	readonly values: AlphaValues;
 	readonly scales?: Readonly<Record<string, { readonly values: AlphaValues }>>;
 };
@@ -47,7 +47,7 @@ export function deriveAlphaScale(input: { distribution: 'linear'; min?: number; 
 
 type Polarity = (typeof POLARITIES)[number];
 
-export type ColorDraft<Tokens extends Record<string, Oklch>> = {
+type ColorDraft<Tokens extends Record<string, Oklch>> = {
 	readonly tokens: Tokens;
 	readonly polarity?: Polarity;
 	readonly groups?: Readonly<

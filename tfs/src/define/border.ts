@@ -1,7 +1,7 @@
 import type { ModeCatalogue } from './axes.js';
 import type { SpacingRangeDraft } from './spacing.js';
 
-export type BorderDraft = {
+type BorderDraft = {
 	readonly radius: SpacingRangeDraft;
 	readonly width: {
 		readonly unit: string;

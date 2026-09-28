@@ -30,7 +30,7 @@ export type ResolvedFontSize = {
 export type ResolvedRoleSizes = Readonly<Record<string, Readonly<Record<string, SizeRow>>>>;
 
 /** The value of a Font size position: `'min'` or n = start + step × (n − 1). */
-export function fontSizeValue(fontSize: ResolvedFontSize, ref: SpacingRef): number {
+function fontSizeValue(fontSize: ResolvedFontSize, ref: SpacingRef): number {
 	return ref === 'min' ? fontSize.min : fontSize.start + fontSize.step * (ref - 1);
 }
 

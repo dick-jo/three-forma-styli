@@ -6,7 +6,7 @@ type TimeScale = {
 };
 
 /** Ordinary scale unnamed at the top (--t-*); named extras in `scales` (--t-{name}-*). */
-export type TimeDraft = TimeScale & {
+type TimeDraft = TimeScale & {
 	readonly scales?: Readonly<Record<string, TimeScale>>;
 };
 

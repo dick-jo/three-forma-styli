@@ -20,11 +20,13 @@
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",
 		"typecheck": "tsc -p tsconfig.json",
-		"test": "vitest run"
+		"test": "vitest run",
+		"knip": "knip"
 	},
 	"devDependencies": {
 		"@types/fontkit": "2.0.9",
 		"@types/node": "^24.19.0",
+		"knip": "^5.88.1",
 		"playwright": "1.61.1",
 		"typescript": "^5.8.2",
 		"vitest": "^3.2.7"
@@ -34,6 +36,10 @@
 		"node": ">=24"
 	},
 	"dependencies": {
+		"esbuild": "^0.28.2",
 		"fontkit": "2.0.4"
+	},
+	"bin": {
+		"tfs": "./dist/cli.js"
 	}
 }

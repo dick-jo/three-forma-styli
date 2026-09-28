@@ -1,3 +1,4 @@
+import { defineConfig } from 'three-forma-styli';
 import { axes } from './axes.js';
 import { alpha, colors } from './color.js';
 import { spacing, gap } from './spacing.js';
@@ -14,8 +15,7 @@ declare module 'three-forma-styli' {
 	}
 }
 
-// Assembly. Output options are illustrative until runbook step 8.
-export default {
+export default defineConfig({
 	system: {
 		axes,
 		alpha,
@@ -34,4 +34,4 @@ export default {
 		colorThemes: { colors: ['bg', 'ev', 'ink', 'neu', 'pri', 'duo'] },
 	},
 	output: { directory: './generated' },
-};
+});

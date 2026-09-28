@@ -12,7 +12,7 @@ import type { Axes, ModeCatalogue, ModesCheck } from './axes.js';
 type FontSizeCalibration = { readonly min: number; readonly start: number; readonly step: number };
 
 /** --fs-min, then --fs-n = start + step × (n − 1) for n = 1…count. */
-export type FontSizeDraft = FontSizeCalibration & {
+type FontSizeDraft = FontSizeCalibration & {
 	readonly unit: string;
 	readonly count: number;
 	readonly modes?: ModeCatalogue<Partial<FontSizeCalibration & { readonly unit: string }>>;
@@ -25,7 +25,7 @@ export function defineFontSize<const T extends FontSizeDraft>(fontSize: T & Mode
 // ---- Fonts ----
 
 /** With `files`: TFS inspects, checks, prepares and loads. Name only: TFS writes the name. */
-export type FontsDraft = Record<
+type FontsDraft = Record<
 	string,
 	| {
 			readonly files: readonly string[];
