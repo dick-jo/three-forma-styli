@@ -31,7 +31,7 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 | 11   | Merge `v0.5-rebuild` to `master`; publish 0.5 to npm                                                              |        |
 | 12   | Figma, preliminary: sync the new project's tokens (chosen modes; shadows/text as styles)                          |        |
 | 13   | Scatter upgrade to 0.5: separate agreed scope, values unchanged                                                   |        |
-| 14   | Codebase tour and final review (finish-line checks)                                                               |        |
+| 14   | Codebase tour (finish-line checks already pass; see below)                                                        |        |
 
 ## Kept list
 
