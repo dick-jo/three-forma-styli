@@ -1,6 +1,6 @@
 # Typography workshop — first pass
 
-Status, 2026-09-28: **Font-size and ordinary-role mock ready for review**.
+Status, 2026-09-28: **atomic Font size ratified**; remaining role/style passes open.
 Milestone 1 only. The [Founder Board](../../founder-board.md#typography) owns the
 already ratified role grammar. This is the first focused example, not closure
 of the whole Typography family or implementation of the new Axis model.
@@ -22,12 +22,12 @@ The atomic scale can stand alone. Roles are the optional semantic layer: a
 role couples a font with a range of font size, weight, line height and letter
 spacing choices. Font size stays a reference into the atomic scale.
 
-## Atomic Font size: the proposal to review
+## Atomic Font size — ratified 2026-09-28
 
 Keep one linear scale and the established `--fs-min` plus `--fs-1…12` output.
 For authoring, use `start`, `step`, and `count` instead of the legacy numerical
-fields `base`, `increment`, and `range`. These field names are a **proposal**;
-the scale calculation is the existing one.
+fields `base`, `increment`, and `range`. The founder ratified these names,
+bounds and mode boundary on 2026-09-28; the scale calculation is the existing one.
 
 | Input   | Meaning                                       | Example    |
 | ------- | --------------------------------------------- | ---------- |
@@ -41,8 +41,13 @@ Font size needs an independent starting value because a useful text-size scale
 can begin at 12px while increasing by 2px. Both retain an independent `min`.
 There is no unsuffixed `--fs` or generated `--fs-max`.
 
-Proposed mode boundary mirrors the Spacing workshop: unit and count are shared;
-Size mode changes may adjust `min`, `start`, and/or `step`. Names stay stable.
+Mode boundary: `count` is shared, so names stay stable. Mode changes may adjust
+`min`, `start`, `step` and/or `unit`. Unit differs from Spacing's shared unit
+because Scatter's production `display` Font-size mode is a fixed-canvas px scale
+(`min 16 / start 24 / step 16`) beside rem modes. Each mode resolves to its own
+complete list and roles consume it through `var()`, so no cross-unit arithmetic
+arises. Spacing's ratified shared unit is unchanged. Migrating `display` onto the
+registered Size axis is runbook detail.
 Values must be finite, `0 < min < start`, `step > 0`, and count a positive integer.
 Keep the existing linear model; this example proposes no ratios, fluid scaling,
 breakpoints, or automatic mode selection.
@@ -124,9 +129,8 @@ project font file to inspect, so it honestly reports `verification: 'unavailable
 That does not certify the physical font's weights or features. The companion
 provides the prepared-font alternative for comparison.
 
-1. **Now:** settle the open atomic Font-size input proposal. The accepted workflow
-   resolves when actual fonts are inspected and how feedback reaches the author.
-2. **Next:** finish sparse role
+1. **Done, 2026-09-28:** atomic Font-size inputs, bounds and mode boundary ratified.
+2. **Now:** finish sparse role
    sizes, role-local weight ranges and size-specific weights;
    categorical variants and physical styles; prepared font facts and useful
    derivation helpers. Use focused cases, not one overloaded declaration.

@@ -514,6 +514,12 @@ review-example change only; migration of actual consumer names belongs to triage
 ### Typography
 
 - Atomic font size remains `--fs-min` plus `--fs-1…n`.
+- Ratified 2026-09-28: authoring inputs `unit / min / start / step / count`
+  replace `base / increment / range`; `--fs-n = start + step × (n − 1)`, the
+  existing linear calculation. Values finite, `0 < min < start`, `step > 0`,
+  positive integer `count`. `count` is shared across modes; a mode may change
+  `min`, `start`, `step` and `unit` (Scatter's fixed-canvas px `display` scale
+  requires a per-mode unit). No `--fs`, `--fs-max`, ratios, fluid or breakpoints.
 - Each role owns the fixed size range `min / s / base / l / max`.
 - `base` is required and unsuffixed. Sparse ranges are controlled: `s` requires
   `min`; `l` requires `max`.
@@ -527,9 +533,8 @@ review-example change only; migration of actual consumer names belongs to triage
 
 The [first Typography mock](./blueprints/typography/README.md), prepared
 2026-09-28, shows the atomic Font-size scale and one ordinary scalar-weight prose
-role. It proposes numerical inputs `start / step / count` and shared unit/count
-with `min/start/step` changes through the established Size axis. These refinements
-await founder review; existing role grammar remains ratified. Prepared fonts,
+role. Its atomic inputs were ratified on 2026-09-28 as recorded above; existing
+role grammar remains ratified. Prepared fonts,
 weight ranges, variants, genuine role mode changes, and full consumer review
 follow in focused passes. No production code is changed.
 
@@ -556,8 +561,8 @@ validator accepts normal/italic 400/700 and rejects 900 against the measured
 100–800 range. Earlier conversion, four fallback-face calculations and Chromium
 loading evidence is preserved separately as historical output. The revised
 blueprint is not yet accepted by the production compiler. The authoring workflow
-direction is accepted; the atomic input proposal, remaining role examples and
-final Typography review remain open.
+direction and atomic inputs are accepted; remaining role examples and final
+Typography review remain open.
 
 ### Spacing and borders
 

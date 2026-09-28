@@ -12,7 +12,8 @@ type Calibration = {
 export type FontSizeDraft<Axes extends AxisCatalogue> = Calibration & {
 	readonly unit: string;
 	readonly count: number;
-	readonly modes?: ModeCatalogue<Axes, Partial<Calibration>>;
+	// Count is shared so names stay stable; a mode may change unit (ratified 2026-09-28).
+	readonly modes?: ModeCatalogue<Axes, Partial<Calibration & { readonly unit: string }>>;
 };
 
 // Reuse the existing role grammar; this first pass has no role mode changes.

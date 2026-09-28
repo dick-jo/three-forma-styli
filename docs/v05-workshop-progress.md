@@ -125,6 +125,11 @@ separately agreed architecture and runbook milestone.
   This settles the product direction, not the exact command or implementation.
   Return to Typography: settle the atomic size input proposal, then review the
   remaining role/style cases and consumer experience before domain closure.
+- **Atomic Font size ratified, 2026-09-28:** `unit / min / start / step / count`,
+  `--fs-n = start + step × (n − 1)`, bounds `0 < min < start`, `step > 0`,
+  positive integer count. Count shared; modes may change min/start/step/unit
+  (Scatter's px `display` scale). Next: scalar weight with multiple styles,
+  sparse/size-specific weights, then variants, role modes and consumption.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -145,7 +150,7 @@ domain retaining its own readiness verdict.
 | 2     | Color and Alpha                           | Blueprint complete; implementation remains later                 | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                        |
 | 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                       | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                    |
 | 4     | Time and Easing                           | Blueprint and representative mocks complete                      | Carry named Time scales, directly authored Easings, and accepted output/consumption into the later runbook. Motion composites remain deferred.                                                                                 |
-| 5     | Typography                                | Authoring-session direction accepted; domain review remains open | First settle atomic scale inputs, then review remaining weight/style cases, variants, role mode changes and complete consumer usage. Carry real fonts through that mock. Licensing is excluded.                                |
+| 5     | Typography                                | Atomic Font size ratified; role/style review remains open        | First settle atomic scale inputs, then review remaining weight/style cases, variants, role mode changes and complete consumer usage. Carry real fonts through that mock. Licensing is excluded.                                |
 | 6     | One assembled design system               | Pending the preceding reviews                                    | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases. |
 
 The Axes/Modes example should stay grounded in Color and Spacing. Its purpose is
