@@ -19,6 +19,7 @@
 		"test": "vitest run"
 	},
 	"devDependencies": {
+		"playwright": "1.61.1",
 		"typescript": "^5.8.2",
 		"vitest": "^3.2.7"
 	},

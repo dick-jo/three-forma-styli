@@ -26,3 +26,4 @@ export {
 	type ResolvedSystem,
 	type SystemInput,
 } from './resolve/index.js';
+export { emitTokensCss } from './emit/css.js';

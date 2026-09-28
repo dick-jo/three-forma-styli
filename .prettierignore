@@ -3,3 +3,4 @@
 **/generated/
 node_modules/
 pnpm-lock.yaml
+tfs/tests/fixtures/*/expected/

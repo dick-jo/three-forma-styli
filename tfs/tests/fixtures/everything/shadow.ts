@@ -19,6 +19,18 @@ export const shadows = defineShadows({
 		{ x: 0, y: 20, blur: 48, spread: -8, color: { color: 'shd', alpha: 'lo' } },
 	],
 
+	// Small screens get a tighter max; its colour still follows the theme.
+	modes: {
+		size: {
+			s: {
+				max: [
+					{ x: 0, y: 2, blur: 4, color: { color: 'shd', alpha: 'lo' } },
+					{ x: 0, y: 12, blur: 32, spread: -6, color: { color: 'shd', alpha: 'lo' } },
+				],
+			},
+		},
+	},
+
 	// Named extras: --shd-glow-pri-*, --shd-glow-duo-*.
 	ranges: {
 		...shadowsForColors({
