@@ -1,7 +1,6 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -10,12 +9,10 @@ import {
 	TfsError,
 	writeFontAssets,
 	type PreparedFonts,
-	type SystemInput,
 } from 'three-forma-styli';
-import config from './fixtures/everything/tfs.config.js';
+import { project, system } from './everything.js';
 
-const project = fileURLToPath(new URL('./fixtures/everything/', import.meta.url));
-const typography = structuredClone((config.system as unknown as SystemInput).typography!);
+const typography = structuredClone(system.typography!);
 const regular = join(project, 'fonts/JetBrainsMono[wght].ttf');
 
 describe('inspection', () => {

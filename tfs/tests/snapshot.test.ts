@@ -1,9 +1,25 @@
 import { expect, it } from 'vitest';
-import { emitTokensCss, resolveSystem, type SystemInput } from 'three-forma-styli';
-import config from './fixtures/everything/tfs.config.js';
+import {
+	emitTokensCss,
+	emitTypographyCss,
+	emitTypographyJs,
+	emitTypographyModuleCss,
+	emitTypographyModuleTypes,
+	emitTypographyTypes,
+} from 'three-forma-styli';
+import { fonts, resolved } from './everything.js';
 
 // The full generated output, committed so every change to it is a readable diff.
-it('tokens.css', async () => {
-	const css = emitTokensCss(resolveSystem(config.system as unknown as SystemInput));
-	await expect(css).toMatchFileSnapshot('./fixtures/everything/expected/tokens.css');
+const outputs = {
+	'tokens.css': emitTokensCss(resolved, fonts.stacks),
+	'fonts.css': fonts.css,
+	'typography.css': emitTypographyCss(resolved),
+	'typography.module.css': emitTypographyModuleCss(resolved),
+	'typography.module.css.d.ts': emitTypographyModuleTypes(resolved),
+	'typography.js': emitTypographyJs(resolved),
+	'typography.d.ts': emitTypographyTypes(resolved),
+};
+
+it.each(Object.entries(outputs))('%s', async (file, content) => {
+	await expect(content).toMatchFileSnapshot(`./fixtures/everything/expected/${file}`);
 });

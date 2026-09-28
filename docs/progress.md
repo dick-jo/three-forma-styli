@@ -21,7 +21,7 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 | 2    | Delete old packages/scripts; single-package skeleton; `define*()` + types; everything-project fixture type-checks | done   |
 | 3    | Checks and mode resolution for every family                                                                       | done   |
 | 4    | `tokens.css` with mode blocks and re-binding, verified in a browser                                               | done   |
-| 5    | Typography: classes, whole-row tokens, `./typography`; fonts copied in (no licensing)                             |        |
+| 5    | Typography: classes, whole-row tokens, `./typography`; fonts copied in (no licensing)                             | done   |
 | 6    | `./tokens`: identity names, exact group types, `var()` helpers                                                    |        |
 | 7    | Runtime colour themes + luminance copied in; `./runtime`; decide `native-color-modes`                             |        |
 | 8    | `tfs build`, `tfs check`, `tfs dev` (watch, last valid output, Workbench data)                                    |        |

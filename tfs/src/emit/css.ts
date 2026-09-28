@@ -1,5 +1,5 @@
 import type { ResolvedSystem } from '../resolve/index.js';
-import { tokensFor, type Token } from './tokens.js';
+import { tokensFor, type FontStacks, type Token } from './tokens.js';
 
 type Values = ReadonlyMap<string, string>;
 
@@ -32,13 +32,13 @@ function modeSelector(attribute: string, mode: string): string {
  * ancestor's mode through one level of re-nesting on the same axis
  * (small → regular → light); deeper same-axis re-nesting is not supported.
  */
-export function emitTokensCss(resolved: ResolvedSystem): string {
-	const ordinaryTokens = tokensFor(resolved, resolved.ordinary);
+export function emitTokensCss(resolved: ResolvedSystem, stacks: FontStacks = {}): string {
+	const ordinaryTokens = tokensFor(resolved, resolved.ordinary, stacks);
 	const names = ordinaryTokens.map((token) => token.name);
 	const ordinary = toMap(ordinaryTokens);
 	const modes = resolved.modes.map((mode) => ({
 		...mode,
-		tokens: toMap(tokensFor(resolved, mode.values)),
+		tokens: toMap(tokensFor(resolved, mode.values, stacks)),
 	}));
 	const axes = [...new Set(modes.map((mode) => mode.axis))];
 

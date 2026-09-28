@@ -34,3 +34,10 @@ export {
 	type FontFace,
 	type PreparedFonts,
 } from './fonts/index.js';
+export {
+	emitTypographyCss,
+	emitTypographyJs,
+	emitTypographyModuleCss,
+	emitTypographyModuleTypes,
+	emitTypographyTypes,
+} from './emit/typography.js';

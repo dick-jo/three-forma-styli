@@ -1,10 +1,11 @@
 import { chromium, type Browser, type Page } from 'playwright';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { emitTokensCss, resolveSystem, type SystemInput } from 'three-forma-styli';
-import config from './fixtures/everything/tfs.config.js';
+import { emitTokensCss, emitTypographyCss } from 'three-forma-styli';
+import { fonts, resolved } from './everything.js';
+import { typographyClassName } from './fixtures/everything/expected/typography.js';
 
-// Real-browser proof that tokens.css resolves correctly in nested and combined modes.
-const css = emitTokensCss(resolveSystem(config.system as unknown as SystemInput));
+// Real-browser proof that the generated CSS resolves correctly in nested and combined modes.
+const css = emitTokensCss(resolved, fonts.stacks) + emitTypographyCss(resolved);
 
 const page = `
 <style>${css}</style>
@@ -18,6 +19,10 @@ const page = `
 	<div data-theme-mode="dark"><div id="light-dark"></div></div>
 </div>
 <div data-theme-mode="light" data-size-mode="s"><div id="both"></div></div>
+<p id="label" class="${typographyClassName({ role: 'label', size: 's' })}">x</p>
+<p id="label-choice" class="${typographyClassName({ role: 'label', size: 's', fontStyle: 'italic', weight: 'max' })}">x</p>
+<div data-size-mode="s"><p id="label-small" class="${typographyClassName({ role: 'label', size: 's' })}">x</p></div>
+<p id="whole-row" style="font: var(--text-label-s)">x</p>
 <div data-size-mode="s"><div data-size-mode="regular"><div data-theme-mode="light"><div id="s-regular-light"></div></div></div></div>
 <div data-size-mode="regular"><div data-size-mode="s"><div data-theme-mode="light"><div id="regular-s-light"></div></div></div></div>
 <div data-size-mode="s"><div data-size-mode="regular"><div data-theme-mode="light" data-size-mode="s"><div id="s-regular-both"></div></div></div></div>
@@ -36,6 +41,20 @@ const read = (id: string, name: string) =>
 		(element, property) => getComputedStyle(element).getPropertyValue(property).trim(),
 		`--${name}`
 	);
+
+const style = (id: string) =>
+	tab.$eval(`#${id}`, (element) => {
+		const s = getComputedStyle(element);
+		return {
+			fontSize: s.fontSize,
+			fontWeight: s.fontWeight,
+			fontStyle: s.fontStyle,
+			lineHeight: s.lineHeight,
+			letterSpacing: s.letterSpacing,
+			textTransform: s.textTransform,
+			fontFamily: s.fontFamily,
+		};
+	});
 
 beforeAll(async () => {
 	browser = await chromium.launch();
@@ -79,6 +98,39 @@ describe('tokens.css in a browser', () => {
 		expect(await read('s-regular-light', 'shd-max')).toBe(ORDINARY_MAX(LIGHT_SHD));
 		expect(await read('regular-s-light', 'shd-max')).toBe(SMALL_MAX(LIGHT_SHD));
 		expect(await read('s-regular-both', 'shd-max')).toBe(SMALL_MAX(LIGHT_SHD));
+	});
+
+	it('a typography class applies the whole size row', async () => {
+		expect(await style('label')).toEqual({
+			fontSize: '12px',
+			fontWeight: '500',
+			fontStyle: 'normal',
+			lineHeight: '15px',
+			letterSpacing: '0.18px',
+			textTransform: 'uppercase',
+			fontFamily: fonts.stacks.mono,
+		});
+	});
+
+	it('style and weight classes override the row', async () => {
+		expect(await style('label-choice')).toMatchObject({
+			fontWeight: '700',
+			fontStyle: 'italic',
+			fontSize: '12px',
+		});
+	});
+
+	it('typography follows size modes', async () => {
+		expect(await style('label-small')).toMatchObject({ fontSize: '11px' });
+	});
+
+	it('the whole-row token sets family, size, weight and line height in one', async () => {
+		expect(await style('whole-row')).toMatchObject({
+			fontSize: '12px',
+			fontWeight: '500',
+			lineHeight: '15px',
+			fontFamily: fonts.stacks.mono,
+		});
 	});
 
 	it('font sizes follow size', async () => {

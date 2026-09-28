@@ -5,6 +5,10 @@ import { TfsError } from '../resolve/issues.js';
 import { SHADOW_POSITIONS } from '../resolve/shadow.js';
 import { RANGE_POSITIONS } from '../resolve/spacing.js';
 import { cssVar, length, num } from './format.js';
+import { rowName, rowsInOrder } from './names.js';
+
+/** CSS font-family value for each declared font, from prepareFonts(). */
+export type FontStacks = Readonly<Record<string, string>>;
 
 /** One CSS custom property: name without the leading `--`, and its CSS value. */
 export type Token = { readonly name: string; readonly value: string };
@@ -57,7 +61,11 @@ function easingCss(easing: Easing): string {
 }
 
 /** Every token for one resolved selection, in a stable reading order. */
-export function tokensFor(resolved: ResolvedSystem, values: ModalValues): Token[] {
+export function tokensFor(
+	resolved: ResolvedSystem,
+	values: ModalValues,
+	stacks: FontStacks = {}
+): Token[] {
 	const { input } = resolved;
 	const tokens: Token[] = [];
 	const add = (name: string, value: string) => tokens.push({ name, value });
@@ -117,6 +125,39 @@ export function tokensFor(resolved: ResolvedSystem, values: ModalValues): Token[
 		const { unit, count, min, start, step } = values.fontSize;
 		add('fs-min', length(min, unit));
 		for (let n = 1; n <= count; n++) add(`fs-${n}`, length(start + step * (n - 1), unit));
+	}
+
+	if (input.typography && values.roleSizes) {
+		for (const [role, definition] of Object.entries(input.typography.roles)) {
+			const stack = stacks[definition.font];
+			if (stack === undefined)
+				throw new Error(`No font-family stack for "${definition.font}"; prepare fonts first.`);
+			const prefix = `text-${role}`;
+			add(`${prefix}-font-family`, stack);
+			if (typeof definition.weights !== 'number') {
+				for (const [name, weight] of Object.entries(definition.weights))
+					add(`${prefix}-font-weight-${name}`, String(weight));
+			}
+			if (definition.textTransform) add(`${prefix}-text-transform`, definition.textTransform);
+			for (const [size, row] of rowsInOrder(values.roleSizes[role]!)) {
+				const name = `text-${rowName(role, size)}`;
+				const weight =
+					typeof definition.weights === 'number'
+						? String(definition.weights)
+						: cssVar(`${prefix}-font-weight-${row.weight}`);
+				add(`${name}-font-size`, cssVar(row.fontSize === 'min' ? 'fs-min' : `fs-${row.fontSize}`));
+				add(`${name}-font-weight`, weight);
+				add(`${name}-line-height`, num(row.lineHeight));
+				add(
+					`${name}-letter-spacing`,
+					row.letterSpacing === 0 ? '0' : `${num(row.letterSpacing)}em`
+				);
+				add(
+					name,
+					`normal ${cssVar(`${name}-font-weight`)} ${cssVar(`${name}-font-size`)}/${cssVar(`${name}-line-height`)} ${cssVar(`${prefix}-font-family`)}`
+				);
+			}
+		}
 	}
 
 	const seen = new Set<string>();
