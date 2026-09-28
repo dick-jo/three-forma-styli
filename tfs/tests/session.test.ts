@@ -144,10 +144,11 @@ describe('the standard theme', () => {
 		);
 	});
 
-	it('tfs init copies it into an empty folder, and refuses a non-empty one', async () => {
+	it('tfs init adds it to a new project, and refuses one that already has files', async () => {
 		const { initProject } = await import('../src/session/init.js');
-		const target = join(await mkdtemp(join(tmpdir(), 'tfs-init-')), 'my-system');
+		const target = await mkdtemp(join(tmpdir(), 'tfs-init-'));
 		temporary.push(target);
+		await writeFile(join(target, 'package.json'), '{}');
 		expect(await initProject(target)).toEqual([
 			'axes.ts',
 			'border.ts',
@@ -160,6 +161,6 @@ describe('the standard theme', () => {
 			'tsconfig.json',
 			'typography.ts',
 		]);
-		await expect(initProject(target)).rejects.toThrow('is not empty');
+		await expect(initProject(target)).rejects.toThrow('already has files (axes.ts');
 	});
 });

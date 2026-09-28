@@ -10,10 +10,10 @@ exact TypeScript types for your app.
 ## Try it
 
 ```sh
-node tfs/dist/cli.js init ~/my-system        # after: pnpm install && pnpm build
-cd ~/my-system && pnpm init
-pnpm add -D ~/project-local/three-forma-styli/tfs typescript
-pnpm tfs dev                                 # builds generated/, opens Workbench, rebuilds on save
+mkdir my-system && cd my-system && pnpm init
+pnpm add -D ~/project-local/three-forma-styli/tfs typescript   # once published: pnpm add -D three-forma-styli
+pnpm tfs init                                                  # adds the standard theme's files
+pnpm tfs dev                                                   # builds generated/, serves Workbench, rebuilds on save
 ```
 
 `tfs build` writes `generated/`; `tfs check` fails CI when it is stale;
