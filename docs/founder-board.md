@@ -511,20 +511,21 @@ own license and third-party notices are separate from this feature removal.
 The mock follows this ruling now. Production removal and existing-consumer
 migration belong to the agreed architecture/runbook and implementation milestones.
 
-The [real-font companion](./blueprints/typography/real-fonts/README.md), revised
-2026-09-28, now starts with the complete authoring sequence: obtain source files,
-optionally inspect them, write `fonts.ts` and role choices, then explicitly run
-the project build. `fonts.ts` is authored input, not generated inspection output.
-TypeScript checks declaration shapes and font identities; file inspection and
-role validation check physical capabilities when a command executes. No editor
-discovery or numeric-range checking is implied by a source-path string.
+The [real-font companion](./blueprints/typography/real-fonts/README.md) follows the
+ongoing authoring-session workflow accepted below on 2026-09-28. `fonts.ts` is
+authored input, not generated inspection output. Supplying source paths lets
+the running session inspect and display capabilities before roles are complete.
+TypeScript checks declaration shapes and font identities; the running TFS
+process checks physical capabilities and role choices after saves. No editor
+numeric-range checking is implied by a source-path string.
 
 The current probe reads the real files and verifies the existing capability
 validator accepts normal/italic 400/700 and rejects 900 against the measured
 100–800 range. Earlier conversion, four fallback-face calculations and Chromium
 loading evidence is preserved separately as historical output. The revised
-blueprint is not yet accepted by the production compiler. The full font workflow
-and atomic input proposals await review; wider role cases remain later work.
+blueprint is not yet accepted by the production compiler. The authoring workflow
+direction is accepted; the atomic input proposal, remaining role examples and
+final Typography review remain open.
 
 ### Spacing and borders
 
@@ -708,13 +709,42 @@ Ratified on 2026-09-09:
 
 ## Workflow contract
 
-| Command                    | Purpose                                           | Expected environment         |
-| -------------------------- | ------------------------------------------------- | ---------------------------- |
-| `tfs build`                | deterministic compile/generate                    | explicit authoring operation |
-| `tfs check`                | reject drift in committed output                  | ordinary CI, no writes       |
-| `tfs review serve`         | local visual and diagnostic review                | author workstation           |
-| repository `check`         | format, build, unit/type, package-boundary checks | every PR                     |
-| repository `check:release` | packed packages + ecosystem fixtures              | release gate                 |
+**Ongoing authoring session accepted, 2026-09-28.** This is the intended product
+experience, not a claim that the current commands already implement it:
+
+1. The author creates a project of readable TypeScript domain files and one
+   assembly/configuration file.
+2. The author starts TFS once. A continuing development session opens the
+   Workbench and observes changes to declarations and referenced font files.
+3. Saving changes automatically checks them, updates the preview, and writes
+   valid generated output for the consuming application. An invalid change
+   reports the problem and retains the last valid output.
+4. Adding font source paths displays inspected family/style/weight capabilities
+   before Typography roles are complete. Authors need not finish a valid whole
+   system or manually run a build merely to discover what a font supports.
+5. TypeScript supplies structural/name feedback while editing. TFS supplies
+   file-dependent and calculated checks during the running session, on save.
+6. The explicit final build repeats the checks and produces dependable output.
+   Applications consume generated CSS/TypeScript; ordinary application
+   typechecking does not run font preparation.
+
+This supersedes manual edit/build/error/retry as the primary authoring flow.
+Standalone inspection remains useful but optional. Font preparation and fallback
+calculation stay inside TFS's workflow; manual manifest or percentage copying
+is not required. The exact development command, handling of incomplete edits,
+update strategy and integration with existing review commands belong to later
+architecture/runbook work. Do not add or promise a separately ratified `tfs dev`
+command solely from this acceptance.
+
+Existing command responsibilities:
+
+| Command                    | Purpose                                           | Expected environment      |
+| -------------------------- | ------------------------------------------------- | ------------------------- |
+| `tfs build`                | deterministic compile/generate                    | final output / automation |
+| `tfs check`                | reject drift in committed output                  | ordinary CI, no writes    |
+| `tfs review serve`         | local visual and diagnostic review                | author workstation        |
+| repository `check`         | format, build, unit/type, package-boundary checks | every PR                  |
+| repository `check:release` | packed packages + ecosystem fixtures              | release gate              |
 
 FontTools belongs to generation and dedicated generated-drift verification, not
 every application typecheck. Next.js and Svelte fixtures are release evidence,

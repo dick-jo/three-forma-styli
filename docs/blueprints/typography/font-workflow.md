@@ -11,7 +11,10 @@ author writes each file and runs inspection/build commands. The founder has
 excluded licensing machinery from TFS; the revised input reflects that ruling.
 Current checks verify source inspection and physical weight validation. Earlier
 preparation/browser evidence is preserved separately, not claimed as a current
-build of the revised input. The workflow recommendation still awaits review.
+build of the revised input. The founder subsequently accepted a continuing
+authoring session with automatic checks, preview and output updates on save.
+The current [Founder Board](../../founder-board.md#workflow-contract) owns that
+direction; manual build/retry is no longer the primary authoring recommendation.
 
 ## Names and responsibilities
 
@@ -71,17 +74,19 @@ its output. Current automatic profiles cover sans/mono normal/italic with a
 Latin calibration sample. Other fonts/platforms and exact text wrapping are not
 universally covered. See [the existing fallback contract](../../typography-fallback-metrics.md).
 
-## Recommendation for the next mock — not yet ratified
+## Earlier recommendation and current direction
 
-Keep preparation and role authoring separate responsibilities within one project
-build workflow. Declare sources once; roles select the authored font identity.
+Keep preparation and role authoring separate responsibilities within the shared
+TFS workflow. Declare sources once; roles select the authored font identity.
 The compiler supplies measured facts and generated CSS. Authors should not copy
 font names, capability lists or fallback percentages between tools and files.
 Keep a route for system or externally managed fonts without requiring preparation,
 and distinguish their unavailable physical verification honestly.
 
-The next representative mock should show one real family from source declaration
-through role reference to prepared files, primary/fallback CSS and diagnostics.
+The companion shows one real family from source declaration through role
+reference, with inspection/validation checks and historical prepared output.
+The accepted continuing session must make capabilities visible as soon as source
+paths are supplied, before roles are complete; implementation is later work.
 Demonstrate normal and italic, an available and unavailable weight, and the
 existing externally managed/system-font boundary. Show the complete author input
 before deciding which existing configuration is necessary or merely cumbersome.

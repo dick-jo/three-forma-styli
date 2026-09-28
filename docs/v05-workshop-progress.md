@@ -105,8 +105,19 @@ separately agreed architecture and runbook milestone.
   validates chosen weights. The source-inspection probe accepts 400/700 in
   normal/italic and rejects 900 against the measured 100–800 range. Earlier
   conversion/fallback/browser results are preserved as historical evidence,
-  not represented as output from the revised input. Workflow review remains
-  open. Scalar weight with additional styles still needs its focused pass.
+  not represented as output from the revised input. This manual build loop was
+  subsequently superseded as the primary authoring experience by the accepted
+  continuing session below. Scalar weight with additional styles still needs
+  its focused pass.
+- **Authoring workflow accepted, 2026-09-28:** create the TS project, start one
+  continuing TFS/Workbench session, edit and save, receive automatic checks and
+  updated preview/generated output, then run the final build. Invalid edits
+  preserve the previous valid output. Referenced fonts are inspected and their
+  capabilities displayed before roles are complete. TypeScript checks shapes
+  and names; the running TFS process checks file facts and calculated values.
+  This settles the product direction, not the exact command or implementation.
+  Return to Typography: settle the atomic size input proposal, then review the
+  remaining role/style cases and consumer experience before domain closure.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -121,14 +132,14 @@ The founder has asked to proceed with this workshop order. It is not an
 implementation runbook. Related domains can be reviewed together, with each
 domain retaining its own readiness verdict.
 
-| Order | Workshop                                  | Current readiness                                                   | What the review should establish                                                                                                                                                                                               |
-| ----- | ----------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated    | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                             |
-| 2     | Color and Alpha                           | Blueprint complete; implementation remains later                    | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                        |
-| 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                          | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                    |
-| 4     | Time and Easing                           | Blueprint and representative mocks complete                         | Carry named Time scales, directly authored Easings, and accepted output/consumption into the later runbook. Motion composites remain deferred.                                                                                 |
-| 5     | Typography                                | Real-font workflow revised after founder correction; review pending | Review the explicit inspect/author/build loop and scale inputs, then remaining weight/style cases, variants, role mode changes and complete consumer surface. Licensing is excluded.                                           |
-| 6     | One assembled design system               | Pending the preceding reviews                                       | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases. |
+| Order | Workshop                                  | Current readiness                                                | What the review should establish                                                                                                                                                                                               |
+| ----- | ----------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                             |
+| 2     | Color and Alpha                           | Blueprint complete; implementation remains later                 | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                        |
+| 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                       | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                    |
+| 4     | Time and Easing                           | Blueprint and representative mocks complete                      | Carry named Time scales, directly authored Easings, and accepted output/consumption into the later runbook. Motion composites remain deferred.                                                                                 |
+| 5     | Typography                                | Authoring-session direction accepted; domain review remains open | First settle atomic scale inputs, then review remaining weight/style cases, variants, role mode changes and complete consumer usage. Carry real fonts through that mock. Licensing is excluded.                                |
+| 6     | One assembled design system               | Pending the preceding reviews                                    | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases. |
 
 The Axes/Modes example should stay grounded in Color and Spacing. Its purpose is
 to settle their shared authoring pattern before other mocks need it. Shadow can
@@ -197,7 +208,8 @@ before the runbook is agreed.
 - [x] Blueprint: Color + Alpha, Groups, polarity, and optional constraint/runtime contracts.
 - [x] Blueprint: Spacing + Gap + Border radius/width, independent minimum and combined border.ts.
 - [x] Blueprint: Time + Easing representative mocks; named scales retained.
-- [ ] Blueprint, now: Typography actual-font/preparation flow; scale proposal and wider role cases remain.
+- [x] Blueprint: ongoing TFS/Workbench authoring session and automatic feedback on save.
+- [ ] Blueprint, now: Typography scale proposal, remaining role/style cases and complete consumption.
 - [ ] Blueprint: assembled-system and CSS/TS/Figma scope review.
 - [ ] Architecture, hygiene, consumer migration triage, and agreed runbook.
 - [ ] Implementation increments, verification, and final review.

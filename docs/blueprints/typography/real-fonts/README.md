@@ -1,6 +1,6 @@
 # Real fonts: authoring, inspection and building
 
-Status, 2026-09-28: **revised blueprint, awaiting workflow review**. Licensing is
+Status, 2026-09-28: **ongoing authoring-session direction accepted**. Licensing is
 outside TFS's scope by founder ruling. The mock has no licensing declarations or
 permission steps. Existing production machinery still needs removal in the later
 implementation milestone; this is not a claim that the revised input builds today.
@@ -20,12 +20,13 @@ my-design-system/
   font-size.ts      ← authored: the atomic size scale
   axes.ts           ← authored: the shared axes
   tfs.config.ts     ← authored: imports these declarations and configures output
-  generated/        ← written by an explicit build
+  generated/        ← valid session updates and final build output
 ```
 
 The directory name is illustrative. Source paths resolve relative to the project
 configuration directory, not the location of an imported `fonts.ts` file.
-Nothing reads the fonts merely because you type a path into TypeScript.
+TypeScript itself does not read font binaries. The running TFS session does so
+when you save their source paths; its implementation remains later work.
 
 ## The complete authoring loop
 
@@ -34,9 +35,20 @@ Nothing reads the fonts merely because you type a path into TypeScript.
 Supply the normal and italic files you intend to use. TFS does not download fonts.
 Existing preparation can convert TTF/OTF to WOFF2, or copy web-ready WOFF/WOFF2.
 
-### 2. Inspect them if you need to learn what they offer
+### 2. Start one continuing authoring session
 
-From the project directory, this existing command reads the actual binaries:
+Start TFS once and leave it running while editing. The intended session opens
+the Workbench, observes your declarations and source files, and automatically
+checks saved changes. The exact command is an architecture decision, not a new
+CLI name ratified by this mock.
+
+When you supply the source paths in step 3, the session displays font capabilities
+before your roles are complete. A valid whole design system is not a prerequisite
+for learning what the files offer. This automatic experience is not implemented
+by the current probe.
+
+Standalone inspection is also available today without any configuration. From
+the project directory, this existing command reads the actual binaries:
 
 ```sh
 tfs fonts inspect \
@@ -61,7 +73,7 @@ JetBrains Mono Italic
 Here `default 400` is a fact stored in the variable font, not a TFS role default.
 This command is optional, read-only, and works before any TFS config exists.
 It does not create `fonts.ts`, prepare web assets or require copying a report
-into the declarations. If you already know your fonts, begin with step 3.
+into the declarations. It is not an extra required step in the ongoing session.
 
 ### 3. Write the font declaration and role choices
 
@@ -105,19 +117,16 @@ The physical files offer **100–800**. This role offers **400 and 700**. You do
 not repeat the physical range in `fonts.ts`: that would create a second claim
 which could disagree with the file, especially after replacing it.
 
-### 4. Run the project build
+### 4. Save, review and continue editing
 
-The recommended workflow uses the existing command:
+On save, the running session reads the changed declarations/files and checks
+role selections against the inspected facts. Valid changes update the preview
+and generated CSS/TypeScript used by the application. Invalid changes report
+the problem and retain the last valid output. Changing a font file triggers
+fresh inspection; an earlier report is not the authority for a replacement file.
 
-```sh
-tfs build .
-```
-
-That is the point at which TFS executes the authored project configuration,
-reads the referenced files, obtains their family/style/range facts, and checks
-role selections against those facts. It prepares web assets, calculates
-supported adjusted fallbacks, and emits the configured CSS, TypeScript and
-inspection evidence. Failed validation must not publish replacement output.
+Preparation and supported adjusted-fallback calculation belong inside this
+workflow. Authors should not manually run a build to discover each mistake.
 
 No separate preparation command, generated-file import or manual Fontpie
 percentage transfer is required in the golden flow. FontTools remains a build
@@ -130,21 +139,27 @@ proposal and removal of production licensing gates still need implementation.
 The final output configuration belongs to the assembled-system review. Existing
 project builds already connect font preparation and role validation internally.
 
-### 5. Edit and rebuild
+### 5. Produce the finished output
 
-After changing a role or replacing a source file, rerun `tfs build .`. The next
-build reads the current files and validates the current choices. A previous
-inspection result does not authorize or supply the next build's capabilities.
-The consuming application uses generated output; its ordinary typecheck does
-not run font preparation.
+The explicit build repeats the checks and generates the final artifacts:
+
+```sh
+tfs build .
+```
+
+This also works without an interactive authoring session, including in automation.
+The consuming application uses generated output; its ordinary typecheck does not
+run font preparation. Existing project builds perform file-based validation;
+the accepted continuous feedback experience still requires implementation.
 
 ## What catches an invalid weight?
 
-| Stage                      | What it knows                                   | Result for `max: 900` with these files                                    |
-| -------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
-| TypeScript while authoring | Declaration shape and available font identities | A number is allowed; it cannot infer a binary's range from a path string. |
-| Optional `fonts inspect`   | Physical facts from the supplied files          | Displays 100–800; does not inspect role declarations.                     |
-| Project build              | Both the current files and authored roles       | Rejects 900 before publishing output.                                     |
+| Stage                                          | What it knows                                         | Result for `max: 900` with these files                                    |
+| ---------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------- |
+| TypeScript while authoring                     | Declaration shape and available font identities       | A number is allowed; it cannot infer a binary's range from a path string. |
+| Optional `fonts inspect`                       | Physical facts from the supplied files                | Displays 100–800; does not inspect role declarations.                     |
+| Running authoring session (accepted direction) | Current files and authored roles, updated after saves | Reports 900 automatically and retains the last valid output.              |
+| Explicit final build                           | Both the current files and authored roles             | Rejects 900 before publishing output.                                     |
 
 The existing validator's actual diagnostic is:
 
@@ -154,8 +169,9 @@ Typography role "code" style "normal" weight "max" (900) is unavailable in font 
 
 The review probe checks 400/700 in both styles and this failure using inspected
 facts, not a manually declared 100–800 capability. A static face would supply
-its individual weight, not an invented continuous range. No automatic editor
-inspection, generated capability types, or background watcher is claimed here.
+its individual weight, not an invented continuous range. The accepted session
+does not imply TypeScript numeric-range inference or generated capability types.
+The probe proves inspection/validation only, not the continuing session.
 
 ## Verification and previous preparation evidence
 
@@ -189,7 +205,7 @@ no source files are supplied, with physical verification explicitly unavailable.
 
 ## Still to review
 
-Review this authoring/build loop first. Then finish the atomic `start/step/count`
-decision and wider role cases: scalar weights with additional styles,
+The authoring-session direction is accepted. Next finish the atomic
+`start/step/count` decision and wider role cases: scalar weights with additional styles,
 size-specific weights, variants, mode changes, and CSS/TypeScript consumption.
 The numbers in these mocks remain illustrative design choices.
