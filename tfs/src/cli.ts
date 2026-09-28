@@ -46,7 +46,7 @@ async function main(argv: string[]): Promise<number> {
 				`  ${run} tfs dev      live session: builds ${here ? '' : `${folder}/`}generated/, serves Workbench`,
 				...(here
 					? []
-					: ['', 'In your app, import once:', `  import './${folder}/generated/styles.css';`]),
+					: ['', `Your app imports ${folder}/generated/styles.css once, from its entry file.`]),
 			].join('\n')
 		);
 		return 0;

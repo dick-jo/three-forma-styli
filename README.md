@@ -9,11 +9,25 @@ exact TypeScript types for your app.
 
 ## Try it
 
+A design system is one folder: config, family files, fonts, and `generated/`.
+
+**Inside an existing app** (npm shown; pnpm/yarn work the same):
+
+```sh
+npm install -D ~/project-local/three-forma-styli/tfs   # once published: npm install -D three-forma-styli
+npx tfs init        # creates ./design-system/
+npx tfs dev         # finds ./design-system; builds its generated/, serves Workbench
+```
+
+The app imports `design-system/generated/styles.css` once, from its entry file.
+
+**As its own project** (a system shared by several apps):
+
 ```sh
 mkdir my-system && cd my-system && pnpm init
-pnpm add -D ~/project-local/three-forma-styli/tfs typescript   # once published: pnpm add -D three-forma-styli
-pnpm tfs init                                                  # adds the standard theme's files
-pnpm tfs dev                                                   # builds generated/, serves Workbench, rebuilds on save
+pnpm add -D ~/project-local/three-forma-styli/tfs typescript
+pnpm tfs init .     # this folder is the design system
+pnpm tfs dev
 ```
 
 `tfs build` writes `generated/`; `tfs check` fails CI when it is stale;
