@@ -65,7 +65,7 @@ export const typography = defineTypography({
 			},
 		},
 		caption: {
-			font: 'supreme',
+			font: 'system',
 			weights: 400,
 			sizes: {
 				base: { fontSize: 1, lineHeight: 1.3, letterSpacing: 0 },

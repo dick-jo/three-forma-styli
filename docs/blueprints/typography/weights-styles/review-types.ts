@@ -82,10 +82,24 @@ type CheckRoles<Roles, FontName> = {
 		RoleModes<Roles[R]>;
 };
 
-export type FontsDraft = Record<
-	string,
-	{ readonly sources: readonly string[]; readonly category: 'sans' | 'serif' | 'mono' }
->;
+type Category = 'sans' | 'serif' | 'mono';
+
+/** Files: TFS inspects, checks, prepares and loads. `name` optionally overrides the CSS family. */
+type FileFont = {
+	readonly files: readonly string[];
+	readonly category: Category;
+	readonly name?: string;
+	readonly display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional';
+};
+
+/** Name only: TFS writes the family name; something else makes the font available. */
+type NamedFont = {
+	readonly name: string;
+	readonly fallbacks: readonly string[];
+	readonly files?: never;
+};
+
+export type FontsDraft = Record<string, FileFont | NamedFont>;
 
 /** Stand-in for the existing `defineTypography` identity helper. */
 export declare function defineTypography<
