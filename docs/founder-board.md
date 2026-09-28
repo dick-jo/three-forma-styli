@@ -324,6 +324,13 @@ Ratified on 2026-09-09; implementation remains pending:
 - The same Time tokens serve duration or delay; no separate delay domain is
   required. Units remain authored per scale, supporting `ms` and `s`.
 
+Review question, 2026-09-28: the founder questions the compulsory name for the
+ordinary scale. The [confirmation mock](./blueprints/time-easing/README.md#time-proposed-prefixless-ordinary-scale)
+compares a directly authored prefixless scale with optional additional named
+scales. That simplification is a recommendation awaiting a ruling; the ratified
+shape below remains current. CSS output and the other Time rules are unchanged
+by the proposal.
+
 Ratified authoring shape, with illustrative values pending theme calibration:
 
 ```ts
@@ -382,8 +389,9 @@ The [Time/Easing confirmation mock](./blueprints/time-easing/README.md), prepare
 2026-09-28, represents these existing decisions across `time.ts` and `easing.ts`,
 with all 12 expected variables, seconds/direct-data alternatives and CSS/TS
 consumption. TypeScript and bounded headless browser evidence pass. Helper imports
-remain declaration-only; no production overhaul is implemented. Representative
-usage awaits founder review, without reopening the ratified contract.
+remain declaration-only; no production overhaul is implemented. The founder
+accepted Easing's representative usage on 2026-09-28. Time's ordinary scale naming
+is the remaining review question above.
 
 ### Motion composites — deferred
 

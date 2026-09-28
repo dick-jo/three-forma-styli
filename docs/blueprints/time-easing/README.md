@@ -1,6 +1,6 @@
 # Time and Easing confirmation mock
 
-Status, 2026-09-28: **ratified contracts represented in a complete mock; ready for review**.
+Status, 2026-09-28: **Easing accepted; Time's ordinary scale naming under review**.
 This is milestone 1. The [authoring contract](../../v05-time-easing-contract.md)
 and [Founder Board](../../founder-board.md#time) govern the shape. The current
 production Time generator still uses numbered multiples, and Easing is still
@@ -33,6 +33,47 @@ when it is not needed. All four positions are authored explicitly and increase;
 there is no numbered Time scale or multiplication input in the new contract.
 The same values can be durations or delays. [alternatives.ts](./alternatives.ts)
 shows equivalent seconds rather than milliseconds.
+
+### Time: proposed prefixless ordinary scale
+
+The founder questions whether the ordinary scale needs the authored name `neu`
+when its output omits that name. The current shape follows Alpha's named-scale
+catalogue; CSS itself does not require the identity. Alpha has a concrete reason
+to retain names: Color can select an Alpha scale independently of which one gets
+the short CSS names. No equivalent selection is required in the current Time
+scope; deferred Motion composites do not establish that requirement.
+
+Recommendation, **not yet ratified**: author the ordinary Time scale directly,
+with optional additional named scales beside it:
+
+```ts
+export const time = {
+	unit: 'ms',
+	values: { min: 50, lo: 100, hi: 200, max: 400 },
+	scales: {
+		anim: {
+			unit: 'ms',
+			values: { min: 500, lo: 1000, hi: 2000, max: 4000 },
+		},
+	},
+};
+```
+
+Top-level `values` emit `--t-min / --t-lo / --t-hi / --t-max`; `anim` emits
+`--t-anim-min / --t-anim-lo / --t-anim-hi / --t-anim-max`. Omit `scales` when
+unneeded. Additional scales remain complete and available simultaneously;
+they do not inherit missing values from the ordinary scale. Units remain
+authored per scale.
+
+This removes `defaultScale` and the compulsory ordinary identity. The tradeoff
+is deliberate: the ordinary scale has its own location, and an author can no
+longer redirect short names by changing a selector. There is no hidden `neu`,
+`default`, or `base` identity. Expected CSS and consumption stay the same.
+Alpha and Shadow retain their ratified catalogues; this proposal concerns Time.
+The checked `time.ts` fixture still represents the existing ratified shape until
+the founder rules on this alternative.
+
+### Easing: accepted representative usage
 
 ```ts
 export const easings = {
@@ -113,10 +154,12 @@ exact token names without importing authoring helpers or a numerical easing engi
 
 ## What remains to review?
 
-The product rules are already ratified. Confirm that the files and output make
-the intended ordinary authoring and optional longer/bounce cases clear. No new
-Axis participation or Motion composite is proposed. Standard-theme calibration
-and Workbench controls belong to later implementation/review, not this approval.
+The founder accepts Easing's representative usage. Resolve Time's ordinary
+scale authoring: retain the named catalogue and `defaultScale`, or adopt the
+proposed direct prefixless scale. Its positions, additional scales, units, and
+duration/delay use are unchanged. No new Axis participation or Motion composite
+is proposed. Standard-theme calibration and Workbench controls belong to later
+implementation/review, not this approval.
 CSS and TypeScript are the primary outputs; useful Figma conversions remain an
 adapter concern and may report unsupported exports.
 

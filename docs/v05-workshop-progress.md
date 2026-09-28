@@ -70,13 +70,17 @@ separately agreed architecture and runbook milestone.
   references, scalar Width, and combined `border.ts`. Its 22 names, Size following,
   rem alternative and genuine mapping/width changes are verified. Example numbers
   are illustrative, not mandatory theme calibrations.
-- **Now:** [Time and Easing confirmation mock](./blueprints/time-easing/README.md).
-  Existing contracts are unchanged: four explicit Time positions, optional longer
-  scale, and directly authored structured Easings. The mock shows Bézier overshoot,
-  constant-speed and repeated-bounce Linear points, seconds, and CSS/TS consumption.
-  TypeScript, all 12 expected values, and browser parsing/computed styles pass.
-  Founder review of the representative usage remains; no new product decision is
-  proposed. The helper declarations and expansion are review evidence only.
+- **Easing complete, 2026-09-28:** the founder accepts the
+  [representative mock](./blueprints/time-easing/README.md), including directly
+  authored Bézier/Linear values and CSS/TS consumption. The existing TypeScript,
+  12-value expansion, and browser evidence remain bounded review checks, not a
+  production implementation.
+- **Now — Time ordinary scale naming:** the founder questions naming the
+  prefixless scale `neu`. The mock README compares the current named catalogue
+  with a proposed direct ordinary scale plus optional additional named scales.
+  Recommendation awaits a ruling; the checked fixture and ratified contract are
+  unchanged. Four positions, units, simultaneous scales, and duration/delay use
+  remain settled.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -96,7 +100,7 @@ domain retaining its own readiness verdict.
 | 1     | Shared Axes and Modes                     | Rules and baseline clarification ratified; current mocks updated          | Carry complete ordinary values and partial mode changes into the remaining domain mocks. Exact exported types, validation and compiler strategy remain later work.                                                                           |
 | 2     | Color and Alpha                           | Blueprint complete; implementation remains later                          | Carry ratified authoring, Groups, direct polarity and optional constraint/runtime contracts into later architecture and migration work.                                                                                                      |
 | 3     | Spacing, Gap, Border radius, Border width | Blueprint and representative mock complete                                | Carry ratified inputs, independent minimum, shared unit/count, references and scalar Width into later implementation. Preserve calibrated consumer values during migration.                                                                  |
-| 4     | Time and Easing                           | Contracts ratified; complete confirmation mock ready for review           | Review the four-position Time scales, directly authored Bézier/Linear choices, complete variable output, and CSS/TS consumption. No new Motion composite or Axis mechanism is proposed.                                                      |
+| 4     | Time and Easing                           | Easing complete; Time ordinary scale naming under review                  | Decide whether Time needs a named ordinary scale or directly authors its prefixless values. Other Time rules and Easing are settled; no Motion composite or Axis mechanism is proposed.                                                      |
 | 5     | Typography                                | Role/size/weight/variant contracts ratified; representative mocks pending | Start with atomic Font size and ordinary role authoring. Cover supported size and weight choices, categorical variants, and prepared font facts through focused examples. Review readability carefully given the history of complexity here. |
 | 6     | One assembled design system               | Pending the preceding reviews                                             | Read the whole authored system and its CSS/TS consumer examples together. Check consistent naming, references, modes, helpers, and the standard-theme vocabulary. Confirm the useful Figma subset and clear unsupported cases.               |
 
@@ -145,13 +149,14 @@ before the runbook is agreed.
 - [x] Blueprint: Axis rules, complete ordinary values, and input/output mock.
 - [x] Blueprint: Color + Alpha, Groups, polarity, and optional constraint/runtime contracts.
 - [x] Blueprint: Spacing + Gap + Border radius/width, independent minimum and combined border.ts.
-- [ ] Blueprint, now: Time + Easing confirmation mock ready for review.
+- [x] Blueprint: Easing representative mock.
+- [ ] Blueprint, now: Time ordinary scale naming, then mock closure.
 - [ ] Blueprint: Typography representative mocks.
 - [ ] Blueprint: assembled-system and CSS/TS/Figma scope review.
 - [ ] Architecture, hygiene, consumer migration triage, and agreed runbook.
 - [ ] Implementation increments, verification, and final review.
 
-Motion composites remain deferred. Time/Easing is the current review; two further
+Motion composites remain deferred. Time is the current review; two further
 blueprint review groups follow it. Several retain already ratified
 contracts and need representative confirmation, not a fresh redesign.
 
