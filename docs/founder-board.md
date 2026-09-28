@@ -760,6 +760,13 @@ live feedback and consumer migration remain for the later architecture/runbook.
 - core's public OKLCH type is structural and does not require consumers to install
   Culori declarations.
 - framework Text components remain application-owned.
+- Ratified 2026-09-28: **TFS generates a class only when one variable cannot do
+  the job in one CSS line.** Typography keeps its classes (seven properties; the
+  `font` token cannot carry letter-spacing/text-transform). Shadow classes are
+  removed; no other domain gets classes. Classes are conveniences over tokens.
+- Ratified 2026-09-28: stop generating `./system` (full resolved-value dump; no
+  consumer imports). `./tokens` supplies names, exact group types (including
+  prefix groups written out literally) and var() helpers.
 
 ### Figma — capstone, founder direction 2026-09-28
 
