@@ -27,3 +27,10 @@ export {
 	type SystemInput,
 } from './resolve/index.js';
 export { emitTokensCss } from './emit/css.js';
+export {
+	inspectFontFile,
+	prepareFonts,
+	writeFontAssets,
+	type FontFace,
+	type PreparedFonts,
+} from './fonts/index.js';

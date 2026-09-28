@@ -43,10 +43,9 @@ listed here was not carried over.
 | `apps/workbench/`                                         | `workbench/` (outside the workspace) | kept per runbook; rejoins in step 8 via the data file     |
 | `.github/requirements-fonttools.txt`                      | unchanged                            | needed by FontTools in step 5                             |
 
-Planned copies: font inspection, FontTools conversion, fallback metrics
-(`packages/compiler/src/fonts/`); OKLCH helpers, runtime themes, luminance
-(`packages/core/src/{runtime,constraints}/`); CSS mode re-binding details
-(`packages/core/src/generator/typography.ts`); Workbench UI (`apps/workbench/`).
+Still planned: OKLCH helpers, runtime themes, luminance
+(`packages/core/src/{runtime,constraints}/`). CSS mode re-binding was rewritten
+in step 4 rather than copied (the old version handled one axis only).
 
 ## Notes
 

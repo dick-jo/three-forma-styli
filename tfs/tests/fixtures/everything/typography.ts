@@ -15,10 +15,7 @@ export const fontSize = defineFontSize({
 });
 
 export const fonts = defineFonts({
-	sans: {
-		files: ['./fonts/Supreme-Variable.woff2', './fonts/Supreme-VariableItalic.woff2'],
-		category: 'sans',
-	},
+	sans: { name: 'system-ui', fallbacks: ['sans-serif'] },
 	mono: {
 		files: ['./fonts/JetBrainsMono[wght].ttf', './fonts/JetBrainsMono-Italic[wght].ttf'],
 		category: 'mono',

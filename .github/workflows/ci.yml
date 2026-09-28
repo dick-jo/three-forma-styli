@@ -26,6 +26,10 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r .github/requirements-fonttools.txt
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter three-forma-styli exec playwright install --with-deps chromium
       - run: pnpm check
