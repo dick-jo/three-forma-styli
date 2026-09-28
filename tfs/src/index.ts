@@ -19,3 +19,10 @@ export {
 	type EasingValue,
 } from './define/motion.js';
 export { defineFonts, defineFontSize, defineTypography } from './define/typography.js';
+export {
+	resolveSystem,
+	TfsError,
+	type Issue,
+	type ResolvedSystem,
+	type SystemInput,
+} from './resolve/index.js';

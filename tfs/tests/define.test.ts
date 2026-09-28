@@ -59,7 +59,6 @@ describe('the everything-project assembles', () => {
 			'time',
 			'easings',
 			'fontSize',
-			'fonts',
 			'typography',
 		]);
 		expect(Object.keys(config.system.shadows.ranges)).toEqual(['glow-pri', 'glow-duo']);
