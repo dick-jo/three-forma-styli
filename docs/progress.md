@@ -66,6 +66,12 @@ handled one axis only).
   `vX.Y.Z`. Trusted publishing from CI is the later upgrade. The four old
   `@three-forma-styli/*` packages get deprecated after Scatter moves (step 13).
 
+## Backlog
+
+- **Drop the Python dependency:** replace FontTools with a WebAssembly WOFF2 library from
+  npm, so `npm install` is all TFS needs. Must produce byte-identical output (the font
+  tests and committed snapshots prove it). Raised by the rkgk setup, 2026-09-28.
+
 ## Finish-line checks
 
 Run 2026-09-28, after step 9. All pass.
