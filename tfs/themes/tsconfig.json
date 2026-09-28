@@ -1,0 +1,10 @@
+{
+	"//": "Repo-only: typechecks the shipped themes against TFS source.",
+	"extends": "./standard/tsconfig.json",
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"paths": { "three-forma-styli": ["../src/index.ts"] }
+	},
+	"include": ["standard/*.ts"]
+}

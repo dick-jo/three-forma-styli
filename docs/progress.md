@@ -7,9 +7,9 @@ The agreed runbook and where we are. Decisions live in [founder-board.md](./foun
 - Blueprint complete and ratified, 2026-09-28.
 - Runbook agreed 2026-09-28: **clean slate**. Rebuild as one package against the
   Board; copy in only the proven parts listed below; delete everything else.
-- Recovery: tag `pre-v05-cleanup` (full pre-cleanup tree, docs and history) and
+- Branch `v0.5-rebuild` (pushed). Recovery: tag `pre-v05-cleanup` (full pre-cleanup tree, docs and history) and
   published tag `@three-forma-styli/*@0.4.0`.
-- Scatter depends on npm `0.4.0` (pinned) and is untouched until step 10.
+- Scatter depends on npm `0.4.0` (pinned) and is untouched until step 13.
 
 ## Runbook
 
@@ -26,9 +26,12 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 | 7    | Runtime colour themes + luminance copied in; `./runtime`; decide `native-color-modes`                             | done   |
 | 8    | `tfs build`, `tfs check`, `tfs dev` (watch, last valid output), `tfs fonts inspect`; knip in CI                   | done   |
 | 8b   | Workbench rewritten: live read-only view served by `tfs dev`, disposable sliders                                  | done   |
-| 9    | Standard theme ported with unchanged values                                                                       |        |
-| 10   | Scatter upgrade to 0.5: separate agreed scope, values unchanged                                                   |        |
-| 11   | Capstone: Figma (chosen modes; shadows/text as styles)                                                            |        |
+| 9    | Standard theme (0.4.0 values, JetBrains Mono for label) + `tfs init`                                              | done   |
+| 10   | Founder test drive: a new project started with `tfs init`; fix what it finds                                      |        |
+| 11   | Merge `v0.5-rebuild` to `master`; publish 0.5 to npm                                                              |        |
+| 12   | Figma, preliminary: sync the new project's tokens (chosen modes; shadows/text as styles)                          |        |
+| 13   | Scatter upgrade to 0.5: separate agreed scope, values unchanged                                                   |        |
+| 14   | Codebase tour and final review (finish-line checks)                                                               |        |
 
 ## Kept list
 
@@ -59,7 +62,7 @@ handled one axis only).
 - `Register` (in `tfs.config.ts`) is how `defineX()` checks mode and colour names
   across files; the stock pattern used by TanStack Router and similar libraries.
 - Release tooling (changesets) was removed with the old packages; the package is
-  `private` until step 10 decides how 0.5 is published.
+  `private` until step 11 decides how 0.5 is published.
 
 ## Finish-line checks
 

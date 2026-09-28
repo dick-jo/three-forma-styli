@@ -131,3 +131,35 @@ describe('the tfs command', () => {
 		expect(result.status).toBe(0);
 	});
 });
+
+describe('the standard theme', () => {
+	it('builds cleanly, fonts included', async () => {
+		const loaded = await loadConfig(new URL('../themes/standard/', import.meta.url).pathname);
+		const outDir = join(await mkdtemp(join(tmpdir(), 'tfs-standard-')), 'generated');
+		temporary.push(outDir);
+		const { resolved } = await buildProject({ ...loaded, outDir });
+		expect(Object.keys(resolved.input.typography!.roles)).toEqual(['prose', 'heading', 'label']);
+		expect(await readFile(join(outDir, 'fonts.css'), 'utf8')).toContain(
+			'"JetBrains Mono fallback"'
+		);
+	});
+
+	it('tfs init copies it into an empty folder, and refuses a non-empty one', async () => {
+		const { initProject } = await import('../src/session/init.js');
+		const target = join(await mkdtemp(join(tmpdir(), 'tfs-init-')), 'my-system');
+		temporary.push(target);
+		expect(await initProject(target)).toEqual([
+			'axes.ts',
+			'border.ts',
+			'color.ts',
+			'fonts',
+			'motion.ts',
+			'shadow.ts',
+			'spacing.ts',
+			'tfs.config.ts',
+			'tsconfig.json',
+			'typography.ts',
+		]);
+		await expect(initProject(target)).rejects.toThrow('is not empty');
+	});
+});

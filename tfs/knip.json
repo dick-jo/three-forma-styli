@@ -5,7 +5,8 @@
 		"src/runtime/index.ts",
 		"src/cli.ts",
 		"tests/**/*.test.ts",
-		"tests/fixtures/**/*.ts"
+		"tests/fixtures/**/*.ts",
+		"themes/standard/*.ts"
 	],
-	"project": ["src/**/*.ts", "tests/**/*.ts"]
+	"project": ["src/**/*.ts", "tests/**/*.ts", "themes/standard/*.ts"]
 }

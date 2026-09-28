@@ -15,11 +15,12 @@
 		}
 	},
 	"files": [
-		"dist"
+		"dist",
+		"themes/standard"
 	],
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",
-		"typecheck": "tsc -p tsconfig.json",
+		"typecheck": "tsc -p tsconfig.json && tsc -p themes/tsconfig.json",
 		"test": "vitest run",
 		"knip": "knip"
 	},

@@ -3,10 +3,12 @@ import { parseArgs } from 'node:util';
 import { buildProject, checkProject } from './session/build.js';
 import { loadConfig } from './session/config.js';
 import { startDev } from './session/dev.js';
+import { initProject } from './session/init.js';
 import { describeError, describeFontFiles } from './session/report.js';
 
 const HELP = `tfs — Three Forma Styli
 
+  tfs init <dir>                start a new project from the standard theme
   tfs dev [dir]                 build, then rebuild on every save
   tfs build [dir]               check everything and write generated/
   tfs check [dir]               fail if generated/ is out of date (for CI)
@@ -24,6 +26,13 @@ async function main(argv: string[]): Promise<number> {
 	if (values.help) return (console.log(HELP), 0);
 	if (!command) return (console.log(HELP), 1);
 
+	if (command === 'init' && rest[0]) {
+		const files = await initProject(rest[0]);
+		console.log(
+			`✓ created ${rest[0]}: ${files.join(', ')}\n\nNext:\n  cd ${rest[0]}\n  pnpm add -D three-forma-styli\n  pnpm tfs dev`
+		);
+		return 0;
+	}
 	if (command === 'build') {
 		const loaded = await loadConfig(rest[0] ?? '.');
 		await buildProject(loaded);
