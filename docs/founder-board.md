@@ -540,8 +540,10 @@ review-example change only; migration of actual consumer names belongs to triage
   whole-row `font` shorthand token, `--text-{role}` / `--text-{role}-{size}`,
   built from the granular tokens and rebound in mode scopes; letter-spacing and
   text-transform remain separate. Generated names must not collide.
-- Variants are categorical and cannot change font family or font size.
-- Resolution order is size → variant → explicit style/weight.
+- Variants removed, 2026-09-28: no production use (Scatter's "variants" are sizes).
+  One-off emphasis uses weight/style classes or tokens; a recurring named treatment
+  is another role (e.g. `label-loud`). Existing variant code is a removal candidate.
+- Resolution order is size → explicit style/weight.
 - Physical style/weight/features/axes are checked against prepared font facts.
 
 The [first Typography mock](./blueprints/typography/README.md), prepared
