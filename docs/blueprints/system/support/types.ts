@@ -2,9 +2,12 @@
  * Review-only types and helper declarations for the assembled blueprint.
  * Not public TFS exports; exact names and implementation belong to the runbook.
  */
-import type { AlphaSystem, Oklch } from '@three-forma-styli/core';
-// Type-only, for role mode checks; axes.ts imports nothing, so no cycle.
+import type { Oklch } from '@three-forma-styli/core';
+// Type-only project imports so each define…() can check names from other files.
 import type { axes } from '../axes.js';
+import type { colors } from '../color.js';
+
+type Axes = typeof axes;
 
 // ---- Axes / Modes ----
 
@@ -56,8 +59,15 @@ export type ColorIdentity<Colors> = Colors extends { readonly tokens: infer T }
 	? Extract<keyof T, string>
 	: never;
 
-export type AlphaPosition<Alpha extends AlphaSystem> =
-	'non' | Extract<keyof Alpha['scales'][Alpha['defaultScale']]['values'], string>;
+type AlphaValues = Readonly<Record<'min' | 'lo-x' | 'lo' | 'hi' | 'hi-x' | 'max', number>>;
+
+/** Ordinary scale unnamed at the top (--a-*); named extras in `scales` (--a-{name}-*). */
+export type AlphaDraft = {
+	readonly values: AlphaValues;
+	readonly scales?: Readonly<Record<string, { readonly values: AlphaValues }>>;
+};
+
+export type AlphaPosition = 'non' | keyof AlphaValues;
 
 // ---- Spacing / Gap / Border ----
 
@@ -88,28 +98,30 @@ export type BorderDraft<Axes extends AxisCatalogue> = {
 
 type ShadowPosition = 'min' | 'lo' | 'hi' | 'max';
 
-type ShadowLayer<Colors, Alpha extends AlphaSystem> = {
+type ShadowLayer<Colors> = {
 	readonly x: number;
 	readonly y: number;
 	readonly blur: number;
 	readonly spread?: number;
 	readonly inset?: boolean;
-	readonly color: { readonly color: ColorIdentity<Colors>; readonly alpha?: AlphaPosition<Alpha> };
+	readonly color: { readonly color: ColorIdentity<Colors>; readonly alpha?: AlphaPosition };
 };
 
 type ShadowRange<Layer> = Readonly<Record<ShadowPosition, readonly [Layer, ...Layer[]]>>;
 
-export type ShadowDraft<Axes extends AxisCatalogue, Colors, Alpha extends AlphaSystem> = {
+type ShadowPositions<Layer> = ShadowRange<Layer>;
+
+/** Ordinary range unnamed at the top (--shd-*); named extras in `ranges` (--shd-{name}-*). */
+export type ShadowDraft<Axes extends AxisCatalogue, Colors> = {
 	readonly unit: string;
-	readonly defaultRange?: string;
-	readonly ranges: Readonly<Record<string, ShadowRange<ShadowLayer<Colors, Alpha>>>>;
+	readonly ranges?: Readonly<Record<string, ShadowRange<ShadowLayer<Colors>>>>;
 	readonly modes?: ModeCatalogue<
 		Axes,
-		{
-			readonly ranges: Readonly<Record<string, Partial<ShadowRange<ShadowLayer<Colors, Alpha>>>>>;
+		Partial<ShadowPositions<ShadowLayer<Colors>>> & {
+			readonly ranges?: Readonly<Record<string, Partial<ShadowRange<ShadowLayer<Colors>>>>>;
 		}
 	>;
-};
+} & Partial<ShadowPositions<ShadowLayer<Colors>>>;
 
 type LayerForColor = {
 	readonly x: number;
@@ -137,17 +149,14 @@ export declare function shadowsForColors<
 
 // ---- Time / Easing ----
 
-export type TimeDraft = {
-	readonly defaultScale: string;
-	readonly scales: Readonly<
-		Record<
-			string,
-			{
-				readonly unit: 'ms' | 's';
-				readonly values: Readonly<Record<'min' | 'lo' | 'hi' | 'max', number>>;
-			}
-		>
-	>;
+type TimeScale = {
+	readonly unit: 'ms' | 's';
+	readonly values: Readonly<Record<'min' | 'lo' | 'hi' | 'max', number>>;
+};
+
+/** Ordinary scale unnamed at the top (--t-*); named extras in `scales` (--t-{name}-*). */
+export type TimeDraft = TimeScale & {
+	readonly scales?: Readonly<Record<string, TimeScale>>;
 };
 
 type CubicBezierEasing = {
@@ -269,7 +278,7 @@ export declare function defineTypography<
 	const Roles extends Record<string, unknown>,
 >(system: {
 	fonts: Fonts;
-	roles: Roles & CheckRoles<typeof axes, Roles, Extract<keyof Fonts, string>>;
+	roles: Roles & CheckRoles<Axes, Roles, Extract<keyof Fonts, string>>;
 }): { fonts: Fonts; roles: Roles };
 
 // ---- Color identity checks within the palette ----
@@ -315,3 +324,20 @@ type ColorCheck<C> = {
 export declare function defineColors<
 	const C extends ColorDraft<typeof axes, Record<string, Oklch>>,
 >(colors: C & ColorCheck<C>): C;
+
+// ---- One define…() per domain: identity helpers that check names ----
+
+export declare function defineAxes<const T extends AxisCatalogue>(axes: T): T;
+export declare function defineAlpha<const T extends AlphaDraft>(alpha: T): T;
+export declare function defineSpacing<const T extends SpacingDraft<Axes>>(spacing: T): T;
+export declare function defineGap<const T extends SpacingRangeDraft<Axes>>(gap: T): T;
+export declare function defineBorder<const T extends BorderDraft<Axes>>(border: T): T;
+export declare function defineShadows<const T extends ShadowDraft<Axes, typeof colors>>(
+	shadows: T
+): T;
+export declare function defineTime<const T extends TimeDraft>(time: T): T;
+export declare function defineEasings<const T extends Readonly<Record<string, EasingValue>>>(
+	easings: T
+): T;
+export declare function defineFontSize<const T extends FontSizeDraft<Axes>>(fontSize: T): T;
+export declare function defineFonts<const T extends FontsDraft>(fonts: T): T;

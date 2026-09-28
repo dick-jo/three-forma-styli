@@ -1,5 +1,29 @@
-import { fonts } from './fonts.js';
-import { defineTypography } from './support/types.js';
+import { defineFonts, defineFontSize, defineTypography } from './support/types.js';
+
+export const fontSize = defineFontSize({
+	unit: 'rem',
+	min: 0.625, // --fs-min
+	start: 0.75, // --fs-1
+	step: 0.125, // --fs-n = start + step × (n − 1)
+	count: 12, // --fs-1 … --fs-12
+	modes: {
+		size: {
+			s: { start: 0.6875 },
+			l: { min: 0.6875, start: 0.8125 },
+		},
+	},
+});
+
+export const fonts = defineFonts({
+	sans: {
+		files: ['./fonts/Supreme-Variable.woff2', './fonts/Supreme-VariableItalic.woff2'],
+		category: 'sans',
+	},
+	mono: {
+		files: ['./fonts/JetBrainsMono[wght].ttf', './fonts/JetBrainsMono-Italic[wght].ttf'],
+		category: 'mono',
+	},
+});
 
 export const typography = defineTypography({
 	fonts,

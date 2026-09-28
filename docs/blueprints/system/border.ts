@@ -1,7 +1,6 @@
-import type { axes } from './axes.js';
-import type { BorderDraft } from './support/types.js';
+import { defineBorder } from './support/types.js';
 
-export const border = {
+export const border = defineBorder({
 	radius: {
 		min: 'min',
 		s: 1,
@@ -12,4 +11,4 @@ export const border = {
 		unit: 'px',
 		value: 1,
 	},
-} as const satisfies BorderDraft<typeof axes>;
+});

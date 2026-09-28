@@ -1,7 +1,6 @@
-import type { axes } from './axes.js';
-import type { SpacingDraft } from './support/types.js';
+import { defineSpacing, defineGap } from './support/types.js';
 
-export const spacing = {
+export const spacing = defineSpacing({
 	unit: 'px',
 	min: 4, // --sp-min
 	step: 8, // --sp-n = 8 × n
@@ -12,4 +11,12 @@ export const spacing = {
 			l: { min: 5, step: 10 },
 		},
 	},
-} as const satisfies SpacingDraft<typeof axes>;
+});
+
+// Each position points at a Spacing position and follows it through Size modes.
+export const gap = defineGap({
+	min: 'min',
+	s: 1,
+	l: 3,
+	max: 6,
+});

@@ -1,14 +1,10 @@
 import { axes } from './axes.js';
-import { alpha } from './alpha.js';
-import { colors } from './color.js';
-import { spacing } from './spacing.js';
-import { gap } from './gap.js';
+import { alpha, colors } from './color.js';
+import { spacing, gap } from './spacing.js';
 import { border } from './border.js';
 import { shadows } from './shadow.js';
-import { time } from './time.js';
-import { easings } from './easing.js';
-import { fontSize } from './font-size.js';
-import { typography } from './typography.js';
+import { time, easings } from './motion.js';
+import { fontSize, fonts, typography } from './typography.js';
 
 // Assembly. Output options are illustrative; their exact shape is runbook work.
 export default {
@@ -23,6 +19,7 @@ export default {
 		time,
 		easings,
 		fontSize,
+		fonts,
 		typography,
 	},
 	output: { directory: './generated' },

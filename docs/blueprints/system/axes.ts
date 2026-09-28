@@ -1,6 +1,6 @@
-import type { AxisCatalogue } from './support/types.js';
+import { defineAxes } from './support/types.js';
 
-export const axes = {
+export const axes = defineAxes({
 	theme: {
 		modes: ['dark', 'light'],
 		activation: { attribute: 'data-theme-mode' },
@@ -9,4 +9,4 @@ export const axes = {
 		modes: ['regular', 's', 'l'],
 		activation: { attribute: 'data-size-mode' },
 	},
-} as const satisfies AxisCatalogue;
+});

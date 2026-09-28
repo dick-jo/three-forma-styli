@@ -1,5 +1,9 @@
 import { oklch } from '@three-forma-styli/core';
-import { defineColors } from './support/types.js';
+import { defineAlpha, defineColors } from './support/types.js';
+
+export const alpha = defineAlpha({
+	values: { min: 0.07, 'lo-x': 0.125, lo: 0.25, hi: 0.68, 'hi-x': 0.85, max: 0.93 },
+});
 
 export const colors = defineColors({
 	// Complete ordinary palette (dark).
