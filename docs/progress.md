@@ -35,14 +35,21 @@ One reviewable step at a time; each ends with its checks passing and a commit.
 Files deliberately copied from `pre-v05-cleanup`, with the reason. Anything not
 listed here was not carried over.
 
-| From                                                      | To                                   | Why                                                       |
-| --------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------- |
-| `docs/blueprints/system/`                                 | `tfs/tests/fixtures/everything/`     | the ratified assembled mock; now imports the real package |
-| mock `support/types.ts`                                   | `tfs/src/define/*.ts`                | review types became the real authoring types              |
-| `packages/core/src/utils.ts` `oklch()`                    | `tfs/src/define/color.ts`            | 3-line constructor, same output                           |
-| `packages/core/src/alpha/authoring.ts` `deriveAlphaScale` | `tfs/src/define/color.ts`            | same maths; test pins 0.4.0 values                        |
-| `apps/workbench/`                                         | `workbench/` (outside the workspace) | kept per runbook; rejoins in step 8 via the data file     |
-| `.github/requirements-fonttools.txt`                      | unchanged                            | needed by FontTools in step 5                             |
+| From                                                                              | To                                     | Why                                                                                                         |
+| --------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `docs/blueprints/system/`                                                         | `tfs/tests/fixtures/everything/`       | the ratified assembled mock; now imports the real package                                                   |
+| mock `support/types.ts`                                                           | `tfs/src/define/*.ts`                  | review types became the real authoring types                                                                |
+| `packages/core/src/utils.ts` `oklch()`                                            | `tfs/src/define/color.ts`              | 3-line constructor, same output                                                                             |
+| `packages/core/src/alpha/authoring.ts` `deriveAlphaScale`                         | `tfs/src/define/color.ts`              | same maths; test pins 0.4.0 values                                                                          |
+| `apps/workbench/`                                                                 | `workbench/` (outside the workspace)   | kept until 8b, where it is rewritten from scratch                                                           |
+| `.github/requirements-fonttools.txt`                                              | unchanged; used by CI                  | FontTools + Brotli for WOFF2 conversion                                                                     |
+| `packages/compiler/src/fonts/inspect.ts` (style/format detection)                 | `tfs/src/fonts/inspect.ts`             | family, style, weight range, container vs extension check; provenance, embedding flags and warnings dropped |
+| `packages/compiler/src/fonts/fonttools.ts` (the two commands)                     | `tfs/src/fonts/convert.ts`             | `ttLib.woff2 compress/decompress`; version/Python provenance dropped                                        |
+| `packages/compiler/src/fonts/fallback-metrics.ts` (formula + 8 Fontpie constants) | `tfs/src/fonts/fallback.ts`            | same numbers; test pins 0.4.0's JetBrains Mono output                                                       |
+| `packages/core/src/runtime/theme.ts` (strict parsing, custom properties, enforce) | `tfs/src/runtime/theme.ts`             | same validation; prefix/alpha-modifier options dropped; ratified null-rule behaviour added                  |
+| `packages/core/src/constraints/luminance.ts`                                      | `tfs/src/runtime/luminance.ts`         | same formula and diagnostics; empty-group case removed (rule lists are validated)                           |
+| JetBrains Mono TTFs + `OFL.txt` (from Scatter)                                    | `tfs/tests/fixtures/everything/fonts/` | real test font; OFL permits redistribution with its licence                                                 |
+| `esbuild` config loading (from `packages/cli/src/config/load-module.ts`)          | `tfs/src/session/config.ts`            | same approach; also yields the watch list for `tfs dev`                                                     |
 
 CSS mode re-binding was rewritten in step 4 rather than copied (the old version
 handled one axis only).
