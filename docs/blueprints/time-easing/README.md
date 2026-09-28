@@ -43,7 +43,7 @@ to retain names: Color can select an Alpha scale independently of which one gets
 the short CSS names. No equivalent selection is required in the current Time
 scope; deferred Motion composites do not establish that requirement.
 
-Recommendation, **not yet ratified**: author the ordinary Time scale directly,
+Alternative, **not ratified**: author the ordinary Time scale directly,
 with optional additional named scales beside it:
 
 ```ts
@@ -72,6 +72,24 @@ longer redirect short names by changing a selector. There is no hidden `neu`,
 Alpha and Shadow retain their ratified catalogues; this proposal concerns Time.
 The checked `time.ts` fixture still represents the existing ratified shape until
 the founder rules on this alternative.
+
+The founder subsequently emphasised consistency and requested an Alpha/Time
+comparison before deciding. The current recommendation is to retain the shared
+named-scale pattern: the smaller ordinary Time declaration does not clearly
+outweigh introducing a different authoring rule. No new ruling has been made.
+
+| Existing named catalogue | Scale chosen by `defaultScale: 'neu'` | Optional additional scale |
+| --- | --- | --- |
+| Alpha | `neu` emits `--a-lo: 0.25` | `pri` emits `--a-pri-lo: 0.3` |
+| Time | `neu` emits `--t-lo: 100ms` | `anim` emits `--t-anim-lo: 1000ms` |
+
+The name is omitted from the chosen scale's CSS output in both domains; no
+`--a-neu-lo` or `--t-neu-lo` duplicate is emitted. Each scale is available
+simultaneously. Alpha's positions differ from Time's, and its additional Color
+consumer selects one scale for all Color ramps. With the current Alpha default,
+`--clr-pri-a-lo` uses opacity `0.25`, not `0.3`: the Color identity `pri` does not
+automatically select the Alpha scale named `pri`. Explicit `colors.alphaScale`
+can change that selection without renaming any Color or standalone Alpha token.
 
 ### Easing: accepted representative usage
 

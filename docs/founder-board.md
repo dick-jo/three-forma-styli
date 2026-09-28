@@ -327,9 +327,9 @@ Ratified on 2026-09-09; implementation remains pending:
 Review question, 2026-09-28: the founder questions the compulsory name for the
 ordinary scale. The [confirmation mock](./blueprints/time-easing/README.md#time-proposed-prefixless-ordinary-scale)
 compares a directly authored prefixless scale with optional additional named
-scales. That simplification is a recommendation awaiting a ruling; the ratified
-shape below remains current. CSS output and the other Time rules are unchanged
-by the proposal.
+scales. The founder then requested comparison with Alpha, emphasising consistency;
+the alternative remains unratified and the shape below remains current. CSS
+output and the other Time rules are unchanged by the proposal.
 
 Ratified authoring shape, with illustrative values pending theme calibration:
 

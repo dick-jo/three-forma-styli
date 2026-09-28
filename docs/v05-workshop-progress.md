@@ -78,9 +78,11 @@ separately agreed architecture and runbook milestone.
 - **Now — Time ordinary scale naming:** the founder questions naming the
   prefixless scale `neu`. The mock README compares the current named catalogue
   with a proposed direct ordinary scale plus optional additional named scales.
-  Recommendation awaits a ruling; the checked fixture and ratified contract are
-  unchanged. Four positions, units, simultaneous scales, and duration/delay use
-  remain settled.
+  The founder requested an Alpha/Time comparison before deciding, emphasising
+  consistency. That comparison now shows the same short-name rule in both
+  catalogues; retaining the shared shape is the current recommendation. A ruling
+  remains pending; the checked fixture and ratified contract are unchanged. Four
+  positions, units, simultaneous scales, and duration/delay use remain settled.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
