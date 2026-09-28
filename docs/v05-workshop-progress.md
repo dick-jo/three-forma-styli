@@ -87,6 +87,14 @@ separately agreed architecture and runbook milestone.
   naming and scale mode boundaries await review. Weight ranges, variants,
   prepared fonts, role mode changes and the full consumer surface follow in
   focused passes; no production implementation has started.
+- **Current Typography focus — actual fonts:** the founder asks to connect role
+  identities to real files and revisit the fiddly FontTools/Fontpie workflow.
+  The [font workflow review](./blueprints/typography/font-workflow.md) records
+  existing preparation, fallback calculation and committed Scatter evidence.
+  Recommendation: one project build connects separate source declarations and
+  role choices, with no manual manifest or percentage copying. This awaits a
+  representative mock and founder ruling. Bring that mock before wider role
+  options; the first scale proposal is not implicitly ratified by this discussion.
 - **Deferred:** Motion composites. Their existing code and consumers enter later
   triage; they do not hold up the blueprint.
 
@@ -156,7 +164,7 @@ before the runbook is agreed.
 - [x] Blueprint: Color + Alpha, Groups, polarity, and optional constraint/runtime contracts.
 - [x] Blueprint: Spacing + Gap + Border radius/width, independent minimum and combined border.ts.
 - [x] Blueprint: Time + Easing representative mocks; named scales retained.
-- [ ] Blueprint, now: Typography Font-size/prose mock, then the remaining focused cases.
+- [ ] Blueprint, now: Typography actual-font/preparation flow; scale proposal and wider role cases remain.
 - [ ] Blueprint: assembled-system and CSS/TS/Figma scope review.
 - [ ] Architecture, hygiene, consumer migration triage, and agreed runbook.
 - [ ] Implementation increments, verification, and final review.

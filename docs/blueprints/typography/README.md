@@ -106,13 +106,20 @@ nested `regular` region inside `l`.
 
 ## Font boundary and remaining passes
 
+The founder has brought the actual-font connection forward. The
+[font workflow review](./font-workflow.md) distinguishes authored identities,
+CSS names and inspected capabilities, and records the existing TFS/Scatter
+preparation evidence. Review that complete workflow before expanding the role
+mock; the basic scale input proposal remains open.
+
 [fonts.ts](./fonts.ts) uses the existing system-font escape hatch. There is no
 project font file to inspect, so it honestly reports `verification: 'unavailable'`.
 That does not certify the physical font's weights or features. Prepared project
 fonts and their authoring ergonomics need their own focused example.
 
 1. **Now:** review the atomic inputs and ordinary prose authoring above.
-2. **Next:** sparse role sizes, role-local weight ranges and size-specific weights;
+2. **Next:** actual-font source/preparation/role/output mock, then sparse role
+   sizes, role-local weight ranges and size-specific weights;
    categorical variants and physical styles; prepared font facts and useful
    derivation helpers. Use focused cases, not one overloaded declaration.
 3. **Then:** any genuine role changes across Axes/Modes, the complete CSS/TS
