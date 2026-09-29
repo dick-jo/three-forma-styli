@@ -1,5 +1,5 @@
 import { readdir, readFile, rename, rm, writeFile, mkdir } from 'node:fs/promises';
-import { join, relative } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { emitColorThemeJs, emitColorThemeTypes } from '../emit/color-theme.js';
 import { emitTokensCss } from '../emit/css.js';
 import { emitFigmaJson } from '../emit/figma.js';
@@ -74,20 +74,30 @@ async function generateInto(loaded: LoadedConfig, directory: string): Promise<Bu
 }
 
 /**
- * Checks everything, then replaces the output directory in one step. If anything
- * is invalid, it throws and the previous output is left untouched.
+ * Checks everything and generates into a staging folder first, so an invalid
+ * system writes nothing. Then moves only the changed files into the existing
+ * output folder and removes files no longer generated. The folder itself is never
+ * replaced, so file watchers (Vite, editors) keep seeing changes.
  */
 export async function buildProject(loaded: LoadedConfig): Promise<BuildResult> {
 	const staging = `${loaded.outDir}.tfs-staging-${process.pid}`;
-	const previous = `${loaded.outDir}.tfs-previous-${process.pid}`;
 	await rm(staging, { recursive: true, force: true });
 	try {
 		const result = await generateInto(loaded, staging);
-		await rename(loaded.outDir, previous).catch((error) => {
-			if (error.code !== 'ENOENT') throw error;
-		});
-		await rename(staging, loaded.outDir);
-		await rm(previous, { recursive: true, force: true });
+		await mkdir(loaded.outDir, { recursive: true });
+		const [fresh, current] = await Promise.all([listFiles(staging), listFiles(loaded.outDir)]);
+		for (const file of fresh) {
+			const target = join(loaded.outDir, file);
+			const [next, previous] = await Promise.all([
+				readFile(join(staging, file)),
+				readFile(target).catch(() => undefined),
+			]);
+			if (previous?.equals(next)) continue;
+			await mkdir(dirname(target), { recursive: true });
+			await rename(join(staging, file), target);
+		}
+		for (const file of current.filter((f) => !fresh.includes(f)))
+			await rm(join(loaded.outDir, file));
 		return result;
 	} finally {
 		await rm(staging, { recursive: true, force: true });
