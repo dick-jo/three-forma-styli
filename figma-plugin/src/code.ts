@@ -7,6 +7,7 @@ import {
 	type TextStyle,
 	type Variable,
 } from './sync';
+import { repairSelection, type RepairApi, type RepairNode } from './repair';
 
 // Connects the real Figma API to the sync logic.
 const api: Api = {
@@ -36,10 +37,45 @@ const api: Api = {
 		),
 };
 
-figma.showUI(__html__, { width: 420, height: 520, themeColors: true });
+const repairApi: RepairApi = {
+	getCollections: api.getCollections,
+	getVariables: api.getVariables,
+	variableById: (id) => figma.variables.getVariableByIdAsync(id) as Promise<Variable | null>,
+	collectionById: (id) =>
+		figma.variables.getVariableCollectionByIdAsync(id) as unknown as Promise<Collection | null>,
+	bindPaint: (paint, variable) =>
+		figma.variables.setBoundVariableForPaint(
+			paint as SolidPaint,
+			'color',
+			variable as unknown as globalThis.Variable
+		),
+	bindEffect: api.bindEffectColor,
+};
 
-figma.ui.onmessage = async (message: { type: 'sync'; json: string }) => {
-	if (message.type !== 'sync') return;
+figma.showUI(__html__, { width: 420, height: 560, themeColors: true });
+
+figma.ui.onmessage = async (message: { type: 'sync' | 'repair'; json: string }) => {
+	if (message.type === 'repair') {
+		try {
+			const selection = figma.currentPage.selection as unknown as RepairNode[];
+			if (selection.length === 0) throw new Error('Select the frames to repair first.');
+			const report = await repairSelection(
+				repairApi,
+				JSON.parse(message.json) as FigmaData,
+				selection
+			);
+			figma.ui.postMessage({ type: 'repaired', report });
+			figma.notify(
+				`TFS: ${report.rebound} bindings rebound, ${report.modes} modes moved${report.manual.length ? `, ${report.manual.length} to check` : ''}`
+			);
+		} catch (error) {
+			figma.ui.postMessage({
+				type: 'error',
+				message: error instanceof Error ? error.message : String(error),
+			});
+		}
+		return;
+	}
 	try {
 		const report = await sync(api, JSON.parse(message.json) as FigmaData);
 		figma.ui.postMessage({ type: 'report', report });

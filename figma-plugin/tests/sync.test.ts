@@ -1,15 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { FigmaData } from 'three-forma-styli';
-import {
-	sync,
-	type Api,
-	type Collection,
-	type EffectStyle,
-	type FontName,
-	type TextStyle,
-	type Variable,
-} from '../src/sync';
+import { sync } from '../src/sync';
+import { fakeFigma } from './fake';
 
 // TFS's real output for its everything-project (a committed snapshot).
 const data: FigmaData = JSON.parse(
@@ -18,92 +11,6 @@ const data: FigmaData = JSON.parse(
 		'utf8'
 	)
 );
-
-/** An in-memory stand-in for the slice of Figma's API the plugin uses. */
-function fakeFigma(
-	fonts: FontName[] = [
-		{ family: 'JetBrains Mono', style: 'Regular' },
-		{ family: 'JetBrains Mono', style: 'Medium' },
-		{ family: 'JetBrains Mono', style: 'Bold' },
-	]
-) {
-	let ids = 0;
-	const collections: (Collection & { modeList: { modeId: string; name: string }[] })[] = [];
-	const variables: (Variable & { values: Record<string, unknown> })[] = [];
-	const textStyles: (TextStyle & { bound?: string })[] = [];
-	const effectStyles: EffectStyle[] = [];
-	const api: Api = {
-		getCollections: async () => collections,
-		createCollection: (name) => {
-			const collection = {
-				id: `c${ids++}`,
-				name,
-				modeList: [{ modeId: `m${ids++}`, name: 'Mode 1' }],
-				get modes() {
-					return this.modeList;
-				},
-				renameMode(modeId: string, next: string) {
-					this.modeList.find((m) => m.modeId === modeId)!.name = next;
-				},
-				addMode(next: string) {
-					const modeId = `m${ids++}`;
-					this.modeList.push({ modeId, name: next });
-					return modeId;
-				},
-			};
-			collections.push(collection);
-			return collection;
-		},
-		getVariables: async () => [...variables],
-		createVariable: (name, collection, type) => {
-			const variable = {
-				id: `v${ids++}`,
-				name,
-				variableCollectionId: collection.id,
-				resolvedType: type,
-				scopes: [] as readonly string[],
-				values: {} as Record<string, unknown>,
-				setValueForMode(modeId: string, value: unknown) {
-					this.values[modeId] = value;
-				},
-			};
-			variables.push(variable);
-			return variable;
-		},
-		alias: (variable) => ({ type: 'VARIABLE_ALIAS', id: variable.id }),
-		availableFonts: async () => fonts,
-		loadFont: async () => {},
-		getTextStyles: async () => [...textStyles],
-		createTextStyle: () => {
-			const style = {
-				name: '',
-				description: '',
-				fontName: { family: '', style: '' },
-				fontSize: 0,
-				lineHeight: null,
-				letterSpacing: null,
-				textCase: '',
-				bound: undefined as string | undefined,
-				setBoundVariable(_field: 'fontSize', variable: Variable | null) {
-					this.bound = variable?.name;
-				},
-			};
-			textStyles.push(style);
-			return style;
-		},
-		getEffectStyles: async () => [...effectStyles],
-		createEffectStyle: () => {
-			const style = { name: '', description: '', effects: [] as readonly unknown[] };
-			effectStyles.push(style);
-			return style;
-		},
-		bindEffectColor: (effect, variable) => ({
-			...(effect as object),
-			boundVariables: { color: { id: variable.id } },
-		}),
-	};
-	return { api, collections, variables, textStyles, effectStyles };
-}
 
 describe('syncing figma.json into a Figma file', () => {
 	it('creates collections with the right modes, and variables with values per mode', async () => {

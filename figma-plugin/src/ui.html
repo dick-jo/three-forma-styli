@@ -35,6 +35,11 @@
 		font-weight: 600;
 		cursor: pointer;
 	}
+	button.secondary {
+		background-color: var(--figma-color-bg-secondary);
+		border: 1px solid var(--figma-color-border);
+		color: var(--figma-color-text);
+	}
 	.hint {
 		color: var(--figma-color-text-secondary);
 	}
@@ -56,6 +61,11 @@
 >
 <input id="url" type="text" value="http://localhost:5178/generated/figma.json" />
 <button id="fetch">Sync from tfs dev</button>
+<button id="repair" class="secondary">Repair selection</button>
+<span class="hint"
+	>Rebinds layers in the selected frames from older collections (e.g. an earlier sync) to the TFS
+	variables with the same names.</span
+>
 <span class="hint">…or pick a figma.json file: <input id="file" type="file" accept=".json" /></span>
 <pre id="out"></pre>
 
@@ -65,15 +75,25 @@
 		out.textContent = 'Syncing…';
 		parent.postMessage({ pluginMessage: { type: 'sync', json } }, '*');
 	};
-	document.getElementById('fetch').onclick = async () => {
+	const load = async () => {
 		const url = document.getElementById('url').value;
 		try {
 			const response = await fetch(url, { cache: 'no-store' });
 			if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-			send(await response.text());
+			return await response.text();
 		} catch (error) {
 			out.textContent = `Could not read ${url}: ${error.message}\nIs tfs dev running, and does tfs.config.ts have output.figma?`;
 		}
+	};
+	document.getElementById('fetch').onclick = async () => {
+		const json = await load();
+		if (json) send(json);
+	};
+	document.getElementById('repair').onclick = async () => {
+		const json = await load();
+		if (!json) return;
+		out.textContent = 'Repairing…';
+		parent.postMessage({ pluginMessage: { type: 'repair', json } }, '*');
 	};
 	document.getElementById('file').onchange = async (event) => {
 		const file = event.target.files[0];
@@ -83,6 +103,15 @@
 		const message = event.data.pluginMessage;
 		if (message.type === 'error') {
 			out.textContent = `✗ ${message.message}`;
+			return;
+		}
+		if (message.type === 'repaired') {
+			const { rebound, modes, manual } = message.report;
+			out.textContent =
+				`✓ ${rebound} bindings rebound · ${modes} frame modes moved\n\n` +
+				(manual.length
+					? `Check by hand (${manual.length})\n  ${manual.join('\n  ')}\n`
+					: 'Nothing left pointing at old collections.\n');
 			return;
 		}
 		const { created, updated, stale, skipped, errors } = message.report;
