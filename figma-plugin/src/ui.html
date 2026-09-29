@@ -1,5 +1,11 @@
 <style>
+	/* A definite height, so the report below can fill the rest of the panel and scroll. */
+	html,
 	body {
+		height: 100%;
+	}
+	body {
+		box-sizing: border-box;
 		margin: 0;
 		padding: 12px;
 		display: flex;
@@ -33,6 +39,7 @@
 		color: var(--figma-color-text-secondary);
 	}
 	pre {
+		min-height: 0;
 		margin: 0;
 		flex: 1;
 		overflow: auto;
