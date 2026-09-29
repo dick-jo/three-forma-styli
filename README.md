@@ -5,7 +5,7 @@ TypeScript files of deliberate choices (colours, spacing, type, shadows, motion)
 TFS derives the repetitive scales and emits framework-neutral CSS variables and
 exact TypeScript types for your app.
 
-> **Status:** `three-forma-styli@0.5.0` is on npm. (0.4.0 was four `@three-forma-styli/*` packages.)
+> **Status:** `three-forma-styli` is on npm (0.5.1). (0.4.0 was four `@three-forma-styli/*` packages.)
 
 ## Try it
 
@@ -43,14 +43,14 @@ pnpm tfs dev
 
 ## Where things live
 
-| Path                    | Job                                                                              |
-| ----------------------- | -------------------------------------------------------------------------------- |
-| `tfs/`                  | the one npm package, `three-forma-styli`: authoring helpers, build, CLI, runtime |
-| `tfs/themes/standard/`  | the standard theme, and the example to read                                      |
-| `tfs/tests/`            | tests, including the everything-project fixture                                  |
-| `workbench/`            | the review UI opened by `tfs dev`; reads TFS's data file only                    |
-| `figma-plugin/` (later) | reads TFS's Figma output only                                                    |
-| `docs/`                 | the Board and the progress file, nothing else                                    |
+| Path                   | Job                                                                              |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `tfs/`                 | the one npm package, `three-forma-styli`: authoring helpers, build, CLI, runtime |
+| `tfs/themes/standard/` | the standard theme, and the example to read                                      |
+| `tfs/tests/`           | tests, including the everything-project fixture                                  |
+| `workbench/`           | the review UI opened by `tfs dev`; reads TFS's data file only                    |
+| `figma-plugin/`        | TFS Token Sync: applies `generated/figma.json` to a Figma file                   |
+| `docs/`                | the Board and the progress file, nothing else                                    |
 
 ## Figma
 
