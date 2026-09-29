@@ -81,7 +81,9 @@ async function syncVariables(
 ): Promise<Map<string, Variable>> {
 	const collections = await api.getCollections();
 	const existing = await api.getVariables();
-	const byName = new Map(existing.map((variable) => [variable.name, variable]));
+	// Names are unique per collection, not per file; aliases and style bindings only
+	// ever point at variables in TFS's own collections.
+	const byName = new Map<string, Variable>();
 	const pending: { variable: Variable; values: readonly FigmaValue[]; modeIds: string[] }[] = [];
 
 	for (const spec of data.collections) {
@@ -111,22 +113,21 @@ async function syncVariables(
 		}
 
 		for (const want of spec.variables) {
-			let variable = byName.get(want.name);
-			if (
-				variable &&
-				(variable.variableCollectionId !== collection.id || variable.resolvedType !== want.type)
-			) {
+			let variable = existing.find(
+				(v) => v.variableCollectionId === collection.id && v.name === want.name
+			);
+			if (variable && variable.resolvedType !== want.type) {
 				report.errors.push(
-					`variable ${want.name} already exists as a different kind or in another collection; rename or remove it in Figma`
+					`variable ${want.name} in ${spec.name} is a different kind (${variable.resolvedType}); rename or remove it in Figma`
 				);
 				continue;
 			}
 			if (variable) report.updated.push(`variable ${want.name}`);
 			else {
 				variable = api.createVariable(want.name, collection, want.type);
-				byName.set(want.name, variable);
 				report.created.push(`variable ${want.name}`);
 			}
+			byName.set(want.name, variable);
 			variable.scopes = want.scopes;
 			pending.push({ variable, values: want.values, modeIds });
 		}

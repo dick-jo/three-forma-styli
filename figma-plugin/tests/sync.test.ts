@@ -188,6 +188,19 @@ describe('syncing figma.json into a Figma file', () => {
 		expect(figma.variables.some((v) => v.name === 'bdw')).toBe(true);
 	});
 
+	it('ignores same-named variables in other collections (e.g. an older sync)', async () => {
+		const figma = fakeFigma();
+		const old = figma.api.createCollection('Color');
+		const oldBg = figma.api.createVariable('clr/bg', old, 'COLOR');
+		const report = await sync(figma.api, data);
+		expect(report.errors).toEqual([]);
+		const theme = figma.collections.find((c) => c.name === 'theme')!;
+		const bg = figma.variables.filter((v) => v.name === 'clr/bg');
+		expect(bg.map((v) => v.variableCollectionId).sort()).toEqual([old.id, theme.id].sort());
+		const lo = figma.effectStyles.find((s) => s.name === 'shd/lo')!;
+		expect((lo.effects[0] as any).boundVariables.color.id).not.toBe(oldBg.id);
+	});
+
 	it('skips a text style whose weight the font lacks, and says why', async () => {
 		const figma = fakeFigma([{ family: 'JetBrains Mono', style: 'Regular' }]);
 		const report = await sync(figma.api, data);
