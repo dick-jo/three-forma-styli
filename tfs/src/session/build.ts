@@ -59,7 +59,9 @@ function textFiles(
 	return files;
 }
 
-/** Runs every check and writes the complete output into `directory` (which must not exist yet). */
+const GIT_IGNORE = '.gitignore';
+
+/** Runs every check and writes the complete output into `directory`. */
 async function generateInto(loaded: LoadedConfig, directory: string): Promise<BuildResult> {
 	const resolved = resolveSystem(loaded.config.system);
 	const fonts = loaded.config.system.typography
@@ -77,15 +79,19 @@ async function generateInto(loaded: LoadedConfig, directory: string): Promise<Bu
  * Checks everything and generates into a staging folder first, so an invalid
  * system writes nothing. Then moves only the changed files into the existing
  * output folder and removes files no longer generated. The folder itself is never
- * replaced, so file watchers (Vite, editors) keep seeing changes.
+ * replaced, so file watchers (Vite, editors) keep seeing changes. The staging
+ * folder ignores itself for git, so an interrupted build can't be committed.
  */
 export async function buildProject(loaded: LoadedConfig): Promise<BuildResult> {
 	const staging = `${loaded.outDir}.tfs-staging-${process.pid}`;
 	await rm(staging, { recursive: true, force: true });
 	try {
+		await mkdir(staging, { recursive: true });
+		await writeFile(join(staging, GIT_IGNORE), '*\n');
 		const result = await generateInto(loaded, staging);
 		await mkdir(loaded.outDir, { recursive: true });
-		const [fresh, current] = await Promise.all([listFiles(staging), listFiles(loaded.outDir)]);
+		const [all, current] = await Promise.all([listFiles(staging), listFiles(loaded.outDir)]);
+		const fresh = all.filter((file) => file !== GIT_IGNORE);
 		for (const file of fresh) {
 			const target = join(loaded.outDir, file);
 			const [next, previous] = await Promise.all([
