@@ -76,6 +76,12 @@ handled one axis only).
   For roles whose `textTransform` isn't `none`, also emit `{role}/as typed/{size}`:
   identical, case `ORIGINAL`, bound to the same variables. Founder likes it; parked.
   Raised by Scatter's label/heading mocks, 2026-10-01.
+- **Shadow directions:** `defineShadows({ …, directions: ['up', 'left', 'right'] })`.
+  Author once with light from above; TFS rotates each layer's offset per direction
+  (up `(−x, −y)`, left `(−y, x)`, right `(y, −x)`) and emits `--shd-{dir}-min…max`.
+  Blur, spread and colour unchanged; CSS, Figma and Workbench need nothing new.
+  Open: whether named ranges get directions too (`--shd-{range}-{dir}-*`).
+  Replaces hand-flipped sets like Scatter's `up` range. Raised 2026-10-01.
 
 ## Finish-line checks
 
