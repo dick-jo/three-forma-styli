@@ -26,7 +26,7 @@
 		"node": ">=24"
 	},
 	"bin": {
-		"tfs": "./dist/cli.js"
+		"tfs": "dist/cli.js"
 	},
 	"exports": {
 		".": {
