@@ -71,6 +71,11 @@ handled one axis only).
 - **Drop the Python dependency:** replace FontTools with a WebAssembly WOFF2 library from
   npm, so `npm install` is all TFS needs. Must produce byte-identical output (the font
   tests and committed snapshots prove it). Raised by the rkgk setup, 2026-09-28.
+- **Figma "as typed" text style twins:** Figma text styles can't override letter case
+  without detaching, so code's `<Text textTransform="none">` has no Figma equivalent.
+  For roles whose `textTransform` isn't `none`, also emit `{role}/as typed/{size}`:
+  identical, case `ORIGINAL`, bound to the same variables. Founder likes it; parked.
+  Raised by Scatter's label/heading mocks, 2026-10-01.
 
 ## Finish-line checks
 
