@@ -50,11 +50,11 @@ describe('syncing figma.json into a Figma file', () => {
 	it('creates effect styles whose colours are bound to colour variables', async () => {
 		const figma = fakeFigma();
 		await sync(figma.api, data);
-		const lo = figma.effectStyles.find((s) => s.name === 'shd/lo')!;
+		const lo = figma.effectStyles.find((s) => s.name === 'shd/up/lo')!;
 		const shdLo = figma.variables.find((v) => v.name === 'clr/shd/lo')!;
 		expect(lo.effects[0]).toMatchObject({
 			type: 'DROP_SHADOW',
-			offset: { x: 0, y: 1 },
+			offset: { x: 1, y: -1 },
 			radius: 2,
 			boundVariables: { color: { id: shdLo.id } },
 		});
@@ -91,7 +91,7 @@ describe('syncing figma.json into a Figma file', () => {
 			effectStyles: data.effectStyles.slice(1),
 		};
 		const report = await sync(figma.api, fewer);
-		expect(report.stale).toEqual(['variable bdw', 'effect style shd/min']);
+		expect(report.stale).toEqual(['variable bdw', 'effect style shd/down/min']);
 		expect(figma.variables.some((v) => v.name === 'bdw')).toBe(true);
 	});
 
@@ -104,7 +104,7 @@ describe('syncing figma.json into a Figma file', () => {
 		const theme = figma.collections.find((c) => c.name === 'theme')!;
 		const bg = figma.variables.filter((v) => v.name === 'clr/bg');
 		expect(bg.map((v) => v.variableCollectionId).sort()).toEqual([old.id, theme.id].sort());
-		const lo = figma.effectStyles.find((s) => s.name === 'shd/lo')!;
+		const lo = figma.effectStyles.find((s) => s.name === 'shd/up/lo')!;
 		expect((lo.effects[0] as any).boundVariables.color.id).not.toBe(oldBg.id);
 	});
 

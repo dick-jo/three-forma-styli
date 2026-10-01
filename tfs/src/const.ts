@@ -21,6 +21,8 @@ export const FONT_STYLES = ['normal', 'italic'] as const;
 export const FONT_CATEGORIES = ['sans', 'serif', 'mono'] as const;
 export const TEXT_TRANSFORMS = ['none', 'uppercase', 'lowercase', 'capitalize'] as const;
 export const TIME_UNITS = ['ms', 's'] as const;
+/** Directional shadow sets: which way the shadow falls. Down/up fall along y, left/right along x. */
+export const SHADOW_DIRECTIONS = ['down', 'up', 'left', 'right'] as const;
 export const LENGTH_UNITS = [
 	'px',
 	'rem',

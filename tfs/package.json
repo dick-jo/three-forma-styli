@@ -1,6 +1,6 @@
 {
 	"name": "three-forma-styli",
-	"version": "0.5.2",
+	"version": "0.6.0",
 	"description": "A designer's opinionated shorthand for design systems: readable TypeScript in, CSS variables and exact types out.",
 	"keywords": [
 		"design-system",

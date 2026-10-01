@@ -21,6 +21,29 @@ function problems(change: (system: any) => void): string[] {
 describe('the everything-project resolves', () => {
 	const resolved = resolveSystem(system);
 
+	it('expands a directional set into one set per direction', () => {
+		const { ordinary, ranges } = resolved.ordinary.shadows!;
+		expect(ordinary).toBeUndefined();
+		expect(Object.keys(ranges)).toEqual(['down', 'up', 'left', 'right', 'glow-pri', 'glow-duo']);
+		// lo[0]: offset 1, x 1 (shifts down/up), y 1 (shifts left/right).
+		const at = (direction: string) => {
+			const { x, y } = ranges[direction]!.lo![0]!;
+			return [x, y];
+		};
+		expect(at('down')).toEqual([1, 1]);
+		expect(at('up')).toEqual([1, -1]);
+		expect(at('left')).toEqual([-1, 1]);
+		expect(at('right')).toEqual([1, 1]);
+		expect(ranges.down!.lo![0]).not.toHaveProperty('offset');
+	});
+
+	it('mode changes reach every direction', () => {
+		const small = resolved.modes.find((m) => m.axis === 'size' && m.mode === 's')!.values;
+		for (const direction of ['down', 'up', 'left', 'right'])
+			expect(small.shadows!.ranges[direction]!.max![1]!.blur).toBe(32);
+		expect(small.shadows!.ranges.up!.max![1]!.y).toBe(-12);
+	});
+
 	it('has one entry per registered mode', () => {
 		expect(resolved.modes.map((mode) => `${mode.axis}.${mode.mode}`)).toEqual([
 			'theme.dark',
@@ -138,6 +161,54 @@ describe('problems are reported with their path', () => {
 			'shadows.min[0].color: "nope" is not a colour',
 		],
 		[
+			'offset needs directions',
+			(s: any) => {
+				delete s.shadows.directions;
+			},
+			'shadows.min[0].offset: needs directions on its set (or use x and y)',
+		],
+		[
+			'directions need offset',
+			(s: any) => delete s.shadows.hi[0].offset,
+			'shadows.hi[0].offset: must be a finite number',
+		],
+		[
+			'only real directions',
+			(s: any) => (s.shadows.directions = ['down', 'north']),
+			'shadows.directions[1]: "north" is not a direction (down, up, left, right)',
+		],
+		[
+			'no direction twice',
+			(s: any) => (s.shadows.directions = ['down', 'down']),
+			'shadows.directions[1]: "down" is listed twice',
+		],
+		[
+			'down/up take y from offset',
+			(s: any) => (s.shadows.directions = ['down', 'up']),
+			'shadows.lo[0].y: down/up take y from offset; use x to shift sideways',
+		],
+		[
+			'left/right take x from offset',
+			(s: any) => (s.shadows.directions = ['left', 'right']),
+			'shadows.lo[0].x: left/right take x from offset; use y to shift',
+		],
+		[
+			'expanded names never collide',
+			(s: any) => (s.shadows.ranges.up = s.shadows.ranges['glow-pri']),
+			'shadows: two sets would both be named "up"; rename a range',
+		],
+		[
+			'modes cannot change directions',
+			(s: any) => (s.shadows.modes.size.s.ranges = { 'glow-pri': { directions: ['up'] } }),
+			'shadows.modes.size.s.ranges.glow-pri.directions: cannot be changed by a mode',
+		],
+		[
+			'mode layers follow the set kind',
+			(s: any) =>
+				(s.shadows.modes.size.s.max[0] = { x: 0, y: 2, blur: 4, color: { color: 'shd' } }),
+			'shadows.modes.size.s.max[0].offset: must be a finite number',
+		],
+		[
 			'time increases',
 			(s: any) => (s.time.values.hi = 50),
 			'time.values: hi (50) must be greater than lo (100)',
@@ -172,6 +243,12 @@ describe('problems are reported with their path', () => {
 		],
 	])('%s', (_name, change, expected) => {
 		expect(problems(change)).toContain(expected);
+	});
+
+	it('reports a layer problem once, at the authored path, not per direction', () => {
+		expect(problems((s) => (s.shadows.min[0].blur = -1))).toEqual([
+			'shadows.min[0].blur: must be 0 or more',
+		]);
 	});
 
 	it('reports every problem at once', () => {

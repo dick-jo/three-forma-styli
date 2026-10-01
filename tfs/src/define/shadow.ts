@@ -1,4 +1,4 @@
-import { LO_HI_POSITIONS } from '../const.js';
+import { LO_HI_POSITIONS, type SHADOW_DIRECTIONS } from '../const.js';
 import type { ModeCatalogue, ModesCheck, Register } from './axes.js';
 import type { AlphaPosition, ColorIdentity, Oklch } from './color.js';
 
@@ -15,22 +15,50 @@ type LayerShape = {
 	readonly inset?: boolean;
 };
 
-type ShadowLayer = LayerShape & {
+type LayerColor = {
 	readonly color: { readonly color: ColorIdentity<Colors>; readonly alpha?: AlphaPosition };
 };
 
+/** Fixed: a literal screen offset. */
+type FixedLayer = LayerShape & LayerColor & { readonly offset?: never };
+
+/**
+ * Directional: `offset` is how far the shadow falls, along each listed direction.
+ * `x` shifts down/up shadows sideways; `y` shifts left/right ones. Default 0.
+ */
+type DirectionalLayer = Omit<LayerShape, 'x' | 'y'> &
+	LayerColor & { readonly offset: number; readonly x?: number; readonly y?: number };
+
+type Directions = readonly [
+	(typeof SHADOW_DIRECTIONS)[number],
+	...(typeof SHADOW_DIRECTIONS)[number][],
+];
+
 type ShadowRange<Layer> = Readonly<Record<ShadowPosition, readonly [Layer, ...Layer[]]>>;
 
-/** Ordinary range unnamed at the top (--shd-*); named extras in `ranges` (--shd-{name}-*). */
+/** Fixed sets have no directions; directional sets list them and emit one set per direction. */
+type ShadowSet =
+	| (ShadowRange<FixedLayer> & { readonly directions?: never })
+	| (ShadowRange<DirectionalLayer> & { readonly directions: Directions });
+
+type AnyLayer = FixedLayer | DirectionalLayer;
+
+/**
+ * Ordinary set unnamed at the top (--shd-*); named extras in `ranges` (--shd-{name}-*).
+ * A directional set emits one set per direction: --shd-{direction}-*, --shd-{name}-{direction}-*.
+ */
 type ShadowDraft = {
 	readonly unit: string;
-	readonly ranges?: Readonly<Record<string, ShadowRange<ShadowLayer>>>;
+	readonly ranges?: Readonly<Record<string, ShadowSet>>;
 	readonly modes?: ModeCatalogue<
-		Partial<ShadowRange<ShadowLayer>> & {
-			readonly ranges?: Readonly<Record<string, Partial<ShadowRange<ShadowLayer>>>>;
+		Partial<ShadowRange<AnyLayer>> & {
+			readonly ranges?: Readonly<Record<string, Partial<ShadowRange<AnyLayer>>>>;
 		}
 	>;
-} & Partial<ShadowRange<ShadowLayer>>;
+} & (
+	| (Partial<ShadowRange<FixedLayer>> & { readonly directions?: never })
+	| (ShadowRange<DirectionalLayer> & { readonly directions: Directions })
+);
 
 export function defineShadows<const T extends ShadowDraft>(shadows: T & ModesCheck<T>): T {
 	return shadows;

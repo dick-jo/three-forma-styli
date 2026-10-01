@@ -85,10 +85,22 @@
 	--bdr-l: var(--sp-2);
 	--bdr-max: var(--sp-3);
 	--bdw: 1px;
-	--shd-min: 0px 1px 2px var(--clr-shd-a-min);
-	--shd-lo: 0px 1px 2px var(--clr-shd-a-lo), 0px 6px 18px -4px var(--clr-shd-a-min);
-	--shd-hi: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo-x);
-	--shd-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-down-min: 0px 1px 2px var(--clr-shd-a-min);
+	--shd-down-lo: 1px 1px 2px var(--clr-shd-a-lo), 0px 6px 18px -4px var(--clr-shd-a-min);
+	--shd-down-hi: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-down-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-up-min: 0px -1px 2px var(--clr-shd-a-min);
+	--shd-up-lo: 1px -1px 2px var(--clr-shd-a-lo), 0px -6px 18px -4px var(--clr-shd-a-min);
+	--shd-up-hi: 0px -2px 4px var(--clr-shd-a-lo), 0px -12px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-up-max: 0px -3px 6px var(--clr-shd-a-lo), 0px -20px 48px -8px var(--clr-shd-a-lo);
+	--shd-left-min: -1px 0px 2px var(--clr-shd-a-min);
+	--shd-left-lo: -1px 1px 2px var(--clr-shd-a-lo), -6px 0px 18px -4px var(--clr-shd-a-min);
+	--shd-left-hi: -2px 0px 4px var(--clr-shd-a-lo), -12px 0px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-left-max: -3px 0px 6px var(--clr-shd-a-lo), -20px 0px 48px -8px var(--clr-shd-a-lo);
+	--shd-right-min: 1px 0px 2px var(--clr-shd-a-min);
+	--shd-right-lo: 1px 1px 2px var(--clr-shd-a-lo), 6px 0px 18px -4px var(--clr-shd-a-min);
+	--shd-right-hi: 2px 0px 4px var(--clr-shd-a-lo), 12px 0px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-right-max: 3px 0px 6px var(--clr-shd-a-lo), 20px 0px 48px -8px var(--clr-shd-a-lo);
 	--shd-glow-pri-min: 0px 0px 4px var(--clr-pri-a-min);
 	--shd-glow-pri-lo: 0px 0px 12px var(--clr-pri-a-lo-x);
 	--shd-glow-pri-hi: 0px 0px 24px var(--clr-pri-a-lo);
@@ -271,10 +283,22 @@
 	--clr-shd-a-hi: oklch(0.06 0 0 / 0.68);
 	--clr-shd-a-hi-x: oklch(0.06 0 0 / 0.85);
 	--clr-shd-a-max: oklch(0.06 0 0 / 0.93);
-	--shd-min: 0px 1px 2px var(--clr-shd-a-min);
-	--shd-lo: 0px 1px 2px var(--clr-shd-a-lo), 0px 6px 18px -4px var(--clr-shd-a-min);
-	--shd-hi: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo-x);
-	--shd-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-down-min: 0px 1px 2px var(--clr-shd-a-min);
+	--shd-down-lo: 1px 1px 2px var(--clr-shd-a-lo), 0px 6px 18px -4px var(--clr-shd-a-min);
+	--shd-down-hi: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-down-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-up-min: 0px -1px 2px var(--clr-shd-a-min);
+	--shd-up-lo: 1px -1px 2px var(--clr-shd-a-lo), 0px -6px 18px -4px var(--clr-shd-a-min);
+	--shd-up-hi: 0px -2px 4px var(--clr-shd-a-lo), 0px -12px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-up-max: 0px -3px 6px var(--clr-shd-a-lo), 0px -20px 48px -8px var(--clr-shd-a-lo);
+	--shd-left-min: -1px 0px 2px var(--clr-shd-a-min);
+	--shd-left-lo: -1px 1px 2px var(--clr-shd-a-lo), -6px 0px 18px -4px var(--clr-shd-a-min);
+	--shd-left-hi: -2px 0px 4px var(--clr-shd-a-lo), -12px 0px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-left-max: -3px 0px 6px var(--clr-shd-a-lo), -20px 0px 48px -8px var(--clr-shd-a-lo);
+	--shd-right-min: 1px 0px 2px var(--clr-shd-a-min);
+	--shd-right-lo: 1px 1px 2px var(--clr-shd-a-lo), 6px 0px 18px -4px var(--clr-shd-a-min);
+	--shd-right-hi: 2px 0px 4px var(--clr-shd-a-lo), 12px 0px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-right-max: 3px 0px 6px var(--clr-shd-a-lo), 20px 0px 48px -8px var(--clr-shd-a-lo);
 	--shd-glow-pri-min: 0px 0px 4px var(--clr-pri-a-min);
 	--shd-glow-pri-lo: 0px 0px 12px var(--clr-pri-a-lo-x);
 	--shd-glow-pri-hi: 0px 0px 24px var(--clr-pri-a-lo);
@@ -341,10 +365,22 @@
 	--clr-shd-a-hi: oklch(0.2 0 0 / 0.68);
 	--clr-shd-a-hi-x: oklch(0.2 0 0 / 0.85);
 	--clr-shd-a-max: oklch(0.2 0 0 / 0.93);
-	--shd-min: 0px 1px 2px var(--clr-shd-a-min);
-	--shd-lo: 0px 1px 2px var(--clr-shd-a-lo), 0px 6px 18px -4px var(--clr-shd-a-min);
-	--shd-hi: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo-x);
-	--shd-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-down-min: 0px 1px 2px var(--clr-shd-a-min);
+	--shd-down-lo: 1px 1px 2px var(--clr-shd-a-lo), 0px 6px 18px -4px var(--clr-shd-a-min);
+	--shd-down-hi: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-down-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-up-min: 0px -1px 2px var(--clr-shd-a-min);
+	--shd-up-lo: 1px -1px 2px var(--clr-shd-a-lo), 0px -6px 18px -4px var(--clr-shd-a-min);
+	--shd-up-hi: 0px -2px 4px var(--clr-shd-a-lo), 0px -12px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-up-max: 0px -3px 6px var(--clr-shd-a-lo), 0px -20px 48px -8px var(--clr-shd-a-lo);
+	--shd-left-min: -1px 0px 2px var(--clr-shd-a-min);
+	--shd-left-lo: -1px 1px 2px var(--clr-shd-a-lo), -6px 0px 18px -4px var(--clr-shd-a-min);
+	--shd-left-hi: -2px 0px 4px var(--clr-shd-a-lo), -12px 0px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-left-max: -3px 0px 6px var(--clr-shd-a-lo), -20px 0px 48px -8px var(--clr-shd-a-lo);
+	--shd-right-min: 1px 0px 2px var(--clr-shd-a-min);
+	--shd-right-lo: 1px 1px 2px var(--clr-shd-a-lo), 6px 0px 18px -4px var(--clr-shd-a-min);
+	--shd-right-hi: 2px 0px 4px var(--clr-shd-a-lo), 12px 0px 32px -6px var(--clr-shd-a-lo-x);
+	--shd-right-max: 3px 0px 6px var(--clr-shd-a-lo), 20px 0px 48px -8px var(--clr-shd-a-lo);
 	--shd-glow-pri-min: 0px 0px 4px var(--clr-pri-a-min);
 	--shd-glow-pri-lo: 0px 0px 12px var(--clr-pri-a-lo-x);
 	--shd-glow-pri-hi: 0px 0px 24px var(--clr-pri-a-lo);
@@ -376,7 +412,10 @@
 	--bdr-s: var(--sp-1);
 	--bdr-l: var(--sp-2);
 	--bdr-max: var(--sp-3);
-	--shd-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-down-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-up-max: 0px -3px 6px var(--clr-shd-a-lo), 0px -20px 48px -8px var(--clr-shd-a-lo);
+	--shd-left-max: -3px 0px 6px var(--clr-shd-a-lo), -20px 0px 48px -8px var(--clr-shd-a-lo);
+	--shd-right-max: 3px 0px 6px var(--clr-shd-a-lo), 20px 0px 48px -8px var(--clr-shd-a-lo);
 	--fs-min: 0.625rem;
 	--fs-1: 0.75rem;
 	--fs-2: 0.875rem;
@@ -443,7 +482,10 @@
 	--bdr-s: var(--sp-1);
 	--bdr-l: var(--sp-2);
 	--bdr-max: var(--sp-3);
-	--shd-max: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo);
+	--shd-down-max: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo);
+	--shd-up-max: 0px -2px 4px var(--clr-shd-a-lo), 0px -12px 32px -6px var(--clr-shd-a-lo);
+	--shd-left-max: -2px 0px 4px var(--clr-shd-a-lo), -12px 0px 32px -6px var(--clr-shd-a-lo);
+	--shd-right-max: 2px 0px 4px var(--clr-shd-a-lo), 12px 0px 32px -6px var(--clr-shd-a-lo);
 	--fs-min: 0.625rem;
 	--fs-1: 0.6875rem;
 	--fs-2: 0.8125rem;
@@ -510,7 +552,10 @@
 	--bdr-s: var(--sp-1);
 	--bdr-l: var(--sp-2);
 	--bdr-max: var(--sp-3);
-	--shd-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-down-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-up-max: 0px -3px 6px var(--clr-shd-a-lo), 0px -20px 48px -8px var(--clr-shd-a-lo);
+	--shd-left-max: -3px 0px 6px var(--clr-shd-a-lo), -20px 0px 48px -8px var(--clr-shd-a-lo);
+	--shd-right-max: 3px 0px 6px var(--clr-shd-a-lo), 20px 0px 48px -8px var(--clr-shd-a-lo);
 	--fs-min: 0.6875rem;
 	--fs-1: 0.8125rem;
 	--fs-2: 0.9375rem;
@@ -557,13 +602,22 @@
 }
 [data-size-mode="regular"][data-theme-mode],
 [data-size-mode="regular"] [data-theme-mode]:not([data-size-mode]):not([data-size-mode="regular"] [data-size-mode]:not([data-size-mode="regular"]) [data-theme-mode]) {
-	--shd-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-down-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-up-max: 0px -3px 6px var(--clr-shd-a-lo), 0px -20px 48px -8px var(--clr-shd-a-lo);
+	--shd-left-max: -3px 0px 6px var(--clr-shd-a-lo), -20px 0px 48px -8px var(--clr-shd-a-lo);
+	--shd-right-max: 3px 0px 6px var(--clr-shd-a-lo), 20px 0px 48px -8px var(--clr-shd-a-lo);
 }
 [data-size-mode="s"][data-theme-mode],
 [data-size-mode="s"] [data-theme-mode]:not([data-size-mode]):not([data-size-mode="s"] [data-size-mode]:not([data-size-mode="s"]) [data-theme-mode]) {
-	--shd-max: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo);
+	--shd-down-max: 0px 2px 4px var(--clr-shd-a-lo), 0px 12px 32px -6px var(--clr-shd-a-lo);
+	--shd-up-max: 0px -2px 4px var(--clr-shd-a-lo), 0px -12px 32px -6px var(--clr-shd-a-lo);
+	--shd-left-max: -2px 0px 4px var(--clr-shd-a-lo), -12px 0px 32px -6px var(--clr-shd-a-lo);
+	--shd-right-max: 2px 0px 4px var(--clr-shd-a-lo), 12px 0px 32px -6px var(--clr-shd-a-lo);
 }
 [data-size-mode="l"][data-theme-mode],
 [data-size-mode="l"] [data-theme-mode]:not([data-size-mode]):not([data-size-mode="l"] [data-size-mode]:not([data-size-mode="l"]) [data-theme-mode]) {
-	--shd-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-down-max: 0px 3px 6px var(--clr-shd-a-lo), 0px 20px 48px -8px var(--clr-shd-a-lo);
+	--shd-up-max: 0px -3px 6px var(--clr-shd-a-lo), 0px -20px 48px -8px var(--clr-shd-a-lo);
+	--shd-left-max: -3px 0px 6px var(--clr-shd-a-lo), -20px 0px 48px -8px var(--clr-shd-a-lo);
+	--shd-right-max: 3px 0px 6px var(--clr-shd-a-lo), 20px 0px 48px -8px var(--clr-shd-a-lo);
 }

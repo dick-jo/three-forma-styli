@@ -9,9 +9,11 @@ export type Modes<Fields> = Readonly<Record<string, Readonly<Record<string, Fiel
 
 export type AlphaValues = Readonly<Record<string, number>>;
 export type SpacingRef = 'min' | number;
+/** Fixed layers give `x, y`; directional layers give `offset` (and x or y across it). */
 export type Layer = {
 	readonly x: number;
 	readonly y: number;
+	readonly offset?: number;
 	readonly blur: number;
 	readonly spread?: number;
 	readonly inset?: boolean;
@@ -101,6 +103,7 @@ export type SystemInput = {
 	};
 	readonly shadows?: Readonly<Record<string, unknown>> & {
 		readonly unit: string;
+		readonly directions?: readonly string[];
 		readonly ranges?: Readonly<Record<string, LayerRange>>;
 		readonly modes?: Modes<Readonly<Record<string, unknown>>>;
 	};

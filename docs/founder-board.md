@@ -158,13 +158,22 @@ Radius references Spacing like Gap (`--bdr-*`). Width is one non-negative scalar
 ```ts
 defineShadows({
   unit: 'px',
-  min: [...], lo: [...], hi: [...], max: [...],        // → --shd-min … --shd-max
+  directions: ['down', 'up', 'left', 'right'],         // → --shd-down-* … --shd-right-*
+  min: [{ offset: 1, blur: 2, color }], lo: [...], hi: [...], max: [...],
   ranges: { inset: {...}, ...shadowsForColors({ prefix: 'glow', colors, range }) },
 })
 ```
 
-- Each position is a non-empty layer list: `x, y, blur, color: { color, alpha? }`,
-  optional `spread`, `inset`. Blur >= 0; offsets and spread may be negative.
+- Each position is a non-empty layer list: `blur, color: { color, alpha? }`,
+  optional `spread`, `inset`, plus its offset. Blur >= 0; spread may be negative.
+- **Fixed sets** give each layer `x, y` (screen offset; may be negative).
+- **Directional sets** list `directions` (any of down, up, left, right) and give each
+  layer `offset` (>= 0): how far it falls along each direction. `x` shifts down/up
+  sideways and `y` shifts left/right (default 0); a set without left/right may not
+  give `y`, one without down/up may not give `x`. Every name states its direction:
+  `--shd-{direction}-*`, `--shd-{name}-{direction}-*`. No unnamed "down" default.
+- A set is one kind; `offset` without `directions` (or the reverse) fails the build,
+  as do two sets that would share a name. Modes change layers, never directions.
 - Named ranges emit `--shd-{name}-*`. A project may have only named ranges.
 - `shadowsForColors` copies one design per Color (`glow-pri`, `glow-duo`).
 - The app chooses `box-shadow` vs `text-shadow`. No classes, no none-token.

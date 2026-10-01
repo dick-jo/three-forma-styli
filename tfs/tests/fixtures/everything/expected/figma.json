@@ -1812,7 +1812,7 @@
 	],
 	"effectStyles": [
 		{
-			"name": "shd/min",
+			"name": "shd/down/min",
 			"layers": [
 				{
 					"inset": false,
@@ -1825,11 +1825,11 @@
 			]
 		},
 		{
-			"name": "shd/lo",
+			"name": "shd/down/lo",
 			"layers": [
 				{
 					"inset": false,
-					"x": 0,
+					"x": 1,
 					"y": 1,
 					"blur": 2,
 					"spread": 0,
@@ -1846,7 +1846,7 @@
 			]
 		},
 		{
-			"name": "shd/hi",
+			"name": "shd/down/hi",
 			"layers": [
 				{
 					"inset": false,
@@ -1867,7 +1867,7 @@
 			]
 		},
 		{
-			"name": "shd/max",
+			"name": "shd/down/max",
 			"layers": [
 				{
 					"inset": false,
@@ -1881,6 +1881,234 @@
 					"inset": false,
 					"x": 0,
 					"y": 20,
+					"blur": 48,
+					"spread": -8,
+					"color": "clr/shd/lo"
+				}
+			]
+		},
+		{
+			"name": "shd/up/min",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": -1,
+					"blur": 2,
+					"spread": 0,
+					"color": "clr/shd/min"
+				}
+			]
+		},
+		{
+			"name": "shd/up/lo",
+			"layers": [
+				{
+					"inset": false,
+					"x": 1,
+					"y": -1,
+					"blur": 2,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": 0,
+					"y": -6,
+					"blur": 18,
+					"spread": -4,
+					"color": "clr/shd/min"
+				}
+			]
+		},
+		{
+			"name": "shd/up/hi",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": -2,
+					"blur": 4,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": 0,
+					"y": -12,
+					"blur": 32,
+					"spread": -6,
+					"color": "clr/shd/lo-x"
+				}
+			]
+		},
+		{
+			"name": "shd/up/max",
+			"layers": [
+				{
+					"inset": false,
+					"x": 0,
+					"y": -3,
+					"blur": 6,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": 0,
+					"y": -20,
+					"blur": 48,
+					"spread": -8,
+					"color": "clr/shd/lo"
+				}
+			]
+		},
+		{
+			"name": "shd/left/min",
+			"layers": [
+				{
+					"inset": false,
+					"x": -1,
+					"y": 0,
+					"blur": 2,
+					"spread": 0,
+					"color": "clr/shd/min"
+				}
+			]
+		},
+		{
+			"name": "shd/left/lo",
+			"layers": [
+				{
+					"inset": false,
+					"x": -1,
+					"y": 1,
+					"blur": 2,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": -6,
+					"y": 0,
+					"blur": 18,
+					"spread": -4,
+					"color": "clr/shd/min"
+				}
+			]
+		},
+		{
+			"name": "shd/left/hi",
+			"layers": [
+				{
+					"inset": false,
+					"x": -2,
+					"y": 0,
+					"blur": 4,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": -12,
+					"y": 0,
+					"blur": 32,
+					"spread": -6,
+					"color": "clr/shd/lo-x"
+				}
+			]
+		},
+		{
+			"name": "shd/left/max",
+			"layers": [
+				{
+					"inset": false,
+					"x": -3,
+					"y": 0,
+					"blur": 6,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": -20,
+					"y": 0,
+					"blur": 48,
+					"spread": -8,
+					"color": "clr/shd/lo"
+				}
+			]
+		},
+		{
+			"name": "shd/right/min",
+			"layers": [
+				{
+					"inset": false,
+					"x": 1,
+					"y": 0,
+					"blur": 2,
+					"spread": 0,
+					"color": "clr/shd/min"
+				}
+			]
+		},
+		{
+			"name": "shd/right/lo",
+			"layers": [
+				{
+					"inset": false,
+					"x": 1,
+					"y": 1,
+					"blur": 2,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": 6,
+					"y": 0,
+					"blur": 18,
+					"spread": -4,
+					"color": "clr/shd/min"
+				}
+			]
+		},
+		{
+			"name": "shd/right/hi",
+			"layers": [
+				{
+					"inset": false,
+					"x": 2,
+					"y": 0,
+					"blur": 4,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": 12,
+					"y": 0,
+					"blur": 32,
+					"spread": -6,
+					"color": "clr/shd/lo-x"
+				}
+			]
+		},
+		{
+			"name": "shd/right/max",
+			"layers": [
+				{
+					"inset": false,
+					"x": 3,
+					"y": 0,
+					"blur": 6,
+					"spread": 0,
+					"color": "clr/shd/lo"
+				},
+				{
+					"inset": false,
+					"x": 20,
+					"y": 0,
 					"blur": 48,
 					"spread": -8,
 					"color": "clr/shd/lo"

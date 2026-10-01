@@ -69,6 +69,19 @@ defineShadows({
 	min: [{ x: 0, y: 1, blur: 2, color: { color: 'shd', alpha: 'half' } }],
 });
 
+// @ts-expect-error offset needs directions on its set.
+defineShadows({ unit: 'px', min: [{ offset: 1, blur: 2, color: { color: 'shd' } }] });
+
+defineShadows({
+	unit: 'px',
+	// @ts-expect-error `sideways` is not a direction.
+	directions: ['sideways'],
+	min: [{ offset: 1, blur: 2, color: { color: 'shd' } }],
+	lo: [{ offset: 1, blur: 2, color: { color: 'shd' } }],
+	hi: [{ offset: 1, blur: 2, color: { color: 'shd' } }],
+	max: [{ offset: 1, blur: 2, color: { color: 'shd' } }],
+});
+
 // ---- Time ----
 
 // @ts-expect-error Time needs all four values.

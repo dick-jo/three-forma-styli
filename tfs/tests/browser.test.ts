@@ -67,7 +67,7 @@ describe('tokens.css in a browser', () => {
 	it('ordinary values at the root', async () => {
 		expect(await read('root', 'sp-1')).toBe('8px');
 		expect(await read('root', 'gap-s')).toBe('8px');
-		expect(await read('root', 'shd-max')).toBe(ORDINARY_MAX(DARK_SHD));
+		expect(await read('root', 'shd-down-max')).toBe(ORDINARY_MAX(DARK_SHD));
 	});
 
 	it('references follow a mode (gap follows spacing)', async () => {
@@ -78,26 +78,26 @@ describe('tokens.css in a browser', () => {
 	it('a mode with no changes restores ordinary values inside another mode', async () => {
 		expect(await read('s-regular', 'gap-s')).toBe('8px');
 		expect(await read('light-dark', 'clr-pri')).toBe('oklch(0.7 0.16 285)');
-		expect(await read('light-dark', 'shd-lo')).toContain(DARK_SHD);
+		expect(await read('light-dark', 'shd-down-lo')).toContain(DARK_SHD);
 	});
 
 	it('shadow colour follows theme', async () => {
-		expect(await read('light', 'shd-max')).toBe(ORDINARY_MAX(LIGHT_SHD));
+		expect(await read('light', 'shd-down-max')).toBe(ORDINARY_MAX(LIGHT_SHD));
 		expect(await read('light', 'shd-glow-pri-lo')).toBe(
 			'0px 0px 12px oklch(0.45 0.18 285 / 0.125)'
 		);
 	});
 
 	it('shadow shape follows size while colour follows theme, however they are nested', async () => {
-		expect(await read('s-then-light', 'shd-max')).toBe(SMALL_MAX(LIGHT_SHD));
-		expect(await read('light-then-s', 'shd-max')).toBe(SMALL_MAX(LIGHT_SHD));
-		expect(await read('both', 'shd-max')).toBe(SMALL_MAX(LIGHT_SHD));
+		expect(await read('s-then-light', 'shd-down-max')).toBe(SMALL_MAX(LIGHT_SHD));
+		expect(await read('light-then-s', 'shd-down-max')).toBe(SMALL_MAX(LIGHT_SHD));
+		expect(await read('both', 'shd-down-max')).toBe(SMALL_MAX(LIGHT_SHD));
 	});
 
 	it('the nearest size mode wins when size is re-nested', async () => {
-		expect(await read('s-regular-light', 'shd-max')).toBe(ORDINARY_MAX(LIGHT_SHD));
-		expect(await read('regular-s-light', 'shd-max')).toBe(SMALL_MAX(LIGHT_SHD));
-		expect(await read('s-regular-both', 'shd-max')).toBe(SMALL_MAX(LIGHT_SHD));
+		expect(await read('s-regular-light', 'shd-down-max')).toBe(ORDINARY_MAX(LIGHT_SHD));
+		expect(await read('regular-s-light', 'shd-down-max')).toBe(SMALL_MAX(LIGHT_SHD));
+		expect(await read('s-regular-both', 'shd-down-max')).toBe(SMALL_MAX(LIGHT_SHD));
 	});
 
 	it('a typography class applies the whole size row', async () => {
