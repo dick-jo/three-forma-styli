@@ -5,7 +5,7 @@ TypeScript files of deliberate choices (colours, spacing, type, shadows, motion)
 TFS derives the repetitive scales and emits framework-neutral CSS variables and
 exact TypeScript types for your app.
 
-> **Status:** `three-forma-styli` is on npm (0.5.1). (0.4.0 was four `@three-forma-styli/*` packages.)
+> **Status:** `three-forma-styli` is on npm (0.6.0). (0.4.0 was four `@three-forma-styli/*` packages.)
 
 ## Try it
 
