@@ -111,6 +111,9 @@ defineColors({
 
 - Every colour gets an alpha ramp from the ordinary Alpha scale.
 - `polarity` is optional: negative = lighter foregrounds, positive = darker.
+  `tokens.css` sets `color-scheme` from it (negative → `dark`, positive → `light`) on
+  `:root` and on every mode of the axis that changes polarity (`normal` where a mode
+  has none), so `light-dark()` and native controls follow the nearest palette.
 - Groups resolve at build time to exact literal lists and exact TypeScript types,
   including prefix groups. They add no CSS. Groups exist for Color only until
   another domain has a real need.
@@ -121,6 +124,8 @@ defineColors({
 
 - Configured at `project.runtime.colorThemes`; for customer palettes at runtime.
 - Exact input validation; each customer palette supplies its own polarity.
+  The result carries `colorScheme` for it; set it on the element that gets
+  `customProperties`.
 - No rule configured → `luminance: null`. Enforcing without a rule is a
   configuration error. No ignored `enforce` metadata.
 - Configured as `runtime: { colorThemes: { colors: [...] } }` in `tfs.config.ts`:

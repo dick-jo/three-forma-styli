@@ -7,6 +7,12 @@ import {
 } from './luminance.js';
 import { formatOklch, type OklchChannels } from './oklch.js';
 
+/** The CSS `color-scheme` for each polarity, so `light-dark()` and native controls follow the palette. */
+export const COLOR_SCHEMES = {
+	negative: 'dark',
+	positive: 'light',
+} as const satisfies Record<Polarity, string>;
+
 /** The generated ./color-theme contract: what customers may set, and the rule. */
 export type ColorThemeConfig<Color extends string = string> = {
 	readonly colors: readonly Color[];
@@ -24,6 +30,8 @@ export type RuntimeColorThemeResult<Color extends string = string> = {
 	readonly theme: RuntimeColorTheme<Color>;
 	/** `--clr-pri`, `--clr-pri-a-lo`, … ready to set on an element. */
 	readonly customProperties: Readonly<Record<string, string>>;
+	/** The `color-scheme` to set on the same element, from the theme's polarity. */
+	readonly colorScheme: (typeof COLOR_SCHEMES)[Polarity];
 	/** Contrast diagnostics, or null when the design system has no rule. */
 	readonly luminance: LuminanceResult | null;
 };
@@ -125,6 +133,7 @@ export function generateRuntimeColorTheme<const Color extends string>(
 	return Object.freeze({
 		theme,
 		customProperties: Object.freeze(customProperties),
+		colorScheme: COLOR_SCHEMES[theme.polarity],
 		luminance: config.luminance ? checkLuminance(emitted, config.luminance, theme.polarity) : null,
 	});
 }

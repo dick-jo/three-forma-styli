@@ -36,6 +36,10 @@ that is its own project, run `npx tfs init .` inside that project instead.
 (`fontFiles`: each font file's URL, for `<link rel="preload">`), and optional
 `generated/color-theme.js` with `three-forma-styli/runtime` for customer themes.
 
+`tokens.css` sets `color-scheme` from each palette's polarity, so `light-dark()`
+and native controls follow the theme. A customer theme's result carries the
+matching `colorScheme`: set it on the element that gets its `customProperties`.
+
 Font files are written as WOFF2 slices by Unicode range (`latin`, `latin-ext`,
 `other`), so pages download only what their text needs; preload the `latin` slice
 of the fonts on your first screen. Each role gets a fallback face sized to its own

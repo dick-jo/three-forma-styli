@@ -26,6 +26,11 @@ const page = `
 <div data-size-mode="s"><div data-size-mode="regular"><div data-theme-mode="light"><div id="s-regular-light"></div></div></div></div>
 <div data-size-mode="regular"><div data-size-mode="s"><div data-theme-mode="light"><div id="regular-s-light"></div></div></div></div>
 <div data-size-mode="s"><div data-size-mode="regular"><div data-theme-mode="light" data-size-mode="s"><div id="s-regular-both"></div></div></div></div>
+<p id="scheme-root" style="color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255))">x</p>
+<div data-theme-mode="light"><p id="scheme-light" style="color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255))">x</p>
+	<div data-theme-mode="dark"><p id="scheme-light-dark" style="color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255))">x</p></div>
+	<div data-size-mode="s"><p id="scheme-light-s" style="color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255))">x</p></div>
+</div>
 `;
 
 const DARK_SHD = 'oklch(0.06 0 0 / 0.25)';
@@ -131,6 +136,20 @@ describe('tokens.css in a browser', () => {
 			lineHeight: '15px',
 			fontFamily: fonts.stacks.label,
 		});
+	});
+
+	it('color-scheme follows the nearest palette polarity, so light-dark() resolves per theme', async () => {
+		const scheme = (id: string) =>
+			tab.$eval(`#${id}`, (element) => {
+				const s = getComputedStyle(element);
+				return { colorScheme: s.colorScheme, color: s.color };
+			});
+		const DARK = { colorScheme: 'dark', color: 'rgb(255, 255, 255)' };
+		const LIGHT = { colorScheme: 'light', color: 'rgb(0, 0, 0)' };
+		expect(await scheme('scheme-root')).toEqual(DARK);
+		expect(await scheme('scheme-light')).toEqual(LIGHT);
+		expect(await scheme('scheme-light-dark')).toEqual(DARK);
+		expect(await scheme('scheme-light-s')).toEqual(LIGHT);
 	});
 
 	it('font sizes follow size', async () => {

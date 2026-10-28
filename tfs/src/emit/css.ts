@@ -1,5 +1,7 @@
 import { GENERATED_HEADER } from '../const.js';
-import type { ResolvedSystem } from '../resolve/index.js';
+import type { ModalValues, ResolvedSystem } from '../resolve/index.js';
+import type { Polarity } from '../runtime/luminance.js';
+import { COLOR_SCHEMES } from '../runtime/theme.js';
 import { tokensFor, type FontStacks, type Token } from './tokens.js';
 
 type Values = ReadonlyMap<string, string>;
@@ -10,9 +12,23 @@ function toMap(tokens: readonly Token[]): Values {
 	return new Map(tokens.map((token) => [token.name, token.value]));
 }
 
-function block(selector: string, names: readonly string[], values: Values): string {
-	if (names.length === 0) return '';
-	return `${selector} {\n${names.map((name) => `\t--${name}: ${values.get(name)};`).join('\n')}\n}\n`;
+function block(
+	selector: string,
+	names: readonly string[],
+	values: Values,
+	colorScheme?: string
+): string {
+	const lines = [
+		...(colorScheme ? [`\tcolor-scheme: ${colorScheme};`] : []),
+		...names.map((name) => `\t--${name}: ${values.get(name)};`),
+	];
+	return lines.length === 0 ? '' : `${selector} {\n${lines.join('\n')}\n}\n`;
+}
+
+/** `normal` where no polarity is set, so a nested mode without one still resets the scheme. */
+function colorScheme(values: ModalValues): string {
+	const polarity = values.colors?.polarity as Polarity | undefined;
+	return polarity ? COLOR_SCHEMES[polarity] : 'normal';
 }
 
 function modeSelector(attribute: string, mode: string): string {
@@ -32,6 +48,10 @@ function modeSelector(attribute: string, mode: string): string {
  * selectors, so the other axis never resets its shape. They follow the nearest
  * ancestor's mode through one level of re-nesting on the same axis
  * (small → regular → light); deeper same-axis re-nesting is not supported.
+ *
+ * `color-scheme` follows colour polarity the same way: on :root, and on every mode
+ * of the axis that changes polarity, so `light-dark()` and native controls match
+ * the nearest palette.
  */
 export function emitTokensCss(resolved: ResolvedSystem, stacks: FontStacks = {}): string {
 	const ordinaryTokens = tokensFor(resolved, resolved.ordinary, stacks);
@@ -68,7 +88,14 @@ export function emitTokensCss(resolved: ResolvedSystem, stacks: FontStacks = {})
 		return found;
 	};
 
-	let css = `${GENERATED_HEADER}${block(':root', names, ordinary)}`;
+	const polarityAxis = resolved.modes.find(
+		(mode) => mode.values.colors?.polarity !== resolved.ordinary.colors?.polarity
+	)?.axis;
+	const rootScheme = resolved.ordinary.colors?.polarity
+		? colorScheme(resolved.ordinary)
+		: undefined;
+
+	let css = `${GENERATED_HEADER}${block(':root', names, ordinary, rootScheme)}`;
 	let combined = '';
 	for (const axis of axes) {
 		const axisModes = modes.filter((mode) => mode.axis === axis);
@@ -79,7 +106,8 @@ export function emitTokensCss(resolved: ResolvedSystem, stacks: FontStacks = {})
 			const values = new Map(
 				declared.map((name) => [name, (own.has(name) ? mode.tokens : ordinary).get(name)!])
 			);
-			css += block(modeSelector(mode.attribute, mode.mode), declared, values);
+			const scheme = axis === polarityAxis ? colorScheme(mode.values) : undefined;
+			css += block(modeSelector(mode.attribute, mode.mode), declared, values, scheme);
 		}
 		const inner = `[${axisModes[0]!.attribute}]`;
 		for (const other of modes.filter((mode) => mode.axis !== axis)) {

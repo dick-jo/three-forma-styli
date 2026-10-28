@@ -29,6 +29,11 @@ describe('runtime themes', () => {
 			expect(css).toContain(`\t${name}: ${value};`);
 	});
 
+	it('carry the color-scheme matching their polarity', () => {
+		expect(generateRuntimeColorTheme(themeable('ordinary'), colorTheme).colorScheme).toBe('dark');
+		expect(generateRuntimeColorTheme(themeable('light'), colorTheme).colorScheme).toBe('light');
+	});
+
 	it('measure the contrast rule for dark and light palettes', () => {
 		const dark = generateRuntimeColorTheme(themeable('ordinary'), colorTheme).luminance!;
 		expect(dark).toMatchObject({
