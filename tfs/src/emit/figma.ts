@@ -249,7 +249,7 @@ function figmaData(
 
 	const textStyles: FigmaData['textStyles'][number][] = [];
 	for (const [role, definition] of Object.entries(input.typography?.roles ?? {})) {
-		const family = figmaFamily(stacks[definition.font]);
+		const family = figmaFamily(stacks[role]);
 		if (!family) {
 			skipped.push(
 				`text styles for ${role}: font "${definition.font}" is a system font with no Figma equivalent`

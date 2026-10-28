@@ -6,7 +6,7 @@ import { TfsError } from '../resolve/issues.js';
 import { cssVar, length, name, num } from './format.js';
 import { rowName, rowsInOrder } from './names.js';
 
-/** CSS font-family value for each declared font, from prepareFonts(). */
+/** CSS font-family value for each role, from prepareFonts(). */
 export type FontStacks = Readonly<Record<string, string>>;
 
 /** One CSS custom property: name without the leading `--`, and its CSS value. */
@@ -123,9 +123,9 @@ export function tokensFor(
 
 	if (input.typography && values.roleSizes) {
 		for (const [role, definition] of Object.entries(input.typography.roles)) {
-			const stack = stacks[definition.font];
+			const stack = stacks[role];
 			if (stack === undefined)
-				throw new Error(`No font-family stack for "${definition.font}"; prepare fonts first.`);
+				throw new Error(`No font-family stack for role "${role}"; prepare fonts first.`);
 			const prefix = name(P.text, role);
 			add(name(prefix, 'font-family'), stack);
 			if (typeof definition.weights !== 'number') {

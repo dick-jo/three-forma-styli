@@ -108,7 +108,7 @@ describe('tokens.css in a browser', () => {
 			lineHeight: '15px',
 			letterSpacing: '0.18px',
 			textTransform: 'uppercase',
-			fontFamily: fonts.stacks.mono,
+			fontFamily: fonts.stacks.label,
 		});
 	});
 
@@ -129,7 +129,7 @@ describe('tokens.css in a browser', () => {
 			fontSize: '12px',
 			fontWeight: '500',
 			lineHeight: '15px',
-			fontFamily: fonts.stacks.mono,
+			fontFamily: fonts.stacks.label,
 		});
 	});
 

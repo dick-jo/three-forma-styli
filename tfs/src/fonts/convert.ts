@@ -14,9 +14,23 @@ async function fonttools(args: readonly string[]): Promise<void> {
 	}
 }
 
-/** TTF/OTF → WOFF2. */
-export function compressToWoff2(source: string, destination: string): Promise<void> {
-	return fonttools(['ttLib.woff2', 'compress', source, '-o', destination]);
+/**
+ * The characters in `unicodes` (a CSS unicode-range value) as WOFF2, from any font
+ * format. Variable axes and every OpenType layout feature are kept.
+ */
+export function subsetToWoff2(
+	source: string,
+	destination: string,
+	unicodes: string
+): Promise<void> {
+	return fonttools([
+		'subset',
+		source,
+		`--unicodes=${unicodes}`,
+		'--layout-features=*',
+		'--flavor=woff2',
+		`--output-file=${destination}`,
+	]);
 }
 
 /** WOFF2 → TTF, for measuring variable WOFF2 faces (fontkit cannot instance them). */

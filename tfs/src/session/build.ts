@@ -3,6 +3,7 @@ import { dirname, join, relative } from 'node:path';
 import { emitColorThemeJs, emitColorThemeTypes } from '../emit/color-theme.js';
 import { emitTokensCss } from '../emit/css.js';
 import { emitFigmaJson } from '../emit/figma.js';
+import { emitFontsJs, emitFontsTypes } from '../emit/fonts.js';
 import { emitTokensJs, emitTokensTypes } from '../emit/tokens-module.js';
 import {
 	emitTypographyCss,
@@ -36,6 +37,8 @@ function textFiles(
 	const styles = ['tokens.css'];
 	if (fonts && fonts.css) {
 		files['fonts.css'] = GENERATED_HEADER + fonts.css;
+		files['fonts.js'] = emitFontsJs(fonts.files);
+		files['fonts.d.ts'] = emitFontsTypes(fonts.files);
 		styles.push('fonts.css');
 	}
 	if (resolved.input.typography) {
@@ -65,7 +68,7 @@ const GIT_IGNORE = '.gitignore';
 async function generateInto(loaded: LoadedConfig, directory: string): Promise<BuildResult> {
 	const resolved = resolveSystem(loaded.config.system);
 	const fonts = loaded.config.system.typography
-		? await prepareFonts(loaded.config.system.typography, loaded.projectDir)
+		? await prepareFonts(loaded.config.system, loaded.projectDir)
 		: undefined;
 	const files = textFiles(loaded, resolved, fonts);
 	await mkdir(directory, { recursive: true });

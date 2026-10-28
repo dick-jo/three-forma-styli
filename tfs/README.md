@@ -32,11 +32,16 @@ that is its own project, run `npx tfs init .` inside that project instead.
 
 `generated/styles.css` (all CSS: tokens, fonts, typography classes),
 `generated/tokens.d.ts` (exact names and group types, `cssVar()`),
-`generated/typography.d.ts` (`typographyClassName()`), and optional
+`generated/typography.d.ts` (`typographyClassName()`), `generated/fonts.js`
+(`fontFiles`: each font file's URL, for `<link rel="preload">`), and optional
 `generated/color-theme.js` with `three-forma-styli/runtime` for customer themes.
 
-Font files are converted with [FontTools](https://github.com/fonttools/fonttools)
-(`pip install fonttools brotli`) when a design system ships TTF/OTF fonts.
+Font files are written as WOFF2 slices by Unicode range (`latin`, `latin-ext`,
+`other`), so pages download only what their text needs; preload the `latin` slice
+of the fonts on your first screen. Each role gets a fallback face sized to its own
+text (case, weight, kerning, optical size), so text barely moves when the font
+arrives. Needs [FontTools](https://github.com/fonttools/fonttools)
+(`pip install fonttools brotli`) when a design system ships font files.
 Requires Node 24+.
 
 Source and design decisions: https://github.com/dick-jo/three-forma-styli

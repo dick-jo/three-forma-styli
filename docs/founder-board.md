@@ -215,10 +215,21 @@ defineFonts({
 });
 ```
 
-- With `files`: TFS reads family/styles/weights, checks roles against them, copies
-  `.woff2/.woff` or converts `.ttf/.otf` to WOFF2 (FontTools), emits `@font-face`
-  and size-matched fallback faces. Optional `name` overrides the CSS family,
+- With `files`: TFS reads family/styles/weights, checks roles against them, writes
+  each file as WOFF2 slices by Unicode range (FontTools), emits `@font-face` and
+  size-matched fallback faces. Optional `name` overrides the CSS family,
   optional `display`.
+- Slices: `latin` and `latin-ext` (Google Fonts' ranges) and `other` (everything
+  else the file covers), each its own `@font-face` with `unicode-range`, so a page
+  downloads only the slices its characters need. Variable axes and every layout
+  feature are kept; no character is dropped.
+- Fallback faces (sans and mono): a local Arial or Courier New scaled to the real
+  font with Fontpie's formula, measured against the text each role renders: its
+  case (uppercase roles measure capitals), its weights, kerning as browsers apply
+  it, and for fonts with an `opsz` axis the optical size at the role's base size.
+  Roles that measure alike share one family (`Geist fallback`); others get their
+  own (`Geist caps fallback`, `Inter opsz 20 fallback`). Each role's
+  `font-family` token names its own family.
 - Name only: TFS writes the family name; the OS, app or a font service loads it;
   nothing is checked.
 - Font licensing is outside TFS: no licence fields, attestations or permission gates.
@@ -261,7 +272,7 @@ label: {
 - **Classes only where one variable cannot do the job in one line.** That is
   typography only: `text--label-s` (size row), `text--label-style-italic`,
   `text--label-weight-max`, global and CSS Modules. No other classes.
-- `@font-face` and fallback faces for file fonts.
+- `@font-face` per Unicode slice and fallback faces for file fonts.
 - Token names must not collide; the build rejects collisions.
 
 **TypeScript** (generated, dependency-free ESM + `.d.ts`)
@@ -270,6 +281,9 @@ label: {
   (`ColorGroup<'accents'>`), and `var()` helpers.
 - `./typography`: typed selection → class names
   (`{ role: 'label', size: 's', weight: 'max', fontStyle: 'italic' }`).
+- `./fonts` (`fonts.js`): `fontFiles[font][face][slice]`, each slice's URL via
+  `new URL(…, import.meta.url)`, so bundlers emit the same file the CSS uses. For
+  preloading: `fontFiles.inter['normal-100-900'].latin`.
 - No full resolved-value dump for apps; detailed data is for Workbench only.
 - Public colour types are structural (no Culori types required by consumers).
 

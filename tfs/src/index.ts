@@ -27,6 +27,7 @@ export {
 	type SystemInput,
 } from './resolve/index.js';
 export { emitTokensCss } from './emit/css.js';
+export { emitFontsJs, emitFontsTypes } from './emit/fonts.js';
 export {
 	inspectFontFile,
 	prepareFonts,

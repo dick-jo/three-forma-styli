@@ -68,9 +68,14 @@ handled one axis only).
 
 ## Backlog
 
-- **Drop the Python dependency:** replace FontTools with a WebAssembly WOFF2 library from
-  npm, so `npm install` is all TFS needs. Must produce byte-identical output (the font
+- **Drop the Python dependency:** replace FontTools (subsetting and WOFF2) with WebAssembly
+  libraries from npm, so `npm install` is all TFS needs. Must produce byte-identical output (the font
   tests and committed snapshots prove it). Raised by the rkgk setup, 2026-09-28.
+- **Fallbacks per optical size:** a role has one fallback family, calibrated at its base
+  size, but fonts with an `opsz` axis narrow as text grows: Scatter's Inter prose is
+  ~1% narrower at 16px and ~2% at 18px than its fallback. A family per distinct optical
+  size of a role's sizes (and a per-size `font-family` token) would remove it. Raised by
+  Scatter's fallback conformance story, 2026-10-28.
 - **Figma "as typed" text style twins:** Figma text styles can't override letter case
   without detaching, so code's `<Text textTransform="none">` has no Figma equivalent.
   For roles whose `textTransform` isn't `none`, also emit `{role}/as typed/{size}`:

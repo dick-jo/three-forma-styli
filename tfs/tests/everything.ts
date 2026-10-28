@@ -7,4 +7,4 @@ export const project = fileURLToPath(new URL('./fixtures/everything/', import.me
 export const config = everything;
 export const system = config.system as unknown as SystemInput;
 export const resolved = resolveSystem(system);
-export const fonts = await prepareFonts(system.typography!, project);
+export const fonts = await prepareFonts(system, project);
