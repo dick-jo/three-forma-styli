@@ -19,6 +19,19 @@ import {
 import { project, system } from './everything.js';
 
 const regular = join(project, 'fonts/JetBrainsMono[wght].ttf');
+/** The slices JetBrains Mono has characters for, in the order a browser tries them. */
+const MONO_SLICES = [
+	'latin',
+	'latin-ext',
+	'vietnamese',
+	'greek',
+	'cyrillic',
+	'cyrillic-ext',
+	'math',
+	'symbols',
+	'other',
+];
+const file = (slice: string) => `mono-normal-100-800-${slice}.woff2`;
 
 /** The everything-project with its typography changed by `change`. */
 function withTypography(change: (typography: any) => void): SystemInput {
@@ -65,11 +78,7 @@ describe('preparation', () => {
 		const sources = [...prepared.css.matchAll(/url\("\.\/fonts\/(mono-normal[^"]+)"\)/g)].map(
 			(match) => match[1]
 		);
-		expect(sources).toEqual([
-			'mono-normal-100-800-other.woff2',
-			'mono-normal-100-800-latin-ext.woff2',
-			'mono-normal-100-800-latin.woff2',
-		]);
+		expect(sources).toEqual([...MONO_SLICES].reverse().map(file));
 		expect(prepared.css).toContain(
 			'src: url("./fonts/mono-normal-100-800-latin.woff2") format("woff2");\n\tfont-weight: 100 800;\n\tfont-style: normal;\n\tfont-display: swap;\n\tunicode-range: U+0-FF, U+131,'
 		);
@@ -232,11 +241,7 @@ describe('output files', () => {
 		const slices = (await readdir(join(out, 'fonts'))).filter((file) =>
 			file.startsWith('mono-normal-')
 		);
-		expect(slices.sort()).toEqual([
-			'mono-normal-100-800-latin-ext.woff2',
-			'mono-normal-100-800-latin.woff2',
-			'mono-normal-100-800-other.woff2',
-		]);
+		expect(slices.sort()).toEqual(MONO_SLICES.map(file).sort());
 		const covered = new Set(slices.flatMap((file) => open(file).characterSet));
 		expect([...new Set(source.characterSet)].filter((c) => !covered.has(c))).toEqual([]);
 		for (const file of slices) {
@@ -292,8 +297,16 @@ describe('output files', () => {
 			'mono-normal-100-800-latin.woff2',
 			'mono-normal-100-800-latin-ext.woff2',
 		]);
-		await add('Привет');
-		expect(requested.at(-1)).toBe('mono-normal-100-800-other.woff2');
+		// One character from each kind of slice downloads that slice alone.
+		for (const [text, slice] of [
+			['Привет', 'cyrillic'],
+			['■', 'symbols'],
+			['─', 'other'],
+		] as const) {
+			const before = requested.length;
+			await add(text);
+			expect(requested.slice(before)).toEqual([file(slice)]);
+		}
 		await browser.close();
 	});
 });

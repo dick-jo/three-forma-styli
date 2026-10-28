@@ -5,11 +5,23 @@ export declare const fontFiles: {
 		readonly "normal-100-800": {
 			readonly "latin": string;
 			readonly "latin-ext": string;
+			readonly "vietnamese": string;
+			readonly "greek": string;
+			readonly "cyrillic": string;
+			readonly "cyrillic-ext": string;
+			readonly "math": string;
+			readonly "symbols": string;
 			readonly "other": string;
 		};
 		readonly "italic-100-800": {
 			readonly "latin": string;
 			readonly "latin-ext": string;
+			readonly "vietnamese": string;
+			readonly "greek": string;
+			readonly "cyrillic": string;
+			readonly "cyrillic-ext": string;
+			readonly "math": string;
+			readonly "symbols": string;
 			readonly "other": string;
 		};
 	};
