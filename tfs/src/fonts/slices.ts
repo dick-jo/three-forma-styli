@@ -6,7 +6,7 @@ import type { Font } from 'fontkit';
  * `latin` and `latin-ext` are Google Fonts' ranges (as served by its CSS API,
  * 2026-10); `other` is everything else the font covers, so no glyph is lost.
  */
-export const SLICES = ['latin', 'latin-ext', 'other'] as const;
+const SLICES = ['latin', 'latin-ext', 'other'] as const;
 export type Slice = (typeof SLICES)[number];
 
 type Range = readonly [number, number];

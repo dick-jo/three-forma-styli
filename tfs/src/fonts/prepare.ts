@@ -210,11 +210,13 @@ export async function prepareFonts(
 			files[id] = {};
 			for (const face of faces[id]!) {
 				const key = faceKey(face);
-				files[id][key] = {};
+				const slices = slicesOf(face.font);
+				files[id][key] = Object.fromEntries(
+					slices.map(({ slice }) => [slice, `${id}-${key}-${slice}.woff2`])
+				);
 				// Declared last-first: where ranges overlap, the last rule is tried first.
-				for (const { slice, unicodeRange } of slicesOf(face.font).reverse()) {
-					const output = `${id}-${key}-${slice}.woff2`;
-					files[id][key][slice] = output;
+				for (const { slice, unicodeRange } of [...slices].reverse()) {
+					const output = files[id][key][slice]!;
 					assets.push({ source: face.file, output, unicodes: unicodeRange });
 					rules.push(
 						`@font-face {\n\tfont-family: ${family(name)};\n\tsrc: url("./fonts/${output}") format("woff2");\n\tfont-weight: ${weightRange(face.weight)};\n\tfont-style: ${face.style};\n\tfont-display: ${font.display ?? 'swap'};\n\tunicode-range: ${unicodeRange};\n}`
