@@ -224,9 +224,11 @@ defineFonts({
   each file as WOFF2 slices by Unicode range (FontTools), emits `@font-face` and
   size-matched fallback faces. Optional `name` overrides the CSS family,
   optional `display`.
-- Slices: `latin` and `latin-ext` (Google Fonts' ranges) and `other` (everything
-  else the file covers), each its own `@font-face` with `unicode-range`, so a page
-  downloads only the slices its characters need. Variable axes and every layout
+- Slices: Google Fonts' subsets and ranges (`latin`, `latin-ext`, `vietnamese`,
+  `greek`, `greek-ext`, `cyrillic`, `cyrillic-ext`, `math`, `symbols`) and `other`
+  (everything else the file covers), each its own `@font-face` with `unicode-range`,
+  so a page downloads only the slices its characters need. Only slices the file has
+  characters for are written. Variable axes and every layout
   feature are kept; no character is dropped.
 - Fallback faces (sans and mono): a local Arial or Courier New scaled to the real
   font with Fontpie's formula, measured against the text each role renders: its
@@ -288,7 +290,10 @@ label: {
   (`{ role: 'label', size: 's', weight: 'max', fontStyle: 'italic' }`).
 - `./fonts` (`fonts.js`): `fontFiles[font][face][slice]`, each slice's URL via
   `new URL(…, import.meta.url)`, so bundlers emit the same file the CSS uses. For
-  preloading: `fontFiles.inter['normal-100-900'].latin`.
+  preloading: `fontFiles.inter['normal-100-900'].latin`. Verified in production
+  builds of Next.js (Turbopack and webpack) and Vite in the browser. Vite's
+  server-side rendering returns `file:` URLs (a Vite limitation), so SvelteKit
+  preloads through its own `preload` option instead (README).
 - No full resolved-value dump for apps; detailed data is for Workbench only.
 - Public colour types are structural (no Culori types required by consumers).
 
@@ -326,10 +331,10 @@ tfs/            the one npm package: three-forma-styli
   src/define/   defineX() helpers and authoring types, one file per family
   src/resolve/  checks and mode resolution, one file per family
   src/emit/     CSS, ./tokens, ./typography, Workbench data
-  src/fonts/    inspection, conversion, fallback metrics
-  src/color/    OKLCH, luminance, runtime colour themes
+  src/fonts/    inspection, Unicode slices, conversion, fallback metrics
   src/session/  tfs dev, build, check
-  src/runtime/  three-forma-styli/runtime (small, no dependencies)
+  src/runtime/  three-forma-styli/runtime: OKLCH, luminance, customer colour themes
+                (small, no dependencies)
   themes/standard/
   tests/        including the everything-project fixture
 workbench/      UI; reads the data file TFS writes, nothing else

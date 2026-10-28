@@ -7,9 +7,10 @@ The agreed runbook and where we are. Decisions live in [founder-board.md](./foun
 - Blueprint complete and ratified, 2026-09-28.
 - Runbook agreed 2026-09-28: **clean slate**. Rebuild as one package against the
   Board; copy in only the proven parts listed below; delete everything else.
-- `three-forma-styli@0.5.0` published 2026-09-28 (git tag `v0.5.0`, on `master`). Recovery: tag `pre-v05-cleanup` (full pre-cleanup tree, docs and history) and
+- `three-forma-styli@0.5.0` published 2026-09-28 (git tag `v0.5.0`, on `master`); latest
+  is 0.7.0 (2026-10-29), each release tagged `vX.Y.Z`. Recovery: tag `pre-v05-cleanup` (full pre-cleanup tree, docs and history) and
   published tag `@three-forma-styli/*@0.4.0`.
-- Scatter depends on npm `0.4.0` (pinned) and is untouched until step 13.
+- Scatter depends on npm `0.6.0` (pinned); 0.7.0 next.
 
 ## Runbook
 

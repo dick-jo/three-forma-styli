@@ -40,9 +40,22 @@ that is its own project, run `npx tfs init .` inside that project instead.
 and native controls follow the theme. A customer theme's result carries the
 matching `colorScheme`: set it on the element that gets its `customProperties`.
 
-Font files are written as WOFF2 slices by Unicode range (`latin`, `latin-ext`,
-`other`), so pages download only what their text needs; preload the `latin` slice
-of the fonts on your first screen. Each role gets a fallback face sized to its own
+Font files are written as WOFF2 slices by Unicode range (Google Fonts' subsets:
+`latin`, `latin-ext`, `greek`, `cyrillic`, `symbols` and so on, plus `other`), so
+pages download only what their text needs. Preload the `latin` slice of the fonts
+on your first screen: with `fontFiles` from `fonts.js` in Next.js or any
+client-side code; in SvelteKit, which can't use it during server rendering, with
+SvelteKit's own option in `hooks.server.ts`:
+
+```ts
+export const handle = ({ event, resolve }) =>
+	resolve(event, {
+		preload: ({ type, path }) =>
+			type === 'js' || type === 'css' || (type === 'font' && /-latin(?!-ext)/.test(path)),
+	});
+```
+
+Each role gets a fallback face sized to its own
 text (case, weight, kerning, optical size), so text barely moves when the font
 arrives. Needs [FontTools](https://github.com/fonttools/fonttools)
 (`pip install fonttools brotli`) when a design system ships font files.
